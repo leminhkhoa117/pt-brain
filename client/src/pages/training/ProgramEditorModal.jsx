@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert, Icon, Spinner } from '../../components/ui.jsx';
-import { listExercises, updateProgram } from '../../api/training.js';
+import ExercisePickerModal from './ExercisePickerModal.jsx';
+import { updateProgram, createProgram } from '../../api/training.js';
 import { getErrorMessage } from '../../api/client.js';
 import { GOAL_LABELS } from '../../lib/format.js';
 import { MUSCLE_LABELS_VI } from '@shared/training/planner.js';
@@ -14,9 +15,8 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState(() => clone(program));
   const [error, setError] = useState(null);
-
-  const exercisesQuery = useQuery({ queryKey: ['exercises'], queryFn: () => listExercises() });
-  const exercises = useMemo(() => exercisesQuery.data?.exercises || [], [exercisesQuery.data]);
+  const [picker, setPicker] = useState(null);
+  const isNew = !draft._id;
 
   const update = (patch) => setDraft((prev) => ({ ...prev, ...patch }));
 
@@ -49,16 +49,15 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
     setDraft((prev) => ({ ...prev, days: prev.days.filter((_, i) => i !== index) }));
 
   const addExercise = (dayIndex) => {
-    const first = exercises[0];
-    if (!first) return;
     const day = draft.days[dayIndex];
+    const newIndex = day.exercises.length;
     updateDay(dayIndex, {
       exercises: [
         ...day.exercises,
         {
-          exerciseId: first._id,
-          name: first.nameVi,
-          muscleGroup: first.primaryMuscles[0],
+          exerciseId: undefined,
+          name: '',
+          muscleGroup: '',
           sets: 3,
           repRange: { min: 8, max: 12 },
           targetRir: 2,
@@ -66,6 +65,26 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
         },
       ],
     });
+    setPicker({ dayIndex, exIndex: newIndex, newRow: true });
+  };
+
+  const closePicker = () => {
+    if (picker?.newRow) {
+      const { dayIndex, exIndex } = picker;
+      setDraft((prev) => {
+        const exercise = prev.days[dayIndex]?.exercises[exIndex];
+        if (!exercise || exercise.name?.trim()) return prev;
+        return {
+          ...prev,
+          days: prev.days.map((day, index) =>
+            index === dayIndex
+              ? { ...day, exercises: day.exercises.filter((_, i) => i !== exIndex) }
+              : day,
+          ),
+        };
+      });
+    }
+    setPicker(null);
   };
 
   const removeExercise = (dayIndex, exIndex) =>
@@ -98,17 +117,24 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
         .filter((day) => day.exercises.length > 0);
 
       if (!days.length) throw new Error('Cần ít nhất 1 ngày có bài tập');
-      return updateProgram(draft._id, {
-        name: draft.name.trim(),
+
+      const payload = {
+        name: draft.name.trim() || 'Giáo án của tôi',
         goal: draft.goal,
-        daysPerWeek: Math.max(1, Math.min(7, Number(draft.daysPerWeek) || days.length)),
-        deloadEveryWeeks: Math.max(3, Math.min(12, Number(draft.deloadEveryWeeks) || 6)),
+        daysPerWeek: days.length,
+        split: draft.split || 'custom',
+        equipment: draft.equipment || [],
         days,
-      });
+        status: draft.status || 'active',
+        deloadEveryWeeks: Math.max(3, Math.min(12, Number(draft.deloadEveryWeeks) || 6)),
+        notes: draft.notes || '',
+      };
+
+      return isNew ? createProgram(payload) : updateProgram(draft._id, payload);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['programs'] });
-      queryClient.invalidateQueries({ queryKey: ['program', draft._id] });
+      if (!isNew) queryClient.invalidateQueries({ queryKey: ['program', draft._id] });
       onSaved?.(data.program);
     },
     onError: (err) => setError(getErrorMessage(err)),
@@ -120,9 +146,16 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600 dark:text-brand-300">
-              Chỉnh sửa giáo án
+              {isNew ? 'Tự tạo giáo án' : 'Chỉnh sửa giáo án'}
             </p>
-            <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">{draft.name}</h2>
+            <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+              {draft.name || (isNew ? 'Giáo án của tôi' : 'Giáo án')}
+            </h2>
+            {isNew && (
+              <p className="mt-1 text-xs text-slate-400">
+                Thêm ngày, chọn bài theo nhóm cơ, đặt set/rep/RIR rồi lưu.
+              </p>
+            )}
           </div>
           <button type="button" className="btn-ghost !p-2" onClick={onClose}>
             <Icon name="close" className="h-4 w-4" />
@@ -201,26 +234,16 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
                     key={exIndex}
                     className="grid grid-cols-2 gap-1.5 rounded-xl bg-slate-50 p-2 dark:bg-white/[0.03] sm:grid-cols-[minmax(0,1.6fr)_repeat(5,minmax(0,0.55fr))_auto] sm:bg-transparent sm:p-0 dark:sm:bg-transparent"
                   >
-                    <select
-                      className="input col-span-2 !py-1.5 text-xs sm:col-span-1"
-                      value={exercise.name}
-                      onChange={(e) => {
-                        const found = exercises.find((item) => item.nameVi === e.target.value);
-                        if (!found) return;
-                        updateExercise(dayIndex, exIndex, {
-                          exerciseId: found._id,
-                          name: found.nameVi,
-                          muscleGroup: found.primaryMuscles[0],
-                        });
-                      }}
+                    <button
+                      type="button"
+                      onClick={() => setPicker({ dayIndex, exIndex })}
+                      className="input col-span-2 flex items-center justify-between gap-2 !py-1.5 text-left text-xs sm:col-span-1"
                     >
-                      <option value="">Chọn bài...</option>
-                      {exercises.map((item) => (
-                        <option key={item._id} value={item.nameVi}>
-                          {item.nameVi}
-                        </option>
-                      ))}
-                    </select>
+                      <span className={exercise.name ? 'truncate' : 'text-slate-400'}>
+                        {exercise.name || 'Chọn bài...'}
+                      </span>
+                      <Icon name="chevronDown" className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    </button>
                     <input
                       type="number"
                       className="input !py-1.5 text-xs"
@@ -318,13 +341,30 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
             onClick={() => save.mutate()}
           >
             {save.isPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="check" className="h-4 w-4" />}
-            {save.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+            {save.isPending ? 'Đang lưu...' : isNew ? 'Tạo giáo án' : 'Lưu thay đổi'}
           </button>
           <button type="button" className="btn-ghost" onClick={onClose}>
             Hủy
           </button>
         </div>
       </div>
+
+      <ExercisePickerModal
+        open={Boolean(picker)}
+        onClose={closePicker}
+        selectedName={
+          picker ? draft.days[picker.dayIndex]?.exercises[picker.exIndex]?.name || '' : ''
+        }
+        onSelect={(item) => {
+          if (!picker) return;
+          updateExercise(picker.dayIndex, picker.exIndex, {
+            exerciseId: item._id,
+            name: item.nameVi,
+            muscleGroup: item.primaryMuscles[0],
+          });
+          setPicker(null);
+        }}
+      />
     </div>
   );
 }

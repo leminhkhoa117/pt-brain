@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../../components/ui.jsx';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import AiPlanModal from './AiPlanModal.jsx';
 import ProgramEditorModal from './ProgramEditorModal.jsx';
 import PlanEvaluationModal from './PlanEvaluationModal.jsx';
@@ -132,7 +133,9 @@ function ProgramDays({ days }) {
 
 export default function PlannerPage() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [showWizard, setShowWizard] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState(initialForm);
   const [preview, setPreview] = useState(null);
@@ -222,6 +225,14 @@ export default function PlannerPage() {
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
+              className="btn-primary"
+              onClick={() => setCreating(true)}
+            >
+              <Icon name="plus" className="h-4 w-4" />
+              Tự tạo giáo án
+            </button>
+            <button
+              type="button"
               className="btn-secondary"
               onClick={() => setAiOpen(true)}
             >
@@ -230,14 +241,14 @@ export default function PlannerPage() {
             </button>
             <button
               type="button"
-              className="btn-primary"
+              className="btn-ghost"
               onClick={() => {
                 setPreview(null);
                 setShowWizard((v) => !v);
               }}
             >
-              <Icon name="plus" className="h-4 w-4" />
-              {showWizard ? 'Đóng wizard' : 'Tạo giáo án mới'}
+              <Icon name="dumbbell" className="h-4 w-4" />
+              {showWizard ? 'Đóng wizard' : 'Tạo nhanh'}
             </button>
           </div>
         }
@@ -527,6 +538,27 @@ export default function PlannerPage() {
             setAiOpen(false);
             setSelectedId(program._id);
             setNotice('Đã lưu giáo án do AI đề xuất.');
+          }}
+        />
+      )}
+      {creating && (
+        <ProgramEditorModal
+          program={{
+            name: 'Giáo án của tôi',
+            goal: user?.profile?.goal || 'lean_bulk',
+            daysPerWeek: 4,
+            split: 'custom',
+            equipment: [],
+            days: [{ name: 'Buổi 1', exercises: [] }],
+            deloadEveryWeeks: 6,
+            status: 'active',
+            notes: '',
+          }}
+          onClose={() => setCreating(false)}
+          onSaved={(program) => {
+            setCreating(false);
+            setSelectedId(program._id);
+            setNotice('Đã tạo giáo án mới. Bạn có thể chỉnh sửa bất cứ lúc nào.');
           }}
         />
       )}

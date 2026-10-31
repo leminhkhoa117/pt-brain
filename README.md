@@ -137,7 +137,7 @@ pt-brain/
 - Lưu bài vào thư viện, mở Reader với DOI đã chọn.
 
 ### Giai đoạn 4 — Planner + Workout Log
-- Thư viện 42 bài tập (seed idempotent), tên Việt + Anh, nhóm cơ, dụng cụ.
+- Thư viện 105 bài tập (seed idempotent), tên Việt + Anh, nhóm cơ, dụng cụ.
 - Wizard giáo án theo quy tắc trong code: full body / upper–lower / PPL, số set/rep/RIR/rest theo mục tiêu và trình độ.
 - Volume theo nhóm cơ mỗi tuần, thanh so với mục tiêu 10–20 set, cảnh báo thiếu/quá nhiều.
 - Log buổi tập: tạ, rep, RIR, so sánh buổi trước, tonnage, set/nhóm cơ, 1RM ước tính.
@@ -165,8 +165,9 @@ pt-brain/
 - **Nav bar lên header**: bỏ sidebar, menu ngang 6 mục chính + “Thêm”, mobile có bottom nav và drawer.
 - **AI đánh giá thể trạng qua ảnh**: 1-4 ảnh (trước/nghiêng/sau), phân tích dựa trên hồ sơ + mục tiêu; trả % mỡ dạng **khoảng** + độ tin cậy, nhận xét cơ/tư thế, ưu tiên, điều chỉnh tập/dinh dưỡng; ảnh lưu riêng tư và xóa được.
 - **Calo từ ảnh bữa ăn**: nhận diện món, khẩu phần, calo/macro, giả định và độ tin cậy; lưu ảnh + thông tin bữa; tổng calo/protein trong ngày so với mục tiêu.
-- **Trang Buổi tập & Bài tập**: lịch sử buổi tập có chi tiết set, tonnage, xóa; thư viện 42 bài tập lọc theo cơ/dụng cụ.
-- **Sửa giáo án**: đổi tên/mục tiêu/deload, thêm/xóa ngày, thêm/xóa bài, chỉnh set/rep/RIR/rest.
+- **Trang Buổi tập & Bài tập**: lịch sử buổi tập có chi tiết set, tonnage, xóa; thư viện 105 bài tập lọc theo cơ/dụng cụ.
+- **Tự tạo giáo án**: mở form trống, thêm ngày, chọn bài qua popup thư viện (tab nhóm cơ, tìm kiếm, lọc dụng cụ), đặt set/rep/RIR/rest rồi lưu.
+- **Sửa giáo án**: đổi tên/mục tiêu/deload, thêm/xóa ngày, thêm/xóa bài, chỉnh set/rep/RIR/rest; chọn bài bằng popup thay vì dropdown.
 - **AI đề xuất giáo án**: dựa trên hồ sơ, dụng cụ, thời gian và evidence base; preview, có thể lưu hoặc để hệ thống fallback theo quy tắc nếu AI lỗi.
 - **Chấm điểm giáo án**: điểm 0-100 + hạng, 7 subscore (volume, tần suất, cân bằng, RIR, hồi phục, đặc hiệu, tiến bộ), điểm mạnh/vấn đề/đề xuất và trích dẫn nghiên cứu.
 
@@ -254,7 +255,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
   - Reader fulltext OA: `sourceKind=open_access_fulltext`, 7.7k ký tự, mức 4, 4 kết quả chính.
   - **PDF có sẵn `000441029.pdf`**: `POST /summaries` trả **202 sau 0s**, job nền 226s với tiến trình `Đang đọc đoạn 1/4 → 4/4 → tổng hợp`; kết quả `ready`, toàn văn 53.902 ký tự, tiêu đề AI “Leg Power Predicts Cognitive Ageing in Twins”, 8 kết quả chính, mức bằng chứng 3.
   - Finder: 28s, 3 truy vấn, 53 kết quả thô → 14 bài sau gộp → 8 kết quả, tổng hợp có trích dẫn.
-  - Planner: 42 bài seed, giáo án 4 buổi = 73 set/tuần, volume đúng theo phép cộng tay.
+  - Planner: 105 bài seed, giáo án 4 buổi = 73 set/tuần, volume đúng theo phép cộng tay.
   - Log 3 buổi → gợi ý tăng tạ 42.5 / 52.5 / 62.5 kg; 1RM progression đúng.
   - Apply-to-plan: 11s, 4 thay đổi trước→sau, áp dụng thành công.
   - SM-2: thẻ mới quality 5 → interval 1 ngày, ease 2.6.
@@ -265,6 +266,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
   - **AI vision**: ảnh táo → bữa ăn 95 kcal (P 0.5 / C 25 / F 0.3), độ tin cậy thấp đúng như kỳ vọng với ảnh minh họa.
   - **AI thể trạng**: ảnh silhouette → từ chối đánh giá hình thể, chỉ đưa khoảng 14-19% dựa trên số liệu tự báo + caveat; đúng hành vi an toàn.
   - **AI plan**: 53s, 4 ngày, 26 bài, rationale + evidence `[E1][E2][E4][E5][E6][E8]`; **chấm điểm**: 30s, 96/A+, 5 đề xuất, trích dẫn `[E1][E5][E6][E8]`.
+  - **Tự tạo giáo án**: form trống → popup 105 bài, tab nhóm cơ, tìm “squat” còn 8 bài → chọn Goblet squat → lưu 201; xóa sạch sau kiểm thử.
   - Production: chạy `SERVE_CLIENT=true` trên cổng 4100 → `/` trả HTML có manifest và asset, `/api/health` OK.
 - UI đã kiểm tra bằng trình duyệt thật: Dashboard, BodyLog (ảnh + PDF), 4 tab máy tính, Reader (kể cả màn hình đang xử lý + polling), Finder, Thư viện, Planner, Workout, Glossary, Flashcards, Clients, modal Apply-to-plan; không có lỗi console.
 
