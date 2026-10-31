@@ -16,6 +16,7 @@ export const listSummaries = (params = {}) =>
   api.get('/summaries', { params }).then(unwrap);
 export const getSummary = (id) => api.get(`/summaries/${id}`).then(unwrap);
 export const deleteSummary = (id) => api.delete(`/summaries/${id}`).then(unwrap);
+export const retrySummary = (id) => api.post(`/summaries/${id}/retry`).then(unwrap);
 export const updateSummaryMeta = (id, payload) =>
   api.patch(`/summaries/${id}`, payload).then(unwrap);
 export const askSummary = (id, question) =>
@@ -24,6 +25,8 @@ export const summaryExportUrl = (id) =>
   `${api.defaults.baseURL}/summaries/${id}/export.md`;
 export const summaryPdfUrl = (id) =>
   `${api.defaults.baseURL}/summaries/${id}/export.pdf`;
+export const clearSummaryChat = (id) =>
+  api.delete(`/summaries/${id}/chat`).then(unwrap);
 
 export const createTerm = (payload) => api.post('/terms', payload).then(unwrap);
 export const listTerms = () => api.get('/terms').then(unwrap);

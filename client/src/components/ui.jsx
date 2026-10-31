@@ -177,13 +177,22 @@ export function Card({ className, children, ...props }) {
   );
 }
 
-export function PageHeader({ title, subtitle, actions }) {
+export function PageHeader({ title, subtitle, eyebrow, actions }) {
   return (
-    <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>
+    <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+      <div className="max-w-2xl">
+        {eyebrow && (
+          <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-600 dark:text-brand-300">
+            {eyebrow}
+          </p>
+        )}
+        <h1 className="text-[1.65rem] font-extrabold leading-tight tracking-[-0.02em] text-slate-900 dark:text-white sm:text-3xl">
+          {title}
+        </h1>
         {subtitle && (
-          <p className="mt-1 max-w-2xl text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+            {subtitle}
+          </p>
         )}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -200,24 +209,28 @@ const STAT_TONES = {
 
 export function Stat({ label, value, unit, hint, tone = 'default', icon }) {
   return (
-    <div className="card">
+    <div className="card hover-lift overflow-hidden">
+      <span
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-400/60 to-transparent"
+        aria-hidden="true"
+      />
       <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
           {label}
         </p>
         {icon && (
-          <span className="rounded-lg bg-brand-50 p-2 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300">
-            <Icon name={icon} className="h-4 w-4" />
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-50 to-teal-50 text-brand-600 ring-1 ring-brand-500/10 dark:from-brand-950/60 dark:to-teal-950/30 dark:text-brand-300 dark:ring-brand-400/10">
+            <Icon name={icon} className="h-[18px] w-[18px]" />
           </span>
         )}
       </div>
-      <p className={clsx('mt-2 text-2xl font-bold tracking-tight', STAT_TONES[tone])}>
+      <p className={clsx('mt-3 text-[1.7rem] font-extrabold tracking-tight', STAT_TONES[tone])}>
         {value}
         {unit && (
-          <span className="ml-1 text-sm font-medium text-slate-400 dark:text-slate-500">{unit}</span>
+          <span className="ml-1 text-xs font-semibold text-slate-400 dark:text-slate-500">{unit}</span>
         )}
       </p>
-      {hint && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">{hint}</p>}
     </div>
   );
 }
@@ -246,10 +259,18 @@ const ALERT_TONES = {
 export function Alert({ tone = 'info', title, children, className }) {
   const icon = tone === 'danger' || tone === 'warning' ? 'alert' : tone === 'success' ? 'check' : 'info';
   return (
-    <div className={clsx('flex items-start gap-3 rounded-xl border p-3.5 text-sm', ALERT_TONES[tone], className)}>
-      <Icon name={icon} className="mt-0.5 h-4 w-4 shrink-0" />
+    <div
+      className={clsx(
+        'flex items-start gap-3 rounded-2xl border p-3.5 text-sm shadow-sm',
+        ALERT_TONES[tone],
+        className,
+      )}
+    >
+      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-white/60 dark:bg-black/20">
+        <Icon name={icon} className="h-3.5 w-3.5" />
+      </span>
       <div>
-        {title && <p className="font-semibold">{title}</p>}
+        {title && <p className="font-bold">{title}</p>}
         <div className={clsx(title && 'mt-0.5')}>{children}</div>
       </div>
     </div>
@@ -258,17 +279,22 @@ export function Alert({ tone = 'info', title, children, className }) {
 
 export function Segmented({ options, value, onChange, className }) {
   return (
-    <div className={clsx('inline-flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800/80', className)}>
+    <div
+      className={clsx(
+        'inline-flex flex-wrap gap-1 rounded-2xl border border-slate-200/70 bg-white/70 p-1 shadow-sm backdrop-blur dark:border-white/[0.06] dark:bg-white/[0.04]',
+        className,
+      )}
+    >
       {options.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
           className={clsx(
-            'rounded-lg px-3 py-1.5 text-sm font-semibold transition',
+            'rounded-xl px-3.5 py-1.5 text-sm font-semibold transition',
             value === opt.value
-              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white'
-              : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200',
+              ? 'bg-gradient-to-br from-brand-500 to-teal-600 text-white shadow-[0_8px_18px_-10px_rgba(13,148,136,0.8)]'
+              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white',
           )}
         >
           {opt.label}

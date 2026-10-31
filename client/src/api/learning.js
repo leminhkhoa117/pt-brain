@@ -8,3 +8,5 @@ export const updateFlashcard = (id, payload) =>
 export const deleteFlashcard = (id) => api.delete(`/flashcards/${id}`).then(unwrap);
 export const reviewFlashcard = (id, quality) =>
   api.post(`/flashcards/${id}/review`, { quality }).then(unwrap);
+
+export const generateQuiz = (payload) => api.post('/quizzes', payload).then(unwrap);

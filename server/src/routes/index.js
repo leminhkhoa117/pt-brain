@@ -13,6 +13,7 @@ import programRoutes from './programs.js';
 import workoutRoutes from './workouts.js';
 import flashcardRoutes from './flashcards.js';
 import clientRoutes from './clients.js';
+import quizRoutes from './quizzes.js';
 
 const router = Router();
 
@@ -34,5 +35,6 @@ router.use('/programs', programRoutes);
 router.use('/workouts', workoutRoutes);
 router.use('/flashcards', flashcardRoutes);
 router.use('/clients', clientRoutes);
+router.use('/quizzes', quizRoutes);
 
 export default router;

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, Card, Field, Icon, LoadingBlock, PageHeader, Stat } from '../components/ui.jsx';
+import { Alert, Card, Field, Icon, LoadingBlock, Stat } from '../components/ui.jsx';
+import BrandLogo from '../components/BrandLogo.jsx';
 import WeightChart from '../components/WeightChart.jsx';
 import Heatmap from '../components/Heatmap.jsx';
 import { fetchSummary, saveMetric } from '../api/metrics.js';
@@ -53,6 +54,8 @@ export default function Dashboard() {
     latest && previous ? Number(latest.weightKg) - Number(previous.weightKg) : null;
   const profileMissing =
     !user?.profile?.heightCm || !user?.profile?.sex || !user?.profile?.birthDate;
+  const hour = new Date().getHours();
+  const greeting = hour < 11 ? 'Chào buổi sáng' : hour < 18 ? 'Chào buổi chiều' : 'Chào buổi tối';
 
   const onQuickSave = (e) => {
     e.preventDefault();
@@ -67,16 +70,77 @@ export default function Dashboard() {
 
   return (
     <div>
-      <PageHeader
-        title="Tổng quan"
-        subtitle={`Hôm nay, ${formatLongDate(todayKey())}. Theo dõi xu hướng thay vì dao động từng ngày.`}
-        actions={
-          <Link to="/body-log" className="btn-primary">
-            <Icon name="plus" className="h-4 w-4" />
-            Nhập số đo
-          </Link>
-        }
-      />
+      <section className="relative mb-5 overflow-hidden rounded-3xl border border-white/10 bg-[#071416] p-6 text-white shadow-[0_40px_90px_-45px_rgba(4,47,46,0.9)] sm:p-8">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -right-16 -top-24 h-80 w-80 rounded-full bg-brand-500/25 blur-[90px]" />
+          <div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-teal-400/10 blur-[80px]" />
+          <div className="surface-grid absolute inset-0 opacity-[0.12]" />
+          <div className="absolute -right-12 -top-16 rotate-12 opacity-25">
+            <BrandLogo size={300} />
+          </div>
+        </div>
+
+        <div className="relative max-w-2xl">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-200/80">
+            {greeting} · {formatLongDate(todayKey())}
+          </p>
+          <h1 className="mt-2 text-[1.9rem] font-extrabold leading-[1.15] tracking-[-0.03em] sm:text-[2.35rem]">
+            Mỗi buổi tập là một
+            <span className="bg-gradient-to-r from-brand-300 via-teal-200 to-emerald-200 bg-clip-text text-transparent">
+              {' '}
+              thí nghiệm nhỏ.
+            </span>
+          </h1>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300/80">
+            {data?.count
+              ? `Bạn đã ghi ${data.count} ngày dữ liệu. Theo dõi xu hướng, không phải dao động từng ngày.`
+              : 'Bắt đầu bằng một con số hôm nay: cân nặng, số đo hoặc một buổi tập.'}
+          </p>
+
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-semibold text-slate-200">
+              <Icon name="target" className="h-3.5 w-3.5 text-brand-300" />
+              {GOAL_LABELS[goal] || 'Duy trì'}
+            </span>
+            {latest && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-semibold text-slate-200">
+                <Icon name="scale" className="h-3.5 w-3.5 text-brand-300" />
+                {formatNumber(latest.weightKg, 1)} kg
+              </span>
+            )}
+            {tdee && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-semibold text-slate-200">
+                <Icon name="flame" className="h-3.5 w-3.5 text-brand-300" />
+                TDEE {formatNumber(tdee, 0)} kcal
+              </span>
+            )}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <Link
+              to="/body-log"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-brand-900 shadow-lg transition hover:bg-brand-50"
+            >
+              <Icon name="plus" className="h-4 w-4" />
+              Nhập số đo hôm nay
+            </Link>
+            <Link
+              to="/training?tab=workout"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/[0.14]"
+            >
+              <Icon name="dumbbell" className="h-4 w-4" />
+              Log buổi tập
+            </Link>
+            <Link
+              to="/research"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/[0.14]"
+            >
+              <Icon name="book" className="h-4 w-4" />
+              Đọc nghiên cứu
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {profileMissing && (
         <Alert tone="warning" title="Hoàn thiện hồ sơ để tính chỉ số chính xác" className="mb-4">

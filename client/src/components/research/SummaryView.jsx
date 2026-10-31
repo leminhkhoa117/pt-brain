@@ -44,6 +44,7 @@ export default function SummaryView({
   savedTerms,
   savingTerm,
   onApply,
+  onAsk,
   favorite,
   onToggleFavorite,
 }) {
@@ -81,6 +82,17 @@ export default function SummaryView({
           >
             {favorite ? '★' : '☆'}
           </button>
+          {onAsk && (
+            <button
+              type="button"
+              onClick={onAsk}
+              className="btn-secondary !px-2.5 !py-1.5 text-xs"
+              title="Hỏi đáp về bài này"
+            >
+              <Icon name="book" className="h-4 w-4" />
+              Hỏi đáp
+            </button>
+          )}
           {onApply && (
             <button
               type="button"

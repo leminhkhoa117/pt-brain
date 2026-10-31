@@ -264,11 +264,72 @@ export async function getSummaryForUser(userId, id) {
   return { summary, paper };
 }
 
+/** Chạy lại job tóm tắt từ nguồn đã lưu (dùng khi job lỗi hoặc server restart). */
+export async function retrySummaryForUser(userId, id) {
+  const summary = await Summary.findOne({ _id: id, userId });
+  if (!summary) throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+  if (summary.status === 'processing') {
+    throw ApiError.conflict('Bài đang được tóm tắt, vui lòng chờ thêm');
+  }
+  const paper = await Paper.findById(summary.paperId);
+  if (!paper) throw ApiError.notFound('Không tìm thấy metadata bài báo');
+  if (!summary.sourceText) {
+    throw new ApiError(
+      422,
+      'NO_SOURCE_TEXT',
+      'Bản ghi không còn nội dung nguồn để tóm tắt lại. Hãy tải lại PDF/link.',
+    );
+  }
+
+  await assertAiQuota(userId, 'summarize');
+
+  summary.status = 'processing';
+  summary.progress = 'Đang chuẩn bị tài liệu...';
+  summary.error = '';
+  await summary.save();
+
+  runSummaryJob({
+    summaryId: summary._id,
+    paperId: paper._id,
+    userId,
+    resolved: {
+      paper,
+      text: summary.sourceText,
+      basedOn: summary.basedOn,
+      sourceUrl: summary.sourceUrl,
+    },
+  });
+
+  return summary;
+}
+
+/** Đánh dấu job kẹt sau khi server restart là failed để người dùng bấm thử lại. */
+export async function markStaleSummariesFailed(maxAgeMinutes = 30) {
+  const cutoff = new Date(Date.now() - maxAgeMinutes * 60 * 1000);
+  const result = await Summary.updateMany(
+    { status: 'processing', updatedAt: { $lt: cutoff } },
+    {
+      $set: {
+        status: 'failed',
+        progress: '',
+        error:
+          'Job tóm tắt bị gián đoạn (server khởi động lại hoặc quá thời gian). Bấm "Thử lại" để chạy lại.',
+      },
+    },
+  );
+  return result.modifiedCount;
+}
+
 export async function appendQa(userId, id, question, answer) {
   await Summary.updateOne(
     { _id: id, userId },
     { $push: { qa: { $each: [{ question, answer, createdAt: new Date() }], $slice: -20 } } },
   );
+}
+
+export async function clearQa(userId, id) {
+  const result = await Summary.updateOne({ _id: id, userId }, { $set: { qa: [] } });
+  if (!result.matchedCount) throw ApiError.notFound('Không tìm thấy bản tóm tắt');
 }
 
 export async function deleteSummaryForUser(userId, id) {

@@ -1,8 +1,10 @@
 import {
   appendQa,
+  clearQa,
   createSummaryForUser,
   deleteSummaryForUser,
   getSummaryForUser,
+  retrySummaryForUser,
 } from '../services/research/reader.js';
 import { proposePlanChanges } from '../services/ai/planAdvisor.js';
 import { askAboutPaper } from '../services/ai/paperSummarizer.js';
@@ -112,6 +114,11 @@ export async function remove(req, res) {
   res.json({ data: { ok: true } });
 }
 
+export async function retry(req, res) {
+  const summary = await retrySummaryForUser(req.userId, req.params.id);
+  res.status(202).json({ data: { summary } });
+}
+
 export async function ask(req, res) {
   const { question } = askSchema.parse(req.body);
   const { summary } = await getSummaryForUser(req.userId, req.params.id);
@@ -132,6 +139,7 @@ export async function ask(req, res) {
     content: summary.content,
     sourceText: summary.sourceText,
     question,
+    history: summary.qa || [],
   });
 
   await appendQa(req.userId, summary._id, question, result.answer);
@@ -144,6 +152,11 @@ export async function ask(req, res) {
       quota: await getAiUsage(req.userId),
     },
   });
+}
+
+export async function clearChat(req, res) {
+  await clearQa(req.userId, req.params.id);
+  res.json({ data: { ok: true } });
 }
 
 export async function exportMarkdown(req, res) {

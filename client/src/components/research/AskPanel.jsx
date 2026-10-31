@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Alert, Card, Icon, Spinner } from '../ui.jsx';
-import { askSummary } from '../../api/summaries.js';
+import { askSummary, clearSummaryChat } from '../../api/summaries.js';
 import { getErrorMessage } from '../../api/client.js';
 
 const SUGGESTIONS = [
@@ -11,7 +11,7 @@ const SUGGESTIONS = [
   'Có thể áp dụng cho người mới tập không?',
 ];
 
-export default function AskPanel({ summaryId, initialQa = [] }) {
+export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0 }) {
   const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState('');
   const [error, setError] = useState(null);
@@ -37,6 +37,15 @@ export default function AskPanel({ summaryId, initialQa = [] }) {
     onError: (err) => setError(getErrorMessage(err)),
   });
 
+  const clear = useMutation({
+    mutationFn: () => clearSummaryChat(summaryId),
+    onSuccess: () => {
+      setMessages([]);
+      setError(null);
+    },
+    onError: (err) => setError(getErrorMessage(err)),
+  });
+
   const submit = (value) => {
     const text = String(value || question).trim();
     if (text.length < 3 || ask.isPending) return;
@@ -51,13 +60,35 @@ export default function AskPanel({ summaryId, initialQa = [] }) {
   }, [messages, ask.isPending]);
 
   return (
-    <Card>
-      <div className="flex items-center justify-between gap-2">
+    <Card id="paper-chat" className="scroll-mt-24">
+      <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Hỏi về bài này</h3>
-          <p className="text-xs text-slate-400">AI chỉ trả lời dựa trên nội dung bài đã nạp.</p>
+          <p className="text-xs text-slate-400">
+            AI đã nạp{' '}
+            <strong className="font-semibold text-slate-500 dark:text-slate-300">
+              {sourceChars.toLocaleString('vi-VN')}
+            </strong>{' '}
+            ký tự từ bài · lịch sử được lưu riêng cho bài này.
+          </p>
         </div>
-        <Icon name="book" className="h-5 w-5 text-brand-600 dark:text-brand-400" />
+        <div className="flex items-center gap-1">
+          {messages.length > 0 && (
+            <button
+              type="button"
+              className="btn-ghost !px-2 !py-1 text-[11px] text-slate-400 hover:text-rose-500"
+              disabled={clear.isPending}
+              onClick={() => {
+                if (window.confirm('Xóa toàn bộ lịch sử hỏi đáp của bài này?')) clear.mutate();
+              }}
+            >
+              {clear.isPending ? 'Đang xóa...' : 'Xóa lịch sử'}
+            </button>
+          )}
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950/60 dark:text-brand-300">
+            <Icon name="book" className="h-4 w-4" />
+          </span>
+        </div>
       </div>
 
       <div

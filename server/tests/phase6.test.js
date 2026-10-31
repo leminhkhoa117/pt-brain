@@ -3,6 +3,7 @@ import { buildBodyLogPdf, buildSummaryPdf } from '../src/services/pdf/summaryPdf
 import { isMeaningfulTitle } from '../src/services/research/pdf.js';
 import { clientCreateSchema } from '../src/validation/client.js';
 import { summaryMetaSchema } from '../src/validation/summary.js';
+import { quizSchema } from '../src/services/ai/quizGenerator.js';
 
 const summary = {
   _id: '507f1f77bcf86cd799439011',
@@ -97,5 +98,53 @@ describe('summaryMetaSchema', () => {
 
   it('từ chối tag quá dài', () => {
     expect(() => summaryMetaSchema.parse({ tags: ['x'.repeat(80)] })).toThrow();
+  });
+});
+
+describe('quizSchema', () => {
+  const valid = {
+    title: 'Quiz',
+    questions: [
+      {
+        question: 'Volume tối ưu?',
+        options: ['5-10 set', '10-20 set', '30-40 set', 'Không rõ'],
+        correctIndex: 1,
+        explanation: 'Tóm tắt nêu 10-20 set/tuần.',
+      },
+      {
+        question: 'Thiết kế?',
+        options: ['RCT', 'Meta-analysis', 'Case report', 'Ý kiến'],
+        correctIndex: 1,
+        explanation: 'Là meta-analysis.',
+      },
+      {
+        question: 'Mức bằng chứng?',
+        options: ['1', '2', '3', '4'],
+        correctIndex: 0,
+        explanation: 'Mức 1.',
+      },
+    ],
+  };
+
+  it('nhận quiz hợp lệ', () => {
+    const parsed = quizSchema.parse(valid);
+    expect(parsed.questions).toHaveLength(3);
+    expect(parsed.questions[0].options).toHaveLength(4);
+  });
+
+  it('từ chối khi không đủ 4 lựa chọn hoặc correctIndex sai', () => {
+    expect(() =>
+      quizSchema.parse({
+        ...valid,
+        questions: [{ ...valid.questions[0], options: ['A', 'B'] }],
+      }),
+    ).toThrow();
+
+    expect(() =>
+      quizSchema.parse({
+        ...valid,
+        questions: [{ ...valid.questions[0], correctIndex: 9 }],
+      }),
+    ).toThrow();
   });
 });

@@ -13,6 +13,8 @@ router.get('/', asyncHandler(summaries.list));
 router.get('/:id/export.md', asyncHandler(summaries.exportMarkdown));
 router.get('/:id/export.pdf', asyncHandler(summaries.exportPdf));
 router.post('/:id/apply-to-plan', aiLimiter, asyncHandler(summaries.applyToPlan));
+router.post('/:id/retry', aiLimiter, asyncHandler(summaries.retry));
+router.delete('/:id/chat', asyncHandler(summaries.clearChat));
 router.patch('/:id', asyncHandler(summaries.updateMeta));
 router.get('/:id', asyncHandler(summaries.getOne));
 router.delete('/:id', asyncHandler(summaries.remove));

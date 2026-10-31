@@ -9,6 +9,7 @@ const aiUsageSchema = new mongoose.Schema(
     ask: { type: Number, default: 0, min: 0 },
     search: { type: Number, default: 0, min: 0 },
     apply: { type: Number, default: 0, min: 0 },
+    quiz: { type: Number, default: 0, min: 0 },
     tokensIn: { type: Number, default: 0, min: 0 },
     tokensOut: { type: Number, default: 0, min: 0 },
     costUsd: { type: Number, default: 0, min: 0 },

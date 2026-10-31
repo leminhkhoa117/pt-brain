@@ -14,8 +14,15 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 | Database | MongoDB 7 (local hoặc Atlas) |
 | AI | OpenCode Go – API OpenAI-compatible, model `deepseek-v4.1-flash` (key chỉ ở backend) |
 | Nguồn nghiên cứu | PubMed E-utilities, Europe PMC, OpenAlex, Unpaywall, Crossref, DOI resolver |
-| Test | Vitest – 114 unit test |
+| Test | Vitest – 120 unit test |
 | Tooling | ESLint 9 (flat config), Prettier, Docker Compose |
+
+## Giao diện & logo
+
+- Logo riêng **PT Brain**: quả tạ đặt trong quỹ đạo electron — ghép chủ đề gym và khoa học.
+- Asset: `client/public/logo-mark.svg` (vector), `favicon.svg`, icon PWA 192/512; component `BrandLogo` dùng chung.
+- Font **Be Vietnam Pro**, bảng màu teal/emerald trên nền navy, card kính mờ, sidebar chia nhóm, hero dashboard, chat full-width, mobile bottom nav nổi.
+- Dark mode mặc định theo hệ thống; có nút chuyển sáng/tối.
 
 ## Chạy nhanh
 
@@ -69,7 +76,7 @@ Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`doc
 ## Lệnh
 
 ```bash
-npm run test        # 114 unit test
+npm run test        # 120 unit test
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
 npm run format      # Prettier
@@ -116,7 +123,8 @@ pt-brain/
 - Ingest: Europe PMC full text XML → PDF OA → abstract; Crossref/Unpaywall fallback; chống SSRF, giới hạn dung lượng, timeout.
 - Tóm tắt theo schema JSON cố định, validate zod, retry 1 lần, cache theo DOI/hash file, giới hạn quota AI/ngày.
 - Bài dài: trích dữ kiện theo từng đoạn rồi tổng hợp để không mất số liệu.
-- UI chia đôi (tóm tắt | bài gốc), tìm trong bài, hỏi đáp trên bài, lưu thuật ngữ, ghi chú, xuất Markdown.
+- UI chia đôi (tóm tắt | bài gốc), tìm trong bài, xuất Markdown/PDF.
+- **Chat hỏi đáp theo từng bài**: lịch sử lưu riêng trong `Summary.qa`, AI nhớ cả nội dung bài + các câu hỏi trước; bài dài được chọn đoạn thông minh (giữ đầu, Results/Discussion/Conclusion và mẫu đều phần còn lại) trước khi đưa vào ngữ cảnh. Có nút xóa lịch sử.
 - Nhãn rõ **“chỉ dựa trên abstract”** khi không có toàn văn; mọi số liệu yêu cầu giữ nguyên.
 
 ### Giai đoạn 3 — Research Finder
@@ -147,6 +155,9 @@ pt-brain/
 - **Ảnh tiến độ**: upload JPEG/PNG/WebP ≤ 8 MB, kiểm tra magic bytes; ảnh lưu ngoài public và chỉ phục vụ qua route có auth + kiểm tra quyền sở hữu; xóa được.
 - **Xuất PDF**: bản tóm tắt và báo cáo BodyLog, dùng font Noto Sans đóng gói sẵn (hiển thị tiếng Việt đúng).
 - **PWA**: manifest, icon 192/512, service worker cache app shell; cài lên điện thoại; chỉ đăng ký SW ở production.
+- **Quiz AI**: 5 câu trắc nghiệm/nội dung đã tóm tắt, chấm điểm, giải thích đáp án; quota riêng.
+- **Job bền hơn**: khi server khởi động lại, job `processing` quá 30 phút được đánh dấu `failed`; nút “Thử lại” chạy lại từ nguồn đã lưu.
+- **Giao diện & logo mới**: logo quả tạ + quỹ đạo electron, font Be Vietnam Pro, sidebar nhóm chức năng, hero dashboard, chat full-width, dark mode được tinh chỉnh.
 - **Quản lý khách hàng**: CRUD khách, mục tiêu, trình độ, trạng thái, giáo án đang áp dụng, check-in, ghi chú.
 - **Production**: server phục vụ `client/dist` khi `SERVE_CLIENT=true`; kèm `render.yaml` và `docs/DEPLOY.md`.
 
@@ -170,6 +181,7 @@ GET    /api/summaries/:id                      DELETE /api/summaries/:id
 PATCH  /api/summaries/:id                      # ghim (isFavorite) + tags
 POST   /api/summaries/:id/ask
 POST   /api/summaries/:id/apply-to-plan
+POST   /api/summaries/:id/retry              DELETE /api/summaries/:id/chat
 GET    /api/summaries/:id/export.md            GET /api/summaries/:id/export.pdf
 
 POST   /api/research/search
@@ -179,6 +191,7 @@ GET    /api/terms         POST /api/terms         PATCH/DELETE /api/terms/:id
 GET    /api/notes         POST /api/notes         PATCH/DELETE /api/notes/:id
 GET    /api/flashcards?due=true               POST /api/flashcards
 PATCH  /api/flashcards/:id  DELETE /api/flashcards/:id  POST /api/flashcards/:id/review
+POST   /api/quizzes                            # tạo quiz từ summary
 
 GET    /api/exercises
 GET    /api/programs      POST /api/programs      POST /api/programs/suggest
@@ -195,7 +208,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 
 ## Kiểm chứng
 
-- `npm run test`: **114/114 pass** — công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, ranker, progression, SM-2, PDF, client validation, apply changes.
+- `npm run test`: **120/120 pass** — công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, ranker, progression, SM-2, PDF, quiz, client validation, retrieval, apply changes.
 - `npm run lint`: 0 lỗi.
 - `npm run build`: thành công; tách chunk react/charts/query.
 - E2E với MongoDB + AI thật:
@@ -208,6 +221,9 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
   - Apply-to-plan: 11s, 4 thay đổi trước→sau, áp dụng thành công.
   - SM-2: thẻ mới quality 5 → interval 1 ngày, ease 2.6.
   - **Phase 6**: ghim thư viện + tag, PDF tóm tắt 47.8 KB, PDF BodyLog 19.1 KB, upload/fetch/xóa ảnh tiến độ, CRUD khách hàng + check-in, manifest/SW/icon PWA đều 200.
+  - **Chat theo bài**: hỏi “Kết quả chính…” → trả lời sau 4s, có trích số liệu; lịch sử lưu 1 cặp Q&A; xóa lịch sử 200; reload vẫn còn lịch sử.
+  - **Quiz AI**: 7s, 5 câu × 4 lựa chọn, có giải thích; làm bài/chấm điểm trên UI.
+  - **5 bài thật**: volume meta-analysis, protein meta-analysis (fulltext), frequency meta-analysis, fulltext OA case report, và PDF `000441029.pdf`.
   - Production: chạy `SERVE_CLIENT=true` trên cổng 4100 → `/` trả HTML có manifest và asset, `/api/health` OK.
 - UI đã kiểm tra bằng trình duyệt thật: Dashboard, BodyLog (ảnh + PDF), 4 tab máy tính, Reader (kể cả màn hình đang xử lý + polling), Finder, Thư viện, Planner, Workout, Glossary, Flashcards, Clients, modal Apply-to-plan; không có lỗi console.
 
@@ -215,15 +231,14 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 
 - **PDF scan không có OCR**: file không có lớp text trả lỗi rõ ràng, cần bản PDF có text hoặc dán nội dung.
 - PDF được **trích text** (không gửi nguyên file cho model như phương án Anthropic trong plan gốc), nên bảng/hình phức tạp có thể mất cấu trúc.
-- Chưa có quiz trắc nghiệm do AI tạo (phần còn lại của mục 6.6).
-- Đã chạy **3 bài thật** (meta-analysis, fulltext OA, PDF quan sát) + Finder; chưa đủ bộ 5 bài acceptance của plan.
 - Chưa có test API tự động (supertest); E2E hiện chạy tay.
 - Docker Compose chưa được chạy thử trên máy này (đã test chế độ production-serving trực tiếp).
-- Job tóm tắt chạy trong RAM của process; nếu server restart giữa chừng, bài có thể kẹt `processing` (chưa có retry tự động).
+- Job tóm tắt chạy trong RAM của process; nếu server restart giữa chừng, job quá 30 phút sẽ được đánh dấu `failed` và có nút “Thử lại”, nhưng chưa tự resume.
 - Ảnh tiến độ lưu trên đĩa local; Render free sẽ mất ảnh sau redeploy — cần S3/Cloudinary cho production thật.
 - “Khách hàng” là CRM một chiều (PT quản lý hồ sơ), chưa phải tài khoản đăng nhập riêng cho khách.
 - PWA đã test manifest/SW/asset và build production, chưa cài thử trên điện thoại thật.
 - Apply-to-plan có thể trả về 0 thay đổi — hành vi an toàn khi bằng chứng yếu.
+- Chat dùng đoạn ngữ cảnh chọn theo mục (không phải embedding/RAG đầy đủ); với bài rất dài vẫn có thể bỏ sót chi tiết nhỏ ngoài các đoạn được chọn.
 
 ## Bảo mật & bản quyền
 

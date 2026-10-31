@@ -22,6 +22,7 @@ import {
   getSummary,
   listSummaries,
   listTerms,
+  retrySummary,
   updateSummaryMeta,
 } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
@@ -181,7 +182,8 @@ export default function ReaderPage() {
   });
 
   const metaMutation = useMutation({
-    mutationFn: ({ id, isFavorite }) => updateSummaryMeta(id, { isFavorite }),    onSuccess: (data) => {
+    mutationFn: ({ id, isFavorite }) => updateSummaryMeta(id, { isFavorite }),
+    onSuccess: (data) => {
       setActive((prev) =>
         prev
           ? {
@@ -195,6 +197,15 @@ export default function ReaderPage() {
           : prev,
       );
       queryClient.invalidateQueries({ queryKey: ['summaries'] });
+    },
+    onError: (err) => setError(getErrorMessage(err)),
+  });
+
+  const retryMutation = useMutation({
+    mutationFn: () => retrySummary(active.summary._id),
+    onSuccess: (data) => {
+      setActive((prev) => (prev ? { ...prev, summary: data.summary } : prev));
+      setError(null);
     },
     onError: (err) => setError(getErrorMessage(err)),
   });
@@ -353,13 +364,22 @@ export default function ReaderPage() {
           ) : active.summary.status === 'failed' ? (
             <Alert tone="danger" title="Tóm tắt thất bại">
               {active.summary.error || 'Có lỗi khi gọi AI. Hãy thử lại với PDF khác hoặc dán nội dung.'}
-              <div className="mt-3">
-                <button type="button" className="btn-secondary" onClick={() => setActive(null)}>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="btn-primary !px-3 !py-1.5 text-xs"
+                  disabled={retryMutation.isPending}
+                  onClick={() => retryMutation.mutate()}
+                >
+                  {retryMutation.isPending ? 'Đang thử lại...' : 'Thử lại'}
+                </button>
+                <button type="button" className="btn-secondary !px-3 !py-1.5 text-xs" onClick={() => setActive(null)}>
                   Quay lại thư viện
                 </button>
               </div>
             </Alert>
           ) : (
+          <>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className={pane === 'source' ? 'hidden lg:block' : ''}>
               <SummaryView
@@ -375,6 +395,11 @@ export default function ReaderPage() {
                   }
                 }}
                 onApply={() => setApplyOpen(true)}
+                onAsk={() =>
+                  document
+                    .getElementById('paper-chat')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
                 favorite={Boolean(active.summary.isFavorite)}
                 onToggleFavorite={() =>
                   metaMutation.mutate({
@@ -391,12 +416,17 @@ export default function ReaderPage() {
                 url={active.paper?.url || active.summary.sourceUrl}
                 title={active.paper?.title}
               />
-              <div className="mt-4">
-                <AskPanel summaryId={active.summary._id} initialQa={active.summary.qa || []} />
-              </div>
               <NoteBox summaryId={active.summary._id} paperId={active.paper?._id} />
             </div>
           </div>
+          <div className="mt-4">
+            <AskPanel
+              summaryId={active.summary._id}
+              initialQa={active.summary.qa || []}
+              sourceChars={active.sourceText?.length || 0}
+            />
+          </div>
+          </>
           )}
           {applyOpen && active.summary.status === 'ready' && (
             <ApplyPlanModal
