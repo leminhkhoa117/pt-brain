@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../components/ui.jsx';
 import { createPaper, searchResearch } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
+import MarkdownText from '../components/MarkdownText.jsx';
 import { formatNumber } from '../lib/format.js';
 
 const LEVEL_STYLES = {
@@ -309,9 +310,9 @@ export default function FinderPage() {
                   Tổng hợp tiếng Việt
                 </h3>
               </div>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-brand-900/90 dark:text-brand-100/90">
+              <MarkdownText className="mt-2 text-brand-900/90 dark:text-brand-100/90">
                 {data.synthesis}
-              </p>
+              </MarkdownText>
               <p className="mt-2 text-[11px] text-brand-700/60 dark:text-brand-300/60">
                 Tổng hợp chỉ dựa trên abstract của các bài trong danh sách. Trích dẫn [n] tương ứng số thứ tự bên dưới.
               </p>
@@ -378,9 +379,12 @@ export default function FinderPage() {
                       </p>
 
                       {item.viSummary && (
-                        <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                        <MarkdownText
+                          compact
+                          className="mt-2 text-slate-700 dark:text-slate-300"
+                        >
                           {item.viSummary}
-                        </p>
+                        </MarkdownText>
                       )}
 
                       {item.abstract && (

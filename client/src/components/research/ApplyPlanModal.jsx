@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Icon, Spinner } from '../ui.jsx';
+import MarkdownText from '../MarkdownText.jsx';
 import { listPrograms } from '../../api/training.js';
 import { applyPlanChanges, applyToPlan } from '../../api/summaries.js';
 import { getErrorMessage } from '../../api/client.js';
@@ -136,7 +137,7 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
             {proposal.rationale && (
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-700 dark:bg-slate-800/50 dark:text-slate-200">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Lý do</p>
-                <p className="mt-1 whitespace-pre-wrap">{proposal.rationale}</p>
+                <MarkdownText className="mt-1">{proposal.rationale}</MarkdownText>
               </div>
             )}
 

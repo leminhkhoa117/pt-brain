@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Alert, Card, Icon, Spinner } from '../ui.jsx';
+import MarkdownText from '../MarkdownText.jsx';
 import { askSummary, clearSummaryChat } from '../../api/summaries.js';
 import { getErrorMessage } from '../../api/client.js';
 
@@ -105,11 +106,15 @@ export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0 })
             key={`${message.role}-${index}`}
             className={
               message.role === 'user'
-                ? 'ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-brand-600 px-3 py-2 text-sm text-white'
-                : 'mr-auto max-w-[92%] whitespace-pre-wrap rounded-2xl rounded-bl-md bg-white px-3 py-2 text-sm text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-200'
+                ? 'ml-auto max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-gradient-to-br from-brand-500 to-teal-600 px-3.5 py-2.5 text-sm text-white shadow-sm'
+                : 'mr-auto max-w-[92%] rounded-2xl rounded-bl-md border border-slate-200/70 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm dark:border-white/[0.06] dark:bg-slate-800/90 dark:text-slate-200'
             }
           >
-            {message.text}
+            {message.role === 'assistant' ? (
+              <MarkdownText>{message.text}</MarkdownText>
+            ) : (
+              message.text
+            )}
           </div>
         ))}
         {ask.isPending && (

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { Alert, Card, Icon } from '../ui.jsx';
+import MarkdownText from '../MarkdownText.jsx';
 import { summaryExportUrl, summaryPdfUrl } from '../../api/summaries.js';
 import { formatNumber } from '../../lib/format.js';
 
@@ -164,7 +165,7 @@ export default function SummaryView({
         <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">
           Tóm tắt nhanh
         </p>
-        <p className="mt-1.5 text-sm leading-relaxed text-brand-900 dark:text-brand-100">{c.tldr}</p>
+        <MarkdownText className="mt-1.5 text-brand-900 dark:text-brand-100">{c.tldr}</MarkdownText>
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -211,7 +212,9 @@ export default function SummaryView({
         </Section>
       ) : null}
 
-      <Section title="Kết luận của tác giả">{c.authorsConclusion}</Section>
+      <Section title="Kết luận của tác giả">
+        <MarkdownText>{c.authorsConclusion}</MarkdownText>
+      </Section>
 
       {c.limitations?.length ? (
         <Section title="Hạn chế">

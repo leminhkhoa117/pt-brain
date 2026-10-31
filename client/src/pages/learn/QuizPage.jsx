@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../../components/ui.jsx';
+import MarkdownText from '../../components/MarkdownText.jsx';
 import { listSummaries } from '../../api/summaries.js';
 import { generateQuiz } from '../../api/learning.js';
 import { getErrorMessage } from '../../api/client.js';
@@ -148,9 +149,9 @@ export default function QuizPage() {
                     <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-600 text-xs font-extrabold text-white">
                       {qIndex + 1}
                     </span>
-                    <p className="text-sm font-semibold leading-relaxed text-slate-800 dark:text-slate-100">
+                    <MarkdownText className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                       {question.question}
-                    </p>
+                    </MarkdownText>
                   </div>
 
                   <div className="mt-3 grid gap-2">
@@ -207,10 +208,11 @@ export default function QuizPage() {
                           : 'bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-200',
                       )}
                     >
-                      <strong>
-                        {answers[qIndex] === question.correctIndex ? 'Chính xác. ' : 'Chưa đúng. '}
-                      </strong>
-                      {question.explanation || 'Không có giải thích.'}
+                      <MarkdownText compact>
+                        {`**${
+                          answers[qIndex] === question.correctIndex ? 'Chính xác.' : 'Chưa đúng.'
+                        }** ${question.explanation || 'Không có giải thích.'}`}
+                      </MarkdownText>
                     </div>
                   )}
                 </Card>
