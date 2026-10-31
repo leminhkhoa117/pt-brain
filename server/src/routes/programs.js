@@ -10,11 +10,14 @@ const router = Router();
 router.use(requireAuth);
 
 router.post('/suggest', validate(suggestProgramSchema), asyncHandler(programs.suggest));
+router.post('/suggest-ai', validate(suggestProgramSchema), asyncHandler(programs.aiSuggest));
 router.get('/', asyncHandler(programs.list));
 router.post('/', validate(programCreateSchema), asyncHandler(programs.create));
 router.get('/:id/volume', asyncHandler(programs.volume));
 router.get('/:id/suggestions', asyncHandler(programs.suggestions));
 router.post('/:id/apply-changes', validate(applyChangesSchema), asyncHandler(programs.applyChanges));
+router.post('/:id/evaluate', asyncHandler(programs.evaluate));
+router.get('/:id/evaluations', asyncHandler(programs.evaluations));
 router.get('/:id', asyncHandler(programs.getOne));
 router.patch('/:id', validate(programUpdateSchema), asyncHandler(programs.update));
 router.delete('/:id', asyncHandler(programs.remove));

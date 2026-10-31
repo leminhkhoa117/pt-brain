@@ -11,3 +11,6 @@ export { Flashcard } from './Flashcard.js';
 export { Note } from './Note.js';
 export { AiUsage } from './AiUsage.js';
 export { Client } from './Client.js';
+export { BodyAssessment } from './BodyAssessment.js';
+export { Meal } from './Meal.js';
+export { PlanEvaluation } from './PlanEvaluation.js';

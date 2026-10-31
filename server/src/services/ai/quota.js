@@ -47,6 +47,7 @@ export async function getAiUsage(userId) {
     search: usage?.search || 0,
     apply: usage?.apply || 0,
     quiz: usage?.quiz || 0,
+    vision: usage?.vision || 0,
     limit: env.AI_DAILY_LIMIT_PER_USER,
     tokensIn: usage?.tokensIn || 0,
     tokensOut: usage?.tokensOut || 0,

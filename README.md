@@ -14,7 +14,7 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 | Database | MongoDB 7 (local hoặc Atlas) |
 | AI | OpenCode Go – API OpenAI-compatible, model `deepseek-v4.1-flash` (key chỉ ở backend) |
 | Nguồn nghiên cứu | PubMed E-utilities, Europe PMC, OpenAlex, Unpaywall, Crossref, DOI resolver |
-| Test | Vitest – 120 unit test |
+| Test | Vitest – 125 unit test |
 | Tooling | ESLint 9 (flat config), Prettier, Docker Compose |
 
 ## Giao diện & logo
@@ -54,6 +54,7 @@ AI_PROVIDER=opencode-go
 AI_BASE_URL=https://opencode.ai/inference/go/openai/v1
 AI_API_KEY=oc_sk_...              # chỉ nằm trong .env, không commit
 AI_MODEL=deepseek-v4.1-flash
+AI_VISION_MODEL=gemini-4-argon
 AI_TIMEOUT_MS=180000
 AI_DAILY_LIMIT_PER_USER=30
 CONTACT_EMAIL=you@example.com     # Crossref/Unpaywall polite pool
@@ -76,7 +77,7 @@ Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`doc
 ## Lệnh
 
 ```bash
-npm run test        # 120 unit test
+npm run test        # 125 unit test
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
 npm run format      # Prettier
@@ -158,6 +159,33 @@ pt-brain/
 - **Quiz AI**: 5 câu trắc nghiệm/nội dung đã tóm tắt, chấm điểm, giải thích đáp án; quota riêng.
 - **Job bền hơn**: khi server khởi động lại, job `processing` quá 30 phút được đánh dấu `failed`; nút “Thử lại” chạy lại từ nguồn đã lưu.
 - **Giao diện & logo mới**: logo quả tạ + quỹ đạo electron, font Be Vietnam Pro, sidebar nhóm chức năng, hero dashboard, chat full-width, dark mode được tinh chỉnh.
+
+### Nâng cấp sau Phase 6
+
+- **Nav bar lên header**: bỏ sidebar, menu ngang 6 mục chính + “Thêm”, mobile có bottom nav và drawer.
+- **AI đánh giá thể trạng qua ảnh**: 1-4 ảnh (trước/nghiêng/sau), phân tích dựa trên hồ sơ + mục tiêu; trả % mỡ dạng **khoảng** + độ tin cậy, nhận xét cơ/tư thế, ưu tiên, điều chỉnh tập/dinh dưỡng; ảnh lưu riêng tư và xóa được.
+- **Calo từ ảnh bữa ăn**: nhận diện món, khẩu phần, calo/macro, giả định và độ tin cậy; lưu ảnh + thông tin bữa; tổng calo/protein trong ngày so với mục tiêu.
+- **Trang Buổi tập & Bài tập**: lịch sử buổi tập có chi tiết set, tonnage, xóa; thư viện 42 bài tập lọc theo cơ/dụng cụ.
+- **Sửa giáo án**: đổi tên/mục tiêu/deload, thêm/xóa ngày, thêm/xóa bài, chỉnh set/rep/RIR/rest.
+- **AI đề xuất giáo án**: dựa trên hồ sơ, dụng cụ, thời gian và evidence base; preview, có thể lưu hoặc để hệ thống fallback theo quy tắc nếu AI lỗi.
+- **Chấm điểm giáo án**: điểm 0-100 + hạng, 7 subscore (volume, tần suất, cân bằng, RIR, hồi phục, đặc hiệu, tiến bộ), điểm mạnh/vấn đề/đề xuất và trích dẫn nghiên cứu.
+
+### Evidence base dùng cho AI
+
+10 nguồn đã kiểm chứng metadata qua Europe PMC, gồm:
+
+- Schoenfeld 2017 – volume dose-response (DOI `10.1080/02640414.2016.1210197`).
+- Schoenfeld 2016 – tần suất tập (DOI `10.1007/s40279-016-0543-8`).
+- Morton 2018 – protein (DOI `10.1136/bjsports-2017-097608`).
+- Refalo 2023 – proximity to failure (DOI `10.1007/s40279-022-01784-y`).
+- Grgic 2018 – nghỉ giữa set (DOI `10.1007/s40279-017-0788-x`).
+- McLeod 2024 – umbrella review prescription (DOI `10.1016/j.jshs.2023.06.005`).
+- Helms 2014 – contest prep (DOI `10.1186/1550-2783-11-20`).
+- Pancar 2026 – deload (DOI `10.1038/s41598-026-40612-5`).
+- AI dietary assessment review 2026 (DOI `10.3390/nu18203406`).
+- Smartphone body composition 2026 (DOI `10.1371/journal.pdig.0000983`).
+
+Điểm plan được **tính bằng code** từ metrics, AI chỉ viết nhận xét/đề xuất và bị giới hạn trích dẫn trong danh sách trên.
 - **Quản lý khách hàng**: CRUD khách, mục tiêu, trình độ, trạng thái, giáo án đang áp dụng, check-in, ghi chú.
 - **Production**: server phục vụ `client/dist` khi `SERVE_CLIENT=true`; kèm `render.yaml` và `docs/DEPLOY.md`.
 
@@ -187,6 +215,13 @@ GET    /api/summaries/:id/export.md            GET /api/summaries/:id/export.pdf
 POST   /api/research/search
 GET    /api/papers        POST /api/papers        GET/DELETE /api/papers/:id
 GET    /api/clients       POST /api/clients       GET/PATCH/DELETE /api/clients/:id
+
+POST   /api/body-assessments                  # multipart 1-4 ảnh
+GET    /api/body-assessments                  GET/DELETE /api/body-assessments/:id
+GET    /api/body-assessments/:id/photos/:filename
+
+GET    /api/meals?date=   POST /api/meals     GET /api/meals/summary?date=
+PATCH  /api/meals/:id     DELETE /api/meals/:id   GET /api/meals/:id/photo
 GET    /api/terms         POST /api/terms         PATCH/DELETE /api/terms/:id
 GET    /api/notes         POST /api/notes         PATCH/DELETE /api/notes/:id
 GET    /api/flashcards?due=true               POST /api/flashcards
@@ -195,10 +230,13 @@ POST   /api/quizzes                            # tạo quiz từ summary
 
 GET    /api/exercises
 GET    /api/programs      POST /api/programs      POST /api/programs/suggest
+POST   /api/programs/suggest-ai                 # AI đề xuất
 GET    /api/programs/:id  PATCH/DELETE /api/programs/:id
 GET    /api/programs/:id/volume
 GET    /api/programs/:id/suggestions?dayName=
 POST   /api/programs/:id/apply-changes
+POST   /api/programs/:id/evaluate               # chấm điểm + đề xuất
+GET    /api/programs/:id/evaluations
 
 GET    /api/workouts      POST /api/workouts      GET/PATCH/DELETE /api/workouts/:id
 GET    /api/workouts/progression/:exercise
@@ -208,7 +246,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 
 ## Kiểm chứng
 
-- `npm run test`: **120/120 pass** — công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, ranker, progression, SM-2, PDF, quiz, client validation, retrieval, apply changes.
+- `npm run test`: **125/125 pass** — công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, ranker, progression, SM-2, PDF, quiz, client validation, retrieval, plan metrics/evidence, apply changes.
 - `npm run lint`: 0 lỗi.
 - `npm run build`: thành công; tách chunk react/charts/query.
 - E2E với MongoDB + AI thật:
@@ -224,6 +262,9 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
   - **Chat theo bài**: hỏi “Kết quả chính…” → trả lời sau 4s, có trích số liệu; lịch sử lưu 1 cặp Q&A; xóa lịch sử 200; reload vẫn còn lịch sử.
   - **Quiz AI**: 7s, 5 câu × 4 lựa chọn, có giải thích; làm bài/chấm điểm trên UI.
   - **5 bài thật**: volume meta-analysis, protein meta-analysis (fulltext), frequency meta-analysis, fulltext OA case report, và PDF `000441029.pdf`.
+  - **AI vision**: ảnh táo → bữa ăn 95 kcal (P 0.5 / C 25 / F 0.3), độ tin cậy thấp đúng như kỳ vọng với ảnh minh họa.
+  - **AI thể trạng**: ảnh silhouette → từ chối đánh giá hình thể, chỉ đưa khoảng 14-19% dựa trên số liệu tự báo + caveat; đúng hành vi an toàn.
+  - **AI plan**: 53s, 4 ngày, 26 bài, rationale + evidence `[E1][E2][E4][E5][E6][E8]`; **chấm điểm**: 30s, 96/A+, 5 đề xuất, trích dẫn `[E1][E5][E6][E8]`.
   - Production: chạy `SERVE_CLIENT=true` trên cổng 4100 → `/` trả HTML có manifest và asset, `/api/health` OK.
 - UI đã kiểm tra bằng trình duyệt thật: Dashboard, BodyLog (ảnh + PDF), 4 tab máy tính, Reader (kể cả màn hình đang xử lý + polling), Finder, Thư viện, Planner, Workout, Glossary, Flashcards, Clients, modal Apply-to-plan; không có lỗi console.
 
@@ -239,6 +280,11 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 - PWA đã test manifest/SW/asset và build production, chưa cài thử trên điện thoại thật.
 - Apply-to-plan có thể trả về 0 thay đổi — hành vi an toàn khi bằng chứng yếu.
 - Chat dùng đoạn ngữ cảnh chọn theo mục (không phải embedding/RAG đầy đủ); với bài rất dài vẫn có thể bỏ sót chi tiết nhỏ ngoài các đoạn được chọn.
+- **Đánh giá thể trạng/ảnh và calo từ ảnh là ước lượng**, sai số lớn, không phải chẩn đoán y tế hay phép đo dinh dưỡng chính xác. Chất lượng phụ thuộc ánh sáng, góc chụp, khẩu phần và món hỗn hợp.
+- Evidence base gồm 10 nguồn chọn lọc, không phải tổng quan toàn bộ tài liệu; điểm plan là công thức nội bộ, AI chỉ giải thích/đề xuất.
+- AI plan có thể trả về fallback theo quy tắc nếu model không trả JSON hợp lệ; UI hiển thị rõ nguồn.
+- Ảnh thể trạng/bữa ăn lưu đĩa local; production cần S3/Cloudinary.
+- Chưa có xác thực ảnh y tế/chuyên gia; không dùng cho người có bệnh lý hoặc rối loạn ăn uống.
 
 ## Bảo mật & bản quyền
 

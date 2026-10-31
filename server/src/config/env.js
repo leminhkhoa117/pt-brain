@@ -32,6 +32,7 @@ const schema = z.object({
   AI_BASE_URL: z.string().url().default('https://opencode.ai/inference/go/openai/v1'),
   AI_API_KEY: z.string().optional().default(''),
   AI_MODEL: z.string().default('deepseek-v4.1-flash'),
+  AI_VISION_MODEL: z.string().default('gemini-4-argon'),
   AI_TIMEOUT_MS: z.coerce.number().int().positive().default(180000),
   AI_DAILY_LIMIT_PER_USER: z.coerce.number().int().positive().default(30),
 

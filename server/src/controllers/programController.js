@@ -1,7 +1,84 @@
 import * as programService from '../services/training/programService.js';
 import { suggestionsForProgramDay } from '../services/training/workoutService.js';
+import { generatePlanProposal, evaluateProgram } from '../services/ai/planCoach.js';
+import { assertAiQuota, getAiUsage, recordAiCall } from '../services/ai/quota.js';
+import { getUser } from '../services/authService.js';
+import { PlanEvaluation } from '../models/PlanEvaluation.js';
 import { programCreateSchema, programUpdateSchema, suggestProgramSchema } from '../validation/training.js';
 import { applyChangesSchema } from '../validation/learning.js';
+
+export async function aiSuggest(req, res) {
+  const params = suggestProgramSchema.parse(req.body);
+  const user = await getUser(req.userId);
+  await assertAiQuota(req.userId, 'apply');
+
+  const result = await generatePlanProposal({
+    profile: {
+      sex: user.profile?.sex,
+      age: user.age(),
+      heightCm: user.profile?.heightCm,
+      goal: params.goal,
+      experience: params.experience,
+    },
+    params,
+  });
+
+  if (result.usage) {
+    await recordAiCall(req.userId, { kind: 'apply', usage: result.usage });
+  }
+
+  res.json({
+    data: {
+      ...result,
+      name: params.name || result.name,
+      goal: params.goal,
+      experience: params.experience,
+      equipment: params.equipment,
+      notes: result.rationale,
+      quota: await getAiUsage(req.userId),
+    },
+  });
+}
+
+export async function evaluate(req, res) {
+  const program = await programService.getProgram(req.userId, req.params.id);
+  const user = await getUser(req.userId);
+  await assertAiQuota(req.userId, 'apply');
+
+  const result = await evaluateProgram({
+    program,
+    profile: {
+      sex: user.profile?.sex,
+      age: user.age(),
+      heightCm: user.profile?.heightCm,
+      goal: program.goal,
+      experience: user.profile?.experience,
+    },
+  });
+
+  await recordAiCall(req.userId, { kind: 'apply', usage: result.usage });
+  const saved = await PlanEvaluation.create({
+    userId: req.userId,
+    programId: program._id,
+    score: result.score,
+    grade: result.grade,
+    content: result,
+    model: result.model,
+  });
+
+  res.status(201).json({ data: { evaluation: result, id: saved._id } });
+}
+
+export async function evaluations(req, res) {
+  const items = await PlanEvaluation.find({
+    userId: req.userId,
+    programId: req.params.id,
+  })
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .lean();
+  res.json({ data: { evaluations: items } });
+}
 
 export async function suggest(req, res) {
   const input = suggestProgramSchema.parse(req.body);

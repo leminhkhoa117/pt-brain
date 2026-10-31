@@ -73,6 +73,7 @@ export async function chatCompletion({
   maxTokens = 6000,
   json = false,
   sessionId,
+  model,
 }) {
   if (!env.AI_API_KEY) {
     throw new ApiError(
@@ -83,7 +84,7 @@ export async function chatCompletion({
   }
 
   const body = {
-    model: env.AI_MODEL,
+    model: model || env.AI_MODEL,
     messages,
     temperature,
     max_tokens: maxTokens,
@@ -101,6 +102,38 @@ export async function chatCompletion({
     delete body.response_format;
     return post(body, sessionId);
   }
+}
+
+/** Gọi model vision với ảnh (buffer + mime), trả về JSON nếu json=true. */
+export async function visionCompletion({
+  system,
+  text,
+  images = [],
+  model = env.AI_VISION_MODEL,
+  maxTokens = 4000,
+  json = true,
+  sessionId,
+}) {
+  const content = [{ type: 'text', text }];
+  for (const image of images) {
+    content.push({
+      type: 'image_url',
+      image_url: {
+        url: `data:${image.mime || 'image/jpeg'};base64,${image.buffer.toString('base64')}`,
+      },
+    });
+  }
+  return chatCompletion({
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content },
+    ],
+    model,
+    temperature: 0.1,
+    maxTokens,
+    json,
+    sessionId,
+  });
 }
 
 /** Bóc JSON khỏi câu trả lời (kể cả khi model bọc trong ```json). */

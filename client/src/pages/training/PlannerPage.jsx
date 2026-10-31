@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../../components/ui.jsx';
+import AiPlanModal from './AiPlanModal.jsx';
+import ProgramEditorModal from './ProgramEditorModal.jsx';
+import PlanEvaluationModal from './PlanEvaluationModal.jsx';
 import {
   createProgram,
   deleteProgram,
@@ -135,6 +138,9 @@ export default function PlannerPage() {
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [evaluating, setEvaluating] = useState(null);
 
   const programsQuery = useQuery({ queryKey: ['programs'], queryFn: listPrograms });
   const detailQuery = useQuery({
@@ -211,19 +217,29 @@ export default function PlannerPage() {
     <div>
       <PageHeader
         title="Giáo án"
-        subtitle="Wizard tạo giáo án theo quy tắc trong code (không để AI tự sinh), đếm volume theo nhóm cơ và cảnh báo thiếu/quá nhiều."
+        subtitle="Tạo giáo án theo quy tắc hoặc để AI đề xuất, đếm volume theo nhóm cơ và cảnh báo thiếu/quá nhiều."
         actions={
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={() => {
-              setPreview(null);
-              setShowWizard((v) => !v);
-            }}
-          >
-            <Icon name="plus" className="h-4 w-4" />
-            {showWizard ? 'Đóng wizard' : 'Tạo giáo án mới'}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setAiOpen(true)}
+            >
+              <Icon name="target" className="h-4 w-4" />
+              AI đề xuất
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => {
+                setPreview(null);
+                setShowWizard((v) => !v);
+              }}
+            >
+              <Icon name="plus" className="h-4 w-4" />
+              {showWizard ? 'Đóng wizard' : 'Tạo giáo án mới'}
+            </button>
+          </div>
         }
       />
 
@@ -450,16 +466,34 @@ export default function PlannerPage() {
                     deload mỗi {detail.program.deloadEveryWeeks} tuần
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="btn-ghost !px-2.5 !py-1.5 text-xs text-rose-500"
-                  onClick={() => {
-                    if (window.confirm('Xóa giáo án này?')) remove.mutate(selectedId);
-                  }}
-                >
-                  <Icon name="trash" className="h-4 w-4" />
-                  Xóa
-                </button>
+                <div className="flex flex-wrap items-center gap-1">
+                  <button
+                    type="button"
+                    className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                    onClick={() => setEditing(detail.program)}
+                  >
+                    <Icon name="settings" className="h-4 w-4" />
+                    Sửa
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                    onClick={() => setEvaluating(detail.program)}
+                  >
+                    <Icon name="target" className="h-4 w-4" />
+                    Chấm điểm
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-ghost !px-2.5 !py-1.5 text-xs text-rose-500"
+                    onClick={() => {
+                      if (window.confirm('Xóa giáo án này?')) remove.mutate(selectedId);
+                    }}
+                  >
+                    <Icon name="trash" className="h-4 w-4" />
+                    Xóa
+                  </button>
+                </div>
               </div>
 
               <div className="mt-4 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/40">
@@ -485,6 +519,34 @@ export default function PlannerPage() {
           )}
         </Card>
       </div>
+
+      {aiOpen && (
+        <AiPlanModal
+          onClose={() => setAiOpen(false)}
+          onSaved={(program) => {
+            setAiOpen(false);
+            setSelectedId(program._id);
+            setNotice('Đã lưu giáo án do AI đề xuất.');
+          }}
+        />
+      )}
+      {editing && (
+        <ProgramEditorModal
+          program={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            queryClient.invalidateQueries({ queryKey: ['program', selectedId] });
+            setNotice('Đã cập nhật giáo án.');
+          }}
+        />
+      )}
+      {evaluating && (
+        <PlanEvaluationModal
+          program={evaluating}
+          onClose={() => setEvaluating(null)}
+        />
+      )}
     </div>
   );
 }

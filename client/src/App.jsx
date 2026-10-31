@@ -11,6 +11,8 @@ import Calculators from './pages/Calculators.jsx';
 import Research from './pages/Research.jsx';
 import Training from './pages/Training.jsx';
 import Learn from './pages/Learn.jsx';
+import NutritionPage from './pages/NutritionPage.jsx';
+import BodyAssessmentPage from './pages/BodyAssessmentPage.jsx';
 import ClientsPage from './pages/ClientsPage.jsx';
 import Settings from './pages/Settings.jsx';
 
@@ -49,6 +51,8 @@ export default function App() {
       <Route element={<ProtectedLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="/body-log" element={<BodyLog />} />
+        <Route path="/body-assessment" element={<BodyAssessmentPage />} />
+        <Route path="/nutrition" element={<NutritionPage />} />
         <Route path="/research" element={<Research />} />
         <Route path="/training" element={<Training />} />
         <Route path="/learn" element={<Learn />} />

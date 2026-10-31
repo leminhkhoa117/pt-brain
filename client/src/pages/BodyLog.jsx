@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, Icon, LoadingBlock, PageHeader } from '../components/ui.jsx';
+import { Link } from 'react-router-dom';
 import {
   deleteMetricPhoto,
   exportPdfUrl,
@@ -215,6 +216,10 @@ export default function BodyLog() {
         subtitle="Mỗi ngày một bản ghi. Nhập lại cùng ngày sẽ cập nhật, không tạo trùng."
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            <Link to="/body-assessment" className="btn-secondary">
+              <Icon name="target" className="h-4 w-4" />
+              AI thể trạng
+            </Link>
             <a
               href={exportPdfUrl()}
               className="btn-secondary"

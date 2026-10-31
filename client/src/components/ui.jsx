@@ -150,6 +150,8 @@ const ICONS = {
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </>
   ),
+  chevronDown: <path d="m6 9 6 6 6-6" />,
+  menu: <path d="M4 6h16M4 12h16M4 18h16" />,
 };
 
 export function Icon({ name, className = 'h-5 w-5' }) {

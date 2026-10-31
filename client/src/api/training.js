@@ -5,6 +5,12 @@ export const listExercises = (params = {}) =>
 
 export const suggestProgram = (payload) =>
   api.post('/programs/suggest', payload).then(unwrap);
+export const aiSuggestProgram = (payload) =>
+  api.post('/programs/suggest-ai', payload).then(unwrap);
+export const evaluateProgram = (id) =>
+  api.post(`/programs/${id}/evaluate`).then(unwrap);
+export const getEvaluations = (id) =>
+  api.get(`/programs/${id}/evaluations`).then(unwrap);
 export const listPrograms = () => api.get('/programs').then(unwrap);
 export const getProgram = (id) => api.get(`/programs/${id}`).then(unwrap);
 export const createProgram = (payload) =>

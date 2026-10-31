@@ -29,3 +29,16 @@ export const uploadImage = multer({
     return cb(null, true);
   },
 });
+
+export const uploadImages = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+    files: 4,
+  },
+  fileFilter(req, file, cb) {
+    const ok = /^image\/(jpeg|png|webp)$/i.test(file.mimetype);
+    if (!ok) return cb(new ApiError(400, 'INVALID_IMAGE', 'Chỉ nhận ảnh JPEG, PNG hoặc WebP'));
+    return cb(null, true);
+  },
+});
