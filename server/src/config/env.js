@@ -1,0 +1,48 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
+import { z } from 'zod';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+// Ưu tiên .env ở root repo, sau đó .env riêng của server
+dotenv.config({ path: path.resolve(here, '../../../.env') });
+dotenv.config({ path: path.resolve(here, '../../.env') });
+
+const boolFromEnv = z
+  .enum(['true', 'false'])
+  .default('false')
+  .transform((v) => v === 'true');
+
+const schema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  PORT: z.coerce.number().int().positive().default(4000),
+  LOG_LEVEL: z.string().default('info'),
+  MONGO_URI: z.string().default('mongodb://127.0.0.1:27017/pt-brain'),
+
+  JWT_ACCESS_SECRET: z.string().min(16).default('dev-access-secret-change-me'),
+  JWT_REFRESH_SECRET: z.string().min(16).default('dev-refresh-secret-change-me'),
+  ACCESS_TOKEN_TTL: z.string().default('15m'),
+  REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
+
+  CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
+  COOKIE_SECURE: boolFromEnv,
+
+  ANTHROPIC_API_KEY: z.string().optional().default(''),
+  ANTHROPIC_MODEL: z.string().default('claude-sonnet-4-5'),
+  AI_DAILY_LIMIT_PER_USER: z.coerce.number().int().positive().default(30),
+});
+
+const parsed = schema.safeParse(process.env);
+if (!parsed.success) {
+  console.error('❌ Biến môi trường không hợp lệ:', parsed.error.flatten().fieldErrors);
+  process.exit(1);
+}
+
+export const env = parsed.data;
+
+if (env.NODE_ENV === 'production') {
+  if (env.JWT_ACCESS_SECRET.includes('change-me') || env.JWT_REFRESH_SECRET.includes('change-me')) {
+    console.error('❌ Production yêu cầu JWT_ACCESS_SECRET / JWT_REFRESH_SECRET thật (không dùng giá trị mặc định).');
+    process.exit(1);
+  }
+}
