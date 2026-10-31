@@ -27,8 +27,10 @@ const schema = z.object({
   CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
   COOKIE_SECURE: boolFromEnv,
 
-  ANTHROPIC_API_KEY: z.string().optional().default(''),
-  ANTHROPIC_MODEL: z.string().default('claude-sonnet-4-5'),
+  AI_PROVIDER: z.string().default('opencode-go'),
+  AI_BASE_URL: z.string().url().default('https://opencode.ai/inference/go/openai/v1'),
+  AI_API_KEY: z.string().optional().default(''),
+  AI_MODEL: z.string().default('deepseek-v4.1-flash'),
   AI_DAILY_LIMIT_PER_USER: z.coerce.number().int().positive().default(30),
 });
 

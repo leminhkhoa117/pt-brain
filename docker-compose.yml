@@ -26,8 +26,10 @@ services:
       CLIENT_ORIGIN: http://localhost:5173
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-me}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-me}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-sonnet-4-5}
+      AI_PROVIDER: ${AI_PROVIDER:-opencode-go}
+      AI_BASE_URL: ${AI_BASE_URL:-https://opencode.ai/inference/go/openai/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-deepseek-v4.1-flash}
     ports:
       - "4000:4000"
     depends_on:

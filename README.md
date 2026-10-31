@@ -40,6 +40,20 @@ Mặc định `MONGO_URI=mongodb://127.0.0.1:27017/pt-brain`. Nếu dùng Atlas,
 
 Mở http://localhost:5173, bấm **Đăng ký**, sau đó vào **Cài đặt** nhập giới tính / ngày sinh / chiều cao để các chỉ số (BMR, TDEE, % mỡ, FFMI) hoạt động.
 
+### Cấu hình AI (OpenCode Go)
+
+Backend gọi model qua API OpenAI-compatible của OpenCode Go:
+
+```env
+AI_PROVIDER=opencode-go
+AI_BASE_URL=https://opencode.ai/inference/go/openai/v1
+AI_API_KEY=oc_sk_...            # chỉ nằm trong .env, không commit, không lộ ra client
+AI_MODEL=deepseek-v4.1-flash
+AI_DAILY_LIMIT_PER_USER=30
+```
+
+Key đã được kiểm tra kết nối thực tế: `HTTP 200`, model trả về `deepseek-v4.1-flash`, usage báo `billing_source: "go"`. Biến không có tiền tố `VITE_` nên Vite không bao giờ đưa key vào bundle frontend.
+
 ### Chạy bằng Docker (không bắt buộc)
 
 ```bash
