@@ -8,6 +8,9 @@ import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import BodyLog from './pages/BodyLog.jsx';
 import Calculators from './pages/Calculators.jsx';
+import Research from './pages/Research.jsx';
+import Training from './pages/Training.jsx';
+import Learn from './pages/Learn.jsx';
 import Settings from './pages/Settings.jsx';
 
 function Splash() {
@@ -45,6 +48,9 @@ export default function App() {
       <Route element={<ProtectedLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="/body-log" element={<BodyLog />} />
+        <Route path="/research" element={<Research />} />
+        <Route path="/training" element={<Training />} />
+        <Route path="/learn" element={<Learn />} />
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/settings" element={<Settings />} />
       </Route>

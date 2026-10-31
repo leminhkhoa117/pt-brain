@@ -8,9 +8,15 @@ import { initials } from '../lib/format.js';
 const NAV = [
   { to: '/', label: 'Tổng quan', icon: 'dashboard', end: true },
   { to: '/body-log', label: 'Theo dõi cơ thể', icon: 'activity' },
+  { to: '/research', label: 'Nghiên cứu', icon: 'book' },
+  { to: '/training', label: 'Giáo án', icon: 'dumbbell' },
+  { to: '/learn', label: 'Học tập', icon: 'notebook' },
   { to: '/calculators', label: 'Máy tính', icon: 'calculator' },
   { to: '/settings', label: 'Cài đặt', icon: 'settings' },
 ];
+
+const MOBILE_PATHS = ['/', '/body-log', '/research', '/training', '/learn'];
+const MOBILE_NAV = NAV.filter((item) => MOBILE_PATHS.includes(item.to));
 
 function NavItem({ item, compact = false }) {
   return (
@@ -96,7 +102,7 @@ export default function Layout({ children }) {
             </Link>
             <div className="hidden items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 lg:flex">
               <span className="inline-flex h-2 w-2 rounded-full bg-brand-500" />
-              Giai đoạn 1 · Nền tảng &amp; theo dõi cơ thể
+              Giai đoạn 5 · Learning &amp; Apply to Plan
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -126,8 +132,8 @@ export default function Layout({ children }) {
 
       {/* Bottom nav mobile */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] pt-1.5 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 lg:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4">
-          {NAV.map((item) => (
+        <div className="mx-auto grid max-w-md grid-cols-5">
+          {MOBILE_NAV.map((item) => (
             <NavItem key={item.to} item={item} compact />
           ))}
         </div>

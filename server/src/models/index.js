@@ -9,3 +9,4 @@ export { Summary } from './Summary.js';
 export { Term } from './Term.js';
 export { Flashcard } from './Flashcard.js';
 export { Note } from './Note.js';
+export { AiUsage } from './AiUsage.js';

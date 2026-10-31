@@ -80,6 +80,68 @@ const ICONS = {
     </>
   ),
   flame: <path d="M12 2s4 4.5 4 8a4 4 0 0 1-8 0c0-1 .3-2 .8-2.8C8 9 6 11 6 14a6 6 0 0 0 12 0c0-5-6-9-6-12Z" />,
+  book: (
+    <>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </>
+  ),
+  send: (
+    <>
+      <path d="m22 2-7 20-4-9-9-4Z" />
+      <path d="M22 2 11 13" />
+    </>
+  ),
+  trash: (
+    <>
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+    </>
+  ),
+  close: <path d="M18 6 6 18M6 6l12 12" />,
+  external: (
+    <>
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    </>
+  ),
+  dumbbell: (
+    <>
+      <path d="m6.5 6.5 11 11" />
+      <path d="m21 21-1-1" />
+      <path d="m3 3 1 1" />
+      <path d="m18 22 4-4" />
+      <path d="m2 6 4-4" />
+      <path d="m3 10 7-7" />
+      <path d="m14 21 7-7" />
+    </>
+  ),
+  cards: (
+    <>
+      <rect x="3" y="5" width="13" height="16" rx="2" />
+      <path d="M7 3h11a2 2 0 0 1 2 2v13" />
+    </>
+  ),
+  notebook: (
+    <>
+      <path d="M4 4a2 2 0 0 1 2-2h13v20H6a2 2 0 0 1-2-2V4Z" />
+      <path d="M8 2v20" />
+    </>
+  ),
+  checkCircle: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="m9 12 2 2 4-4" />
+    </>
+  ),
 };
 
 export function Icon({ name, className = 'h-5 w-5' }) {

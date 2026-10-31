@@ -31,7 +31,12 @@ const schema = z.object({
   AI_BASE_URL: z.string().url().default('https://opencode.ai/inference/go/openai/v1'),
   AI_API_KEY: z.string().optional().default(''),
   AI_MODEL: z.string().default('deepseek-v4.1-flash'),
+  AI_TIMEOUT_MS: z.coerce.number().int().positive().default(180000),
   AI_DAILY_LIMIT_PER_USER: z.coerce.number().int().positive().default(30),
+
+  // Email liên hệ cho Crossref/Unpaywall (polite pool) và User-Agent
+  CONTACT_EMAIL: z.string().email().default('dev@example.com'),
+  PDF_MAX_MB: z.coerce.number().int().positive().max(100).default(20),
 });
 
 const parsed = schema.safeParse(process.env);

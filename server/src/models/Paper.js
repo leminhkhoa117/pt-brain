@@ -11,6 +11,8 @@ const paperSchema = new mongoose.Schema(
     pmid: { type: String, default: '' },
     pmcid: { type: String, default: '' },
     url: { type: String, default: '' },
+    fullTextUrl: { type: String, default: '' },
+    pdfUrl: { type: String, default: '' },
     abstract: { type: String, default: '' },
     publicationTypes: { type: [String], default: [] },
     // Mức bằng chứng 1 (cao nhất) -> 5 (thấp nhất), xếp hạng bằng code

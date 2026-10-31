@@ -34,6 +34,17 @@ export function errorHandler(err, req, res, next) {
     code = 'VALIDATION_ERROR';
     message = 'Dữ liệu không hợp lệ';
     details = Object.values(err.errors).map((e) => ({ path: e.path, message: e.message }));
+  } else if (err.name === 'MulterError') {
+    status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+    code = 'UPLOAD_ERROR';
+    message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? 'File vượt quá dung lượng cho phép'
+        : `Lỗi upload file: ${err.message}`;
+  } else if (err.type === 'entity.too.large') {
+    status = 413;
+    code = 'PAYLOAD_TOO_LARGE';
+    message = 'Dữ liệu gửi lên quá lớn';
   }
 
   if (status >= 500) {
