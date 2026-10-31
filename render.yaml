@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: pt-brain
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm --prefix server ci && npm --prefix client ci && npm --prefix client run build
+    startCommand: node server/src/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVE_CLIENT
+        value: "true"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: AI_PROVIDER
+        value: opencode-go
+      - key: AI_BASE_URL
+        value: https://opencode.ai/inference/go/openai/v1
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_MODEL
+        value: deepseek-v4.1-flash
+      - key: AI_TIMEOUT_MS
+        value: "180000"
+      - key: AI_DAILY_LIMIT_PER_USER
+        value: "30"
+      - key: CONTACT_EMAIL
+        sync: false
+      - key: PDF_MAX_MB
+        value: "20"

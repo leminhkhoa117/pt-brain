@@ -43,7 +43,13 @@ async function post(body, sessionId) {
   const choice = json?.choices?.[0];
   const text = choice?.message?.content;
   if (typeof text !== 'string' || !text.trim()) {
-    throw new ApiError(502, 'AI_EMPTY', 'AI trả về nội dung rỗng');
+    const finish = choice?.finish_reason || 'unknown';
+    throw new ApiError(
+      502,
+      'AI_EMPTY',
+      `AI trả về nội dung rỗng (finish_reason: ${finish})`,
+      { usage: json?.usage, finishReason: finish },
+    );
   }
 
   return {

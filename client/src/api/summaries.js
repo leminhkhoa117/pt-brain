@@ -12,13 +12,18 @@ export const createSummary = ({ file, title, doi, url, text }) => {
   return api.post('/summaries', { doi, url, text, title }).then(unwrap);
 };
 
-export const listSummaries = () => api.get('/summaries').then(unwrap);
+export const listSummaries = (params = {}) =>
+  api.get('/summaries', { params }).then(unwrap);
 export const getSummary = (id) => api.get(`/summaries/${id}`).then(unwrap);
 export const deleteSummary = (id) => api.delete(`/summaries/${id}`).then(unwrap);
+export const updateSummaryMeta = (id, payload) =>
+  api.patch(`/summaries/${id}`, payload).then(unwrap);
 export const askSummary = (id, question) =>
   api.post(`/summaries/${id}/ask`, { question }).then(unwrap);
 export const summaryExportUrl = (id) =>
   `${api.defaults.baseURL}/summaries/${id}/export.md`;
+export const summaryPdfUrl = (id) =>
+  `${api.defaults.baseURL}/summaries/${id}/export.pdf`;
 
 export const createTerm = (payload) => api.post('/terms', payload).then(unwrap);
 export const listTerms = () => api.get('/terms').then(unwrap);

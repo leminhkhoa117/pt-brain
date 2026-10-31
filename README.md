@@ -2,19 +2,19 @@
 
 Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm tắt bài báo sang tiếng Việt, tính chỉ số, theo dõi cơ thể, lên giáo án và ôn tập kiến thức — trong một nơi.
 
-> **Trạng thái: hoàn thành Giai đoạn 0 → 5.**
-> Phase 6 (ảnh tiến độ, PWA, quản lý khách hàng, triển khai production) chưa làm.
+> **Trạng thái: hoàn thành Giai đoạn 0 → 6.**
+> Đã có thư viện bài đã phân tích, tóm tắt bất đồng bộ, ảnh tiến độ, xuất PDF, PWA, quản lý khách hàng và cấu hình deploy production.
 
 ## Tech stack
 
 | Lớp | Công nghệ |
 | --- | --- |
 | Frontend | React 18 + Vite, React Router, TanStack Query, Tailwind CSS, Recharts, react-hook-form + zod |
-| Backend | Node.js 20+, Express, Mongoose, zod, JWT + bcrypt, multer, pdf-parse, cheerio, helmet, express-rate-limit, pino |
+| Backend | Node.js 20+, Express, Mongoose, zod, JWT + bcrypt, multer, pdf-parse, pdfkit, cheerio, helmet, express-rate-limit, pino |
 | Database | MongoDB 7 (local hoặc Atlas) |
 | AI | OpenCode Go – API OpenAI-compatible, model `deepseek-v4.1-flash` (key chỉ ở backend) |
 | Nguồn nghiên cứu | PubMed E-utilities, Europe PMC, OpenAlex, Unpaywall, Crossref, DOI resolver |
-| Test | Vitest – 106 unit test |
+| Test | Vitest – 114 unit test |
 | Tooling | ESLint 9 (flat config), Prettier, Docker Compose |
 
 ## Chạy nhanh
@@ -64,10 +64,12 @@ docker compose up --build
 
 Máy phát triển hiện tại chưa cài Docker; cấu hình đã sẵn nhưng luồng local mới là luồng đã kiểm chứng.
 
+Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`docs/DEPLOY.md`](docs/DEPLOY.md).
+
 ## Lệnh
 
 ```bash
-npm run test        # 106 unit test
+npm run test        # 114 unit test
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
 npm run format      # Prettier
@@ -139,6 +141,15 @@ pt-brain/
 - Sổ tay ghi chú: tìm kiếm toàn văn, sửa/xóa, tag.
 - **Áp dụng vào plan**: AI đọc kết luận bài nghiên cứu + giáo án hiện tại, đề xuất thay đổi sets/RIR/rep range **có bảng trước → sau**; người dùng duyệt mới ghi vào giáo án.
 
+### Giai đoạn 6 — Hoàn thiện
+- **Thư viện nghiên cứu**: mọi bài đã phân tích được lưu tự động; ghim (★), tag, tìm kiếm theo tiêu đề/DOI/tóm tắt, mở lại, xuất Markdown/PDF.
+- **Tóm tắt bất đồng bộ**: `POST /summaries` trả `202` kèm job nền; lưu `status/progress`, client polling và hiển thị “Đang đọc đoạn 2/4...”. PDF dài không còn bị timeout HTTP.
+- **Ảnh tiến độ**: upload JPEG/PNG/WebP ≤ 8 MB, kiểm tra magic bytes; ảnh lưu ngoài public và chỉ phục vụ qua route có auth + kiểm tra quyền sở hữu; xóa được.
+- **Xuất PDF**: bản tóm tắt và báo cáo BodyLog, dùng font Noto Sans đóng gói sẵn (hiển thị tiếng Việt đúng).
+- **PWA**: manifest, icon 192/512, service worker cache app shell; cài lên điện thoại; chỉ đăng ký SW ở production.
+- **Quản lý khách hàng**: CRUD khách, mục tiêu, trình độ, trạng thái, giáo án đang áp dụng, check-in, ghi chú.
+- **Production**: server phục vụ `client/dist` khi `SERVE_CLIENT=true`; kèm `render.yaml` và `docs/DEPLOY.md`.
+
 ## API chính
 
 ```
@@ -149,16 +160,21 @@ GET    /api/me        PATCH /api/me        DELETE /api/me
 
 POST   /api/calc/:type?save=true          GET /api/calc/history
 GET    /api/metrics?from=&to=&days=       GET /api/metrics/summary
-GET    /api/metrics/export.csv            GET/PUT /api/metrics/:date
+GET    /api/metrics/export.csv            GET /api/metrics/export.pdf
+GET/PUT /api/metrics/:date
+POST   /api/metrics/:date/photos          # multipart ảnh tiến độ
+GET    /api/metrics/photos/:filename      DELETE /api/metrics/:date/photos/:filename
 
 POST   /api/summaries (JSON | multipart PDF)   GET /api/summaries
 GET    /api/summaries/:id                      DELETE /api/summaries/:id
+PATCH  /api/summaries/:id                      # ghim (isFavorite) + tags
 POST   /api/summaries/:id/ask
 POST   /api/summaries/:id/apply-to-plan
-GET    /api/summaries/:id/export.md
+GET    /api/summaries/:id/export.md            GET /api/summaries/:id/export.pdf
 
 POST   /api/research/search
 GET    /api/papers        POST /api/papers        GET/DELETE /api/papers/:id
+GET    /api/clients       POST /api/clients       GET/PATCH/DELETE /api/clients/:id
 GET    /api/terms         POST /api/terms         PATCH/DELETE /api/terms/:id
 GET    /api/notes         POST /api/notes         PATCH/DELETE /api/notes/:id
 GET    /api/flashcards?due=true               POST /api/flashcards
@@ -179,29 +195,35 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 
 ## Kiểm chứng
 
-- `npm run test`: **106/106 pass** — công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, ranker, progression, SM-2, apply changes.
+- `npm run test`: **114/114 pass** — công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, ranker, progression, SM-2, PDF, client validation, apply changes.
 - `npm run lint`: 0 lỗi.
 - `npm run build`: thành công; tách chunk react/charts/query.
 - E2E với MongoDB + AI thật:
   - Reader DOI meta-analysis: 201 trong ~65s, nhãn abstract-only, số liệu `P = 0.002`, `ES 0.023`, cache lần 2 trong **2s** cùng ID.
   - Reader fulltext OA: `sourceKind=open_access_fulltext`, 7.7k ký tự, mức 4, 4 kết quả chính.
+  - **PDF có sẵn `000441029.pdf`**: `POST /summaries` trả **202 sau 0s**, job nền 226s với tiến trình `Đang đọc đoạn 1/4 → 4/4 → tổng hợp`; kết quả `ready`, toàn văn 53.902 ký tự, tiêu đề AI “Leg Power Predicts Cognitive Ageing in Twins”, 8 kết quả chính, mức bằng chứng 3.
   - Finder: 28s, 3 truy vấn, 53 kết quả thô → 14 bài sau gộp → 8 kết quả, tổng hợp có trích dẫn.
   - Planner: 42 bài seed, giáo án 4 buổi = 73 set/tuần, volume đúng theo phép cộng tay.
   - Log 3 buổi → gợi ý tăng tạ 42.5 / 52.5 / 62.5 kg; 1RM progression đúng.
   - Apply-to-plan: 11s, 4 thay đổi trước→sau, áp dụng thành công.
-  - SM-2: thẻ mới quality 5 → interval 1 ngày, ease 2.6; CRUD thuật ngữ/ghi chú đều pass.
-- UI đã kiểm tra bằng trình duyệt thật: Dashboard, BodyLog, 4 tab máy tính, Reader, Finder, Planner, Workout, Glossary, Flashcards, modal Apply-to-plan; không có lỗi console.
+  - SM-2: thẻ mới quality 5 → interval 1 ngày, ease 2.6.
+  - **Phase 6**: ghim thư viện + tag, PDF tóm tắt 47.8 KB, PDF BodyLog 19.1 KB, upload/fetch/xóa ảnh tiến độ, CRUD khách hàng + check-in, manifest/SW/icon PWA đều 200.
+  - Production: chạy `SERVE_CLIENT=true` trên cổng 4100 → `/` trả HTML có manifest và asset, `/api/health` OK.
+- UI đã kiểm tra bằng trình duyệt thật: Dashboard, BodyLog (ảnh + PDF), 4 tab máy tính, Reader (kể cả màn hình đang xử lý + polling), Finder, Thư viện, Planner, Workout, Glossary, Flashcards, Clients, modal Apply-to-plan; không có lỗi console.
 
 ## Giới hạn đã biết
 
 - **PDF scan không có OCR**: file không có lớp text trả lỗi rõ ràng, cần bản PDF có text hoặc dán nội dung.
 - PDF được **trích text** (không gửi nguyên file cho model như phương án Anthropic trong plan gốc), nên bảng/hình phức tạp có thể mất cấu trúc.
 - Chưa có quiz trắc nghiệm do AI tạo (phần còn lại của mục 6.6).
-- Chưa hoàn tất bộ 5 bài acceptance đầy đủ của plan (mới chạy 2 bài thật + Finder); logic đã có 106 test.
+- Đã chạy **3 bài thật** (meta-analysis, fulltext OA, PDF quan sát) + Finder; chưa đủ bộ 5 bài acceptance của plan.
 - Chưa có test API tự động (supertest); E2E hiện chạy tay.
-- Docker Compose chưa được chạy thử trên máy này.
-- Phase 6 chưa làm: ảnh tiến độ, PWA, đa người dùng/khách hàng, deploy production.
-- Apply-to-plan có thể trả về 0 thay đổi — đây là hành vi an toàn khi bằng chứng yếu.
+- Docker Compose chưa được chạy thử trên máy này (đã test chế độ production-serving trực tiếp).
+- Job tóm tắt chạy trong RAM của process; nếu server restart giữa chừng, bài có thể kẹt `processing` (chưa có retry tự động).
+- Ảnh tiến độ lưu trên đĩa local; Render free sẽ mất ảnh sau redeploy — cần S3/Cloudinary cho production thật.
+- “Khách hàng” là CRM một chiều (PT quản lý hồ sơ), chưa phải tài khoản đăng nhập riêng cho khách.
+- PWA đã test manifest/SW/asset và build production, chưa cài thử trên điện thoại thật.
+- Apply-to-plan có thể trả về 0 thay đổi — hành vi an toàn khi bằng chứng yếu.
 
 ## Bảo mật & bản quyền
 

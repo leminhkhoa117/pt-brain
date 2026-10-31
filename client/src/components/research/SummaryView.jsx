@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Alert, Card, Icon } from '../ui.jsx';
-import { summaryExportUrl } from '../../api/summaries.js';
+import { summaryExportUrl, summaryPdfUrl } from '../../api/summaries.js';
 import { formatNumber } from '../../lib/format.js';
 
 const LEVEL_STYLES = {
@@ -44,6 +44,8 @@ export default function SummaryView({
   savedTerms,
   savingTerm,
   onApply,
+  favorite,
+  onToggleFavorite,
 }) {
   const c = summary.content || {};
   const level = c.evidenceLevel?.level ?? 5;
@@ -67,6 +69,18 @@ export default function SummaryView({
           )}
         </div>
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={onToggleFavorite}
+            className={clsx(
+              'btn-ghost !px-2.5 !py-1.5 text-sm',
+              favorite ? 'text-amber-500' : 'text-slate-400',
+            )}
+            title={favorite ? 'Bỏ ghim khỏi thư viện' : 'Ghim vào thư viện'}
+            aria-label="Ghim vào thư viện"
+          >
+            {favorite ? '★' : '☆'}
+          </button>
           {onApply && (
             <button
               type="button"
@@ -85,6 +99,13 @@ export default function SummaryView({
           >
             <Icon name="download" className="h-4 w-4" />
             .md
+          </a>
+          <a
+            href={summaryPdfUrl(summary._id)}
+            className="btn-ghost !px-2.5 !py-1.5 text-xs"
+            title="Tải PDF"
+          >
+            .pdf
           </a>
           {summary.sourceUrl || paper?.url ? (
             <a

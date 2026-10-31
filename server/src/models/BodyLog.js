@@ -35,6 +35,15 @@ const postureItemSchema = new mongoose.Schema(
   { _id: false },
 );
 
+const photoSchema = new mongoose.Schema(
+  {
+    filename: { type: String, required: true },
+    note: { type: String, default: '', maxlength: 300 },
+    uploadedAt: { type: Date, default: Date.now },
+  },
+  { _id: false },
+);
+
 const bodyLogSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
@@ -51,6 +60,7 @@ const bodyLogSchema = new mongoose.Schema(
     proteinG: { type: Number, min: 0, max: 1000 },
     notes: { type: String, maxlength: 2000 },
     posture: [postureItemSchema],
+    photos: { type: [photoSchema], default: [] },
     computed: { type: computedSchema, default: () => ({}) },
   },
   { timestamps: true },

@@ -1,7 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, Icon, LoadingBlock, PageHeader } from '../components/ui.jsx';
-import { fetchMetricByDate, fetchMetrics, saveMetric } from '../api/metrics.js';
+import {
+  deleteMetricPhoto,
+  exportPdfUrl,
+  fetchMetricByDate,
+  fetchMetrics,
+  metricPhotoUrl,
+  saveMetric,
+  uploadMetricPhoto,
+} from '../api/metrics.js';
 import { getErrorMessage } from '../api/client.js';
 import { bodyLogSchema } from '../lib/schemas.js';
 import { formatDateKey, formatLongDate, todayKey } from '../lib/date.js';
@@ -80,6 +88,10 @@ export default function BodyLog() {
   const [posture, setPosture] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
   const [notice, setNotice] = useState(null);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoNote, setPhotoNote] = useState('');
+  const [photoError, setPhotoError] = useState(null);
+  const photoInputRef = useRef(null);
 
   const { data: log, isLoading } = useQuery({
     queryKey: ['metric', date],
@@ -124,6 +136,28 @@ export default function BodyLog() {
       setNotice({ tone: 'success', text: 'Đã lưu dữ liệu cho ngày này.' });
     },
     onError: (error) => setNotice({ tone: 'danger', text: getErrorMessage(error) }),
+  });
+
+  const uploadPhoto = useMutation({
+    mutationFn: ({ file, note }) => uploadMetricPhoto(date, file, note),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['metric', date], data.log);
+      queryClient.invalidateQueries({ queryKey: ['metrics'] });
+      setPhotoFile(null);
+      setPhotoNote('');
+      setPhotoError(null);
+      if (photoInputRef.current) photoInputRef.current.value = '';
+    },
+    onError: (error) => setPhotoError(getErrorMessage(error)),
+  });
+
+  const removePhoto = useMutation({
+    mutationFn: (filename) => deleteMetricPhoto(date, filename),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['metric', date] });
+      queryClient.invalidateQueries({ queryKey: ['metrics'] });
+    },
+    onError: (error) => setPhotoError(getErrorMessage(error)),
   });
 
   const computed =
@@ -180,13 +214,23 @@ export default function BodyLog() {
         title="Theo dõi cơ thể"
         subtitle="Mỗi ngày một bản ghi. Nhập lại cùng ngày sẽ cập nhật, không tạo trùng."
         actions={
-          <a
-            href={`${import.meta.env.VITE_API_BASE || '/api'}/metrics/export.csv`}
-            className="btn-secondary"
-          >
-            <Icon name="download" className="h-4 w-4" />
-            Xuất CSV
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={exportPdfUrl()}
+              className="btn-secondary"
+              title="Tải báo cáo PDF"
+            >
+              <Icon name="download" className="h-4 w-4" />
+              PDF
+            </a>
+            <a
+              href={`${import.meta.env.VITE_API_BASE || '/api'}/metrics/export.csv`}
+              className="btn-secondary"
+            >
+              <Icon name="download" className="h-4 w-4" />
+              CSV
+            </a>
+          </div>
         }
       />
 
@@ -378,6 +422,84 @@ export default function BodyLog() {
               <p className="mt-3 text-sm text-slate-400">
                 Lưu số đo (cần chiều cao trong hồ sơ) để xem BMI, % mỡ, LBM, FFMI và TDEE.
               </p>
+            )}
+          </Card>
+
+          <Card>
+            <h3 className="card-title">Ảnh tiến độ</h3>
+            <p className="mt-2 text-xs text-slate-400">
+              Ảnh chỉ bạn xem (yêu cầu đăng nhập). Hãy lưu cân nặng trước khi thêm ảnh.
+            </p>
+
+            <div className="mt-3 space-y-2">
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => {
+                  const selected = e.target.files?.[0] || null;
+                  if (selected && selected.size > 8 * 1024 * 1024) {
+                    setPhotoError('Ảnh tối đa 8 MB.');
+                    setPhotoFile(null);
+                    return;
+                  }
+                  setPhotoError(null);
+                  setPhotoFile(selected);
+                }}
+                className="block w-full text-xs text-slate-500 file:mr-2 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-700 dark:file:bg-brand-950 dark:file:text-brand-300"
+              />
+              <input
+                className="input !py-1.5 text-xs"
+                placeholder="Ghi chú ảnh (tùy chọn)"
+                value={photoNote}
+                onChange={(e) => setPhotoNote(e.target.value)}
+                maxLength={300}
+              />
+              <button
+                type="button"
+                className="btn-secondary w-full text-xs"
+                disabled={!photoFile || !log || uploadPhoto.isPending}
+                onClick={() => uploadPhoto.mutate({ file: photoFile, note: photoNote })}
+              >
+                {uploadPhoto.isPending ? 'Đang tải ảnh...' : 'Tải ảnh lên'}
+              </button>
+              {!log && (
+                <p className="text-[11px] text-amber-600">Chưa có bản ghi ngày này.</p>
+              )}
+              {photoError && <p className="text-xs text-rose-500">{photoError}</p>}
+            </div>
+
+            {log?.photos?.length ? (
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {log.photos.map((photo) => (
+                  <div key={photo.filename} className="group relative">
+                    <a
+                      href={metricPhotoUrl(photo.filename)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <img
+                        src={metricPhotoUrl(photo.filename)}
+                        alt={photo.note || 'Ảnh tiến độ'}
+                        loading="lazy"
+                        className="h-24 w-full rounded-lg border border-slate-200 object-cover dark:border-slate-700"
+                      />
+                    </a>
+                    <button
+                      type="button"
+                      className="absolute right-1 top-1 rounded-full bg-slate-950/60 p-1 text-white opacity-0 transition group-hover:opacity-100"
+                      onClick={() => {
+                        if (window.confirm('Xóa ảnh này?')) removePhoto.mutate(photo.filename);
+                      }}
+                      aria-label="Xóa ảnh"
+                    >
+                      <Icon name="close" className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-xs text-slate-400">Chưa có ảnh.</p>
             )}
           </Card>
 

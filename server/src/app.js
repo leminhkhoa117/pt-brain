@@ -3,6 +3,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import pinoHttp from 'pino-http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import { generalLimiter } from './middleware/rateLimit.js';
@@ -47,6 +49,19 @@ export function createApp() {
   }
 
   app.use('/api', generalLimiter, routes);
+
+  // Production: server phục vụ luôn client đã build (SERVE_CLIENT=true)
+  if (env.SERVE_CLIENT) {
+    const clientDist = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../../client/dist',
+    );
+    app.use(express.static(clientDist, { index: false, maxAge: '1h' }));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) return next();
+      return res.sendFile(path.join(clientDist, 'index.html'));
+    });
+  }
 
   app.use(notFound);
   app.use(errorHandler);

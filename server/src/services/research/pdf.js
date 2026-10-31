@@ -19,6 +19,15 @@ export function cleanPdfTitle(value = '') {
     .slice(0, 300);
 }
 
+export function isMeaningfulTitle(value = '') {
+  const title = normalizeText(String(value));
+  if (title.length < 12) return false;
+  if (/\.(indd|pdf|docx?|tex|qxd)$/i.test(title)) return false;
+  if (/^[A-Z0-9_-]{3,24}$/i.test(title)) return false;
+  if (!/[a-z]{3,}/i.test(title)) return false;
+  return true;
+}
+
 /** Trích text từ PDF. PDF scan không có text sẽ trả lỗi rõ ràng (chưa hỗ trợ OCR). */
 export async function parsePdfBuffer(buffer, { filename = '' } = {}) {
   if (!buffer?.length) throw ApiError.badRequest('File PDF rỗng');
@@ -37,10 +46,16 @@ export async function parsePdfBuffer(buffer, { filename = '' } = {}) {
     );
   }
   const infoTitle = data.info?.Title ? cleanPdfTitle(data.info.Title) : '';
+  const fileTitle = cleanPdfTitle(filename);
+  const title = isMeaningfulTitle(infoTitle)
+    ? infoTitle
+    : isMeaningfulTitle(fileTitle)
+      ? fileTitle
+      : '';
   return {
     text,
     pages: data.numpages || 0,
-    title: infoTitle || cleanPdfTitle(filename) || 'Bài báo từ PDF',
+    title,
     hash: sha256(buffer),
   };
 }

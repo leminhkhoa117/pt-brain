@@ -26,6 +26,7 @@ const schema = z.object({
 
   CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
   COOKIE_SECURE: boolFromEnv,
+  SERVE_CLIENT: boolFromEnv,
 
   AI_PROVIDER: z.string().default('opencode-go'),
   AI_BASE_URL: z.string().url().default('https://opencode.ai/inference/go/openai/v1'),

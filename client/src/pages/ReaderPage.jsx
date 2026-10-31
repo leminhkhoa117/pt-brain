@@ -22,6 +22,7 @@ import {
   getSummary,
   listSummaries,
   listTerms,
+  updateSummaryMeta,
 } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
 import { formatDateKey } from '../lib/date.js';
@@ -100,7 +101,7 @@ export default function ReaderPage() {
   const [loadingId, setLoadingId] = useState(null);
   const [applyOpen, setApplyOpen] = useState(false);
 
-  const listQuery = useQuery({ queryKey: ['summaries'], queryFn: listSummaries });
+  const listQuery = useQuery({ queryKey: ['summaries'], queryFn: () => listSummaries() });
   const termsQuery = useQuery({ queryKey: ['terms'], queryFn: listTerms });
 
   useEffect(() => {
@@ -115,6 +116,29 @@ export default function ReaderPage() {
       setLink(url);
       setActive(null);
     }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const id = searchParams.get('summary');
+    if (!id) return undefined;
+    let cancelled = false;
+    setLoadingId(id);
+    getSummary(id)
+      .then((data) => {
+        if (!cancelled) {
+          setActive(data);
+          setPane('summary');
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError(getErrorMessage(err));
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingId(null);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [searchParams]);
 
   const savedTerms = new Set((termsQuery.data?.terms || []).map((t) => t.en));
@@ -151,6 +175,25 @@ export default function ReaderPage() {
     mutationFn: (id) => deleteSummary(id),
     onSuccess: () => {
       setActive(null);
+      queryClient.invalidateQueries({ queryKey: ['summaries'] });
+    },
+    onError: (err) => setError(getErrorMessage(err)),
+  });
+
+  const metaMutation = useMutation({
+    mutationFn: ({ id, isFavorite }) => updateSummaryMeta(id, { isFavorite }),    onSuccess: (data) => {
+      setActive((prev) =>
+        prev
+          ? {
+              ...prev,
+              summary: {
+                ...prev.summary,
+                isFavorite: data.summary.isFavorite,
+                tags: data.summary.tags,
+              },
+            }
+          : prev,
+      );
       queryClient.invalidateQueries({ queryKey: ['summaries'] });
     },
     onError: (err) => setError(getErrorMessage(err)),
@@ -206,6 +249,45 @@ export default function ReaderPage() {
   const stage = STAGES[Math.min(STAGES.length - 1, Math.floor(elapsed / 6))];
   const summaries = listQuery.data?.summaries || [];
   const usage = listQuery.data?.usage;
+  const [processingElapsed, setProcessingElapsed] = useState(0);
+
+  useEffect(() => {
+    const id = active?.summary?._id;
+    const status = active?.summary?.status;
+    if (!id || status !== 'processing') return undefined;
+    let cancelled = false;
+    const started = Date.now();
+    setProcessingElapsed(0);
+
+    const poll = setInterval(async () => {
+      try {
+        const data = await getSummary(id);
+        if (cancelled) return;
+        setActive(data);
+        if (data.summary.status !== 'processing') {
+          queryClient.invalidateQueries({ queryKey: ['summaries'] });
+        }
+      } catch (err) {
+        if (cancelled) return;
+        if (err?.response?.status === 404 || err?.response?.status === 403) {
+          clearInterval(poll);
+          clearInterval(tick);
+          setError('Không tìm thấy bản tóm tắt (có thể đã bị xóa).');
+          setActive(null);
+        }
+      }
+    }, 3500);
+
+    const tick = setInterval(() => {
+      if (!cancelled) setProcessingElapsed(Math.round((Date.now() - started) / 1000));
+    }, 1000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(poll);
+      clearInterval(tick);
+    };
+  }, [active?.summary?._id, active?.summary?.status, queryClient]);
 
   return (
     <div>
@@ -248,6 +330,36 @@ export default function ReaderPage() {
             />
           </div>
 
+          {active.summary.status === 'processing' ? (
+            <Card className="py-16 text-center">
+              <Spinner className="mx-auto h-9 w-9" />
+              <h2 className="mt-4 text-lg font-bold text-slate-900 dark:text-white">
+                Đang tóm tắt bài...
+              </h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {active.summary.progress || 'Đang xử lý...'}
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                Đã {processingElapsed}s · bạn có thể rời tab và quay lại thư viện sau.
+              </p>
+              <button
+                type="button"
+                className="btn-secondary mt-5"
+                onClick={() => setActive(null)}
+              >
+                Về thư viện
+              </button>
+            </Card>
+          ) : active.summary.status === 'failed' ? (
+            <Alert tone="danger" title="Tóm tắt thất bại">
+              {active.summary.error || 'Có lỗi khi gọi AI. Hãy thử lại với PDF khác hoặc dán nội dung.'}
+              <div className="mt-3">
+                <button type="button" className="btn-secondary" onClick={() => setActive(null)}>
+                  Quay lại thư viện
+                </button>
+              </div>
+            </Alert>
+          ) : (
           <div className="grid gap-4 lg:grid-cols-2">
             <div className={pane === 'source' ? 'hidden lg:block' : ''}>
               <SummaryView
@@ -263,6 +375,13 @@ export default function ReaderPage() {
                   }
                 }}
                 onApply={() => setApplyOpen(true)}
+                favorite={Boolean(active.summary.isFavorite)}
+                onToggleFavorite={() =>
+                  metaMutation.mutate({
+                    id: active.summary._id,
+                    isFavorite: !active.summary.isFavorite,
+                  })
+                }
               />
             </div>
 
@@ -278,7 +397,8 @@ export default function ReaderPage() {
               <NoteBox summaryId={active.summary._id} paperId={active.paper?._id} />
             </div>
           </div>
-          {applyOpen && (
+          )}
+          {applyOpen && active.summary.status === 'ready' && (
             <ApplyPlanModal
               summaryId={active.summary._id}
               onClose={() => setApplyOpen(false)}

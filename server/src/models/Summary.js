@@ -12,6 +12,14 @@ const summarySchema = new mongoose.Schema(
     basedOn: { type: String, enum: ['fulltext', 'abstract_only'], default: 'abstract_only' },
     // JSON theo schema mục 6.4 của plan, validate bằng zod ở Giai đoạn 2
     content: { type: mongoose.Schema.Types.Mixed, required: true },
+    status: {
+      type: String,
+      enum: ['processing', 'ready', 'failed'],
+      default: 'ready',
+      index: true,
+    },
+    progress: { type: String, default: '' },
+    error: { type: String, default: '' },
     // Nội dung nguồn để đọc đối chiếu và hỏi đáp.
     // Chỉ lưu fulltext khi là open access hoặc PDF do chính người dùng tải lên;
     // bài paywall chỉ lưu abstract (không lưu nguyên văn có bản quyền).
@@ -23,6 +31,9 @@ const summarySchema = new mongoose.Schema(
       default: 'abstract',
     },
     pdfHash: { type: String, default: '' },
+    tags: { type: [String], default: [] },
+    isFavorite: { type: Boolean, default: false },
+    savedAt: { type: Date, default: Date.now },
     qa: [
       {
         question: { type: String, required: true },

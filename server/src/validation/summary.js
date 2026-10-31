@@ -175,6 +175,13 @@ export const askSchema = z.object({
   question: z.string().trim().min(3, 'Câu hỏi quá ngắn').max(2000, 'Câu hỏi quá dài'),
 });
 
+export const summaryMetaSchema = z
+  .object({
+    tags: z.array(z.string().trim().min(1).max(50)).max(20).optional(),
+    isFavorite: z.boolean().optional(),
+  })
+  .strict();
+
 export const termSchema = z.object({
   en: z.string().trim().min(1).max(200),
   vi: z.string().trim().min(1).max(200),

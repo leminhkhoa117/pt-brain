@@ -30,3 +30,10 @@ createRoot(document.getElementById('root')).render(
     </ThemeProvider>
   </StrictMode>,
 );
+
+// PWA: chỉ đăng ký ở production để không ảnh hưởng HMR khi dev
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}

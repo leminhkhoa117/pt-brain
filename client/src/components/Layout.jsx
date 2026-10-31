@@ -11,6 +11,7 @@ const NAV = [
   { to: '/research', label: 'Nghiên cứu', icon: 'book' },
   { to: '/training', label: 'Giáo án', icon: 'dumbbell' },
   { to: '/learn', label: 'Học tập', icon: 'notebook' },
+  { to: '/clients', label: 'Khách hàng', icon: 'users' },
   { to: '/calculators', label: 'Máy tính', icon: 'calculator' },
   { to: '/settings', label: 'Cài đặt', icon: 'settings' },
 ];
@@ -102,7 +103,7 @@ export default function Layout({ children }) {
             </Link>
             <div className="hidden items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 lg:flex">
               <span className="inline-flex h-2 w-2 rounded-full bg-brand-500" />
-              Giai đoạn 5 · Learning &amp; Apply to Plan
+              Giai đoạn 6 · Hoàn thiện &amp; PWA
             </div>
             <div className="flex items-center gap-2">
               <button

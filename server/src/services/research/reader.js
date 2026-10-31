@@ -100,18 +100,22 @@ const PAPER_FIELDS = [
 ];
 
 async function upsertPaper(userId, data) {
+  const normalized = {
+    ...data,
+    title: data.title?.trim() || 'Bài báo chưa có tiêu đề',
+  };
   const query = { userId };
-  if (data.doi) query.doi = data.doi.toLowerCase();
-  else if (data.pmid) query.pmid = String(data.pmid);
-  else if (data.pmcid) query.pmcid = String(data.pmcid);
-  else query.title = data.title;
+  if (normalized.doi) query.doi = normalized.doi.toLowerCase();
+  else if (normalized.pmid) query.pmid = String(normalized.pmid);
+  else if (normalized.pmcid) query.pmcid = String(normalized.pmcid);
+  else query.title = normalized.title;
 
   let paper = await Paper.findOne(query);
   if (!paper) {
-    paper = new Paper({ userId, source: data.source || 'manual' });
+    paper = new Paper({ userId, source: normalized.source || 'manual' });
   }
   for (const field of PAPER_FIELDS) {
-    const value = data[field];
+    const value = normalized[field];
     if (value === undefined || value === null) continue;
     if (Array.isArray(value) && value.length === 0 && paper[field]?.length) continue;
     if (field === 'doi') {
@@ -125,32 +129,93 @@ async function upsertPaper(userId, data) {
 }
 
 /**
- * Pipeline hoàn chỉnh: lấy nguồn -> cache -> gọi AI -> lưu Paper + Summary.
- * Trả về sourceText để client hiển thị đối chiếu (không phải lúc nào cũng lưu toàn văn).
+ * Chạy AI trong nền để request không bị timeout với PDF dài.
+ * Cập nhật progress/status vào Summary để client polling.
+ */
+async function runSummaryJob({ summaryId, paperId, userId, resolved }) {
+  try {
+    const { content, usage, model, promptVersion } = await summarizePaper({
+      paper: resolved.paper,
+      text: resolved.text,
+      basedOn: resolved.basedOn,
+      onProgress: (progress) => {
+        Summary.updateOne({ _id: summaryId }, { $set: { progress } }).catch(() => {});
+      },
+    });
+
+    // PDF thường có metadata rác; bổ sung các field còn thiếu từ nội dung AI trích
+    if (content.metadata) {
+      const update = {};
+      if (!resolved.paper.title && content.metadata.title) update.title = content.metadata.title;
+      if (!resolved.paper.journal && content.metadata.journal) update.journal = content.metadata.journal;
+      if (!resolved.paper.year && content.metadata.year) update.year = content.metadata.year;
+      if (!resolved.paper.doi && content.metadata.doi) update.doi = content.metadata.doi;
+      if (Object.keys(update).length) {
+        await Paper.findByIdAndUpdate(paperId, { $set: update }).catch(() => {});
+      }
+    }
+
+    await Summary.updateOne(
+      { _id: summaryId },
+      {
+        $set: {
+          content,
+          model,
+          promptVersion,
+          status: 'ready',
+          progress: '',
+          error: '',
+        },
+      },
+    );
+    await recordAiCall(userId, { kind: 'summarize', usage }).catch(() => {});
+  } catch (error) {
+    await Summary.updateOne(
+      { _id: summaryId },
+      {
+        $set: {
+          status: 'failed',
+          progress: '',
+          error: (error.message || 'Lỗi tóm tắt').slice(0, 500),
+        },
+      },
+    ).catch(() => {});
+  }
+}
+
+/**
+ * Pipeline: lấy nguồn -> cache -> tạo Summary "processing" -> chạy AI nền.
+ * Trả về ngay để client hiển thị tiến trình và polling.
  */
 export async function createSummaryForUser(user, input, file) {
   const resolved = await resolveInput(input, file);
   const cacheKey = buildCacheKey(resolved);
 
-  const cached = await Summary.findOne({ userId: user._id, cacheKey });
-  if (cached) {
-    const paper = await Paper.findById(cached.paperId);
+  const existing = await Summary.findOne({ userId: user._id, cacheKey }).sort({
+    createdAt: -1,
+  });
+  if (existing && (!existing.status || existing.status === 'ready')) {
+    const paper = await Paper.findById(existing.paperId);
     return {
-      summary: cached,
+      summary: existing,
       paper,
-      sourceText: cached.sourceText,
+      sourceText: existing.sourceText,
       cached: true,
       usage: null,
     };
   }
+  if (existing?.status === 'processing') {
+    const paper = await Paper.findById(existing.paperId);
+    return {
+      summary: existing,
+      paper,
+      sourceText: existing.sourceText,
+      cached: false,
+      processing: true,
+    };
+  }
 
   await assertAiQuota(user._id, 'summarize');
-
-  const { content, usage, model, promptVersion } = await summarizePaper({
-    paper: resolved.paper,
-    text: resolved.text,
-    basedOn: resolved.basedOn,
-  });
 
   const paper = await upsertPaper(user._id, resolved.paper);
   const sourceText = truncateText(resolved.text, 400000);
@@ -160,19 +225,36 @@ export async function createSummaryForUser(user, input, file) {
     paperId: paper._id,
     inputType: resolved.inputType,
     basedOn: resolved.basedOn,
-    content,
+    content: {
+      metadata: {
+        title: resolved.paper.title || '',
+        authors: resolved.paper.authors || [],
+        year: resolved.paper.year || 0,
+        journal: resolved.paper.journal || '',
+        doi: resolved.paper.doi || '',
+      },
+      tldr: 'Đang xử lý...',
+      mainResults: [],
+      confidence: { basedOn: resolved.basedOn, missingInfo: [] },
+    },
     sourceText,
     sourceUrl: resolved.sourceUrl || '',
     sourceKind: resolved.sourceKind,
     pdfHash: resolved.pdfHash || '',
-    model,
-    promptVersion,
     cacheKey,
+    status: 'processing',
+    progress: 'Đang chuẩn bị tài liệu...',
   });
 
-  await recordAiCall(user._id, { kind: 'summarize', usage });
+  // Không await: chạy nền, cập nhật status/progress để client polling
+  runSummaryJob({
+    summaryId: summary._id,
+    paperId: paper._id,
+    userId: user._id,
+    resolved,
+  });
 
-  return { summary, paper, sourceText, cached: false, usage };
+  return { summary, paper, sourceText, cached: false, processing: true };
 }
 
 export async function getSummaryForUser(userId, id) {

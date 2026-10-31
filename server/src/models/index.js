@@ -10,3 +10,4 @@ export { Term } from './Term.js';
 export { Flashcard } from './Flashcard.js';
 export { Note } from './Note.js';
 export { AiUsage } from './AiUsage.js';
+export { Client } from './Client.js';
