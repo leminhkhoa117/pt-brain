@@ -3,7 +3,9 @@ import axios from 'axios';
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || '/api',
   withCredentials: true,
-  timeout: 30000,
+  // Render free ngủ sau ~15 phút; request đầu tiên có thể mất 50-60 giây để
+  // đánh thức instance. Để 90 giây để người dùng không bị lỗi oan khi mở app.
+  timeout: 90000,
 });
 
 // Endpoint có gọi AI (tóm tắt, tìm nghiên cứu, vision, quiz, meal plan…) chạy lâu
