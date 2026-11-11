@@ -4,7 +4,8 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm ci && npm --prefix server ci && npm --prefix client ci && npm --prefix client run build
+    # NODE_ENV=production khiến npm ci bỏ devDependencies; ép cài dev để có vite
+    buildCommand: npm ci && npm --prefix server ci && npm --prefix client ci --include=dev && npm --prefix client run build
     startCommand: node server/src/index.js
     healthCheckPath: /api/health
     envVars:
