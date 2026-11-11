@@ -4,6 +4,10 @@ import { MUSCLE_VOLUME_TARGET } from '../../../../shared/config/nutrition.js';
 import { volumeStatus } from '../../../../shared/calculators/index.js';
 import { suggestSplit, SPLIT_LABELS, volumeFromDays } from '../../../../shared/training/planner.js';
 import { listExercises } from './exerciseService.js';
+import {
+  healthConditionLabel,
+  isExerciseAvoided,
+} from '../../../../shared/health/conditions.js';
 
 const TEMPLATES = {
   full_body: [
@@ -168,12 +172,14 @@ function pickExercise(pool, slot, used, allowedEquipment) {
     : base;
   const candidates = byCategory.length ? byCategory : base;
 
+  // Nếu người dùng đã chọn dụng cụ, tuyệt đối không fallback sang dụng cụ khác:
+  // thà bỏ trống slot còn hơn gợi ý bài họ không thể tập.
   const withEquipment = allowedEquipment.size
     ? candidates.filter((e) => e.equipment.some((eq) => allowedEquipment.has(eq)))
     : candidates;
-  const finalPool = (withEquipment.length ? withEquipment : candidates).filter(
-    (e) => !used.has(e.slug),
-  );
+  if (allowedEquipment.size && !withEquipment.length) return null;
+
+  const finalPool = withEquipment.filter((e) => !used.has(e.slug));
   if (!finalPool.length) return null;
 
   finalPool.sort((a, b) => Number(b.isCompound) - Number(a.isCompound));
@@ -211,10 +217,14 @@ export async function suggestProgram({
   daysPerWeek = 3,
   equipment = [],
   sessionMinutes = 60,
+  healthConditions = [],
 }) {
   const days = Number(daysPerWeek) || 3;
   const split = suggestSplit(days);
-  const pool = await listExercises();
+  const all = await listExercises();
+  const pool = healthConditions?.length
+    ? all.filter((exercise) => !isExerciseAvoided(exercise.nameEn, exercise.nameVi, healthConditions))
+    : all;
   if (!pool.length) throw new ApiError(500, 'NO_EXERCISES', 'Thư viện bài tập chưa được seed');
 
   const allowedEquipment = new Set(
@@ -224,6 +234,7 @@ export async function suggestProgram({
   const used = new Set();
   const templates = TEMPLATES[split];
   const programDays = [];
+  let missingSlots = 0;
 
   for (let index = 0; index < days; index += 1) {
     const template = templates[index % templates.length];
@@ -231,7 +242,10 @@ export async function suggestProgram({
     const exercises = [];
     for (const slot of slots) {
       const exercise = pickExercise(pool, slot, used, allowedEquipment);
-      if (!exercise) continue;
+      if (!exercise) {
+        missingSlots += 1;
+        continue;
+      }
       used.add(exercise.slug);
       exercises.push(prescription(exercise, goal, experience));
     }
@@ -247,7 +261,16 @@ export async function suggestProgram({
     daysPerWeek: days,
     days: programDays,
     equipment,
-    notes: `Gợi ý theo quy tắc: ${days} buổi/tuần, ${SPLIT_LABELS[split]}, tối đa ${maxExercises} bài/buổi. Mục tiêu volume 10-20 set/nhóm cơ/tuần.`,
+    missingSlots,
+    notes: `Gợi ý theo quy tắc: ${days} buổi/tuần, ${SPLIT_LABELS[split]}, tối đa ${maxExercises} bài/buổi. Mục tiêu volume 10-20 set/nhóm cơ/tuần.${
+      healthConditions?.length
+        ? ` Đã loại bài không phù hợp với: ${healthConditions.map(healthConditionLabel).join(', ')}.`
+        : ''
+    }${
+      missingSlots
+        ? ` Có ${missingSlots} slot bị bỏ trống vì không có bài phù hợp dụng cụ đã chọn; hãy thêm dụng cụ hoặc dùng "Tự tạo giáo án".`
+        : ''
+    }`,
   };
 }
 

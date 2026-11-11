@@ -12,6 +12,7 @@ export async function list(req, res) {
     from: req.query.from,
     to: req.query.to,
     programId: req.query.programId,
+    kind: req.query.kind,
     limit: req.query.limit,
   });
   res.json({ data: { workouts } });

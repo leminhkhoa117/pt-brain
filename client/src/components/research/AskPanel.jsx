@@ -65,7 +65,7 @@ export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0 })
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Hỏi về bài này</h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             AI đã nạp{' '}
             <strong className="font-semibold text-slate-500 dark:text-slate-300">
               {sourceChars.toLocaleString('vi-VN')}
@@ -77,7 +77,7 @@ export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0 })
           {messages.length > 0 && (
             <button
               type="button"
-              className="btn-ghost !px-2 !py-1 text-[11px] text-slate-400 hover:text-rose-500"
+              className="btn-ghost !px-2 !py-1 text-[11px] text-slate-500 dark:text-slate-400 hover:text-rose-500"
               disabled={clear.isPending}
               onClick={() => {
                 if (window.confirm('Xóa toàn bộ lịch sử hỏi đáp của bài này?')) clear.mutate();
@@ -97,7 +97,7 @@ export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0 })
         className="mt-3 max-h-80 space-y-2.5 overflow-auto rounded-xl bg-slate-50 p-3 dark:bg-slate-950/40"
       >
         {!messages.length && (
-          <div className="py-4 text-center text-xs text-slate-400">
+          <div className="py-4 text-center text-xs text-slate-500 dark:text-slate-400">
             Chưa có câu hỏi. Thử một gợi ý bên dưới.
           </div>
         )}
@@ -106,8 +106,8 @@ export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0 })
             key={`${message.role}-${index}`}
             className={
               message.role === 'user'
-                ? 'ml-auto max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-gradient-to-br from-brand-500 to-teal-600 px-3.5 py-2.5 text-sm text-white shadow-sm'
-                : 'mr-auto max-w-[92%] rounded-2xl rounded-bl-md border border-slate-200/70 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm dark:border-white/[0.06] dark:bg-slate-800/90 dark:text-slate-200'
+                ? 'ml-auto max-w-[85%] whitespace-pre-wrap rounded-lg rounded-br-md bg-gradient-to-br from-brand-500 to-teal-600 px-3.5 py-2.5 text-sm text-white shadow-sm'
+                : 'mr-auto max-w-[92%] rounded-lg rounded-bl-md border border-slate-200/70 bg-white px-3.5 py-2.5 text-sm text-slate-700 shadow-sm dark:border-white/[0.06] dark:bg-slate-800/90 dark:text-slate-200'
             }
           >
             {message.role === 'assistant' ? (
@@ -118,7 +118,7 @@ export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0 })
           </div>
         ))}
         {ask.isPending && (
-          <div className="mr-auto flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-xs text-slate-500 shadow-sm dark:bg-slate-800 dark:text-slate-400">
+          <div className="mr-auto flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs text-slate-500 shadow-sm dark:bg-slate-800 dark:text-slate-400">
             <Spinner className="h-3.5 w-3.5" /> Đang tìm trong bài...
           </div>
         )}

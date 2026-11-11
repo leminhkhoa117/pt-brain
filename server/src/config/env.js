@@ -28,6 +28,9 @@ const schema = z.object({
   COOKIE_SECURE: boolFromEnv,
   SERVE_CLIENT: boolFromEnv,
 
+  // 'disk' cho local; 'mongo' (GridFS) cho Render free không có ổ đĩa persistent
+  STORAGE_DRIVER: z.enum(['disk', 'mongo']).default('disk'),
+
   AI_PROVIDER: z.string().default('opencode-go'),
   AI_BASE_URL: z.string().url().default('https://opencode.ai/inference/go/openai/v1'),
   AI_API_KEY: z.string().optional().default(''),

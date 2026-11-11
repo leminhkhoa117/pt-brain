@@ -37,14 +37,11 @@ export default function PlanEvaluationModal({ program, onClose }) {
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 backdrop-blur-sm sm:items-center sm:p-4">
-      <div className="max-h-[94vh] w-full overflow-auto rounded-t-3xl bg-white p-5 shadow-2xl dark:bg-slate-900 sm:max-w-3xl sm:rounded-3xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 sm:items-center sm:p-4">
+      <div className="max-h-[94vh] w-full overflow-auto rounded-t-lg bg-white p-5 shadow-overlay dark:bg-slate-900 sm:max-w-3xl sm:rounded-lg">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600 dark:text-brand-300">
-              Plan Review · Evidence-based
-            </p>
-            <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
               Đánh giá giáo án: {program.name}
             </h2>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -81,7 +78,7 @@ export default function PlanEvaluationModal({ program, onClose }) {
             <p className="mt-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
               AI đang phân tích giáo án...
             </p>
-            <p className="text-xs text-slate-400">Thường 10-30 giây.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Thường 10-30 giây.</p>
           </div>
         )}
 
@@ -97,7 +94,7 @@ export default function PlanEvaluationModal({ program, onClose }) {
                 <div className="grid h-[92px] w-[92px] place-items-center rounded-full bg-white dark:bg-slate-900">
                   <div className="text-center">
                     <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{result.score}</p>
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">/ 100</p>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">/ 100</p>
                   </div>
                 </div>
               </div>
@@ -165,7 +162,7 @@ export default function PlanEvaluationModal({ program, onClose }) {
                         </span>
                       </div>
                       {(item.evidenceIds || []).length > 0 && (
-                        <p className="mt-1 text-[10px] text-slate-400">
+                        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                           Bằng chứng: {item.evidenceIds.join(', ')}
                         </p>
                       )}
@@ -193,7 +190,7 @@ export default function PlanEvaluationModal({ program, onClose }) {
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{item.rationale}</p>
                     )}
                     {(item.evidenceIds || []).length > 0 && (
-                      <p className="mt-1 text-[10px] text-slate-400">
+                      <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                         Bằng chứng: {item.evidenceIds.join(', ')}
                       </p>
                     )}

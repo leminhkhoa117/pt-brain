@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CartesianGrid,
@@ -9,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../../components/ui.jsx';
+import { Alert, Card, EmptyState, Field, Icon, InfoTip, PageHeader, Spinner } from '../../components/ui.jsx';
 import {
   createWorkout,
   getProgram,
@@ -19,9 +20,17 @@ import {
   listWorkouts,
 } from '../../api/training.js';
 import { getErrorMessage } from '../../api/client.js';
+import { fetchSummary } from '../../api/metrics.js';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { formatDateKey, todayKey } from '../../lib/date.js';
 import { formatNumber } from '../../lib/format.js';
 import { MUSCLE_LABELS_VI } from '@shared/training/planner.js';
+import {
+  CARDIO_ACTIVITIES,
+  CARDIO_BY_KEY,
+  CARDIO_INTENSITY_LABELS,
+  estimateCardioCalories,
+} from '@shared/training/cardio.js';
 
 const SUGGESTION_TONE = {
   increase: 'success',
@@ -37,7 +46,7 @@ function ExerciseLogger({ item, rows, onChange, onAdd, onRemove }) {
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-white">{item.name}</h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {MUSCLE_LABELS_VI[item.muscleGroup] || item.muscleGroup} · {item.sets} ×{' '}
             {item.repRange.min}-{item.repRange.max} · RIR {item.targetRir}
           </p>
@@ -52,7 +61,7 @@ function ExerciseLogger({ item, rows, onChange, onAdd, onRemove }) {
       </Alert>
 
       {item.lastSets?.length ? (
-        <p className="mt-2 text-[11px] text-slate-400">
+        <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
           Buổi trước:{' '}
           {item.lastSets
             .map(
@@ -65,8 +74,14 @@ function ExerciseLogger({ item, rows, onChange, onAdd, onRemove }) {
         </p>
       ) : null}
 
+      {(item.equipment || []).includes('bodyweight') && (
+        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+          Bài bodyweight: có thể để tạ trống hoặc 0, hệ thống vẫn tính set và rep.
+        </p>
+      )}
+
       <div className="mt-3 space-y-1.5">
-        <div className="grid grid-cols-[1fr_1fr_0.8fr_auto] gap-2 px-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+        <div className="grid grid-cols-[1fr_1fr_0.8fr_auto] gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           <span>Tạ (kg)</span>
           <span>Rep</span>
           <span>RIR</span>
@@ -79,7 +94,7 @@ function ExerciseLogger({ item, rows, onChange, onAdd, onRemove }) {
               type="number"
               step="0.5"
               min="0"
-              placeholder="40"
+              placeholder={(item.equipment || []).includes('bodyweight') ? '0' : '40'}
               value={row.weightKg}
               onChange={(e) => onChange(index, 'weightKg', e.target.value)}
             />
@@ -105,7 +120,7 @@ function ExerciseLogger({ item, rows, onChange, onAdd, onRemove }) {
             <button
               type="button"
               onClick={() => onRemove(index)}
-              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-950/40"
+              className="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 transition hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-950/40"
               aria-label="Xóa set"
             >
               <Icon name="close" className="h-4 w-4" />
@@ -126,12 +141,26 @@ function ExerciseLogger({ item, rows, onChange, onAdd, onRemove }) {
   );
 }
 
+const isBodyweightMeta = (meta) => (meta?.equipment || []).includes('bodyweight');
+const isValidSetRow = (row, meta) =>
+  Number(row.reps) > 0 && (isBodyweightMeta(meta) || Number(row.weightKg) > 0);
+
 export default function WorkoutPage() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [programId, setProgramId] = useState('');
   const [dayName, setDayName] = useState('');
   const [date, setDate] = useState(todayKey());
   const [durationMin, setDurationMin] = useState('60');
+  const [mode, setMode] = useState('strength');
+  const [cardio, setCardio] = useState({
+    activity: 'running',
+    durationMin: '30',
+    distanceKm: '',
+    intensity: 'moderate',
+    caloriesBurned: '',
+    notes: '',
+  });
   const [logs, setLogs] = useState({});
   const [notice, setNotice] = useState(null);
   const [error, setError] = useState(null);
@@ -139,10 +168,7 @@ export default function WorkoutPage() {
   const [selectedExercise, setSelectedExercise] = useState('');
 
   const programsQuery = useQuery({ queryKey: ['programs'], queryFn: listPrograms });
-  const programs = useMemo(
-    () => programsQuery.data?.programs || [],
-    [programsQuery.data],
-  );
+  const programs = useMemo(() => programsQuery.data?.programs || [], [programsQuery.data]);
 
   useEffect(() => {
     if (!programId && programs.length) {
@@ -201,7 +227,9 @@ export default function WorkoutPage() {
     mutationFn: (payload) => createWorkout(payload),
     onSuccess: (data) => {
       setResult(data.workout);
-      setNotice('Đã lưu buổi tập.');
+      setNotice(
+        data.workout.kind === 'cardio' ? 'Đã lưu buổi vận động.' : 'Đã lưu buổi tập.',
+      );
       setError(null);
       queryClient.invalidateQueries({ queryKey: ['suggestions', programId, dayName] });
       queryClient.invalidateQueries({ queryKey: ['workouts'] });
@@ -215,13 +243,42 @@ export default function WorkoutPage() {
     queryFn: () => listWorkouts({ limit: 20 }),
   });
 
+  const metricsQuery = useQuery({
+    queryKey: ['metrics-summary', 30],
+    queryFn: () => fetchSummary(30),
+  });
+  const weightKg =
+    Number(metricsQuery.data?.latest?.weightKg || user?.profile?.weightKg) || 0;
+  const cardioEstimate = useMemo(() => {
+    if (!weightKg) return null;
+    try {
+      return estimateCardioCalories({
+        activity: cardio.activity,
+        durationMin: Number(cardio.durationMin),
+        distanceKm: cardio.distanceKm === '' ? undefined : Number(cardio.distanceKm),
+        weightKg,
+        intensity: cardio.intensity,
+      });
+    } catch {
+      return null;
+    }
+  }, [cardio.activity, cardio.durationMin, cardio.distanceKm, cardio.intensity, weightKg]);
+  const plannedCardio = suggestionsQuery.data?.cardio || [];
+
   const progressionQuery = useQuery({
     queryKey: ['progression', selectedExercise],
     queryFn: () => getProgression(selectedExercise),
     enabled: Boolean(selectedExercise),
   });
 
-  const suggestions = suggestionsQuery.data?.suggestions || [];
+  const suggestions = useMemo(
+    () => suggestionsQuery.data?.suggestions || [],
+    [suggestionsQuery.data],
+  );
+  const suggestionsByName = useMemo(
+    () => new Map(suggestions.map((item) => [item.name, item])),
+    [suggestions],
+  );
 
   const updateRow = (name, index, key, value) =>
     setLogs((prev) => ({
@@ -250,23 +307,22 @@ export default function WorkoutPage() {
 
   const submit = () => {
     setError(null);
-    const exerciseMap = new Map(suggestions.map((s) => [s.name, s]));
     const sets = [];
     for (const [name, rows] of Object.entries(logs)) {
-      const meta = exerciseMap.get(name);
+      const meta = suggestionsByName.get(name);
       for (const row of rows) {
-        if (!Number(row.weightKg) || !Number(row.reps)) continue;
+        if (!isValidSetRow(row, meta)) continue;
         sets.push({
           exercise: name,
           muscleGroup: meta?.muscleGroup || 'other',
-          weightKg: Number(row.weightKg),
+          weightKg: Number(row.weightKg) || 0,
           reps: Number(row.reps),
           rir: row.rir === '' || row.rir === null ? undefined : Number(row.rir),
         });
       }
     }
     if (!sets.length) {
-      setError('Nhập ít nhất một set có tạ và số rep trước khi lưu.');
+      setError('Nhập ít nhất một set có số rep và mức tạ phù hợp trước khi lưu.');
       return;
     }
     save.mutate({
@@ -278,6 +334,37 @@ export default function WorkoutPage() {
     });
   };
 
+  const submitCardio = () => {
+    setError(null);
+    if (!Number(cardio.durationMin)) {
+      setError('Nhập thời gian vận động (phút) trước khi lưu.');
+      return;
+    }
+    save.mutate({
+      kind: 'cardio',
+      date,
+      programId: programId || undefined,
+      dayName,
+      activity: cardio.activity,
+      durationMin: Number(cardio.durationMin),
+      distanceKm: cardio.distanceKm === '' ? undefined : Number(cardio.distanceKm),
+      intensity: cardio.intensity,
+      caloriesBurned:
+        cardio.caloriesBurned === '' ? undefined : Number(cardio.caloriesBurned),
+      notes: cardio.notes,
+    });
+  };
+
+  const applyPlannedCardio = (item) =>
+    setCardio((prev) => ({
+      ...prev,
+      activity: item.activity,
+      durationMin: String(item.durationMin),
+      distanceKm: item.distanceKm ?? '',
+      intensity: item.intensity || 'moderate',
+      notes: item.notes || '',
+    }));
+
   const chartData = (progressionQuery.data?.points || []).map((p) => ({
     ...p,
     label: formatDateKey(p.dateKey),
@@ -286,19 +373,18 @@ export default function WorkoutPage() {
   const dayNames = program?.days.map((d) => d.name) || [];
   const totalInputSets = useMemo(
     () =>
-      Object.values(logs).reduce(
-        (sum, rows) =>
-          sum + rows.filter((r) => Number(r.weightKg) > 0 && Number(r.reps) > 0).length,
-        0,
-      ),
-    [logs],
+      Object.entries(logs).reduce((sum, [name, rows]) => {
+        const meta = suggestionsByName.get(name);
+        return sum + rows.filter((row) => isValidSetRow(row, meta)).length;
+      }, 0),
+    [logs, suggestionsByName],
   );
 
   return (
     <div>
       <PageHeader
         title="Log buổi tập"
-        subtitle="Ghi tạ, rep và RIR cho từng set. Hệ thống so với buổi trước và gợi ý tăng tạ theo quy tắc."
+        subtitle="Ghi tạ hoặc cardio (chạy bộ, bơi, đạp xe...). Hệ thống so với buổi trước, gợi ý tăng tạ và ước tính calo theo MET."
       />
 
       {notice && (
@@ -312,17 +398,261 @@ export default function WorkoutPage() {
         </Alert>
       )}
 
-      {!programs.length ? (
-        <Card className="text-center text-sm text-slate-400">
-          Chưa có giáo án. Tạo giáo án ở tab “Giáo án” trước khi log buổi tập.
-        </Card>
+      <div className="mb-4 inline-flex gap-0.5 rounded-md border border-line bg-surface p-0.5 dark:border-white/10 dark:bg-transparent">
+        <button
+          type="button"
+          onClick={() => setMode('strength')}
+          className={`h-8 rounded px-3 text-xs font-semibold transition-colors ${
+            mode === 'strength'
+              ? 'bg-pine-700 text-white dark:bg-pine-400 dark:text-pine-950'
+              : 'text-slate-600 hover:bg-paper-2 dark:text-slate-400 dark:hover:bg-white/[0.06]'
+          }`}
+        >
+          Tập tạ
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('cardio')}
+          className={`h-8 rounded px-3 text-xs font-semibold transition-colors ${
+            mode === 'cardio'
+              ? 'bg-pine-700 text-white dark:bg-pine-400 dark:text-pine-950'
+              : 'text-slate-600 hover:bg-paper-2 dark:text-slate-400 dark:hover:bg-white/[0.06]'
+          }`}
+        >
+          Cardio / vận động
+        </button>
+      </div>
+
+      {mode === 'cardio' ? (
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+              Ghi buổi vận động
+            </h2>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Chạy bộ, bơi, đạp xe, đi bộ... Hệ thống ước tính calo theo MET và cân nặng; bạn có thể
+              nhập calo thủ công nếu có đồng hồ theo dõi nhịp tim.
+            </p>
+
+            {plannedCardio.length > 0 && (
+              <div className="mt-3 rounded-lg border border-brand-200 bg-brand-50/60 p-2.5 dark:border-brand-900 dark:bg-brand-950/30">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">
+                  Cardio trong plan hôm nay
+                </p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {plannedCardio.map((item, index) => (
+                    <button
+                      key={`${item.activity}-${index}`}
+                      type="button"
+                      className="btn-secondary !px-2 !py-1 text-xs"
+                      onClick={() => applyPlannedCardio(item)}
+                    >
+                      {CARDIO_BY_KEY[item.activity]?.label || item.activity} · {item.durationMin} phút
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Field label="Ngày">
+                <input
+                  className="input"
+                  type="date"
+                  value={date}
+                  max={todayKey()}
+                  onChange={(e) => setDate(e.target.value || todayKey())}
+                />
+              </Field>
+              <Field label="Hoạt động">
+                <select
+                  className="select"
+                  value={cardio.activity}
+                  onChange={(e) => setCardio((prev) => ({ ...prev, activity: e.target.value }))}
+                >
+                  {CARDIO_ACTIVITIES.map((item) => (
+                    <option key={item.key} value={item.key}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Thời gian (phút)">
+                <input
+                  className="input"
+                  type="number"
+                  min="1"
+                  max="600"
+                  value={cardio.durationMin}
+                  onChange={(e) =>
+                    setCardio((prev) => ({ ...prev, durationMin: e.target.value }))
+                  }
+                />
+              </Field>
+              <Field
+                label="Quãng đường (km, tùy chọn)"
+                hint="Càng có quãng đường, ước tính chạy bộ càng sát theo pace."
+              >
+                <input
+                  className="input"
+                  type="number"
+                  min="0"
+                  max="1000"
+                  step="0.1"
+                  value={cardio.distanceKm}
+                  onChange={(e) =>
+                    setCardio((prev) => ({ ...prev, distanceKm: e.target.value }))
+                  }
+                />
+              </Field>
+              <Field label="Cường độ">
+                <select
+                  className="select"
+                  value={cardio.intensity}
+                  onChange={(e) => setCardio((prev) => ({ ...prev, intensity: e.target.value }))}
+                >
+                  {Object.entries(CARDIO_INTENSITY_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field
+                label="Calo thủ công (tùy chọn)"
+                hint="Để trống để dùng ước tính MET; nhập số từ đồng hồ nếu có."
+              >
+                <input
+                  className="input"
+                  type="number"
+                  min="0"
+                  max="20000"
+                  placeholder={cardioEstimate ? `Ước tính ${cardioEstimate.calories}` : ''}
+                  value={cardio.caloriesBurned}
+                  onChange={(e) =>
+                    setCardio((prev) => ({ ...prev, caloriesBurned: e.target.value }))
+                  }
+                />
+              </Field>
+            </div>
+
+            <Field label="Ghi chú" className="mt-3">
+              <input
+                className="input"
+                placeholder="Cảm giác, thời tiết, lộ trình..."
+                value={cardio.notes}
+                onChange={(e) => setCardio((prev) => ({ ...prev, notes: e.target.value }))}
+              />
+            </Field>
+
+            <div className="mt-3 rounded-lg border border-slate-200 p-3 text-xs dark:border-slate-800">
+              {cardioEstimate ? (
+                <p className="text-slate-600 dark:text-slate-300">
+                  Ước tính: <strong>{cardioEstimate.calories} kcal</strong> · MET{' '}
+                  {cardioEstimate.met}
+                  {cardioEstimate.paceMinPerKm
+                    ? ` · pace ${cardioEstimate.paceMinPerKm} phút/km`
+                    : ''}
+                  {weightKg ? ` · cân nặng ${formatNumber(weightKg, 1)} kg` : ''}
+                </p>
+              ) : (
+                <p className="text-amber-600 dark:text-amber-400">
+                  Chưa có cân nặng trong BodyLog/hồ sơ. Nhập calo thủ công để lưu buổi vận động.
+                </p>
+              )}
+              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                Đây là ước lượng theo MET, không phải phép đo chính xác.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="btn-primary mt-4"
+              disabled={save.isPending}
+              onClick={submitCardio}
+            >
+              {save.isPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="check" className="h-4 w-4" />}
+              {save.isPending ? 'Đang lưu...' : 'Lưu buổi vận động'}
+            </button>
+          </Card>
+
+          <div className="space-y-4">
+            <Card>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Buổi vận động gần đây
+              </h3>
+              <div className="mt-2 divide-y divide-slate-100 dark:divide-slate-800">
+                {(historyQuery.data?.workouts || [])
+                  .filter((workout) => workout.kind === 'cardio')
+                  .slice(0, 10)
+                  .map((workout) => (
+                    <div key={workout._id} className="py-2 text-xs">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">
+                          {CARDIO_BY_KEY[workout.activity]?.label || workout.activity}
+                        </span>
+                        <span className="text-slate-500 dark:text-slate-400">
+                          {formatDateKey(workout.dateKey, true)}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 text-slate-500 dark:text-slate-400">
+                        {workout.durationMin || 0} phút
+                        {workout.distanceKm ? ` · ${formatNumber(workout.distanceKm, 1)} km` : ''}
+                        {' · '}
+                        {formatNumber(workout.caloriesBurned, 0)} kcal
+                        {workout.caloriesSource === 'manual' ? ' · thủ công' : ' · ước tính'}
+                      </p>
+                    </div>
+                  ))}
+                {!(historyQuery.data?.workouts || []).some((workout) => workout.kind === 'cardio') && (
+                  <p className="py-3 text-xs text-slate-500 dark:text-slate-400">
+                    Chưa có buổi cardio nào.
+                  </p>
+                )}
+              </div>
+            </Card>
+
+            {result?.kind === 'cardio' && (
+              <Card>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                  Đã lưu buổi vận động
+                </h3>
+                <p className="mt-2 text-sm font-semibold text-brand-700 dark:text-brand-300">
+                  {CARDIO_BY_KEY[result.activity]?.label || result.activity} ·{' '}
+                  {result.durationMin} phút
+                </p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {formatNumber(result.caloriesBurned, 0)} kcal ·{' '}
+                  {result.caloriesSource === 'manual' ? 'nhập thủ công' : 'ước tính MET'}
+                  {result.distanceKm
+                    ? ` · ${formatNumber(result.distanceKm, 1)} km`
+                    : ''}
+                </p>
+              </Card>
+            )}
+          </div>
+        </div>
+      ) : !programs.length ? (
+        <div className="panel">
+          <EmptyState
+            icon="dumbbell"
+            title="Chưa có giáo án"
+            note="Tạo giáo án trước khi log buổi tập. Hệ thống sẽ so sánh với buổi trước và gợi ý tăng tạ theo quy tắc."
+            action={
+              <Link to="/training" className="btn-primary btn-sm">
+                <Icon name="plus" className="h-3.5 w-3.5" />
+                Tạo giáo án
+              </Link>
+            }
+          />
+        </div>
       ) : (
         <>
           <Card className="mb-4">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Field label="Giáo án">
                 <select
-                  className="input"
+                  className="select"
                   value={programId}
                   onChange={(e) => {
                     setProgramId(e.target.value);
@@ -338,7 +668,7 @@ export default function WorkoutPage() {
               </Field>
               <Field label="Buổi tập">
                 <select
-                  className="input"
+                  className="select"
                   value={dayName}
                   onChange={(e) => setDayName(e.target.value)}
                 >
@@ -404,9 +734,7 @@ export default function WorkoutPage() {
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                     Lưu buổi tập
                   </h3>
-                  <p className="mt-1 text-xs text-slate-400">
-                    {totalInputSets} set hợp lệ đã nhập
-                  </p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{totalInputSets} set hợp lệ đã nhập</p>
                   <button
                     type="button"
                     className="btn-primary mt-3 w-full"
@@ -418,14 +746,24 @@ export default function WorkoutPage() {
 
                   {result && (
                     <div className="mt-3 rounded-xl bg-slate-50 p-3 text-xs dark:bg-slate-800/50">
-                      <p className="font-semibold text-slate-700 dark:text-slate-200">
+                      <p className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-200">
                         Đã lưu · tonnage {formatNumber(result.computed?.tonnage, 0)} kg
+                        <InfoTip label="Tonnage">
+                          Tổng khối lượng đã nâng trong buổi = Σ (tạ × rep) của mọi set.
+                        </InfoTip>
                       </p>
                       <ul className="mt-1 space-y-0.5 text-slate-500 dark:text-slate-400">
                         {Object.entries(result.computed?.estimated1RMs || {}).map(
                           ([name, value]) => (
                             <li key={name}>
-                              {name}: 1RM ~{formatNumber(value, 1)} kg
+                              {name}:{' '}
+                              <span className="inline-flex items-center gap-0.5">
+                                1RM ~{formatNumber(value, 1)} kg
+                                <InfoTip label="1RM ước tính">
+                                  Mức tạ tối đa ước tính cho 1 lần lặp, suy ra từ set vừa tập bằng
+                                  công thức Epley/Brzycki.
+                                </InfoTip>
+                              </span>
                             </li>
                           ),
                         )}
@@ -435,11 +773,14 @@ export default function WorkoutPage() {
                 </Card>
 
                 <Card>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                  <h3 className="flex items-center gap-1 text-sm font-semibold text-slate-900 dark:text-white">
                     Tiến trình 1RM
+                    <InfoTip label="1RM">
+                      Mức tạ tối đa ước tính cho 1 lần lặp của bài đang chọn, theo thời gian.
+                    </InfoTip>
                   </h3>
                   <select
-                    className="input mt-2 !py-1.5 text-xs"
+                    className="select mt-2 !py-1.5 text-xs"
                     value={selectedExercise}
                     onChange={(e) => setSelectedExercise(e.target.value)}
                   >
@@ -452,19 +793,43 @@ export default function WorkoutPage() {
                   <div className="mt-2 h-40">
                     {chartData.length ? (
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-200 dark:text-slate-800" vertical={false} />
-                          <XAxis dataKey="label" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                          <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                        <LineChart
+                          data={chartData}
+                          margin={{ top: 5, right: 5, left: -25, bottom: 0 }}
+                        >
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="currentColor"
+                            className="text-slate-200 dark:text-slate-800"
+                            vertical={false}
+                          />
+                          <XAxis
+                            dataKey="label"
+                            tick={{ fontSize: 10 }}
+                            tickLine={false}
+                            axisLine={false}
+                          />
+                          <YAxis
+                            domain={['dataMin - 2', 'dataMax + 2']}
+                            tick={{ fontSize: 10 }}
+                            tickLine={false}
+                            axisLine={false}
+                          />
                           <Tooltip
                             formatter={(value) => [`${formatNumber(value, 1)} kg`, '1RM']}
                             labelFormatter={(label) => `Ngày ${label}`}
                           />
-                          <Line type="monotone" dataKey="estimated1RM" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line
+                            type="monotone"
+                            dataKey="estimated1RM"
+                            stroke="#10b981"
+                            strokeWidth={2}
+                            dot={{ r: 3 }}
+                          />
                         </LineChart>
                       </ResponsiveContainer>
                     ) : (
-                      <p className="pt-12 text-center text-xs text-slate-400">
+                      <p className="pt-12 text-center text-xs text-slate-500 dark:text-slate-400">
                         Chưa có dữ liệu cho bài này.
                       </p>
                     )}
@@ -477,12 +842,15 @@ export default function WorkoutPage() {
                   </h3>
                   <div className="mt-2 divide-y divide-slate-100 dark:divide-slate-800">
                     {(historyQuery.data?.workouts || []).map((workout) => (
-                      <div key={workout._id} className="flex items-center justify-between py-2 text-xs">
+                      <div
+                        key={workout._id}
+                        className="flex items-center justify-between py-2 text-xs"
+                      >
                         <div>
                           <p className="font-semibold text-slate-700 dark:text-slate-200">
                             {formatDateKey(workout.dateKey, true)}
                           </p>
-                          <p className="text-slate-400">{workout.dayName || 'Buổi tập'}</p>
+                          <p className="text-slate-500 dark:text-slate-400">{workout.dayName || 'Buổi tập'}</p>
                         </div>
                         <span className="text-slate-500">
                           {formatNumber(workout.computed?.tonnage, 0)} kg
@@ -490,7 +858,7 @@ export default function WorkoutPage() {
                       </div>
                     ))}
                     {!historyQuery.data?.workouts?.length && (
-                      <p className="py-3 text-xs text-slate-400">Chưa có buổi tập nào.</p>
+                      <p className="py-3 text-xs text-slate-500 dark:text-slate-400">Chưa có buổi tập nào.</p>
                     )}
                   </div>
                 </Card>
@@ -502,4 +870,3 @@ export default function WorkoutPage() {
     </div>
   );
 }
-

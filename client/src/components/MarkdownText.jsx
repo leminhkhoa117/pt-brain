@@ -28,7 +28,7 @@ export default function MarkdownText({ children, className, compact = false }) {
           ),
           em: ({ children: content }) => <em className="italic">{content}</em>,
           del: ({ children: content }) => (
-            <del className="text-slate-400 line-through">{content}</del>
+            <del className="text-slate-500 dark:text-slate-400 line-through">{content}</del>
           ),
           ul: ({ children: content }) => (
             <ul className="mb-2 list-disc space-y-1 pl-5 last:mb-0 marker:text-brand-500">

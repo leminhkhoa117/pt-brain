@@ -76,10 +76,10 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="max-h-[92vh] w-full overflow-auto rounded-t-2xl bg-white p-5 shadow-2xl dark:bg-slate-900 sm:max-w-2xl sm:rounded-2xl">
+      <div className="max-h-[92vh] w-full overflow-auto rounded-t-2xl bg-white p-5 shadow-overlay dark:bg-slate-900 sm:max-w-2xl sm:rounded-lg">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Áp dụng vào giáo án</h2>
+            <h2 className="font-display text-[20px] font-semibold text-slate-900 dark:text-white">Áp dụng vào giáo án</h2>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               AI đề xuất chỉnh volume / RIR / rep range dựa trên bài đã tóm tắt. Bạn duyệt trước khi áp dụng.
             </p>
@@ -100,7 +100,7 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
             <label className="label">Chọn giáo án</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <select
-                className="input"
+                className="select"
                 value={programId}
                 onChange={(e) => {
                   setProgramId(e.target.value);
@@ -136,7 +136,7 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
           <div className="mt-4">
             {proposal.rationale && (
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-700 dark:bg-slate-800/50 dark:text-slate-200">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Lý do</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Lý do</p>
                 <MarkdownText className="mt-1">{proposal.rationale}</MarkdownText>
               </div>
             )}
@@ -144,7 +144,7 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
             {proposal.changes?.length ? (
               <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
                 <table className="min-w-full text-sm">
-                  <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-400 dark:bg-slate-800">
+                  <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:bg-slate-800">
                     <tr>
                       <th className="px-3 py-2">Ngày / bài</th>
                       <th className="px-3 py-2">Chỉnh</th>
@@ -159,9 +159,9 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
                           <p className="font-semibold text-slate-700 dark:text-slate-200">
                             {change.exerciseName}
                           </p>
-                          <p className="text-xs text-slate-400">{change.dayName}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{change.dayName}</p>
                           {change.reason && (
-                            <p className="mt-0.5 text-[11px] text-slate-400">{change.reason}</p>
+                            <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{change.reason}</p>
                           )}
                         </td>
                         <td className="px-3 py-2 text-slate-500">

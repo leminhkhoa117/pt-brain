@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert,
   Card,
+  EmptyState,
   Field,
   Icon,
   PageHeader,
@@ -23,6 +24,8 @@ import {
   listSummaries,
   listTerms,
   retrySummary,
+  summaryTranslationUrl,
+  translateSummary,
   updateSummaryMeta,
 } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
@@ -68,7 +71,7 @@ function NoteBox({ summaryId, paperId }) {
         maxLength={10000}
       />
       <div className="mt-2 flex items-center justify-between gap-2">
-        <p className="text-xs text-slate-400">Lưu gắn với bài này và thư viện ghi chú.</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Lưu gắn với bài này và thư viện ghi chú.</p>
         <button
           type="button"
           className="btn-secondary"
@@ -89,7 +92,9 @@ function NoteBox({ summaryId, paperId }) {
 
 export default function ReaderPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const fromFinder = searchParams.get('from') === 'finder';
   const [mode, setMode] = useState('link');
   const [link, setLink] = useState('');
   const [text, setText] = useState('');
@@ -160,6 +165,17 @@ export default function ReaderPage() {
     onError: (err) => setError(getErrorMessage(err)),
   });
 
+  const autoStarted = useRef(false);
+
+  useEffect(() => {
+    if (autoStarted.current || searchParams.get('auto') !== '1') return;
+    const doi = searchParams.get('doi');
+    const url = searchParams.get('url');
+    if (!doi && !url) return;
+    autoStarted.current = true;
+    createMutation.mutate(doi ? { doi } : { url });
+  }, [createMutation, searchParams]);
+
   const saveTermMutation = useMutation({
     mutationFn: (term) =>
       createTerm({
@@ -179,6 +195,20 @@ export default function ReaderPage() {
       queryClient.invalidateQueries({ queryKey: ['summaries'] });
     },
     onError: (err) => setError(getErrorMessage(err)),
+  });
+
+  const translateMutation = useMutation({
+    mutationFn: () => translateSummary(active.summary._id),
+    onSuccess: (data) => {
+      setActive((prev) =>
+        prev
+          ? {
+              ...prev,
+              summary: { ...prev.summary, translation: data.translation },
+            }
+          : prev,
+      );
+    },
   });
 
   const metaMutation = useMutation({
@@ -302,17 +332,19 @@ export default function ReaderPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Research Reader"
-        subtitle="Dán link/DOI, tải PDF hoặc dán văn bản. AI tóm tắt tiếng Việt, giữ nguyên số liệu gốc để bạn đối chiếu."
-        actions={
-          usage ? (
-            <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              AI hôm nay: {usage.summarize}/{usage.limit} lượt tóm tắt
-            </span>
-          ) : null
-        }
-      />
+      {!active && (
+        <PageHeader
+          title="Đọc &amp; tóm tắt"
+          subtitle="Dán link/DOI, tải PDF hoặc dán văn bản. AI tóm tắt tiếng Việt, giữ nguyên số liệu gốc để bạn đối chiếu."
+          actions={
+            usage ? (
+              <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                AI hôm nay: {usage.summarize}/{usage.limit} lượt tóm tắt
+              </span>
+            ) : null
+          }
+        />
+      )}
 
       {error && (
         <Alert tone="danger" className="mb-4">
@@ -323,13 +355,24 @@ export default function ReaderPage() {
       {active ? (
         <>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <button
-              type="button"
-              className="btn-ghost"
-              onClick={() => setActive(null)}
-            >
-              ← Thư viện
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              {fromFinder && (
+                <button
+                  type="button"
+                  className="btn-ghost"
+                  onClick={() => navigate('/research?tab=finder')}
+                >
+                  ← Kết quả tìm kiếm
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => setActive(null)}
+              >
+                ← Thư viện
+              </button>
+            </div>
             <Segmented
               className="lg:hidden"
               options={[
@@ -344,14 +387,15 @@ export default function ReaderPage() {
           {active.summary.status === 'processing' ? (
             <Card className="py-16 text-center">
               <Spinner className="mx-auto h-9 w-9" />
-              <h2 className="mt-4 text-lg font-bold text-slate-900 dark:text-white">
+              <h2 className="mt-4 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
                 Đang tóm tắt bài...
               </h2>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 {active.summary.progress || 'Đang xử lý...'}
               </p>
-              <p className="mt-1 text-xs text-slate-400">
-                Đã {processingElapsed}s · bạn có thể rời tab và quay lại thư viện sau.
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Đã {processingElapsed}s · bài dài có thể mất 2–4 phút. Nếu quá 6 phút không cập nhật,
+                hệ thống sẽ báo lỗi để bạn bấm “Thử lại”.
               </p>
               <button
                 type="button"
@@ -400,6 +444,16 @@ export default function ReaderPage() {
                     .getElementById('paper-chat')
                     ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                 }
+                onRefresh={() => {
+                  if (
+                    window.confirm(
+                      'Tạo lại bản tóm tắt bằng AI? Việc này tốn 1 lượt tóm tắt và có thể mất 1–2 phút. Bản dịch đã lưu vẫn được giữ.',
+                    )
+                  ) {
+                    retryMutation.mutate();
+                  }
+                }}
+                refreshing={retryMutation.isPending || translateMutation.isPending}
                 favorite={Boolean(active.summary.isFavorite)}
                 onToggleFavorite={() =>
                   metaMutation.mutate({
@@ -415,6 +469,13 @@ export default function ReaderPage() {
                 text={active.sourceText}
                 url={active.paper?.url || active.summary.sourceUrl}
                 title={active.paper?.title}
+                translation={active.summary.translation}
+                downloadUrl={summaryTranslationUrl(active.summary._id)}
+                onTranslate={() => translateMutation.mutate()}
+                translating={translateMutation.isPending}
+                translateError={
+                  translateMutation.isError ? getErrorMessage(translateMutation.error) : ''
+                }
               />
               <NoteBox summaryId={active.summary._id} paperId={active.paper?._id} />
             </div>
@@ -440,7 +501,7 @@ export default function ReaderPage() {
           <Card>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <Segmented options={MODES} value={mode} onChange={setMode} />
-              <span className="text-xs text-slate-400">PDF tối đa 20 MB · ưu tiên bài open access</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">PDF tối đa 20 MB · ưu tiên bài open access</span>
             </div>
 
             <form onSubmit={submit} className="space-y-4" noValidate>
@@ -461,12 +522,12 @@ export default function ReaderPage() {
 
               {mode === 'pdf' && (
                 <Field label="File PDF" hint="PDF có lớp text. Bản scan chưa hỗ trợ OCR.">
-                  <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-slate-300 px-4 py-4 text-sm transition hover:border-brand-400 dark:border-slate-700">
-                    <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                      <Icon name="book" className="h-5 w-5" />
+                  <label className="flex cursor-pointer items-center justify-between gap-3 rounded-md border border-dashed border-line bg-paper-2/60 px-4 py-4 text-[13px] transition-colors hover:border-pine-600 dark:border-white/15 dark:bg-white/[0.03]">
+                    <span className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                      <Icon name="book" className="h-4 w-4" />
                       {file ? `${file.name} · ${formatNumber(file.size / 1024 / 1024, 2)} MB` : 'Chọn file PDF'}
                     </span>
-                    <span className="badge bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                    <span className="badge badge-pine">
                       Chọn
                     </span>
                     <input
@@ -514,7 +575,7 @@ export default function ReaderPage() {
               </Field>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="max-w-xl text-xs leading-relaxed text-slate-400">
+                <p className="max-w-xl text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                   Chỉ nạp toàn văn từ nguồn hợp pháp (open access) hoặc file bạn tự tải lên. Bài paywall
                   sẽ được gắn nhãn “chỉ dựa trên abstract”.
                 </p>
@@ -550,17 +611,28 @@ export default function ReaderPage() {
 
           <div className="mt-6">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+              <h2 className="font-display text-[17px] font-semibold text-slate-900 dark:text-white">
                 Bài đã lưu {summaries.length ? `(${summaries.length})` : ''}
               </h2>
               {listQuery.isFetching && <Spinner className="h-4 w-4" />}
             </div>
 
             {!summaries.length && !listQuery.isLoading && (
-              <Card className="text-center text-sm text-slate-400">
-                Chưa có bản tóm tắt. Thử một DOI quen thuộc như{' '}
-                <code className="text-xs">10.1080/02640414.2016.1210197</code>.
-              </Card>
+              <div className="panel">
+                <EmptyState
+                  icon="book"
+                  title="Chưa có bản tóm tắt"
+                  note={
+                    <>
+                      Thử một DOI quen thuộc như{' '}
+                      <code className="rounded bg-paper-2 px-1 py-0.5 font-mono text-[11px] dark:bg-white/[0.06]">
+                        10.1080/02640414.2016.1210197
+                      </code>
+                      .
+                    </>
+                  }
+                />
+              </div>
             )}
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -576,7 +648,7 @@ export default function ReaderPage() {
                       Mức {item.paper?.evidenceLevel || '?'}
                     </span>
                     {item.basedOn === 'abstract_only' && (
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-500">
+                      <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-500">
                         Abstract
                       </span>
                     )}
@@ -585,7 +657,7 @@ export default function ReaderPage() {
                   <p className="mt-2 line-clamp-2 text-sm font-semibold leading-snug text-slate-800 group-hover:text-brand-700 dark:text-slate-100 dark:group-hover:text-brand-300">
                     {item.paper?.title || 'Không rõ tiêu đề'}
                   </p>
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     {item.paper?.journal || 'Không rõ tạp chí'}
                     {item.paper?.year ? ` · ${item.paper.year}` : ''}
                     {item.createdAt ? ` · lưu ${formatDateKey(String(item.createdAt).slice(0, 10))}` : ''}

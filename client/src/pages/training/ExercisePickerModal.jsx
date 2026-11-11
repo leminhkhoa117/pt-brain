@@ -70,15 +70,12 @@ export default function ExercisePickerModal({
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/65 p-0 backdrop-blur-sm sm:items-center sm:p-4">
-      <div className="flex max-h-[92vh] w-full flex-col rounded-t-3xl bg-white shadow-2xl dark:bg-slate-900 sm:max-w-3xl sm:rounded-3xl">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/75 p-0 sm:items-center sm:p-4">
+      <div className="flex max-h-[92vh] w-full flex-col rounded-t-lg bg-white shadow-overlay dark:bg-slate-900 sm:max-w-3xl sm:rounded-lg">
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4 dark:border-white/[0.06]">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600 dark:text-brand-300">
-              Thư viện bài tập
-            </p>
-            <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">Chọn bài tập</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">Chọn bài tập</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Lọc theo nhóm cơ, tìm theo tên Việt/Anh và chọn bài phù hợp.
             </p>
           </div>
@@ -97,10 +94,10 @@ export default function ExercisePickerModal({
                 onChange={(e) => setSearch(e.target.value)}
                 autoFocus
               />
-              <Icon name="search" className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Icon name="search" className="absolute left-3 top-3 h-4 w-4 text-slate-500 dark:text-slate-400" />
             </div>
             <select
-              className="input max-w-[170px]"
+              className="select max-w-[170px]"
               value={equipment}
               onChange={(e) => setEquipment(e.target.value)}
             >
@@ -160,7 +157,7 @@ export default function ExercisePickerModal({
                         <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                           {item.nameVi}
                         </p>
-                        <p className="truncate text-[11px] text-slate-400">{item.nameEn}</p>
+                        <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">{item.nameEn}</p>
                       </div>
                       <span
                         className={`badge shrink-0 ${
@@ -179,7 +176,7 @@ export default function ExercisePickerModal({
                         </span>
                       ))}
                     </div>
-                    <p className="mt-1 text-[10px] text-slate-400">
+                    <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                       {(item.equipment || []).join(', ')}
                     </p>
                   </button>
@@ -187,13 +184,13 @@ export default function ExercisePickerModal({
               })}
             </div>
           ) : (
-            <div className="py-12 text-center text-sm text-slate-400">
+            <div className="py-12 text-center text-sm text-slate-500 dark:text-slate-400">
               Không tìm thấy bài phù hợp. Thử đổi nhóm cơ hoặc từ khóa.
             </div>
           )}
         </div>
 
-        <div className="border-t border-slate-100 p-3 text-[11px] text-slate-400 dark:border-white/[0.06]">
+        <div className="border-t border-slate-100 p-3 text-[11px] text-slate-500 dark:text-slate-400 dark:border-white/[0.06]">
           Hiển thị {filtered.length} / {all.length} bài tập
         </div>
       </div>

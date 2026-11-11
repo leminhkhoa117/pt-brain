@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, Card, Icon, LoadingBlock, PageHeader } from '../components/ui.jsx';
+import { Alert, Card, Icon, InfoTip, LoadingBlock, PageHeader } from '../components/ui.jsx';
 import { Link } from 'react-router-dom';
 import {
   deleteMetricPhoto,
@@ -31,14 +31,6 @@ const LIFESTYLE = [
   { key: 'steps', label: 'Số bước', step: '100' },
   { key: 'calories', label: 'Calo nạp (kcal)', step: '10' },
   { key: 'proteinG', label: 'Protein (g)', step: '1' },
-];
-
-const CHECKLIST = [
-  { key: 'stand_posture', label: 'Đứng thẳng: tai - vai - hông - mắt cá thẳng hàng' },
-  { key: 'squat_depth', label: 'Squat đạt độ sâu (đùi dưới song song)' },
-  { key: 'shoulder_mobility', label: 'Vai gập quá đầu không đau / không nhô vai' },
-  { key: 'hip_mobility', label: 'Hông gập đủ sâu khi squat / hip hinge' },
-  { key: 'knee_tracking', label: 'Gối đi theo hướng mũi chân khi squat' },
 ];
 
 const emptyForm = {
@@ -86,7 +78,6 @@ export default function BodyLog() {
   const queryClient = useQueryClient();
   const [date, setDate] = useState(todayKey());
   const [form, setForm] = useState(emptyForm);
-  const [posture, setPosture] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
   const [notice, setNotice] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
@@ -115,11 +106,6 @@ export default function BodyLog() {
 
   useEffect(() => {
     setForm(toForm(log));
-    const next = {};
-    for (const item of log?.posture || []) {
-      if (item.ok !== undefined) next[item.key] = Boolean(item.ok);
-    }
-    setPosture(next);
     setFieldErrors({});
   }, [log?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -196,11 +182,6 @@ export default function BodyLog() {
       calories: values.calories ?? null,
       proteinG: values.proteinG ?? null,
       notes: values.notes || '',
-      posture: CHECKLIST.filter((item) => posture[item.key] !== undefined).map((item) => ({
-        key: item.key,
-        label: item.label,
-        ok: Boolean(posture[item.key]),
-      })),
     };
     for (const { key } of MEASUREMENTS) {
       if (values[key] !== undefined) payload.measurements[key] = values[key];
@@ -220,11 +201,7 @@ export default function BodyLog() {
               <Icon name="target" className="h-4 w-4" />
               AI thể trạng
             </Link>
-            <a
-              href={exportPdfUrl()}
-              className="btn-secondary"
-              title="Tải báo cáo PDF"
-            >
+            <a href={exportPdfUrl()} className="btn-secondary" title="Tải báo cáo PDF">
               <Icon name="download" className="h-4 w-4" />
               PDF
             </a>
@@ -264,14 +241,14 @@ export default function BodyLog() {
                 </button>
               </div>
             </div>
-            <p className="-mt-2 mb-4 text-xs text-slate-400">{formatLongDate(date)}</p>
+            <p className="-mt-2 mb-4 text-xs text-slate-500 dark:text-slate-400">{formatLongDate(date)}</p>
 
             {isLoading ? (
               <LoadingBlock label="Đang tải bản ghi..." />
             ) : (
               <form onSubmit={onSubmit} className="space-y-6" noValidate>
                 <section>
-                  <h3 className="mb-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                  <h3 className="mb-3 font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
                     Chỉ số chính
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -299,10 +276,10 @@ export default function BodyLog() {
                 </section>
 
                 <section>
-                  <h3 className="mb-1 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                  <h3 className="mb-1 font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
                     Số đo (cm)
                   </h3>
-                  <p className="mb-3 text-xs text-slate-400">
+                  <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
                     Cần vòng cổ + vòng bụng (nữ thêm vòng mông) để tính % mỡ US Navy.
                   </p>
                   <div className="grid gap-3 sm:grid-cols-3">
@@ -320,7 +297,7 @@ export default function BodyLog() {
                 </section>
 
                 <section>
-                  <h3 className="mb-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                  <h3 className="mb-3 font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
                     Lối sống &amp; dinh dưỡng
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-3">
@@ -334,32 +311,6 @@ export default function BodyLog() {
                         onChange={setValue(key)}
                         error={fieldErrors[key]}
                       />
-                    ))}
-                  </div>
-                </section>
-
-                <section>
-                  <h3 className="mb-1 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    Checklist tư thế &amp; tầm vận động
-                  </h3>
-                  <p className="mb-3 text-xs text-slate-400">Tích nếu đạt. Bỏ trống nếu chưa đánh giá.</p>
-                  <div className="space-y-2">
-                    {CHECKLIST.map((item) => (
-                      <label
-                        key={item.key}
-                        className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 px-3 py-2.5 text-sm transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50"
-                      >
-                        <input
-                          type="checkbox"
-                          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-                          checked={posture[item.key] ?? false}
-                          onChange={(e) => {
-                            const { checked } = e.target;
-                            setPosture((prev) => ({ ...prev, [item.key]: checked }));
-                          }}
-                        />
-                        <span>{item.label}</span>
-                      </label>
                     ))}
                   </div>
                 </section>
@@ -385,7 +336,6 @@ export default function BodyLog() {
                     className="btn-ghost"
                     onClick={() => {
                       setForm(toForm(log));
-                      setPosture({});
                       setFieldErrors({});
                       setNotice(null);
                     }}
@@ -400,59 +350,118 @@ export default function BodyLog() {
 
         <div className="space-y-4">
           <Card>
-            <h3 className="card-title">Chỉ số đã tính</h3>
+            <h3 className="font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
+              Chỉ số đã tính
+            </h3>
             {computed && Object.keys(computed).length ? (
-              <dl className="mt-3 space-y-2.5 text-sm">
+              <dl className="mt-2 divide-y divide-line dark:divide-white/[0.07]">
                 {[
-                  ['BMI', computed.bmi, ''],
-                  ['% mỡ (Navy)', computed.bodyFatNavy, '%'],
-                  ['Khối lượng nạc', computed.leanMassKg, 'kg'],
-                  ['FFMI', computed.ffmi, ''],
-                  ['FFMI chuẩn hóa', computed.ffmiNormalized, ''],
-                  ['BMR', computed.bmr, 'kcal'],
-                  ['TDEE', computed.tdee, 'kcal'],
+                  [
+                    'BMI',
+                    computed.bmi,
+                    '',
+                    'Chỉ số khối cơ thể = cân nặng / chiều cao². Không phân biệt cơ và mỡ.',
+                  ],
+                  [
+                    '% mỡ (Navy)',
+                    computed.bodyFatNavy,
+                    '%',
+                    'Ước tính % mỡ bằng công thức US Navy từ vòng cổ, bụng (và mông với nữ).',
+                  ],
+                  [
+                    'Khối lượng nạc',
+                    computed.leanMassKg,
+                    'kg',
+                    'LBM – cân nặng trừ khối mỡ: cơ, xương, nước và nội tạng.',
+                  ],
+                  [
+                    'FFMI',
+                    computed.ffmi,
+                    '',
+                    'Fat-Free Mass Index – chỉ số khối cơ, không phụ thuộc mỡ.',
+                  ],
+                  [
+                    'FFMI chuẩn hóa',
+                    computed.ffmiNormalized,
+                    '',
+                    'FFMI hiệu chỉnh về chiều cao 1,8 m để so sánh giữa các chiều cao.',
+                  ],
+                  [
+                    'BMR',
+                    computed.bmr,
+                    'kcal',
+                    'Năng lượng cơ thể tiêu hao khi nghỉ hoàn toàn trong 24 giờ (Mifflin-St Jeor).',
+                  ],
+                  [
+                    'TDEE',
+                    computed.tdee,
+                    'kcal',
+                    'Tổng năng lượng tiêu hao/ngày = BMR × hệ số vận động.',
+                  ],
                 ]
                   .filter(([, value]) => value !== undefined && value !== null)
-                  .map(([label, value, unit]) => (
-                    <div key={label} className="flex items-center justify-between gap-2">
-                      <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
-                      <dd className="font-semibold text-slate-800 dark:text-slate-100">
+                  .map(([label, value, unit, info]) => (
+                    <div key={label} className="flex items-center justify-between gap-2 py-2">
+                      <dt className="flex items-center gap-1 text-[12.5px] text-slate-500 dark:text-slate-400">
+                        {label}
+                        <InfoTip label={label}>{info}</InfoTip>
+                      </dt>
+                      <dd className="num text-[13px] font-medium text-slate-900 dark:text-slate-100">
                         {formatNumber(value, label === 'BMR' || label === 'TDEE' ? 0 : 1)}
-                        {unit && <span className="ml-1 text-xs font-normal text-slate-400">{unit}</span>}
+                        {unit && (
+                          <span className="ml-1 font-sans text-[11px] font-normal text-slate-500 dark:text-slate-400">
+                            {unit}
+                          </span>
+                        )}
                       </dd>
                     </div>
                   ))}
               </dl>
             ) : (
-              <p className="mt-3 text-sm text-slate-400">
+              <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
                 Lưu số đo (cần chiều cao trong hồ sơ) để xem BMI, % mỡ, LBM, FFMI và TDEE.
               </p>
             )}
           </Card>
 
           <Card>
-            <h3 className="card-title">Ảnh tiến độ</h3>
-            <p className="mt-2 text-xs text-slate-400">
+            <h3 className="font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
+              Ảnh tiến độ
+            </h3>
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
               Ảnh chỉ bạn xem (yêu cầu đăng nhập). Hãy lưu cân nặng trước khi thêm ảnh.
             </p>
 
             <div className="mt-3 space-y-2">
-              <input
-                ref={photoInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(e) => {
-                  const selected = e.target.files?.[0] || null;
-                  if (selected && selected.size > 8 * 1024 * 1024) {
-                    setPhotoError('Ảnh tối đa 8 MB.');
-                    setPhotoFile(null);
-                    return;
-                  }
-                  setPhotoError(null);
-                  setPhotoFile(selected);
-                }}
-                className="block w-full text-xs text-slate-500 file:mr-2 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-700 dark:file:bg-brand-950 dark:file:text-brand-300"
-              />
+              <label className="flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-line bg-paper-2/60 px-3 py-2.5 text-[12px] text-slate-500 transition-colors hover:border-pine-600 dark:border-white/15 dark:bg-white/[0.03] dark:text-slate-400">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-line bg-surface text-slate-500 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
+                  <Icon name="upload" className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium text-slate-700 dark:text-slate-200">
+                    {photoFile ? photoFile.name : 'Chọn ảnh JPG / PNG / WebP'}
+                  </span>
+                  <span className="block text-[11px] text-slate-500 dark:text-slate-400">
+                    Tối đa 8 MB · ảnh chỉ bạn xem
+                  </span>
+                </span>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(e) => {
+                    const selected = e.target.files?.[0] || null;
+                    if (selected && selected.size > 8 * 1024 * 1024) {
+                      setPhotoError('Ảnh tối đa 8 MB.');
+                      setPhotoFile(null);
+                      return;
+                    }
+                    setPhotoError(null);
+                    setPhotoFile(selected);
+                  }}
+                  className="sr-only"
+                />
+              </label>
               <input
                 className="input !py-1.5 text-xs"
                 placeholder="Ghi chú ảnh (tùy chọn)"
@@ -468,9 +477,7 @@ export default function BodyLog() {
               >
                 {uploadPhoto.isPending ? 'Đang tải ảnh...' : 'Tải ảnh lên'}
               </button>
-              {!log && (
-                <p className="text-[11px] text-amber-600">Chưa có bản ghi ngày này.</p>
-              )}
+              {!log && <p className="text-[11px] text-amber-600">Chưa có bản ghi ngày này.</p>}
               {photoError && <p className="text-xs text-rose-500">{photoError}</p>}
             </div>
 
@@ -478,11 +485,7 @@ export default function BodyLog() {
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {log.photos.map((photo) => (
                   <div key={photo.filename} className="group relative">
-                    <a
-                      href={metricPhotoUrl(photo.filename)}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
+                    <a href={metricPhotoUrl(photo.filename)} target="_blank" rel="noreferrer">
                       <img
                         src={metricPhotoUrl(photo.filename)}
                         alt={photo.note || 'Ảnh tiến độ'}
@@ -504,7 +507,7 @@ export default function BodyLog() {
                 ))}
               </div>
             ) : (
-              <p className="mt-3 text-xs text-slate-400">Chưa có ảnh.</p>
+              <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">Chưa có ảnh.</p>
             )}
           </Card>
 
@@ -532,11 +535,11 @@ export default function BodyLog() {
                     </button>
                   ))
               ) : (
-                <p className="py-3 text-sm text-slate-400">Chưa có bản ghi nào.</p>
+                <p className="py-3 text-sm text-slate-500 dark:text-slate-400">Chưa có bản ghi nào.</p>
               )}
             </div>
             {recentLogs.length > 10 && (
-              <p className="mt-2 text-xs text-slate-400">Hiển thị 10 bản ghi mới nhất.</p>
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Hiển thị 10 bản ghi mới nhất.</p>
             )}
           </Card>
         </div>

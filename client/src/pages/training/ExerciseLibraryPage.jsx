@@ -48,9 +48,9 @@ export default function ExerciseLibraryPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <Icon name="search" className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <Icon name="search" className="absolute left-3 top-3 h-4 w-4 text-slate-500 dark:text-slate-400" />
           </div>
-          <select className="input" value={muscle} onChange={(e) => setMuscle(e.target.value)}>
+          <select className="select" value={muscle} onChange={(e) => setMuscle(e.target.value)}>
             <option value="">Tất cả nhóm cơ</option>
             {MUSCLES.map(([value, label]) => (
               <option key={value} value={value}>
@@ -58,7 +58,7 @@ export default function ExerciseLibraryPage() {
               </option>
             ))}
           </select>
-          <select className="input" value={equipment} onChange={(e) => setEquipment(e.target.value)}>
+          <select className="select" value={equipment} onChange={(e) => setEquipment(e.target.value)}>
             <option value="">Tất cả dụng cụ</option>
             {equipmentList.map((item) => (
               <option key={item} value={item}>
@@ -82,7 +82,7 @@ export default function ExerciseLibraryPage() {
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                     {exercise.nameVi}
                   </h3>
-                  <p className="text-xs text-slate-400">{exercise.nameEn}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{exercise.nameEn}</p>
                 </div>
                 <span
                   className={`badge ${
@@ -106,7 +106,7 @@ export default function ExerciseLibraryPage() {
                   </span>
                 ))}
               </div>
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 Dụng cụ: {(exercise.equipment || []).join(', ') || '—'}
               </p>
             </Card>

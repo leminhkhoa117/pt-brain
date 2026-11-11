@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   deleteAccount,
   fetchMe,
@@ -11,9 +12,18 @@ import {
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [age, setAge] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Xóa cache khi đổi/đăng xuất tài khoản để không lộ dữ liệu của user trước
+  // trên cùng thiết bị (React Query giữ cache theo key, không theo user).
+  const resetSession = useCallback(() => {
+    setUser(null);
+    setAge(null);
+    queryClient.clear();
+  }, [queryClient]);
 
   useEffect(() => {
     let mounted = true;
@@ -34,28 +44,41 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const login = useCallback(async (payload) => {
-    const data = await loginRequest(payload);
-    setUser(data.user);
-    const me = await fetchMe();
-    setAge(me.age);
-    return data.user;
-  }, []);
+  useEffect(() => {
+    const onExpired = () => resetSession();
+    window.addEventListener('pt-auth-expired', onExpired);
+    return () => window.removeEventListener('pt-auth-expired', onExpired);
+  }, [resetSession]);
 
-  const register = useCallback(async (payload) => {
-    const data = await registerRequest(payload);
-    setUser(data.user);
-    return data.user;
-  }, []);
+  const login = useCallback(
+    async (payload) => {
+      const data = await loginRequest(payload);
+      queryClient.clear();
+      setUser(data.user);
+      const me = await fetchMe();
+      setAge(me.age);
+      return data.user;
+    },
+    [queryClient],
+  );
+
+  const register = useCallback(
+    async (payload) => {
+      const data = await registerRequest(payload);
+      queryClient.clear();
+      setUser(data.user);
+      return data.user;
+    },
+    [queryClient],
+  );
 
   const logout = useCallback(async () => {
     try {
       await logoutRequest();
     } finally {
-      setUser(null);
-      setAge(null);
+      resetSession();
     }
-  }, []);
+  }, [resetSession]);
 
   const saveProfile = useCallback(async (payload) => {
     const data = await updateMe(payload);
@@ -66,9 +89,8 @@ export function AuthProvider({ children }) {
 
   const removeAccount = useCallback(async () => {
     await deleteAccount();
-    setUser(null);
-    setAge(null);
-  }, []);
+    resetSession();
+  }, [resetSession]);
 
   const value = useMemo(
     () => ({ user, age, loading, login, register, logout, saveProfile, removeAccount }),

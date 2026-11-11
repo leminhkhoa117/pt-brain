@@ -23,6 +23,24 @@ describe('selectRelevantContext', () => {
     expect(context).toContain('[Đoạn');
   });
 
+  it('ưu tiên đoạn chứa từ khóa và số liệu trong câu hỏi', () => {
+    const chunks = Array.from(
+      { length: 40 },
+      (_, i) =>
+        `Section ${i}: ` +
+        'nội dung nền '.repeat(500) +
+        (i === 30 ? ' creatine monohydrate p = 0.003 ' : ''),
+    );
+    const text = chunks.join('\n\n');
+    const context = selectRelevantContext(
+      text,
+      'creatine monohydrate p = 0.003 có hiệu quả không?',
+      { maxChars: 20000 },
+    );
+    expect(context).toContain('creatine monohydrate');
+    expect(context).toContain('p = 0.003');
+  });
+
   it('giới hạn độ dài tương đối', () => {
     const text = 'Luận điểm khoa học. '.repeat(10000);
     const context = selectRelevantContext(text, 'câu hỏi', { maxChars: 10000 });

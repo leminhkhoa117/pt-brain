@@ -23,6 +23,8 @@ export const EXERCISES = [
   // Chest
   { slug: 'barbell-bench-press', nameVi: 'Bench press tạ đòn', nameEn: 'Barbell Bench Press', primaryMuscles: ['chest'], secondaryMuscles: ['triceps', 'shoulders'], equipment: ['barbell'], category: 'compound', isCompound: true },
   { slug: 'incline-dumbbell-press', nameVi: 'Đẩy ngực nghiêng tạ đơn', nameEn: 'Incline Dumbbell Press', primaryMuscles: ['chest'], secondaryMuscles: ['shoulders', 'triceps'], equipment: ['dumbbell'], category: 'compound', isCompound: true },
+  { slug: 'dumbbell-bench-press', nameVi: 'Đẩy ngực tạ đơn', nameEn: 'Dumbbell Bench Press', primaryMuscles: ['chest'], secondaryMuscles: ['shoulders', 'triceps'], equipment: ['dumbbell'], category: 'compound', isCompound: true },
+  { slug: 'dumbbell-floor-press', nameVi: 'Đẩy ngực tạ đơn trên sàn', nameEn: 'Dumbbell Floor Press', primaryMuscles: ['chest'], secondaryMuscles: ['triceps'], equipment: ['dumbbell'], category: 'compound', isCompound: true },
   { slug: 'machine-chest-press', nameVi: 'Đẩy ngực máy', nameEn: 'Machine Chest Press', primaryMuscles: ['chest'], secondaryMuscles: ['triceps'], equipment: ['machine'], category: 'compound', isCompound: true },
   { slug: 'cable-fly', nameVi: 'Ép ngực cáp', nameEn: 'Cable Chest Fly', primaryMuscles: ['chest'], secondaryMuscles: ['shoulders'], equipment: ['cable'], category: 'isolation', isCompound: false },
   { slug: 'push-up', nameVi: 'Hít đất', nameEn: 'Push-up', primaryMuscles: ['chest'], secondaryMuscles: ['triceps', 'shoulders'], equipment: ['bodyweight'], category: 'compound', isCompound: true },
@@ -115,6 +117,9 @@ export const EXERCISES = [
   { slug: 'cable-kickback', nameVi: 'Đá mông cáp', nameEn: 'Cable Glute Kickback', primaryMuscles: ['glutes'], secondaryMuscles: [], equipment: ['cable'], category: 'isolation', isCompound: false },
   { slug: 'sumo-deadlift', nameVi: 'Sumo deadlift', nameEn: 'Sumo Deadlift', primaryMuscles: ['glutes', 'hamstrings'], secondaryMuscles: ['back'], equipment: ['barbell'], category: 'compound', isCompound: true },
   { slug: 'hip-abduction', nameVi: 'Mở hông máy', nameEn: 'Hip Abduction', primaryMuscles: ['glutes'], secondaryMuscles: [], equipment: ['machine'], category: 'isolation', isCompound: false },
+  { slug: 'hip-adduction', nameVi: 'Khép hông máy', nameEn: 'Hip Adduction', primaryMuscles: ['thigh-inner'], secondaryMuscles: ['glutes'], equipment: ['machine'], category: 'isolation', isCompound: false },
+  { slug: 'cable-hip-adduction', nameVi: 'Khép hông cáp', nameEn: 'Cable Hip Adduction', primaryMuscles: ['thigh-inner'], secondaryMuscles: ['glutes'], equipment: ['cable'], category: 'isolation', isCompound: false },
+  { slug: 'copenhagen-plank', nameVi: 'Plank Copenhagen', nameEn: 'Copenhagen Plank', primaryMuscles: ['thigh-inner'], secondaryMuscles: ['core'], equipment: ['bodyweight'], category: 'isolation', isCompound: false },
   { slug: 'single-leg-hip-thrust', nameVi: 'Hip thrust một chân', nameEn: 'Single-Leg Hip Thrust', primaryMuscles: ['glutes'], secondaryMuscles: ['hamstrings'], equipment: ['bodyweight'], category: 'compound', isCompound: true },
   { slug: 'frog-pump', nameVi: 'Frog pump', nameEn: 'Frog Pump', primaryMuscles: ['glutes'], secondaryMuscles: [], equipment: ['bodyweight'], category: 'isolation', isCompound: false },
 

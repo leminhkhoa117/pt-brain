@@ -1,26 +1,38 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { Spinner } from './components/ui.jsx';
 import { useAuth } from './hooks/useAuth.jsx';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import BodyLog from './pages/BodyLog.jsx';
-import Calculators from './pages/Calculators.jsx';
-import Research from './pages/Research.jsx';
-import Training from './pages/Training.jsx';
-import Learn from './pages/Learn.jsx';
-import NutritionPage from './pages/NutritionPage.jsx';
-import BodyAssessmentPage from './pages/BodyAssessmentPage.jsx';
-import ClientsPage from './pages/ClientsPage.jsx';
-import Settings from './pages/Settings.jsx';
+
+// Tách route theo trang: dashboard không phải tải Three.js/Recharts của
+// trang Cơ bắp 3D hay các trang nặng khác ngay từ lần đầu.
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Register = lazy(() => import('./pages/Register.jsx'));
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
+const BodyLog = lazy(() => import('./pages/BodyLog.jsx'));
+const Calculators = lazy(() => import('./pages/Calculators.jsx'));
+const Research = lazy(() => import('./pages/Research.jsx'));
+const Training = lazy(() => import('./pages/Training.jsx'));
+const Learn = lazy(() => import('./pages/Learn.jsx'));
+const NutritionPage = lazy(() => import('./pages/NutritionPage.jsx'));
+const BodyAssessmentPage = lazy(() => import('./pages/BodyAssessmentPage.jsx'));
+const MusclePage = lazy(() => import('./pages/MusclePage.jsx'));
+const Settings = lazy(() => import('./pages/Settings.jsx'));
+
+function PageFallback() {
+  return (
+    <div className="grid min-h-[50vh] place-items-center">
+      <Spinner className="h-8 w-8" />
+    </div>
+  );
+}
 
 function Splash() {
   return (
-    <div className="grid min-h-screen place-items-center bg-slate-100 dark:bg-slate-950">
+    <div className="grid min-h-screen place-items-center bg-paper dark:bg-[#0e1211]">
       <div className="flex flex-col items-center gap-4">
-        <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-600 text-xl font-black text-white shadow-soft">
+        <span className="grid h-12 w-12 place-items-center rounded-md bg-pine-700 font-display text-lg font-semibold text-white dark:bg-pine-500 dark:text-pine-950">
           PT
         </span>
         <Spinner />
@@ -31,12 +43,15 @@ function Splash() {
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
+  const location = useLocation();
   if (loading) return <Splash />;
   if (!user) return <Navigate to="/login" replace />;
   return (
     <Layout>
-      <ErrorBoundary>
-        <Outlet />
+      <ErrorBoundary key={location.pathname}>
+        <Suspense fallback={<PageFallback />}>
+          <Outlet />
+        </Suspense>
       </ErrorBoundary>
     </Layout>
   );
@@ -45,18 +60,32 @@ function ProtectedLayout() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route
+        path="/login"
+        element={
+          <Suspense fallback={<Splash />}>
+            <Login />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <Suspense fallback={<Splash />}>
+            <Register />
+          </Suspense>
+        }
+      />
 
       <Route element={<ProtectedLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="/body-log" element={<BodyLog />} />
         <Route path="/body-assessment" element={<BodyAssessmentPage />} />
+        <Route path="/muscles" element={<MusclePage />} />
         <Route path="/nutrition" element={<NutritionPage />} />
         <Route path="/research" element={<Research />} />
         <Route path="/training" element={<Training />} />
         <Route path="/learn" element={<Learn />} />
-        <Route path="/clients" element={<ClientsPage />} />
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/settings" element={<Settings />} />
       </Route>

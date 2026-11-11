@@ -3,6 +3,7 @@ import { volumeFromDays } from '../../../../shared/training/planner.js';
 const PUSH = new Set(['chest', 'shoulders', 'triceps']);
 const PULL = new Set(['back', 'biceps']);
 const UPPER = new Set(['chest', 'back', 'shoulders', 'biceps', 'triceps']);
+const LOWER = new Set(['quads', 'hamstrings', 'glutes', 'calves']);
 const MAJOR = ['chest', 'back', 'shoulders', 'quads', 'hamstrings', 'glutes'];
 
 const clamp = (n) => Math.max(0, Math.min(100, Math.round(n)));
@@ -41,7 +42,7 @@ export function computeProgramMetrics(program, exerciseMap = {}) {
       if (PUSH.has(exercise.muscleGroup)) pushSets += sets;
       if (PULL.has(exercise.muscleGroup)) pullSets += sets;
       if (UPPER.has(exercise.muscleGroup)) upperSets += sets;
-      else lowerSets += sets;
+      else if (LOWER.has(exercise.muscleGroup)) lowerSets += sets;
       if (exercise.targetRir !== undefined) {
         rirSum += Number(exercise.targetRir);
         rirCount += 1;

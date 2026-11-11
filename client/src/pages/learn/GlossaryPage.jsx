@@ -167,7 +167,7 @@ export default function GlossaryPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              <Icon name="search" className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-400" />
+              <Icon name="search" className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
             </div>
           </div>
 
@@ -225,7 +225,7 @@ export default function GlossaryPage() {
               </div>
             ))}
             {!filtered.length && (
-              <p className="py-6 text-center text-sm text-slate-400">
+              <p className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">
                 {terms.length ? 'Không tìm thấy thuật ngữ phù hợp.' : 'Chưa có thuật ngữ nào.'}
               </p>
             )}

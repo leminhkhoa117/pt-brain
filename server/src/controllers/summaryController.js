@@ -8,14 +8,19 @@ import {
 } from '../services/research/reader.js';
 import { proposePlanChanges } from '../services/ai/planAdvisor.js';
 import { askAboutPaper } from '../services/ai/paperSummarizer.js';
+import { translateSource } from '../services/ai/translator.js';
 import { getProgram } from '../services/training/programService.js';
 import { applyPlanSchema } from '../validation/learning.js';
 import { assertAiQuota, getAiUsage, recordAiCall } from '../services/ai/quota.js';
 import { getUser } from '../services/authService.js';
 import { Summary } from '../models/Summary.js';
+import { Paper } from '../models/Paper.js';
+import { escapeRegex } from '../utils/regex.js';
 import { createSummaryInputSchema, askSchema, summaryMetaSchema } from '../validation/summary.js';
 import { summaryToMarkdown } from '../utils/markdown.js';
 import { buildSummaryPdf } from '../services/pdf/summaryPdf.js';
+import { sendPdfFile } from '../services/research/pdf.js';
+import { ApiError } from '../utils/ApiError.js';
 
 export async function create(req, res) {
   const user = await getUser(req.userId);
@@ -40,36 +45,56 @@ export async function create(req, res) {
 }
 
 export async function list(req, res) {
-  const summaries = await Summary.find({ userId: req.userId })
-    .sort({ createdAt: -1 })
-    .limit(100)
-    .populate('paperId', 'title authors year journal doi evidenceLevel isOpenAccess')
-    .lean();
+  const params = req.validatedQuery || req.query || {};
+  const q = String(params.q || '').trim();
+  const favoriteOnly = params.favorite === 'true';
+  const tag = String(params.tag || '').trim();
+  const limit = Math.min(Math.max(Number(params.limit) || 100, 1), 100);
+  const offset = Math.max(Number(params.offset) || 0, 0);
 
-  const q = String(req.query.q || '').trim().toLowerCase();
-  const favoriteOnly = req.query.favorite === 'true';
-  const tag = String(req.query.tag || '').trim();
+  const query = { userId: req.userId };
+  if (favoriteOnly) query.isFavorite = true;
+  if (tag) query.tags = tag;
 
-  const filtered = summaries.filter((s) => {
-    if (favoriteOnly && !s.isFavorite) return false;
-    if (tag && !(s.tags || []).includes(tag)) return false;
-    if (!q) return true;
-    const haystack = [
-      s.paperId?.title,
-      s.paperId?.doi,
-      s.content?.tldr,
-      s.content?.metadata?.title,
-      ...(s.tags || []),
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
-    return haystack.includes(q);
-  });
+  if (q) {
+    const safe = escapeRegex(q);
+    const matchingPapers = await Paper.find({
+      userId: req.userId,
+      $or: [
+        { title: { $regex: safe, $options: 'i' } },
+        { doi: { $regex: safe, $options: 'i' } },
+      ],
+    })
+      .select('_id')
+      .limit(200)
+      .lean();
+
+    const alternatives = [
+      { tags: { $regex: safe, $options: 'i' } },
+      { 'content.tldr': { $regex: safe, $options: 'i' } },
+      { 'content.metadata.title': { $regex: safe, $options: 'i' } },
+    ];
+    if (matchingPapers.length) {
+      alternatives.unshift({ paperId: { $in: matchingPapers.map((paper) => paper._id) } });
+    }
+    query.$or = alternatives;
+  }
+
+  const [summaries, total, favorites, filteredTotal] = await Promise.all([
+    Summary.find(query)
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
+      .populate('paperId', 'title authors year journal doi evidenceLevel isOpenAccess')
+      .lean(),
+    Summary.countDocuments({ userId: req.userId }),
+    Summary.countDocuments({ userId: req.userId, isFavorite: true }),
+    Summary.countDocuments(query),
+  ]);
 
   res.json({
     data: {
-      summaries: filtered.map((s) => ({
+      summaries: summaries.map((s) => ({
         id: s._id,
         paper: s.paperId,
         basedOn: s.basedOn,
@@ -82,8 +107,14 @@ export async function list(req, res) {
         createdAt: s.createdAt,
       })),
       stats: {
-        total: summaries.length,
-        favorites: summaries.filter((s) => s.isFavorite).length,
+        total,
+        favorites,
+        filtered: filteredTotal,
+      },
+      page: {
+        limit,
+        offset,
+        hasMore: offset + summaries.length < filteredTotal,
       },
       usage: await getAiUsage(req.userId),
     },
@@ -159,6 +190,64 @@ export async function clearChat(req, res) {
   res.json({ data: { ok: true } });
 }
 
+/** Dịch toàn văn/abstract sang tiếng Việt; lưu lại để lần sau không gọi AI nữa. */
+export async function translate(req, res) {
+  const { summary, paper } = await getSummaryForUser(req.userId, req.params.id);
+  if (summary.status && summary.status !== 'ready') {
+    return res.status(409).json({
+      error: {
+        code: 'SUMMARY_NOT_READY',
+        message: 'Bài chưa tóm tắt xong, chưa thể dịch.',
+      },
+    });
+  }
+  if (summary.translation?.text && req.query.force !== '1') {
+    return res.json({ data: { translation: summary.translation, cached: true } });
+  }
+  if (!summary.sourceText || summary.sourceText.length < 80) {
+    throw new ApiError(422, 'EMPTY_SOURCE', 'Bài này không có đủ nội dung để dịch.');
+  }
+
+  await assertAiQuota(req.userId, 'translate');
+  const result = await translateSource({
+    text: summary.sourceText,
+    title: paper?.title || summary.content?.metadata?.title || '',
+  });
+  const translation = {
+    text: result.text,
+    model: result.model,
+    chars: result.chars,
+    truncated: result.truncated,
+    createdAt: new Date(),
+  };
+  await Summary.updateOne(
+    { _id: summary._id, userId: req.userId },
+    { $set: { translation } },
+  );
+  await recordAiCall(req.userId, { kind: 'translate', usage: result.usage });
+
+  res.json({
+    data: {
+      translation,
+      cached: false,
+      quota: await getAiUsage(req.userId),
+    },
+  });
+}
+
+/** Phục vụ PDF gốc của bài do người dùng tải lên, để mở đúng trang hình/bảng. */
+export async function sourcePdf(req, res) {
+  const { summary } = await getSummaryForUser(req.userId, req.params.id);
+  if (summary.sourceKind !== 'user_pdf' || !summary.pdfHash) {
+    throw new ApiError(
+      404,
+      'PDF_NOT_AVAILABLE',
+      'Bài này không có PDF gốc được lưu. Hãy mở link bài báo để xem hình.',
+    );
+  }
+  await sendPdfFile(req, res, summary.pdfHash);
+}
+
 export async function exportMarkdown(req, res) {
   const { summary, paper } = await getSummaryForUser(req.userId, req.params.id);
   const markdown = summaryToMarkdown(summary, paper);
@@ -172,6 +261,42 @@ export async function exportMarkdown(req, res) {
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="pt-brain-${slug || 'summary'}.md"`);
   res.send(markdown);
+}
+
+/** Tải bản dịch tiếng Việt của bài (chỉ phần đã dịch). */
+export async function exportTranslation(req, res) {
+  const { summary, paper } = await getSummaryForUser(req.userId, req.params.id);
+  const text = summary.translation?.text;
+  if (!text) {
+    throw new ApiError(404, 'TRANSLATION_NOT_FOUND', 'Bài này chưa có bản dịch tiếng Việt.');
+  }
+
+  const title = summary.content?.metadata?.title || paper?.title || 'Bản dịch bài nghiên cứu';
+  const header = [
+    title,
+    'Bản dịch tiếng Việt — dịch tự động từ bài gốc',
+    summary.translation.truncated
+      ? 'Lưu ý: chỉ dịch phần đầu của bài (giới hạn 40.000 ký tự); phần còn lại xem bản gốc.'
+      : '',
+    '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const slug = (paper?.title || title || 'ban-dich')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+    .toLowerCase();
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="pt-brain-${slug || 'ban-dich'}-vi.txt"`,
+  );
+  res.send(`${header}\n${text}\n`);
 }
 
 /** Xuất PDF có font tiếng Việt. */

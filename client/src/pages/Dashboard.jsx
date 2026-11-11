@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Alert, Card, Field, Icon, LoadingBlock, Stat } from '../components/ui.jsx';
-import BrandLogo from '../components/BrandLogo.jsx';
+import { Alert, Badge, Field, Icon, LoadingBlock, Panel, PageHeader, Stat } from '../components/ui.jsx';
 import WeightChart from '../components/WeightChart.jsx';
 import Heatmap from '../components/Heatmap.jsx';
 import { fetchSummary, saveMetric } from '../api/metrics.js';
@@ -38,7 +37,11 @@ export default function Dashboard() {
   if (isLoading) return <LoadingBlock />;
 
   if (error) {
-    return <Alert tone="danger" title="Không tải được dữ liệu">{getErrorMessage(error)}</Alert>;
+    return (
+      <Alert tone="danger" title="Không tải được dữ liệu">
+        {getErrorMessage(error)}
+      </Alert>
+    );
   }
 
   const latest = data?.latest;
@@ -50,19 +53,15 @@ export default function Dashboard() {
   const tdee = latest?.computed?.tdee;
   const targets = tdee ? calorieTarget(tdee, goal) : null;
   const bodyFat = latest?.computed?.bodyFatNavy ?? latest?.bodyFatPct;
-  const delta =
-    latest && previous ? Number(latest.weightKg) - Number(previous.weightKg) : null;
-  const profileMissing =
-    !user?.profile?.heightCm || !user?.profile?.sex || !user?.profile?.birthDate;
-  const hour = new Date().getHours();
-  const greeting = hour < 11 ? 'Chào buổi sáng' : hour < 18 ? 'Chào buổi chiều' : 'Chào buổi tối';
+  const delta = latest && previous ? Number(latest.weightKg) - Number(previous.weightKg) : null;
+  const profileMissing = !user?.profile?.heightCm || !user?.profile?.sex || !user?.profile?.birthDate;
 
   const onQuickSave = (e) => {
     e.preventDefault();
     setNotice(null);
     const value = Number(weight);
     if (!value || value < 20 || value > 400) {
-      setNotice({ tone: 'danger', text: 'Cân nặng phải trong khoảng 20-400 kg.' });
+      setNotice({ tone: 'danger', text: 'Cân nặng phải trong khoảng 20–400 kg.' });
       return;
     }
     quickSave.mutate({ weightKg: value });
@@ -70,258 +69,249 @@ export default function Dashboard() {
 
   return (
     <div>
-      <section className="relative mb-5 overflow-hidden rounded-3xl border border-white/10 bg-[#071416] p-6 text-white shadow-[0_40px_90px_-45px_rgba(4,47,46,0.9)] sm:p-8">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-16 -top-24 h-80 w-80 rounded-full bg-brand-500/25 blur-[90px]" />
-          <div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-teal-400/10 blur-[80px]" />
-          <div className="surface-grid absolute inset-0 opacity-[0.12]" />
-          <div className="absolute -right-12 -top-16 rotate-12 opacity-25">
-            <BrandLogo size={300} />
-          </div>
-        </div>
-
-        <div className="relative max-w-2xl">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-200/80">
-            {greeting} · {formatLongDate(todayKey())}
-          </p>
-          <h1 className="mt-2 text-[1.9rem] font-extrabold leading-[1.15] tracking-[-0.03em] sm:text-[2.35rem]">
-            Mỗi buổi tập là một
-            <span className="bg-gradient-to-r from-brand-300 via-teal-200 to-emerald-200 bg-clip-text text-transparent">
-              {' '}
-              thí nghiệm nhỏ.
-            </span>
-          </h1>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300/80">
-            {data?.count
-              ? `Bạn đã ghi ${data.count} ngày dữ liệu. Theo dõi xu hướng, không phải dao động từng ngày.`
-              : 'Bắt đầu bằng một con số hôm nay: cân nặng, số đo hoặc một buổi tập.'}
-          </p>
-
-          <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-semibold text-slate-200">
-              <Icon name="target" className="h-3.5 w-3.5 text-brand-300" />
-              {GOAL_LABELS[goal] || 'Duy trì'}
-            </span>
-            {latest && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-semibold text-slate-200">
-                <Icon name="scale" className="h-3.5 w-3.5 text-brand-300" />
-                {formatNumber(latest.weightKg, 1)} kg
-              </span>
-            )}
-            {tdee && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[11px] font-semibold text-slate-200">
-                <Icon name="flame" className="h-3.5 w-3.5 text-brand-300" />
-                TDEE {formatNumber(tdee, 0)} kcal
-              </span>
-            )}
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-2">
-            <Link
-              to="/body-log"
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-brand-900 shadow-lg transition hover:bg-brand-50"
-            >
-              <Icon name="plus" className="h-4 w-4" />
-              Nhập số đo hôm nay
+      <PageHeader
+        title="Hôm nay"
+        subtitle={
+          data?.count
+            ? `Bạn đã ghi ${data.count} ngày dữ liệu. Đọc xu hướng, không đọc dao động từng ngày.`
+            : 'Bắt đầu bằng một con số hôm nay: cân nặng, số đo hoặc một buổi tập.'
+        }
+        meta={
+          <>
+            <span>{formatLongDate(todayKey())}</span>
+            <span className="text-slate-300 dark:text-slate-600">/</span>
+            <span>Mục tiêu: {GOAL_LABELS[goal] || 'Duy trì'}</span>
+          </>
+        }
+        actions={
+          <>
+            <Link to="/body-log" className="btn-primary">
+              <Icon name="plus" className="h-3.5 w-3.5" />
+              Ghi số đo
             </Link>
-            <Link
-              to="/training?tab=workout"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/[0.14]"
-            >
-              <Icon name="dumbbell" className="h-4 w-4" />
+            <Link to="/training?tab=workout" className="btn-secondary">
+              <Icon name="dumbbell" className="h-3.5 w-3.5" />
               Log buổi tập
             </Link>
-            <Link
-              to="/research"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/[0.14]"
-            >
-              <Icon name="book" className="h-4 w-4" />
-              Đọc nghiên cứu
-            </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {profileMissing && (
-        <Alert tone="warning" title="Hoàn thiện hồ sơ để tính chỉ số chính xác" className="mb-4">
-          Cần giới tính, ngày sinh và chiều cao để tính BMR, TDEE, % mỡ và FFMI.{' '}
-          <Link to="/settings" className="font-semibold underline">
-            Cập nhật hồ sơ
-          </Link>
-        </Alert>
+        <div className="mb-4">
+          <Alert tone="warning" title="Hồ sơ chưa đủ để tính chỉ số">
+            Cần giới tính, ngày sinh và chiều cao để tính BMR, TDEE, % mỡ và FFMI.{' '}
+            <Link to="/settings" className="link">
+              Cập nhật hồ sơ
+            </Link>
+          </Alert>
+        </div>
       )}
 
       {warnings.length > 0 && (
-        <div className="mb-4 space-y-2">
+        <div className="mb-4 space-y-1.5">
           {warnings.map((w) => (
-            <Alert key={w.code} tone={w.severity === 'danger' ? 'danger' : w.severity === 'warning' ? 'warning' : 'info'}>
+            <Alert
+              key={w.code}
+              tone={w.severity === 'danger' ? 'danger' : w.severity === 'warning' ? 'warning' : 'info'}
+            >
               {w.message}
             </Alert>
           ))}
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat
-          label="Cân nặng hiện tại"
-          value={latest ? formatNumber(latest.weightKg, 1) : '—'}
-          unit={latest ? 'kg' : ''}
-          hint={
-            delta === null
-              ? 'Chưa có dữ liệu hôm trước'
-              : `So với lần nhập trước: ${formatSigned(delta, 1, ' kg')}`
-          }
-          icon="scale"
-        />
-        <Stat
-          label="Trung bình 7 ngày"
-          value={trend.length ? formatNumber(trend.at(-1).ma7, 1) : '—'}
-          unit={trend.length ? 'kg' : ''}
-          hint="Làm mượt biến động cân nặng hằng ngày"
-          icon="activity"
-        />
-        <Stat
-          label="Tốc độ đổi cân"
-          value={rate ? formatNumber(rate.weeklyRatePct, 2) : '—'}
-          unit={rate ? '%/tuần' : ''}
-          tone={
-            rate && Math.abs(rate.weeklyRatePct) > 1
-              ? 'warning'
-              : rate
-                ? 'brand'
-                : 'default'
-          }
-          hint={
-            rate
-              ? `TB 7 ngày: ${formatNumber(rate.recentAvg, 1)} kg · trước đó ${formatNumber(rate.previousAvg, 1)} kg`
-              : 'Cần thêm dữ liệu (tối thiểu 2 tuần)'
-          }
-          icon="flame"
-        />
-        <Stat
-          label="% mỡ cơ thể"
-          value={bodyFat ? formatNumber(bodyFat, 1) : '—'}
-          unit={bodyFat ? '%' : ''}
-          hint={
-            bodyFat
-              ? latest?.computed?.bodyFatNavy
-                ? 'Tính bằng công thức US Navy'
-                : 'Số bạn nhập tay'
-              : 'Nhập số đo cổ / bụng để tính'
-          }
-          icon="target"
-        />
-      </div>
+      {/* Signature: ruled measurement strip */}
+      <section className="overflow-hidden rounded-lg border border-line dark:border-white/[0.08]" aria-label="Chỉ số mới nhất">
+        <div className="grid grid-cols-2 gap-px bg-line dark:bg-white/[0.08] lg:grid-cols-4">
+          <div className="bg-surface dark:bg-[#151b18]">
+            <Stat
+              label="Cân nặng"
+              value={latest ? formatNumber(latest.weightKg, 1) : '—'}
+              unit={latest ? 'kg' : ''}
+              info="Cân nặng của bản ghi mới nhất trong Theo dõi cơ thể. Nên cân cùng thời điểm mỗi ngày để giảm nhiễu."
+              hint={
+                delta === null
+                  ? 'Chưa có dữ liệu hôm trước'
+                  : `So với lần nhập trước: ${formatSigned(delta, 1, ' kg')}`
+              }
+              icon="scale"
+            />
+          </div>
+          <div className="bg-surface dark:bg-[#151b18]">
+            <Stat
+              label="TB 7 ngày"
+              value={trend.length ? formatNumber(trend.at(-1).ma7, 1) : '—'}
+              unit={trend.length ? 'kg' : ''}
+              info="MA7 – trung bình trượt 7 ngày của cân nặng. Đường này làm mượt dao động nước, muối và thời điểm cân để thấy xu hướng thật."
+              hint="Đã làm mượt biến động hằng ngày"
+              icon="activity"
+            />
+          </div>
+          <div className="bg-surface dark:bg-[#151b18]">
+            <Stat
+              label="Tốc độ đổi"
+              value={rate ? formatNumber(rate.weeklyRatePct, 2) : '—'}
+              unit={rate ? '%/tuần' : ''}
+              info="Phần trăm thay đổi cân nặng mỗi tuần, tính từ trung bình 7 ngày gần nhất so với 7 ngày trước đó. Tăng/giảm 0,25–1%/tuần thường là mức hợp lý."
+              tone={rate && Math.abs(rate.weeklyRatePct) > 1 ? 'warning' : rate ? 'brand' : 'default'}
+              hint={
+                rate
+                  ? `TB 7 ngày ${formatNumber(rate.recentAvg, 1)} kg · trước đó ${formatNumber(rate.previousAvg, 1)} kg`
+                  : 'Cần tối thiểu 2 tuần dữ liệu'
+              }
+              icon="flame"
+            />
+          </div>
+          <div className="bg-surface dark:bg-[#151b18]">
+            <Stat
+              label="% mỡ cơ thể"
+              value={bodyFat ? formatNumber(bodyFat, 1) : '—'}
+              unit={bodyFat ? '%' : ''}
+              info="Tỷ lệ khối lượng mỡ trên tổng cân nặng. Ước tính bằng công thức US Navy từ số đo cổ/bụng (và mông với nữ), hoặc số bạn tự nhập."
+              hint={
+                bodyFat
+                  ? latest?.computed?.bodyFatNavy
+                    ? 'US Navy · từ số đo cổ / bụng'
+                    : 'Số bạn nhập tay'
+                  : 'Nhập số đo cổ / bụng để tính'
+              }
+              icon="target"
+            />
+          </div>
+        </div>
+      </section>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                Xu hướng cân nặng
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Đường liền là cân nặng, đường nét đứt là trung bình trượt 7 ngày.
-              </p>
-            </div>
-            <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              90 ngày
-            </span>
-          </div>
-          <WeightChart data={trend} />
-        </Card>
+        <Panel
+          className="lg:col-span-2"
+          title="Xu hướng cân nặng"
+          note="Đường liền là cân nặng; đường nét đứt là trung bình trượt 7 ngày."
+          actions={<Badge>90 ngày</Badge>}
+        >
+          <WeightChart data={trend} height={280} />
+        </Panel>
 
-        <Card>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white">Nhập nhanh hôm nay</h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Chỉ cân nặng là bắt buộc. Các số đo khác nhập ở trang Theo dõi cơ thể.
-          </p>
-          <form onSubmit={onQuickSave} className="mt-4 space-y-3">
-            <Field label="Cân nặng (kg)">
-              <input
-                className="input text-lg font-semibold"
-                type="number"
-                inputMode="decimal"
-                step="0.1"
-                min="20"
-                max="400"
-                placeholder={latest ? String(latest.weightKg) : '72.5'}
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-              />
-            </Field>
-            <button type="submit" className="btn-primary w-full" disabled={quickSave.isPending}>
-              {quickSave.isPending ? 'Đang lưu...' : 'Lưu cân nặng'}
-            </button>
-          </form>
-
-          {notice && (
-            <Alert tone={notice.tone} className="mt-3">
-              {notice.text}
-            </Alert>
-          )}
-
-          <div className="mt-5 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Mục tiêu hiện tại</p>
-            <p className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-100">
-              {GOAL_LABELS[goal] || 'Duy trì'}
-            </p>
-            {tdee ? (
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                TDEE ước tính {formatNumber(tdee, 0)} kcal · mục tiêu{' '}
-                {formatNumber(targets.min, 0)}–{formatNumber(targets.max, 0)} kcal/ngày
-              </p>
-            ) : (
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Cần hồ sơ đầy đủ để ước tính TDEE.
-              </p>
+        <div className="space-y-4">
+          <Panel title="Ghi nhanh" note="Chỉ cân nặng là bắt buộc. Số đo khác nằm ở trang Theo dõi cơ thể.">
+            <form onSubmit={onQuickSave}>
+              <Field label="Cân nặng hôm nay (kg)">
+                <div className="flex gap-2">
+                  <input
+                    className="input num text-[15px]"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.1"
+                    min="20"
+                    max="400"
+                    placeholder={latest ? String(latest.weightKg) : '72.5'}
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
+                  />
+                  <button type="submit" className="btn-primary" disabled={quickSave.isPending}>
+                    {quickSave.isPending ? 'Đang lưu…' : 'Lưu'}
+                  </button>
+                </div>
+              </Field>
+            </form>
+            {notice && (
+              <Alert tone={notice.tone} className="mt-3">
+                {notice.text}
+              </Alert>
             )}
-          </div>
-        </Card>
+          </Panel>
+
+          <Panel title="Mục tiêu hiện tại" flush>
+            <dl className="divide-y divide-line text-[12.5px] dark:divide-white/[0.07]">
+              <div className="flex items-baseline justify-between gap-4 px-4 py-2.5 sm:px-5">
+                <dt className="text-slate-500 dark:text-slate-400">Mục tiêu</dt>
+                <dd className="font-medium text-slate-900 dark:text-slate-100">
+                  {GOAL_LABELS[goal] || 'Duy trì'}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 px-4 py-2.5 sm:px-5">
+                <dt className="text-slate-500 dark:text-slate-400">TDEE ước tính</dt>
+                <dd className="num text-slate-900 dark:text-slate-100">
+                  {tdee ? `${formatNumber(tdee, 0)} kcal` : '—'}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 px-4 py-2.5 sm:px-5">
+                <dt className="text-slate-500 dark:text-slate-400">Calo mục tiêu</dt>
+                <dd className="num text-slate-900 dark:text-slate-100">
+                  {targets ? `${formatNumber(targets.min, 0)}–${formatNumber(targets.max, 0)}` : '—'}
+                </dd>
+              </div>
+            </dl>
+          </Panel>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <Card>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Lịch nhập liệu</h2>
-            <span className="text-xs text-slate-400">{data?.count || 0} ngày đã lưu</span>
-          </div>
-          <Heatmap logs={trend} />
-        </Card>
-
-        <Card>
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white">Gợi ý bước tiếp theo</h2>
-          <ul className="mt-3 space-y-3 text-sm text-slate-600 dark:text-slate-300">
-            <li className="flex gap-3">
-              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                1
-              </span>
-              Nhập cân nặng mỗi sáng sau khi thức dậy, cùng điều kiện để giảm nhiễu.
-            </li>
-            <li className="flex gap-3">
-              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                2
-              </span>
-              Đo vòng bụng / cổ 1-2 lần mỗi tuần để theo dõi % mỡ và FFMI.
-            </li>
-            <li className="flex gap-3">
-              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                3
-              </span>
-              Dùng máy tính TDEE để chốt calo mục tiêu và macro trước khi lên giáo án.
-            </li>
-          </ul>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link to="/calculators" className="btn-secondary">
-              Máy tính chỉ số
-              <Icon name="arrowRight" className="h-4 w-4" />
+        <Panel
+          title="Lịch nhập liệu"
+          note={`${data?.count || 0} ngày đã lưu trong 8 tuần gần nhất`}
+          actions={
+            <Link to="/body-log" className="btn-ghost btn-sm">
+              Mở nhật ký
+              <Icon name="arrowRight" className="h-3.5 w-3.5" />
             </Link>
-            <a href={`${import.meta.env.VITE_API_BASE || '/api'}/metrics/export.csv`} className="btn-ghost">
-              <Icon name="download" className="h-4 w-4" />
+          }
+        >
+          <Heatmap logs={trend} />
+        </Panel>
+
+        <Panel title="Việc nên làm tiếp" note="Theo thứ tự ưu tiên cho tuần này." flush>
+          <ol className="divide-y divide-line dark:divide-white/[0.07]">
+            {[
+              {
+                text: 'Cân mỗi sáng sau khi thức dậy, cùng điều kiện để giảm nhiễu.',
+                to: '/body-log',
+                action: 'Ghi cân nặng',
+              },
+              {
+                text: 'Đo vòng bụng / cổ 1–2 lần mỗi tuần để theo dõi % mỡ và FFMI.',
+                to: '/body-log',
+                action: 'Nhập số đo',
+              },
+              {
+                text: 'Chốt calo mục tiêu và macro trước khi lên giáo án.',
+                to: '/calculators',
+                action: 'Máy tính TDEE',
+              },
+            ].map((step, index) => (
+              <li key={step.text} className="flex items-start gap-3 px-4 py-3 sm:px-5">
+                <span className="mt-0.5 font-mono text-[11px] tabular-nums text-slate-500 dark:text-slate-400">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <p className="min-w-0 flex-1 text-[12.5px] leading-relaxed text-slate-600 dark:text-slate-300">
+                  {step.text}
+                </p>
+                <Link
+                  to={step.to}
+                  className="shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-pine-700 hover:underline dark:text-pine-300"
+                >
+                  {step.action}
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <div className="flex flex-wrap gap-2 border-t border-line px-4 py-3 dark:border-white/[0.07] sm:px-5">
+            <Link to="/calculators" className="btn-secondary btn-sm">
+              Máy tính chỉ số
+            </Link>
+            <Link to="/muscles" className="btn-ghost btn-sm">
+              <Icon name="target" className="h-3.5 w-3.5" />
+              Cơ bắp 3D
+            </Link>
+            <a
+              href={`${import.meta.env.VITE_API_BASE || '/api'}/metrics/export.csv`}
+              className="btn-ghost btn-sm"
+            >
+              <Icon name="download" className="h-3.5 w-3.5" />
               Xuất CSV
             </a>
           </div>
-        </Card>
+        </Panel>
       </div>
     </div>
   );

@@ -76,7 +76,7 @@ export default function Register() {
           Tạo tài khoản
         </button>
 
-        <p className="text-center text-xs leading-relaxed text-slate-400">
+        <p className="text-center text-xs leading-relaxed text-slate-500 dark:text-slate-400">
           Dữ liệu cơ thể là dữ liệu nhạy cảm. Mật khẩu được mã hóa bằng bcrypt và bạn có thể xóa toàn bộ
           dữ liệu bất cứ lúc nào.
         </p>

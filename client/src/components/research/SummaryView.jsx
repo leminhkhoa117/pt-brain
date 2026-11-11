@@ -1,8 +1,14 @@
+import { useState } from 'react';
 import clsx from 'clsx';
 import { Alert, Card, Icon } from '../ui.jsx';
 import MarkdownText from '../MarkdownText.jsx';
-import { summaryExportUrl, summaryPdfUrl } from '../../api/summaries.js';
+import {
+  summaryExportUrl,
+  summaryPdfUrl,
+  summarySourcePdfUrl,
+} from '../../api/summaries.js';
 import { formatNumber } from '../../lib/format.js';
+import FigureViewer from './FigureViewer.jsx';
 
 const LEVEL_STYLES = {
   1: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
@@ -16,7 +22,7 @@ function Info({ label, children }) {
   if (!children) return null;
   return (
     <div className="rounded-xl border border-slate-100 p-3 dark:border-slate-800">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
       <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-200">
         {children}
       </p>
@@ -36,6 +42,39 @@ function Section({ title, children }) {
   );
 }
 
+function ReadingLegend() {
+  return (
+    <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 dark:border-slate-800 dark:bg-slate-900/40">
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+        <Icon name="info" className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+        Cách đọc số liệu (p, KTC 95%, effect size)
+      </summary>
+      <div className="mt-2 grid gap-2 text-[11px] leading-relaxed text-slate-600 dark:text-slate-300 sm:grid-cols-2">
+        <p>
+          <strong className="text-slate-800 dark:text-slate-100">p &lt; 0.05:</strong> thường được xem là
+          có ý nghĩa thống kê; p càng nhỏ càng ít khả năng kết quả chỉ do ngẫu nhiên.
+        </p>
+        <p>
+          <strong className="text-slate-800 dark:text-slate-100">KTC 95%:</strong> khoảng giá trị thật
+          của kết quả. Nếu khoảng không chứa 0, kết quả thường có ý nghĩa thống kê.
+        </p>
+        <p>
+          <strong className="text-slate-800 dark:text-slate-100">Effect size:</strong> độ lớn ảnh
+          hưởng. Quy ước tham khảo của Cohen: khoảng 0.2 = nhỏ, 0.5 = vừa, 0.8 = lớn.
+        </p>
+        <p>
+          <strong className="text-slate-800 dark:text-slate-100">β / Stdβ:</strong> hệ số hồi quy cho
+          biết chiều và mức liên quan, không chứng minh quan hệ nhân quả.
+        </p>
+        <p className="sm:col-span-2 text-slate-500 dark:text-slate-400">
+          Đây là quy ước tham khảo, không phải ngưỡng tuyệt đối. Luôn đọc cùng thiết kế nghiên cứu và
+          khoảng tin cậy.
+        </p>
+      </div>
+    </details>
+  );
+}
+
 export default function SummaryView({
   summary,
   paper,
@@ -46,6 +85,8 @@ export default function SummaryView({
   savingTerm,
   onApply,
   onAsk,
+  onRefresh,
+  refreshing,
   favorite,
   onToggleFavorite,
 }) {
@@ -53,6 +94,20 @@ export default function SummaryView({
   const level = c.evidenceLevel?.level ?? 5;
   const authors = (c.metadata?.authors || paper?.authors || []).slice(0, 8);
   const abstractOnly = c.confidence?.basedOn === 'abstract_only' || summary.basedOn === 'abstract_only';
+  const figures = Array.isArray(c.figures) ? c.figures : [];
+  const canViewPdf = summary.sourceKind === 'user_pdf' && Boolean(summary.pdfHash);
+  const pdfUrl = canViewPdf ? summarySourcePdfUrl(summary._id) : '';
+  const sourceLink = paper?.url || summary.sourceUrl || '';
+  const [viewer, setViewer] = useState(null);
+
+  const openFigure = (figure) => {
+    if (pdfUrl && Number(figure.page) > 0) {
+      setViewer(figure);
+      return;
+    }
+    const target = sourceLink || pdfUrl;
+    if (target) window.open(target, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <Card className="flex flex-col">
@@ -70,13 +125,13 @@ export default function SummaryView({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1">
           <button
             type="button"
             onClick={onToggleFavorite}
             className={clsx(
               'btn-ghost !px-2.5 !py-1.5 text-sm',
-              favorite ? 'text-amber-500' : 'text-slate-400',
+              favorite ? 'text-amber-500' : 'text-slate-500 dark:text-slate-400',
             )}
             title={favorite ? 'Bỏ ghim khỏi thư viện' : 'Ghim vào thư viện'}
             aria-label="Ghim vào thư viện"
@@ -120,6 +175,18 @@ export default function SummaryView({
           >
             .pdf
           </a>
+          {onRefresh ? (
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={refreshing}
+              className="btn-ghost !px-2.5 !py-1.5 text-xs"
+              title="Tạo lại bản tóm tắt bằng AI (tốn 1 lượt, dùng khi muốn cập nhật hình/bảng và kết quả mới)"
+            >
+              <Icon name="refresh" className="h-4 w-4" />
+              Tạo lại
+            </button>
+          ) : null}
           {summary.sourceUrl || paper?.url ? (
             <a
               href={paper?.url || summary.sourceUrl}
@@ -161,7 +228,7 @@ export default function SummaryView({
         </Alert>
       )}
 
-      <div className="mt-4 rounded-2xl bg-brand-50 p-4 dark:bg-brand-950/40">
+      <div className="mt-4 rounded-lg bg-brand-50 p-4 dark:bg-brand-950/40">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">
           Tóm tắt nhanh
         </p>
@@ -184,28 +251,139 @@ export default function SummaryView({
       </div>
 
       <Section title="Kết quả chính">
-        <div className="space-y-2.5">
+        {c.resultsOverview ? (
+          <div className="rounded-xl border border-brand-200/70 bg-brand-50/60 p-3.5 dark:border-brand-900/60 dark:bg-brand-950/30">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">
+              Đọc nhanh
+            </p>
+            <p className="mt-1 text-[13px] leading-relaxed text-brand-900 dark:text-brand-100">
+              {c.resultsOverview}
+            </p>
+          </div>
+        ) : null}
+
+        <ReadingLegend />
+
+        <div className="mt-3 space-y-3">
           {(c.mainResults || []).map((item, index) => (
-            <div
+            <article
               key={`${item.finding}-${index}`}
-              className="rounded-xl border border-slate-200 p-3 dark:border-slate-800"
+              className="rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900/40"
             >
-              <p className="font-semibold text-slate-800 dark:text-slate-100">{item.finding}</p>
-              <p className="mt-1 rounded-lg bg-amber-50 px-2.5 py-1.5 font-mono text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
-                {item.numbers}
-              </p>
-              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{item.plainMeaning}</p>
-            </div>
+              <div className="flex gap-3">
+                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                  {index + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-semibold leading-snug text-slate-800 dark:text-slate-100">
+                    {item.finding}
+                  </p>
+                  <div className="mt-2 rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-800/60">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      Nghĩa là
+                    </p>
+                    <p className="mt-0.5 text-[13px] leading-relaxed text-slate-700 dark:text-slate-200">
+                      {item.plainMeaning}
+                    </p>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                      Số liệu gốc
+                    </span>
+                    <span className="font-mono text-[11px] leading-relaxed text-amber-800 dark:text-amber-300">
+                      {item.numbers}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
       </Section>
+
+      {figures.length ? (
+        <Section title="Hình & bảng">
+          <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+            Giải thích do AI viết từ chú thích và nội dung bài.
+            {canViewPdf
+              ? ' Bấm “Xem hình” để mở đúng trang PDF gốc bạn đã tải lên.'
+              : ' Bài này lấy từ link nên ảnh thật mở ở trang gốc; phần dưới chỉ giải thích nội dung.'}
+          </p>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            {figures.map((figure, index) => (
+              <article
+                key={`${figure.label}-${index}`}
+                className="flex flex-col rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900/40"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span
+                    className={clsx(
+                      'badge',
+                      figure.kind === 'table'
+                        ? 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300'
+                        : 'bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300',
+                    )}
+                  >
+                    {figure.label}
+                  </span>
+                  {figure.page ? (
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Trang {figure.page}
+                    </span>
+                  ) : null}
+                </div>
+                {figure.title ? (
+                  <h4 className="mt-2 text-sm font-semibold leading-snug text-slate-800 dark:text-slate-100">
+                    {figure.title}
+                  </h4>
+                ) : null}
+                {figure.caption ? (
+                  <p className="mt-1 line-clamp-3 text-[11px] italic leading-relaxed text-slate-500 dark:text-slate-400">
+                    “{figure.caption}”
+                  </p>
+                ) : null}
+                {figure.explanation ? (
+                  <p className="mt-2 text-[13px] leading-relaxed text-slate-700 dark:text-slate-200">
+                    {figure.explanation}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-[13px] italic leading-relaxed text-slate-500 dark:text-slate-400">
+                    Chưa có giải thích tự động cho hình/bảng này. Mở bài gốc để xem chi tiết.
+                  </p>
+                )}
+                {figure.whatToLookFor ? (
+                  <p className="mt-2 rounded-lg bg-amber-50 px-2.5 py-2 text-xs leading-relaxed text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+                    <strong>Cần chú ý:</strong> {figure.whatToLookFor}
+                  </p>
+                ) : null}
+                {canViewPdf || sourceLink ? (
+                  <button
+                    type="button"
+                    onClick={() => openFigure(figure)}
+                    className="btn-secondary mt-3 w-full !py-1.5 text-xs"
+                  >
+                    <Icon name="external" className="h-3.5 w-3.5" />
+                    {canViewPdf && figure.page
+                      ? `Xem hình · trang ${figure.page}`
+                      : 'Xem trong bài gốc'}
+                  </button>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </Section>
+      ) : null}
 
       {c.secondaryResults?.length ? (
         <Section title="Kết quả phụ">
           <ul className="list-disc space-y-1.5 pl-5">
             {c.secondaryResults.map((item, index) => (
               <li key={`${item.finding}-${index}`}>
-                <strong>{item.finding}</strong> — {item.numbers}. {item.plainMeaning}
+                <strong>{item.finding}</strong>
+                {item.numbers && item.numbers !== 'Không nêu trong bài' ? ` — ${item.numbers}.` : ''}
+                {item.plainMeaning && item.plainMeaning !== 'Không nêu trong bài'
+                  ? ` ${item.plainMeaning}`
+                  : ''}
               </li>
             ))}
           </ul>
@@ -293,6 +471,16 @@ export default function SummaryView({
           </ul>
         ) : null}
       </div>
+
+      {viewer && (
+        <FigureViewer
+          src={pdfUrl}
+          page={viewer.page}
+          label={viewer.label}
+          title={viewer.title}
+          onClose={() => setViewer(null)}
+        />
+      )}
     </Card>
   );
 }

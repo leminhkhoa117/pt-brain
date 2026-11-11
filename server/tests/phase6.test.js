@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildBodyLogPdf, buildSummaryPdf } from '../src/services/pdf/summaryPdf.js';
 import { isMeaningfulTitle } from '../src/services/research/pdf.js';
-import { clientCreateSchema } from '../src/validation/client.js';
 import { summaryMetaSchema } from '../src/validation/summary.js';
 import { quizSchema } from '../src/services/ai/quizGenerator.js';
 
@@ -74,19 +73,6 @@ describe('PDF title detection', () => {
 
   it('giữ title thật', () => {
     expect(isMeaningfulTitle('Kicking Back Cognitive Ageing in Older Twins')).toBe(true);
-  });
-});
-
-describe('client validation', () => {
-  it('nhận khách hàng hợp lệ', () => {
-    const parsed = clientCreateSchema.parse({ name: 'Trần Thị B', email: 'b@example.com' });
-    expect(parsed.goal).toBe('maintain');
-    expect(parsed.status).toBe('active');
-  });
-
-  it('từ chối tên quá ngắn / email sai', () => {
-    expect(() => clientCreateSchema.parse({ name: 'A' })).toThrow();
-    expect(() => clientCreateSchema.parse({ name: 'Khách A', email: 'sai' })).toThrow();
   });
 });
 

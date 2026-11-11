@@ -3,7 +3,7 @@ import { ApiError } from '../../utils/ApiError.js';
 
 const USER_AGENT = `PTBrain/0.2 (research-reader; mailto:${env.CONTACT_EMAIL})`;
 
-async function post(body, sessionId) {
+async function post(body, sessionId, timeoutMs = env.AI_TIMEOUT_MS) {
   let response;
   try {
     response = await fetch(`${env.AI_BASE_URL}/chat/completions`, {
@@ -15,7 +15,7 @@ async function post(body, sessionId) {
         'x-opencode-session': sessionId || 'ptbrain-reader',
       },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(env.AI_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (error) {
     throw new ApiError(504, 'AI_TIMEOUT', `AI không phản hồi kịp: ${error.message}`);
@@ -55,6 +55,7 @@ async function post(body, sessionId) {
   return {
     text,
     model: json.model || env.AI_MODEL,
+    finishReason: choice?.finish_reason || '',
     usage: {
       input: json.usage?.prompt_tokens ?? 0,
       output: json.usage?.completion_tokens ?? 0,
@@ -74,6 +75,8 @@ export async function chatCompletion({
   json = false,
   sessionId,
   model,
+  reasoningEffort,
+  timeoutMs,
 }) {
   if (!env.AI_API_KEY) {
     throw new ApiError(
@@ -90,17 +93,26 @@ export async function chatCompletion({
     max_tokens: maxTokens,
   };
   if (json) body.response_format = { type: 'json_object' };
+  if (reasoningEffort) body.reasoning_effort = reasoningEffort;
 
   try {
-    return await post(body, sessionId);
+    return await post(body, sessionId, timeoutMs);
   } catch (error) {
+    const unsupportedReasoning =
+      reasoningEffort &&
+      error.upstreamStatus === 400 &&
+      /reasoning|unknown|unsupported|invalid/i.test(error.message);
+    if (unsupportedReasoning) {
+      delete body.reasoning_effort;
+      return post(body, sessionId, timeoutMs);
+    }
     const unsupportedJsonMode =
       json &&
       error.upstreamStatus === 400 &&
       /response_format|json[_ ]?mode|not support/i.test(error.message);
     if (!unsupportedJsonMode) throw error;
     delete body.response_format;
-    return post(body, sessionId);
+    return post(body, sessionId, timeoutMs);
   }
 }
 

@@ -8,9 +8,17 @@ import {
   resolveWorkByDoi,
   resolveWorkByUrl,
 } from './metadata.js';
-import { parsePdfBuffer } from './pdf.js';
+import { parsePdfBuffer, savePdfBuffer, removePdfFile } from './pdf.js';
+import { extractFigureHints } from './figures.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { normalizeText, truncateText } from '../../utils/text.js';
+import {
+  acquireSummaryLock,
+  releaseSummaryLock,
+  releaseSummaryLocks,
+} from './summaryLock.js';
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function inferTitleFromText(text) {
   const first = normalizeText(text)
@@ -37,6 +45,8 @@ async function resolveInput(input, file) {
       sourceKind: 'user_pdf',
       sourceUrl: '',
       pdfHash: parsed.hash,
+      pdfPages: parsed.pages || 0,
+      figureHints: parsed.figureHints || [],
       inputType: 'pdf',
     };
   }
@@ -78,6 +88,24 @@ export function buildCacheKey(resolved) {
     return `url:${crypto.createHash('sha256').update(resolved.sourceUrl).digest('hex').slice(0, 40)}`;
   }
   return `text:${crypto.createHash('sha256').update(resolved.text).digest('hex').slice(0, 40)}`;
+}
+
+// Job tóm tắt chạy trong RAM. Nếu server restart hoặc AI treo, document có thể
+// kẹt ở "processing" mãi. Sau 6 phút không cập nhật thì coi là job chết.
+const STALE_PROCESSING_MS = 6 * 60 * 1000;
+const STALE_PROCESSING_ERROR =
+  'Job tóm tắt bị gián đoạn (server khởi động lại hoặc quá thời gian). Bấm "Thử lại" để chạy lại.';
+
+async function failIfStale(summary) {
+  if (!summary || summary.status !== 'processing') return false;
+  const updatedAt = summary.updatedAt ? new Date(summary.updatedAt).getTime() : 0;
+  if (updatedAt && Date.now() - updatedAt < STALE_PROCESSING_MS) return false;
+  summary.status = 'failed';
+  summary.progress = '';
+  summary.error = STALE_PROCESSING_ERROR;
+  await summary.save();
+  await releaseSummaryLock(summary.userId, summary.cacheKey);
+  return true;
 }
 
 const PAPER_FIELDS = [
@@ -128,16 +156,29 @@ async function upsertPaper(userId, data) {
   return paper;
 }
 
+async function responseForSummary(summary, { cached, processing }) {
+  const paper = await Paper.findById(summary.paperId);
+  return {
+    summary,
+    paper,
+    sourceText: summary.sourceText,
+    cached,
+    processing,
+    usage: null,
+  };
+}
+
 /**
  * Chạy AI trong nền để request không bị timeout với PDF dài.
  * Cập nhật progress/status vào Summary để client polling.
  */
-async function runSummaryJob({ summaryId, paperId, userId, resolved }) {
+async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey }) {
   try {
     const { content, usage, model, promptVersion } = await summarizePaper({
       paper: resolved.paper,
       text: resolved.text,
       basedOn: resolved.basedOn,
+      figureHints: resolved.figureHints || [],
       onProgress: (progress) => {
         Summary.updateOne({ _id: summaryId }, { $set: { progress } }).catch(() => {});
       },
@@ -146,7 +187,12 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved }) {
     // PDF thường có metadata rác; bổ sung các field còn thiếu từ nội dung AI trích
     if (content.metadata) {
       const update = {};
-      if (!resolved.paper.title && content.metadata.title) update.title = content.metadata.title;
+      const currentTitle = String(resolved.paper.title || '').trim();
+      const aiTitle = String(content.metadata.title || '').trim();
+      const titleMissing = !currentTitle || /chưa có tiêu đề|^không rõ$/i.test(currentTitle);
+      if (titleMissing && aiTitle && !/^không rõ$|^unknown$/i.test(aiTitle)) {
+        update.title = aiTitle;
+      }
       if (!resolved.paper.journal && content.metadata.journal) update.journal = content.metadata.journal;
       if (!resolved.paper.year && content.metadata.year) update.year = content.metadata.year;
       if (!resolved.paper.doi && content.metadata.doi) update.doi = content.metadata.doi;
@@ -180,6 +226,8 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved }) {
         },
       },
     ).catch(() => {});
+  } finally {
+    await releaseSummaryLock(userId, cacheKey);
   }
 }
 
@@ -189,134 +237,309 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved }) {
  */
 export async function createSummaryForUser(user, input, file) {
   const resolved = await resolveInput(input, file);
+  resolved.figureHints =
+    resolved.figureHints?.length ? resolved.figureHints : extractFigureHints(resolved.text);
   const cacheKey = buildCacheKey(resolved);
+  const findExisting = () =>
+    Summary.findOne({ userId: user._id, cacheKey }).sort({ createdAt: -1 });
 
-  const existing = await Summary.findOne({ userId: user._id, cacheKey }).sort({
-    createdAt: -1,
-  });
+  let existing = await findExisting();
+  if (existing) await failIfStale(existing);
   if (existing && (!existing.status || existing.status === 'ready')) {
-    const paper = await Paper.findById(existing.paperId);
-    return {
-      summary: existing,
-      paper,
-      sourceText: existing.sourceText,
-      cached: true,
-      usage: null,
-    };
+    return responseForSummary(existing, { cached: true, processing: false });
   }
   if (existing?.status === 'processing') {
-    const paper = await Paper.findById(existing.paperId);
-    return {
-      summary: existing,
-      paper,
-      sourceText: existing.sourceText,
-      cached: false,
-      processing: true,
-    };
+    return responseForSummary(existing, { cached: false, processing: true });
   }
 
-  await assertAiQuota(user._id, 'summarize');
+  const locked = await acquireSummaryLock(user._id, cacheKey);
+  if (!locked) {
+    // Request khác đang tạo Summary. Chờ ngắn để trả đúng bản đang xử lý
+    // thay vì tạo thêm job thứ hai.
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      await sleep(200);
+      existing = await findExisting();
+      if (!existing) continue;
+      if (existing.status === 'processing') {
+        return responseForSummary(existing, { cached: false, processing: true });
+      }
+      if (!existing.status || existing.status === 'ready') {
+        return responseForSummary(existing, { cached: true, processing: false });
+      }
+    }
+    throw ApiError.conflict('Bài này đang được xử lý, vui lòng thử lại sau vài giây');
+  }
 
-  const paper = await upsertPaper(user._id, resolved.paper);
-  const sourceText = truncateText(resolved.text, 400000);
+  let jobStarted = false;
+  try {
+    // Double-check sau khi có khóa: request trước có thể vừa tạo xong.
+    existing = await findExisting();
+    if (existing && (!existing.status || existing.status === 'ready')) {
+      await releaseSummaryLock(user._id, cacheKey);
+      return responseForSummary(existing, { cached: true, processing: false });
+    }
+    if (existing?.status === 'processing') {
+      await releaseSummaryLock(user._id, cacheKey);
+      return responseForSummary(existing, { cached: false, processing: true });
+    }
 
-  const summary = await Summary.create({
-    userId: user._id,
-    paperId: paper._id,
-    inputType: resolved.inputType,
-    basedOn: resolved.basedOn,
-    content: {
-      metadata: {
-        title: resolved.paper.title || '',
-        authors: resolved.paper.authors || [],
-        year: resolved.paper.year || 0,
-        journal: resolved.paper.journal || '',
-        doi: resolved.paper.doi || '',
+    await assertAiQuota(user._id, 'summarize');
+
+    // Nếu lần trước fail nhưng còn nguồn, chạy lại trên cùng document để
+    // không để lại bản ghi lỗi trùng trong thư viện.
+    if (existing?.status === 'failed' && existing.sourceText) {
+      const paper = await Paper.findById(existing.paperId);
+      if (paper) {
+        existing.status = 'processing';
+        existing.progress = 'Đang chuẩn bị tài liệu...';
+        existing.error = '';
+        await existing.save();
+        jobStarted = true;
+        runSummaryJob({
+          summaryId: existing._id,
+          paperId: paper._id,
+          userId: user._id,
+          resolved: {
+            paper,
+            text: existing.sourceText,
+            basedOn: existing.basedOn,
+            sourceUrl: existing.sourceUrl,
+            figureHints: existing.figureHints?.length
+              ? existing.figureHints
+              : extractFigureHints(existing.sourceText),
+          },
+          cacheKey,
+        });
+        return responseForSummary(existing, { cached: false, processing: true });
+      }
+    }
+
+    if (existing?.status === 'failed') {
+      await Summary.deleteOne({ _id: existing._id, userId: user._id }).catch(() => {});
+    }
+
+    const paper = await upsertPaper(user._id, resolved.paper);
+    const sourceText = truncateText(resolved.text, 400000);
+
+    // Lưu PDF gốc để mở đúng trang hình/bảng. Nếu lưu lỗi, bản tóm tắt vẫn chạy.
+    if (file && resolved.pdfHash) {
+      await savePdfBuffer(file.buffer, resolved.pdfHash).catch(() => {});
+    }
+
+    const summary = await Summary.create({
+      userId: user._id,
+      paperId: paper._id,
+      inputType: resolved.inputType,
+      basedOn: resolved.basedOn,
+      content: {
+        metadata: {
+          title: resolved.paper.title || '',
+          authors: resolved.paper.authors || [],
+          year: resolved.paper.year || 0,
+          journal: resolved.paper.journal || '',
+          doi: resolved.paper.doi || '',
+        },
+        tldr: 'Đang xử lý...',
+        mainResults: [],
+        confidence: { basedOn: resolved.basedOn, missingInfo: [] },
       },
-      tldr: 'Đang xử lý...',
-      mainResults: [],
-      confidence: { basedOn: resolved.basedOn, missingInfo: [] },
-    },
-    sourceText,
-    sourceUrl: resolved.sourceUrl || '',
-    sourceKind: resolved.sourceKind,
-    pdfHash: resolved.pdfHash || '',
-    cacheKey,
-    status: 'processing',
-    progress: 'Đang chuẩn bị tài liệu...',
-  });
+      sourceText,
+      sourceUrl: resolved.sourceUrl || '',
+      sourceKind: resolved.sourceKind,
+      pdfHash: resolved.pdfHash || '',
+      pdfPages: resolved.pdfPages || 0,
+      figureHints: resolved.figureHints || [],
+      cacheKey,
+      status: 'processing',
+      progress: 'Đang chuẩn bị tài liệu...',
+    });
 
-  // Không await: chạy nền, cập nhật status/progress để client polling
-  runSummaryJob({
-    summaryId: summary._id,
-    paperId: paper._id,
-    userId: user._id,
-    resolved,
-  });
+    // Không await: chạy nền, cập nhật status/progress để client polling
+    jobStarted = true;
+    runSummaryJob({
+      summaryId: summary._id,
+      paperId: paper._id,
+      userId: user._id,
+      resolved,
+      cacheKey,
+    });
 
-  return { summary, paper, sourceText, cached: false, processing: true };
+    return { summary, paper, sourceText, cached: false, processing: true };
+  } catch (error) {
+    if (!jobStarted) await releaseSummaryLock(user._id, cacheKey);
+    throw error;
+  }
 }
 
 export async function getSummaryForUser(userId, id) {
   const summary = await Summary.findOne({ _id: id, userId });
   if (!summary) throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+  await failIfStale(summary);
   const paper = await Paper.findById(summary.paperId);
   return { summary, paper };
 }
 
 /** Chạy lại job tóm tắt từ nguồn đã lưu (dùng khi job lỗi hoặc server restart). */
 export async function retrySummaryForUser(userId, id) {
-  const summary = await Summary.findOne({ _id: id, userId });
+  let summary = await Summary.findOne({ _id: id, userId });
   if (!summary) throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+  await failIfStale(summary);
   if (summary.status === 'processing') {
     throw ApiError.conflict('Bài đang được tóm tắt, vui lòng chờ thêm');
   }
-  const paper = await Paper.findById(summary.paperId);
-  if (!paper) throw ApiError.notFound('Không tìm thấy metadata bài báo');
-  if (!summary.sourceText) {
-    throw new ApiError(
-      422,
-      'NO_SOURCE_TEXT',
-      'Bản ghi không còn nội dung nguồn để tóm tắt lại. Hãy tải lại PDF/link.',
-    );
+
+  const lockKey = summary.cacheKey;
+  const locked = lockKey ? await acquireSummaryLock(userId, lockKey) : true;
+  if (!locked) {
+    throw ApiError.conflict('Bài này đang được xử lý, vui lòng chờ thêm');
   }
 
-  await assertAiQuota(userId, 'summarize');
+  let jobStarted = false;
+  try {
+    // Re-check sau khi có khóa: một request khác có thể vừa thắng race.
+    summary = await Summary.findOne({ _id: id, userId });
+    if (!summary) throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+    if (summary.status === 'processing') {
+      throw ApiError.conflict('Bài đang được tóm tắt, vui lòng chờ thêm');
+    }
 
-  summary.status = 'processing';
-  summary.progress = 'Đang chuẩn bị tài liệu...';
-  summary.error = '';
-  await summary.save();
+    const paper = await Paper.findById(summary.paperId);
+    if (!paper) throw ApiError.notFound('Không tìm thấy metadata bài báo');
+    if (!summary.sourceText) {
+      throw new ApiError(
+        422,
+        'NO_SOURCE_TEXT',
+        'Bản ghi không còn nội dung nguồn để tóm tắt lại. Hãy tải lại PDF/link.',
+      );
+    }
 
-  runSummaryJob({
-    summaryId: summary._id,
-    paperId: paper._id,
-    userId,
-    resolved: {
-      paper,
-      text: summary.sourceText,
-      basedOn: summary.basedOn,
-      sourceUrl: summary.sourceUrl,
-    },
-  });
+    await assertAiQuota(userId, 'summarize');
 
-  return summary;
+    summary.status = 'processing';
+    summary.progress = 'Đang chuẩn bị tài liệu...';
+    summary.error = '';
+    await summary.save();
+
+    jobStarted = true;
+    runSummaryJob({
+      summaryId: summary._id,
+      paperId: paper._id,
+      userId,
+      resolved: {
+        paper,
+        text: summary.sourceText,
+        basedOn: summary.basedOn,
+        sourceUrl: summary.sourceUrl,
+        figureHints: summary.figureHints?.length
+          ? summary.figureHints
+          : extractFigureHints(summary.sourceText),
+      },
+      cacheKey: summary.cacheKey,
+    });
+
+    return summary;
+  } catch (error) {
+    if (!jobStarted && lockKey) await releaseSummaryLock(userId, lockKey);
+    throw error;
+  }
+}
+
+/**
+ * Khôi phục job đang processing sau khi server restart. Vì job chạy trong RAM,
+ * không có tiến trình nào đang giữ các document này sau restart; ta chạy lại
+ * từ sourceText đã lưu. Giới hạn số job resume cùng lúc để không bùng AI call.
+ */
+export async function resumeInterruptedSummaries({ limit = 5 } = {}) {
+  const processing = await Summary.find({ status: 'processing' }).sort({ updatedAt: 1 }).lean();
+  const selected = processing.slice(0, limit);
+  const overflow = processing.slice(limit);
+
+  if (overflow.length) {
+    await Summary.updateMany(
+      { _id: { $in: overflow.map((item) => item._id) } },
+      {
+        $set: {
+          status: 'failed',
+          progress: '',
+          error:
+            'Có quá nhiều job bị gián đoạn khi khởi động lại. Bấm "Thử lại" cho các job cần thiết.',
+        },
+      },
+    );
+    await releaseSummaryLocks(overflow);
+  }
+
+  let resumed = 0;
+  let failed = overflow.length;
+
+  for (const summary of selected) {
+    const paper = await Paper.findById(summary.paperId);
+    if (!paper || !summary.sourceText) {
+      await Summary.updateOne(
+        { _id: summary._id },
+        {
+          $set: {
+            status: 'failed',
+            progress: '',
+            error:
+              'Không thể khôi phục job sau khởi động lại vì thiếu nội dung nguồn. Hãy tải lại PDF/link.',
+          },
+        },
+      ).catch(() => {});
+      failed += 1;
+      continue;
+    }
+
+    const locked = summary.cacheKey
+      ? await acquireSummaryLock(summary.userId, summary.cacheKey)
+      : true;
+    if (!locked) continue;
+
+    await Summary.updateOne(
+      { _id: summary._id, status: 'processing' },
+      { $set: { progress: 'Đang khôi phục sau khởi động lại...' } },
+    );
+    runSummaryJob({
+      summaryId: summary._id,
+      paperId: paper._id,
+      userId: summary.userId,
+      resolved: {
+        paper,
+        text: summary.sourceText,
+        basedOn: summary.basedOn,
+        sourceUrl: summary.sourceUrl,
+        figureHints: summary.figureHints?.length
+          ? summary.figureHints
+          : extractFigureHints(summary.sourceText),
+      },
+      cacheKey: summary.cacheKey,
+    });
+    resumed += 1;
+  }
+
+  return { resumed, failed };
 }
 
 /** Đánh dấu job kẹt sau khi server restart là failed để người dùng bấm thử lại. */
-export async function markStaleSummariesFailed(maxAgeMinutes = 30) {
+export async function markStaleSummariesFailed(maxAgeMinutes = 0) {
   const cutoff = new Date(Date.now() - maxAgeMinutes * 60 * 1000);
+  const stale = await Summary.find({
+    status: 'processing',
+    updatedAt: { $lt: cutoff },
+  })
+    .select('userId cacheKey')
+    .lean();
   const result = await Summary.updateMany(
     { status: 'processing', updatedAt: { $lt: cutoff } },
     {
       $set: {
         status: 'failed',
         progress: '',
-        error:
-          'Job tóm tắt bị gián đoạn (server khởi động lại hoặc quá thời gian). Bấm "Thử lại" để chạy lại.',
+        error: STALE_PROCESSING_ERROR,
       },
     },
   );
+  await releaseSummaryLocks(stale);
   return result.modifiedCount;
 }
 
@@ -335,6 +558,10 @@ export async function clearQa(userId, id) {
 export async function deleteSummaryForUser(userId, id) {
   const result = await Summary.findOneAndDelete({ _id: id, userId });
   if (!result) throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+  if (result.pdfHash) {
+    const remaining = await Summary.countDocuments({ pdfHash: result.pdfHash });
+    if (!remaining) await removePdfFile(result.pdfHash);
+  }
 }
 
 export { parseIdentifier };

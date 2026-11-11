@@ -3,6 +3,7 @@ import { Summary } from '../models/Summary.js';
 import { ApiError } from '../utils/ApiError.js';
 import { paperCreateSchema } from '../validation/research.js';
 import { escapeRegex } from '../utils/regex.js';
+import { removeOrphanPdfs } from '../services/userFiles.js';
 
 export async function create(req, res) {
   const data = paperCreateSchema.parse(req.body);
@@ -42,6 +43,10 @@ export async function getOne(req, res) {
 export async function remove(req, res) {
   const paper = await Paper.findOneAndDelete({ _id: req.params.id, userId: req.userId });
   if (!paper) throw ApiError.notFound('Không tìm thấy bài báo');
+  const summaries = await Summary.find({ userId: req.userId, paperId: paper._id })
+    .select('pdfHash')
+    .lean();
   await Summary.deleteMany({ userId: req.userId, paperId: paper._id });
+  await removeOrphanPdfs(summaries.map((summary) => summary.pdfHash));
   res.json({ data: { ok: true } });
 }

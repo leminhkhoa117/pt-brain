@@ -1,5 +1,4 @@
 import { fileURLToPath } from 'node:url';
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { BodyAssessment } from '../models/BodyAssessment.js';
 import { BodyLog } from '../models/BodyLog.js';
@@ -10,7 +9,7 @@ import { bodyAssessmentSchema, bodyAssessmentFormSchema } from '../validation/vi
 import { EVIDENCE_BASE, formatEvidence, getEvidence, evidenceReferences } from '../research/evidenceBase.js';
 import { ApiError } from '../utils/ApiError.js';
 import { todayKeyVN } from '../utils/date.js';
-import { saveImageFile, removeImageFile } from '../utils/image.js';
+import { saveImageFile, removeImageFile, sendImageFile } from '../utils/image.js';
 
 const DIR = fileURLToPath(new URL('../../uploads/assessments/', import.meta.url));
 const VIEWS = ['front', 'side', 'back', 'detail'];
@@ -158,14 +157,18 @@ export async function getOne(req, res) {
 }
 
 export async function servePhoto(req, res) {
+  const filename = String(req.params.filename || '');
+  if (!/^[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/i.test(filename)) {
+    throw ApiError.badRequest('Tên file ảnh không hợp lệ');
+  }
+
   const assessment = await BodyAssessment.findOne({
     _id: req.params.id,
     userId: req.userId,
-    'images.filename': req.params.filename,
+    'images.filename': filename,
   });
   if (!assessment) throw ApiError.notFound('Không tìm thấy ảnh');
-  res.setHeader('Cache-Control', 'private, max-age=3600');
-  res.sendFile(path.join(DIR, req.params.filename));
+  await sendImageFile(req, res, DIR, filename);
 }
 
 export async function remove(req, res) {

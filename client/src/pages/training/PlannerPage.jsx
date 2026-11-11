@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../../components/ui.jsx';
+import { Alert, Badge, EmptyState, Field, Icon, InfoTip, PageHeader, Panel, Spinner } from '../../components/ui.jsx';
 import { useAuth } from '../../hooks/useAuth.jsx';
 import AiPlanModal from './AiPlanModal.jsx';
 import ProgramEditorModal from './ProgramEditorModal.jsx';
@@ -16,6 +16,7 @@ import {
 import { getErrorMessage } from '../../api/client.js';
 import { GOAL_LABELS } from '../../lib/format.js';
 import { MUSCLE_LABELS_VI, SPLIT_LABELS } from '@shared/training/planner.js';
+import { CARDIO_BY_KEY } from '@shared/training/cardio.js';
 
 const EQUIPMENT = [
   { value: 'barbell', label: 'Barbell' },
@@ -52,26 +53,26 @@ function VolumeBars({ volume }) {
               </span>
               <span
                 className={clsx(
-                  'font-semibold',
+                  'num text-[11px] font-medium',
                   item.status === 'low'
-                    ? 'text-amber-600 dark:text-amber-400'
+                    ? 'text-ochre-600 dark:text-ochre-300'
                     : item.status === 'high'
-                      ? 'text-rose-600 dark:text-rose-400'
-                      : 'text-emerald-600 dark:text-emerald-400',
+                      ? 'text-vermilion-600 dark:text-vermilion-300'
+                      : 'text-pine-700 dark:text-pine-300',
                 )}
               >
                 {item.sets} set
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+            <div className="h-1.5 overflow-hidden rounded-sm bg-paper-2 dark:bg-white/[0.08]">
               <div
                 className={clsx(
-                  'h-full rounded-full',
+                  'h-full',
                   item.status === 'low'
-                    ? 'bg-amber-400'
+                    ? 'bg-ochre-500'
                     : item.status === 'high'
-                      ? 'bg-rose-400'
-                      : 'bg-emerald-500',
+                      ? 'bg-vermilion-500'
+                      : 'bg-pine-600 dark:bg-pine-400',
                 )}
                 style={{ width: `${pct}%` }}
               />
@@ -89,22 +90,49 @@ function ProgramDays({ days }) {
       {days.map((day) => (
         <details
           key={day.name}
-          className="rounded-xl border border-slate-200 dark:border-slate-800"
+          className="rounded-md border border-line dark:border-white/[0.08]"
         >
-          <summary className="cursor-pointer px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
-            {day.name}
-            <span className="ml-2 text-xs font-normal text-slate-400">
+          <summary className="cursor-pointer px-3 py-2.5 text-[13px] font-semibold text-slate-700 dark:text-slate-200">
+            {day.name}{' '}
+            <span className="ml-2 font-mono text-[11px] font-normal uppercase tracking-[0.06em] text-slate-500 dark:text-slate-400">
               {day.exercises.length} bài
+              {day.cardio?.length ? ` · ${day.cardio.length} cardio` : ''}
             </span>
           </summary>
-          <div className="border-t border-slate-100 px-3 py-2 dark:border-slate-800">
-            <table className="min-w-full text-xs">
-              <thead className="text-left uppercase tracking-wide text-slate-400">
+          <div className="border-t border-line px-3 py-2 dark:border-white/[0.07]">
+            {day.cardio?.length > 0 && (
+              <div className="mb-2 rounded-md bg-brand-50/60 px-2.5 py-1.5 dark:bg-brand-950/30">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">
+                  Cardio
+                </p>
+                <ul className="mt-1 space-y-0.5 text-xs text-slate-600 dark:text-slate-300">
+                  {day.cardio.map((item, index) => (
+                    <li key={`${day.name}-cardio-${index}`}>
+                      {CARDIO_BY_KEY[item.activity]?.label || item.activity} · {item.durationMin}{' '}
+                      phút
+                      {item.distanceKm ? ` · ${item.distanceKm} km` : ''}
+                      {item.intensity
+                        ? ` · ${item.intensity === 'light' ? 'nhẹ' : item.intensity === 'vigorous' ? 'mạnh' : 'vừa'}`
+                        : ''}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <table className="table-clinical min-w-full">
+              <thead className="text-left uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 <tr>
                   <th className="py-1.5">Bài</th>
                   <th className="py-1.5">Nhóm cơ</th>
                   <th className="py-1.5">Set × rep</th>
-                  <th className="py-1.5">RIR</th>
+                  <th className="py-1.5">
+                    <span className="inline-flex items-center gap-1">
+                      RIR
+                      <InfoTip label="RIR (Reps In Reserve)">
+                        Số rep còn dư trước khi thất bại. RIR 2 = còn có thể làm thêm khoảng 2 rep.
+                      </InfoTip>
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -152,10 +180,7 @@ export default function PlannerPage() {
     enabled: Boolean(selectedId),
   });
 
-  const programs = useMemo(
-    () => programsQuery.data?.programs || [],
-    [programsQuery.data],
-  );
+  const programs = useMemo(() => programsQuery.data?.programs || [], [programsQuery.data]);
 
   useEffect(() => {
     if (!selectedId && programs.length) setSelectedId(programs[0]._id);
@@ -223,19 +248,11 @@ export default function PlannerPage() {
         subtitle="Tạo giáo án theo quy tắc hoặc để AI đề xuất, đếm volume theo nhóm cơ và cảnh báo thiếu/quá nhiều."
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={() => setCreating(true)}
-            >
+            <button type="button" className="btn-primary" onClick={() => setCreating(true)}>
               <Icon name="plus" className="h-4 w-4" />
               Tự tạo giáo án
             </button>
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => setAiOpen(true)}
-            >
+            <button type="button" className="btn-secondary" onClick={() => setAiOpen(true)}>
               <Icon name="target" className="h-4 w-4" />
               AI đề xuất
             </button>
@@ -266,14 +283,17 @@ export default function PlannerPage() {
       )}
 
       {showWizard && (
-        <Card className="mb-4">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-            Wizard tạo giáo án
-          </h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Hệ thống đề xuất split và bài tập theo mục tiêu, trình độ, dụng cụ và thời gian mỗi buổi.
-          </p>
-
+        <Panel
+          className="mb-4"
+          title="Tạo giáo án nhanh"
+          note="Hệ thống đề xuất split và bài tập theo mục tiêu, trình độ, dụng cụ và thời gian mỗi buổi."
+          actions={
+            <button type="button" className="btn-ghost btn-sm" onClick={resetWizard}>
+              <Icon name="close" className="h-3.5 w-3.5" />
+              Đóng
+            </button>
+          }
+        >
           {!preview ? (
             <>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -288,7 +308,7 @@ export default function PlannerPage() {
                 </Field>
                 <Field label="Mục tiêu">
                   <select
-                    className="input"
+                    className="select"
                     value={form.goal}
                     onChange={(e) => setForm((f) => ({ ...f, goal: e.target.value }))}
                   >
@@ -301,7 +321,7 @@ export default function PlannerPage() {
                 </Field>
                 <Field label="Trình độ">
                   <select
-                    className="input"
+                    className="select"
                     value={form.experience}
                     onChange={(e) => setForm((f) => ({ ...f, experience: e.target.value }))}
                   >
@@ -312,7 +332,7 @@ export default function PlannerPage() {
                 </Field>
                 <Field label="Số buổi/tuần">
                   <select
-                    className="input"
+                    className="select"
                     value={form.daysPerWeek}
                     onChange={(e) =>
                       setForm((f) => ({ ...f, daysPerWeek: Number(e.target.value) }))
@@ -327,7 +347,7 @@ export default function PlannerPage() {
                 </Field>
                 <Field label="Thời gian mỗi buổi">
                   <select
-                    className="input"
+                    className="select"
                     value={form.sessionMinutes}
                     onChange={(e) =>
                       setForm((f) => ({ ...f, sessionMinutes: Number(e.target.value) }))
@@ -349,13 +369,17 @@ export default function PlannerPage() {
                       key={item.value}
                       type="button"
                       onClick={() => toggleEquipment(item.value)}
+                      aria-pressed={form.equipment.includes(item.value)}
                       className={clsx(
-                        'rounded-full border px-3 py-1.5 text-xs font-semibold transition',
+                        'inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-[12px] font-medium transition-colors',
                         form.equipment.includes(item.value)
-                          ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300'
-                          : 'border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400',
+                          ? 'border-pine-600 bg-pine-50 text-pine-800 dark:border-pine-400/60 dark:bg-pine-950/50 dark:text-pine-200'
+                          : 'border-line bg-surface text-slate-600 hover:border-line-strong dark:border-white/10 dark:bg-transparent dark:text-slate-400 dark:hover:border-white/20',
                       )}
                     >
+                      {form.equipment.includes(item.value) && (
+                        <Icon name="check" className="h-3 w-3" />
+                      )}
                       {item.label}
                     </button>
                   ))}
@@ -368,22 +392,20 @@ export default function PlannerPage() {
                 disabled={suggest.isPending}
                 onClick={() => suggest.mutate()}
               >
-                {suggest.isPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="target" className="h-4 w-4" />}
+                {suggest.isPending ? (
+                  <Spinner className="h-4 w-4 text-white" />
+                ) : (
+                  <Icon name="target" className="h-4 w-4" />
+                )}
                 {suggest.isPending ? 'Đang tạo...' : 'Gợi ý giáo án'}
               </button>
             </>
           ) : (
             <>
-              <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                <span className="badge bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                  {preview.splitLabel}
-                </span>
-                <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  {preview.daysPerWeek} buổi/tuần
-                </span>
-                <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  {preview.days.reduce((sum, d) => sum + d.exercises.length, 0)} bài
-                </span>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                <Badge tone="pine">{preview.splitLabel}</Badge>
+                <Badge>{preview.daysPerWeek} buổi/tuần</Badge>
+                <Badge>{preview.days.reduce((sum, d) => sum + d.exercises.length, 0)} bài</Badge>
               </div>
 
               <div className="mt-3">
@@ -424,16 +446,28 @@ export default function PlannerPage() {
               </div>
             </>
           )}
-        </Card>
+        </Panel>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-1">
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Giáo án của bạn</h2>
-          <div className="mt-3 space-y-2">
-            {programsQuery.isLoading && <Spinner className="h-5 w-5" />}
+      <div className={clsx('grid gap-4', programs.length > 0 && 'lg:grid-cols-3')}>
+        <Panel
+          className={clsx(programs.length > 0 && 'lg:col-span-1')}
+          title="Giáo án của bạn"
+          note={`${programs.length} giáo án đã lưu`}
+          flush
+        >
+          <div className="space-y-1 p-2">
+            {programsQuery.isLoading && (
+              <div className="p-3">
+                <Spinner className="h-4 w-4" />
+              </div>
+            )}
             {!programs.length && !programsQuery.isLoading && (
-              <p className="text-sm text-slate-400">Chưa có giáo án. Dùng wizard để tạo.</p>
+              <EmptyState
+                icon="dumbbell"
+                title="Chưa có giáo án"
+                note="Dùng Tạo nhanh hoặc Tự tạo giáo án để bắt đầu."
+              />
             )}
             {programs.map((program) => (
               <button
@@ -441,35 +475,38 @@ export default function PlannerPage() {
                 type="button"
                 onClick={() => setSelectedId(program._id)}
                 className={clsx(
-                  'w-full rounded-xl border p-3 text-left transition',
+                  'w-full rounded-md border px-3 py-2.5 text-left transition-colors',
                   selectedId === program._id
-                    ? 'border-brand-400 bg-brand-50/60 dark:border-brand-800 dark:bg-brand-950/30'
-                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700',
+                    ? 'border-pine-600 bg-pine-50/70 dark:border-pine-500/50 dark:bg-pine-950/30'
+                    : 'border-transparent hover:border-line hover:bg-paper-2 dark:hover:border-white/10 dark:hover:bg-white/[0.04]',
                 )}
               >
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100">
                   {program.name}
                 </p>
-                <p className="mt-0.5 text-xs text-slate-400">
+                <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.06em] text-slate-500 dark:text-slate-400">
                   {SPLIT_LABELS[program.split] || program.split} · {program.daysPerWeek} buổi/tuần
                 </p>
               </button>
             ))}
           </div>
-        </Card>
+        </Panel>
 
-        <Card className="lg:col-span-2">
-          {!selectedId && (
-            <p className="py-10 text-center text-sm text-slate-400">
-              Chọn một giáo án để xem volume và các ngày tập.
-            </p>
-          )}
+        {programs.length > 0 && (
+          <Panel className="lg:col-span-2">
+            {!selectedId && (
+              <EmptyState
+                icon="clipboard"
+                title="Chọn một giáo án"
+                note="Volume theo nhóm cơ và các ngày tập sẽ hiện ở đây."
+              />
+            )}
           {selectedId && detailQuery.isLoading && <Spinner />}
           {detail && (
             <>
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  <h2 className="font-display text-[20px] font-semibold text-slate-900 dark:text-white">
                     {detail.program.name}
                   </h2>
                   <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
@@ -480,44 +517,48 @@ export default function PlannerPage() {
                 <div className="flex flex-wrap items-center gap-1">
                   <button
                     type="button"
-                    className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                    className="btn-ghost btn-sm"
                     onClick={() => setEditing(detail.program)}
                   >
-                    <Icon name="settings" className="h-4 w-4" />
+                    <Icon name="settings" className="h-3.5 w-3.5" />
                     Sửa
                   </button>
                   <button
                     type="button"
-                    className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                    className="btn-ghost btn-sm"
                     onClick={() => setEvaluating(detail.program)}
                   >
-                    <Icon name="target" className="h-4 w-4" />
+                    <Icon name="target" className="h-3.5 w-3.5" />
                     Chấm điểm
                   </button>
                   <button
                     type="button"
-                    className="btn-ghost !px-2.5 !py-1.5 text-xs text-rose-500"
+                    className="btn-ghost btn-sm text-vermilion-600 dark:text-vermilion-300"
                     onClick={() => {
                       if (window.confirm('Xóa giáo án này?')) remove.mutate(selectedId);
                     }}
                   >
-                    <Icon name="trash" className="h-4 w-4" />
+                    <Icon name="trash" className="h-3.5 w-3.5" />
                     Xóa
                   </button>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/40">
+              <div className="mt-4 rounded-md border border-line bg-paper-2/60 p-3 dark:border-white/[0.08] dark:bg-white/[0.03]">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <p className="flex items-center gap-1 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">
                     Volume mỗi tuần
+                    <InfoTip label="Volume (set/nhóm cơ/tuần)">
+                      Tổng số set của từng nhóm cơ trong một tuần. Khoảng 10-20 set/nhóm cơ/tuần là
+                      mức tham khảo cho người tập trung cấp.
+                    </InfoTip>
                   </p>
-                  <p className="text-xs text-slate-500">{totalSets} set/tuần</p>
+                  <p className="num text-[11px] text-slate-500">{totalSets} set/tuần</p>
                 </div>
                 <div className="mt-2">
                   <VolumeBars volume={volume} />
                 </div>
-                <p className="mt-2 text-[11px] text-slate-400">
+                <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
                   Mục tiêu {volume?.target.min}-{volume?.target.max} set/nhóm cơ/tuần. Vàng = thiếu,
                   đỏ = quá nhiều.
                 </p>
@@ -528,7 +569,8 @@ export default function PlannerPage() {
               </div>
             </>
           )}
-        </Card>
+          </Panel>
+        )}
       </div>
 
       {aiOpen && (
@@ -549,7 +591,7 @@ export default function PlannerPage() {
             daysPerWeek: 4,
             split: 'custom',
             equipment: [],
-            days: [{ name: 'Buổi 1', exercises: [] }],
+            days: [{ name: 'Buổi 1', exercises: [], cardio: [] }],
             deloadEveryWeeks: 6,
             status: 'active',
             notes: '',
@@ -574,12 +616,8 @@ export default function PlannerPage() {
         />
       )}
       {evaluating && (
-        <PlanEvaluationModal
-          program={evaluating}
-          onClose={() => setEvaluating(null)}
-        />
+        <PlanEvaluationModal program={evaluating} onClose={() => setEvaluating(null)} />
       )}
     </div>
   );
 }
-

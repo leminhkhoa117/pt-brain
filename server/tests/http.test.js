@@ -9,6 +9,8 @@ describe('SSRF guard', () => {
     expect(isPrivateAddress('192.168.1.10')).toBe(true);
     expect(isPrivateAddress('169.254.169.254')).toBe(true);
     expect(isPrivateAddress('::1')).toBe(true);
+    expect(isPrivateAddress('64:ff9b::7f00:1')).toBe(true);
+    expect(isPrivateAddress('2002:7f00:1::')).toBe(true);
     expect(isPrivateAddress('8.8.8.8')).toBe(false);
     expect(isPrivateAddress('1.1.1.1')).toBe(false);
   });
@@ -22,6 +24,10 @@ describe('SSRF guard', () => {
   it('chặn protocol không phải http/https', async () => {
     await expect(assertPublicUrl('file:///etc/passwd')).rejects.toThrow();
     await expect(assertPublicUrl('ftp://example.com/file')).rejects.toThrow();
+  });
+
+  it('chặn URL có userinfo', async () => {
+    await expect(assertPublicUrl('https://user:pass@8.8.8.8/file')).rejects.toThrow();
   });
 
   it('cho phép IP public literal (không cần DNS)', async () => {

@@ -129,6 +129,14 @@ export function buildSummaryPdf(summary, paper) {
   labelValue(doc, 'Chỉ số đo', c.outcomes);
 
   heading(doc, 'Kết quả chính');
+  if (c.resultsOverview) {
+    doc
+      .font('Noto')
+      .fontSize(9.5)
+      .fillColor('#0f766e')
+      .text(`Đọc nhanh: ${c.resultsOverview}`, { lineGap: 2.5 });
+    doc.moveDown(0.4);
+  }
   for (const [index, item] of (c.mainResults || []).entries()) {
     doc.font('NotoBold').fontSize(10).fillColor('#1e293b').text(`${index + 1}. ${item.finding}`, {
       lineGap: 2,
@@ -138,6 +146,24 @@ export function buildSummaryPdf(summary, paper) {
     });
     paragraph(doc, `Nghĩa là: ${item.plainMeaning}`, { size: 9, color: '#475569' });
     doc.moveDown(0.25);
+  }
+
+  if (Array.isArray(c.figures) && c.figures.length) {
+    heading(doc, 'Hình & bảng');
+    for (const figure of c.figures) {
+      const title = `${figure.label}${figure.page ? ` (trang ${figure.page})` : ''}${
+        figure.title ? ` — ${figure.title}` : ''
+      }`;
+      doc.font('NotoBold').fontSize(10).fillColor('#1e293b').text(title, { lineGap: 2 });
+      if (figure.caption) {
+        paragraph(doc, `Chú thích gốc: ${figure.caption}`, { size: 8.5, color: '#64748b' });
+      }
+      if (figure.explanation) paragraph(doc, figure.explanation, { size: 9 });
+      if (figure.whatToLookFor) {
+        paragraph(doc, `Cần chú ý: ${figure.whatToLookFor}`, { size: 9, color: '#92400e' });
+      }
+      doc.moveDown(0.3);
+    }
   }
 
   if (Array.isArray(c.secondaryResults) && c.secondaryResults.length) {

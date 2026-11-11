@@ -1,21 +1,29 @@
+import { BodyAssessment } from '../models/BodyAssessment.js';
 import { BodyLog } from '../models/BodyLog.js';
 import { CalcHistory } from '../models/CalcHistory.js';
 import { Flashcard } from '../models/Flashcard.js';
+import { Meal } from '../models/Meal.js';
+import { MealPlan } from '../models/MealPlan.js';
+import { MealPlanReview } from '../models/MealPlanReview.js';
 import { Note } from '../models/Note.js';
 import { Paper } from '../models/Paper.js';
+import { PlanEvaluation } from '../models/PlanEvaluation.js';
 import { Program } from '../models/Program.js';
 import { Summary } from '../models/Summary.js';
 import { Term } from '../models/Term.js';
 import { User } from '../models/User.js';
 import { WorkoutSession } from '../models/WorkoutSession.js';
+import { AiUsage } from '../models/AiUsage.js';
 import { ApiError } from '../utils/ApiError.js';
 import { env } from '../config/env.js';
+import { hashToken, signAccessToken, signRefreshToken, verifyRefreshToken } from './tokens.js';
 import {
-  hashToken,
-  signAccessToken,
-  signRefreshToken,
-  verifyRefreshToken,
-} from './tokens.js';
+  ASSESSMENT_IMAGE_DIR,
+  MEAL_IMAGE_DIR,
+  PHOTO_DIR,
+  removeImageFiles,
+  removeOrphanPdfs,
+} from './userFiles.js';
 
 const REFRESH_TTL_MS = env.REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
 
@@ -59,9 +67,7 @@ export async function rotateSession(refreshToken) {
   } catch {
     throw ApiError.unauthorized('Refresh token không hợp lệ hoặc đã hết hạn');
   }
-  const user = await User.findById(payload.sub).select(
-    '+refreshTokenHash +refreshTokenExpiresAt',
-  );
+  const user = await User.findById(payload.sub).select('+refreshTokenHash +refreshTokenExpiresAt');
   if (!user) throw ApiError.unauthorized('Tài khoản không tồn tại');
   const matches = user.refreshTokenHash === hashToken(refreshToken);
   const notExpired = user.refreshTokenExpiresAt && user.refreshTokenExpiresAt > new Date();
@@ -93,10 +99,13 @@ const PROFILE_FIELDS = [
   'sex',
   'birthDate',
   'heightCm',
+  'weightKg',
   'activityLevel',
   'goal',
   'experience',
   'units',
+  'healthConditions',
+  'conditionNotes',
 ];
 
 export async function updateUser(userId, { name, profile }) {
@@ -117,9 +126,20 @@ export async function updateUser(userId, { name, profile }) {
   return user;
 }
 
-/** Xóa tài khoản và toàn bộ dữ liệu liên quan (yêu cầu riêng tư của plan). */
+/**
+ * Xóa tài khoản và toàn bộ dữ liệu liên quan (yêu cầu riêng tư của plan).
+ * Ảnh/PDF nằm ngoài MongoDB nên phải thu thập trước khi xóa document, sau đó
+ * mới xóa file. PDF dedupe theo hash nên chỉ xóa khi không còn ai tham chiếu.
+ */
 export async function deleteAccount(userId) {
   const filter = { userId };
+  const [logs, meals, assessments, summaries] = await Promise.all([
+    BodyLog.find(filter).select('photos.filename').lean(),
+    Meal.find(filter).select('image.filename').lean(),
+    BodyAssessment.find(filter).select('images.filename').lean(),
+    Summary.find(filter).select('pdfHash').lean(),
+  ]);
+
   await Promise.all([
     BodyLog.deleteMany(filter),
     CalcHistory.deleteMany(filter),
@@ -130,6 +150,29 @@ export async function deleteAccount(userId) {
     Term.deleteMany(filter),
     Flashcard.deleteMany(filter),
     Note.deleteMany(filter),
+    BodyAssessment.deleteMany(filter),
+    Meal.deleteMany(filter),
+    MealPlan.deleteMany(filter),
+    MealPlanReview.deleteMany(filter),
+    PlanEvaluation.deleteMany(filter),
+    AiUsage.deleteMany(filter),
   ]);
+
+  await Promise.all([
+    removeImageFiles(
+      PHOTO_DIR,
+      logs.flatMap((log) => (log.photos || []).map((photo) => photo.filename)),
+    ),
+    removeImageFiles(
+      MEAL_IMAGE_DIR,
+      meals.map((meal) => meal.image?.filename),
+    ),
+    removeImageFiles(
+      ASSESSMENT_IMAGE_DIR,
+      assessments.flatMap((assessment) => (assessment.images || []).map((image) => image.filename)),
+    ),
+    removeOrphanPdfs(summaries.map((summary) => summary.pdfHash)),
+  ]);
+
   await User.findByIdAndDelete(userId);
 }

@@ -6,6 +6,13 @@ export const api = axios.create({
   timeout: 30000,
 });
 
+// Endpoint có gọi AI (tóm tắt, tìm nghiên cứu, vision, quiz, meal plan…) chạy lâu
+// hơn CRUD thường rất nhiều; timeout 30s mặc định sẽ cắt ngang và báo
+// "Máy chủ phản hồi quá lâu" dù server vẫn đang xử lý bình thường.
+// Đo thực tế: tìm nghiên cứu ~50-60s, meal plan ~120s; server cho phép mỗi lượt
+// AI tới 180s và một số luồng retry 2 lần nên trần client đặt trên mức đó.
+export const AI_TIMEOUT_MS = 420000;
+
 let refreshPromise = null;
 
 api.interceptors.response.use(
@@ -25,6 +32,9 @@ api.interceptors.response.use(
       return api(original);
     } catch (refreshError) {
       refreshPromise = null;
+      // Cho AuthProvider biết phiên đã hết hạn để điều hướng về /login thay vì
+      // để người dùng mắc kẹt trên trang với mọi query đều lỗi 401.
+      window.dispatchEvent(new Event('pt-auth-expired'));
       return Promise.reject(refreshError);
     }
   },
@@ -39,5 +49,18 @@ export function getErrorMessage(error, fallback = 'Có lỗi xảy ra, vui lòng
   if (Array.isArray(details) && details.length) {
     return details.map((d) => d.message).join('; ');
   }
-  return error?.response?.data?.error?.message || error?.message || fallback;
+  const message = error?.response?.data?.error?.message;
+  if (message) return message;
+  // Dev proxy trả 500 rỗng khi API chưa kịp khởi động lại; axios chỉ có câu
+  // "Request failed with status code 500" nên thay bằng thông báo dễ hiểu.
+  if (error?.code === 'ECONNABORTED') {
+    return 'Máy chủ phản hồi quá lâu. Vui lòng thử lại.';
+  }
+  if (!error?.response) {
+    return 'Không kết nối được máy chủ API. Kiểm tra server đang chạy rồi thử lại.';
+  }
+  if (error.response.status >= 500) {
+    return 'Máy chủ đang khởi động lại hoặc gặp sự cố. Vui lòng thử lại sau vài giây.';
+  }
+  return error?.message || fallback;
 }

@@ -102,10 +102,10 @@ export default function BodyAssessmentPage() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-1">
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Ảnh &amp; mục tiêu</h2>
+          <h2 className="font-display text-[16px] font-semibold text-slate-900 dark:text-white">Ảnh &amp; mục tiêu</h2>
           <div className="mt-3 space-y-3">
             <Field label="Mục tiêu hiện tại">
-              <select className="input" value={goal} onChange={(e) => setGoal(e.target.value)}>
+              <select className="select" value={goal} onChange={(e) => setGoal(e.target.value)}>
                 {Object.entries(GOAL_LABELS).map(([value, label]) => (
                   <option key={value} value={value}>
                     {label}
@@ -114,17 +114,30 @@ export default function BodyAssessmentPage() {
               </select>
             </Field>
             <Field label="Ảnh cơ thể (tối đa 4)">
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                className="block w-full text-xs text-slate-500 file:mr-2 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-brand-700 dark:file:bg-brand-950 dark:file:text-brand-300"
-                onChange={(e) => {
-                  const list = Array.from(e.target.files || []).slice(0, 4);
-                  setFiles(list);
-                  setError(null);
-                }}
-              />
+              <label className="flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-line bg-paper-2/60 px-3 py-3 text-[12px] text-slate-500 transition-colors hover:border-pine-600 dark:border-white/15 dark:bg-white/[0.03] dark:text-slate-400">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-line bg-surface text-slate-500 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
+                  <Icon name="upload" className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-medium text-slate-700 dark:text-slate-200">
+                    {files.length ? `${files.length} ảnh đã chọn` : 'Chọn tối đa 4 ảnh'}
+                  </span>
+                  <span className="block text-[11px] text-slate-400">
+                    Trước / nghiêng / sau · JPG, PNG, WebP
+                  </span>
+                </span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  className="sr-only"
+                  onChange={(e) => {
+                    const list = Array.from(e.target.files || []).slice(0, 4);
+                    setFiles(list);
+                    setError(null);
+                  }}
+                />
+              </label>
             </Field>
 
             {previews.length > 0 && (
@@ -136,7 +149,7 @@ export default function BodyAssessmentPage() {
                       alt={VIEW_LABELS[VIEWS[index]]}
                       className="h-20 w-full rounded-lg object-cover"
                     />
-                    <span className="absolute bottom-1 left-1 rounded bg-slate-950/70 px-1.5 py-0.5 text-[9px] font-semibold text-white">
+                    <span className="absolute bottom-1 left-1 rounded bg-slate-950/70 px-1.5 py-0.5 text-[11px] font-semibold text-white">
                       {VIEW_LABELS[VIEWS[index]] || 'Ảnh'}
                     </span>
                   </div>
@@ -146,7 +159,7 @@ export default function BodyAssessmentPage() {
 
             <Field label="Ghi chú (tùy chọn)">
               <textarea
-                className="input min-h-[80px]"
+                className="textarea min-h-[80px]"
                 placeholder="Chấn thương cũ, vùng muốn cải thiện, lịch tập..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -154,7 +167,7 @@ export default function BodyAssessmentPage() {
               />
             </Field>
 
-            <label className="flex cursor-pointer items-start gap-2 rounded-xl bg-slate-50 p-3 text-xs text-slate-600 dark:bg-white/[0.04] dark:text-slate-300">
+            <label className="flex cursor-pointer items-start gap-2 rounded-md border border-line bg-paper-2/60 p-3 text-[12px] leading-relaxed text-slate-600 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-slate-300">
               <input
                 type="checkbox"
                 className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600"
@@ -177,7 +190,7 @@ export default function BodyAssessmentPage() {
               {analyze.isPending ? 'AI đang phân tích ảnh...' : 'Phân tích thể trạng'}
             </button>
             {analyze.isPending && (
-              <p className="text-center text-xs text-slate-400">
+              <p className="text-center text-xs text-slate-500 dark:text-slate-400">
                 Thường 10-40 giây cho 1-4 ảnh.
               </p>
             )}
@@ -191,7 +204,7 @@ export default function BodyAssessmentPage() {
               <p className="mt-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Chưa có đánh giá nào
               </p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 Thêm ảnh và mục tiêu để AI nhận xét về cân bằng cơ, tư thế và hướng cải thiện.
               </p>
             </Card>
@@ -202,10 +215,7 @@ export default function BodyAssessmentPage() {
               <Card>
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600 dark:text-brand-300">
-                      Kết quả đánh giá · {formatDateKey(result.assessment.dateKey, true)}
-                    </p>
-                    <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                    <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
                       {GOAL_LABELS[result.assessment.goal]}
                     </h2>
                   </div>
@@ -218,7 +228,7 @@ export default function BodyAssessmentPage() {
 
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
                   <div className="rounded-xl bg-brand-50 p-3 dark:bg-brand-950/30">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-brand-600 dark:text-brand-300">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-brand-600 dark:text-brand-300">
                       % mỡ ước tính từ ảnh
                     </p>
                     <p className="mt-1 text-xl font-extrabold text-brand-800 dark:text-brand-200">
@@ -232,7 +242,7 @@ export default function BodyAssessmentPage() {
                     </p>
                   </div>
                   <div className="rounded-xl bg-slate-50 p-3 dark:bg-white/[0.04]">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Cân bằng cơ
                     </p>
                     <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -326,7 +336,7 @@ export default function BodyAssessmentPage() {
                     Xóa đánh giá
                   </button>
                 </div>
-                <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+                <p className="mt-3 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
                   {analysis.disclaimer}
                   {analysis.limitations?.length ? ` Hạn chế: ${analysis.limitations.join('; ')}.` : ''}
                 </p>

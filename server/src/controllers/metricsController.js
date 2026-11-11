@@ -1,6 +1,3 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { BodyLog } from '../models/BodyLog.js';
 import { buildBodyLogPdf } from '../services/pdf/summaryPdf.js';
@@ -9,34 +6,14 @@ import {
   getBodyLog,
   getSummary as getMetricsSummary,
   listBodyLogs,
-  POSTURE_CHECKLIST,
   upsertBodyLog,
 } from '../services/metricsService.js';
 import { getUser } from '../services/authService.js';
 import { ApiError } from '../utils/ApiError.js';
 import { parseDateKey } from '../utils/date.js';
+import { detectImageExt, removeImageFile, saveImageFile, sendImageFile } from '../utils/image.js';
 
 const PHOTO_DIR = fileURLToPath(new URL('../../uploads/photos/', import.meta.url));
-
-function detectImageExt(buffer) {
-  if (buffer.length > 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
-    return 'jpg';
-  }
-  if (
-    buffer.length > 8 &&
-    buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
-  ) {
-    return 'png';
-  }
-  if (
-    buffer.length > 12 &&
-    buffer.subarray(0, 4).toString() === 'RIFF' &&
-    buffer.subarray(8, 12).toString() === 'WEBP'
-  ) {
-    return 'webp';
-  }
-  return null;
-}
 
 export async function listMetrics(req, res) {
   const logs = await listBodyLogs(req.userId, req.validatedQuery || {});
@@ -51,12 +28,12 @@ export async function getMetric(req, res) {
 export async function putMetric(req, res) {
   const user = await getUser(req.userId);
   const log = await upsertBodyLog(user, req.params.date, req.body);
-  res.json({ data: { log, checklist: POSTURE_CHECKLIST } });
+  res.json({ data: { log } });
 }
 
 export async function summary(req, res) {
   const data = await getMetricsSummary(req.userId, req.validatedQuery || {});
-  res.json({ data: { ...data, checklist: POSTURE_CHECKLIST } });
+  res.json({ data });
 }
 
 export async function downloadCsv(req, res) {
@@ -90,9 +67,11 @@ export async function uploadPhoto(req, res) {
     throw ApiError.notFound('Hãy lưu cân nặng của ngày này trước khi thêm ảnh tiến độ');
   }
 
-  await fs.mkdir(PHOTO_DIR, { recursive: true });
-  const filename = `${req.userId}-${req.params.date}-${crypto.randomUUID()}.${ext}`;
-  await fs.writeFile(path.join(PHOTO_DIR, filename), req.file.buffer);
+  const filename = await saveImageFile(
+    req.file.buffer,
+    PHOTO_DIR,
+    `${req.userId}-${req.params.date}`,
+  );
 
   log.photos.push({
     filename,
@@ -111,8 +90,7 @@ export async function servePhoto(req, res) {
   }
   const exists = await BodyLog.exists({ userId: req.userId, 'photos.filename': filename });
   if (!exists) throw ApiError.notFound('Không tìm thấy ảnh');
-  res.setHeader('Cache-Control', 'private, max-age=3600');
-  res.sendFile(path.join(PHOTO_DIR, filename));
+  await sendImageFile(req, res, PHOTO_DIR, filename);
 }
 
 export async function deletePhoto(req, res) {
@@ -125,6 +103,6 @@ export async function deletePhoto(req, res) {
 
   log.photos.splice(index, 1);
   await log.save();
-  await fs.unlink(path.join(PHOTO_DIR, filename)).catch(() => {});
+  await removeImageFile(PHOTO_DIR, filename);
   res.json({ data: { ok: true } });
 }

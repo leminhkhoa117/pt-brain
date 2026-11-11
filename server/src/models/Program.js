@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { CARDIO_KEYS } from '../../../shared/training/cardio.js';
 
 const programExerciseSchema = new mongoose.Schema(
   {
@@ -16,10 +17,27 @@ const programExerciseSchema = new mongoose.Schema(
   { _id: false },
 );
 
+const programCardioSchema = new mongoose.Schema(
+  {
+    activity: { type: String, enum: CARDIO_KEYS, required: true },
+    durationMin: { type: Number, required: true, min: 1, max: 600 },
+    distanceKm: { type: Number, min: 0, max: 1000 },
+    intensity: {
+      type: String,
+      enum: ['light', 'moderate', 'vigorous'],
+      default: 'moderate',
+    },
+    notes: { type: String, default: '', maxlength: 500 },
+  },
+  { _id: false },
+);
+
 const programDaySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     exercises: { type: [programExerciseSchema], default: [] },
+    // Cardio lên lịch cùng ngày, ví dụ Chủ nhật chạy bộ 30 phút.
+    cardio: { type: [programCardioSchema], default: [] },
   },
   { _id: false },
 );

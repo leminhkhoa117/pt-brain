@@ -137,7 +137,7 @@ export default function FlashcardsPage() {
             </Card>
           ) : current ? (
             <Card className="text-center">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Thẻ đến hạn · còn {queue.length}
               </p>
               <p className="mt-6 text-xl font-bold text-slate-900 dark:text-white">
@@ -150,7 +150,7 @@ export default function FlashcardsPage() {
                     {current.back}
                   </p>
                   <div className="mt-6">
-                    <p className="text-xs text-slate-400">Bạn nhớ thẻ này ở mức nào?</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Bạn nhớ thẻ này ở mức nào?</p>
                     <div className="mt-2 flex flex-wrap justify-center gap-2">
                       {QUALITY_LABELS.map((item) => (
                         <button
@@ -178,7 +178,7 @@ export default function FlashcardsPage() {
                 </button>
               )}
 
-              <p className="mt-5 text-[11px] text-slate-400">
+              <p className="mt-5 text-[11px] text-slate-500 dark:text-slate-400">
                 Ease {current.ease} · interval {current.intervalDays} ngày · reps {current.reps}
               </p>
             </Card>
@@ -188,48 +188,49 @@ export default function FlashcardsPage() {
               <p className="mt-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
                 Hôm nay không có thẻ cần ôn.
               </p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 Tạo thêm thẻ từ Từ điển hoặc quay lại khi thẻ đến hạn.
               </p>
             </Card>
           )}
         </div>
 
-        <Card>
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Tất cả thẻ</h3>
-          <div className="mt-2 max-h-[520px] space-y-2 overflow-auto">
-            {(allQuery.data?.cards || []).map((card) => (
-              <div
-                key={card._id}
-                className="rounded-xl border border-slate-200 p-2.5 text-xs dark:border-slate-800"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-slate-700 dark:text-slate-200">
-                      {card.front}
-                    </p>
-                    <p className="mt-0.5 line-clamp-2 text-slate-400">{card.back}</p>
-                    <p className="mt-1 text-[10px] text-slate-400">
-                      Due {formatDateKey(String(card.dueDate).slice(0, 10), true)} · interval{' '}
-                      {card.intervalDays} ngày
-                    </p>
+        {(allQuery.data?.cards || []).length > 0 && (
+          <Card>
+            <h3 className="font-display text-[16px] font-semibold text-slate-900 dark:text-white">
+              Tất cả thẻ
+            </h3>
+            <div className="mt-2 max-h-[520px] space-y-2 overflow-auto">
+              {(allQuery.data?.cards || []).map((card) => (
+                <div
+                  key={card._id}
+                  className="rounded-md border border-line p-2.5 text-xs dark:border-white/[0.08]"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-slate-700 dark:text-slate-200">
+                        {card.front}
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-slate-500 dark:text-slate-400">{card.back}</p>
+                      <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                        Due {formatDateKey(String(card.dueDate).slice(0, 10), true)} · interval{' '}
+                        {card.intervalDays} ngày
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-ghost btn-sm text-vermilion-600 dark:text-vermilion-300"
+                      onClick={() => remove.mutate(card._id)}
+                      aria-label="Xóa thẻ"
+                    >
+                      <Icon name="trash" className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    className="btn-ghost !p-1 text-rose-500"
-                    onClick={() => remove.mutate(card._id)}
-                    aria-label="Xóa thẻ"
-                  >
-                    <Icon name="trash" className="h-3.5 w-3.5" />
-                  </button>
                 </div>
-              </div>
-            ))}
-            {!(allQuery.data?.cards || []).length && (
-              <p className="py-4 text-center text-xs text-slate-400">Chưa có thẻ nào.</p>
-            )}
-          </div>
-        </Card>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );

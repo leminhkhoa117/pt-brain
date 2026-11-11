@@ -1,7 +1,11 @@
 import { WorkoutSession } from '../../models/WorkoutSession.js';
 import { Program } from '../../models/Program.js';
+import { Exercise } from '../../models/Exercise.js';
+import { BodyLog } from '../../models/BodyLog.js';
+import { User } from '../../models/User.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { parseDateKey } from '../../utils/date.js';
+import { estimateCardioCalories } from '../../../../shared/training/cardio.js';
 import {
   estimateOneRepMax,
   setsByMuscle,
@@ -35,8 +39,74 @@ export function computeSession(sets = []) {
   };
 }
 
+async function cardioWeightForUser(userId) {
+  const [user, latestLog] = await Promise.all([
+    User.findById(userId).select('profile.weightKg').lean(),
+    BodyLog.findOne({ userId }).sort({ dateKey: -1 }).select('weightKg').lean(),
+  ]);
+  return Number(latestLog?.weightKg || user?.profile?.weightKg) || null;
+}
+
 export async function createWorkout(userId, data) {
   const date = parseDateKey(data.date);
+
+  if (data.kind === 'cardio') {
+    const manual = data.caloriesBurned !== undefined;
+    let calories = Number(data.caloriesBurned) || 0;
+    let met = 0;
+    let paceMinPerKm = 0;
+
+    if (!manual) {
+      const weightKg = await cardioWeightForUser(userId);
+      if (!weightKg) {
+        throw new ApiError(
+          422,
+          'CARDIO_WEIGHT_REQUIRED',
+          'Cần cân nặng trong hồ sơ hoặc BodyLog để ước tính calo. Bạn có thể nhập calo thủ công.',
+        );
+      }
+      try {
+        const estimate = estimateCardioCalories({
+          activity: data.activity,
+          durationMin: data.durationMin,
+          distanceKm: data.distanceKm,
+          weightKg,
+          intensity: data.intensity,
+        });
+        calories = estimate.calories;
+        met = estimate.met;
+        paceMinPerKm = estimate.paceMinPerKm || 0;
+      } catch (error) {
+        throw ApiError.badRequest(error.message);
+      }
+    }
+
+    return WorkoutSession.create({
+      userId,
+      date,
+      dateKey: data.date,
+      programId: data.programId,
+      dayName: data.dayName || '',
+      kind: 'cardio',
+      activity: data.activity,
+      distanceKm: data.distanceKm,
+      intensity: data.intensity || 'moderate',
+      caloriesBurned: Math.round(calories),
+      caloriesSource: manual ? 'manual' : 'estimated',
+      sets: [],
+      notes: data.notes || '',
+      durationMin: data.durationMin,
+      computed: {
+        tonnage: 0,
+        setsByMuscle: {},
+        estimated1RMs: {},
+        calories: Math.round(calories),
+        met,
+        paceMinPerKm,
+      },
+    });
+  }
+
   const computed = computeSession(data.sets);
   return WorkoutSession.create({
     userId,
@@ -44,19 +114,21 @@ export async function createWorkout(userId, data) {
     dateKey: data.date,
     programId: data.programId,
     dayName: data.dayName || '',
+    kind: 'strength',
     sets: data.sets,
     notes: data.notes || '',
     durationMin: data.durationMin,
-    computed,
+    computed: { ...computed, calories: 0 },
   });
 }
 
-export async function listWorkouts(userId, { from, to, programId, limit = 50 } = {}) {
+export async function listWorkouts(userId, { from, to, programId, kind, limit = 50 } = {}) {
   const query = { userId };
   if (from || to) {
     query.dateKey = { ...(from ? { $gte: from } : {}), ...(to ? { $lte: to } : {}) };
   }
   if (programId) query.programId = programId;
+  if (kind) query.kind = kind;
   return WorkoutSession.find(query)
     .sort({ dateKey: -1 })
     .limit(Math.min(Number(limit) || 50, 200))
@@ -89,12 +161,15 @@ export async function deleteWorkout(userId, id) {
 
 /** Tiến trình 1RM ước tính của một bài theo thời gian. */
 export async function progressionForExercise(userId, exercise) {
+  // Lấy 200 buổi MỚI NHẤT rồi đảo lại để biểu đồ vẫn tăng dần theo thời gian.
+  // Sort tăng dần + limit sẽ lấy nhầm 200 buổi cũ nhất khi lịch sử dài.
   const sessions = await WorkoutSession.find({ userId, 'sets.exercise': exercise })
-    .sort({ dateKey: 1 })
+    .sort({ dateKey: -1, createdAt: -1 })
     .limit(200)
     .lean();
 
   return sessions
+    .reverse()
     .map((session) => {
       const sets = (session.sets || []).filter((s) => s.exercise === exercise);
       if (!sets.length) return null;
@@ -139,6 +214,17 @@ export async function suggestionsForProgramDay(userId, program, dayName) {
     .limit(60)
     .lean();
 
+  // Gắn equipment để client biết bài bodyweight được phép log tạ = 0.
+  const exerciseIds = (day.exercises || [])
+    .map((exercise) => exercise.exerciseId)
+    .filter(Boolean);
+  const exerciseDocs = exerciseIds.length
+    ? await Exercise.find({ _id: { $in: exerciseIds } }).select('_id equipment').lean()
+    : [];
+  const equipmentById = new Map(
+    exerciseDocs.map((exercise) => [String(exercise._id), exercise.equipment || []]),
+  );
+
   const firstSession = await WorkoutSession.findOne({ userId, programId: program._id })
     .sort({ dateKey: 1 })
     .lean();
@@ -151,6 +237,7 @@ export async function suggestionsForProgramDay(userId, program, dayName) {
       : [];
     return {
       ...plain,
+      equipment: equipmentById.get(String(plain.exerciseId)) || [],
       lastDate: session?.dateKey || null,
       lastSets,
       suggestion: buildProgressionSuggestion({
@@ -165,6 +252,7 @@ export async function suggestionsForProgramDay(userId, program, dayName) {
   return {
     dayName: day.name,
     suggestions,
+    cardio: day.cardio || [],
     deload: deloadStatus({
       firstSessionDate: firstSession?.date,
       deloadEveryWeeks: program.deloadEveryWeeks,

@@ -12,6 +12,11 @@ export async function aiSuggest(req, res) {
   const user = await getUser(req.userId);
   await assertAiQuota(req.userId, 'apply');
 
+  const healthConditions = params.healthConditions?.length
+    ? params.healthConditions
+    : user.profile?.healthConditions || [];
+  const conditionNotes = params.conditionNotes ?? user.profile?.conditionNotes ?? '';
+
   const result = await generatePlanProposal({
     profile: {
       sex: user.profile?.sex,
@@ -19,8 +24,10 @@ export async function aiSuggest(req, res) {
       heightCm: user.profile?.heightCm,
       goal: params.goal,
       experience: params.experience,
+      healthConditions,
+      conditionNotes,
     },
-    params,
+    params: { ...params, healthConditions, conditionNotes },
   });
 
   if (result.usage) {
@@ -34,6 +41,8 @@ export async function aiSuggest(req, res) {
       goal: params.goal,
       experience: params.experience,
       equipment: params.equipment,
+      healthConditions,
+      conditionNotes,
       notes: result.rationale,
       quota: await getAiUsage(req.userId),
     },
@@ -53,6 +62,8 @@ export async function evaluate(req, res) {
       heightCm: user.profile?.heightCm,
       goal: program.goal,
       experience: user.profile?.experience,
+      healthConditions: user.profile?.healthConditions || [],
+      conditionNotes: user.profile?.conditionNotes || '',
     },
   });
 

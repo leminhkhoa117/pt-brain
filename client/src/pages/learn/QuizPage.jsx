@@ -77,7 +77,7 @@ export default function QuizPage() {
           <p className="mt-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
             Chưa có bài nào đã tóm tắt.
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Vào Nghiên cứu → Đọc &amp; tóm tắt một bài trước, rồi quay lại đây.
           </p>
           <Link to="/research" className="btn-primary mt-4">
@@ -90,7 +90,7 @@ export default function QuizPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
               <Field label="Chọn bài đã tóm tắt" className="flex-1">
                 <select
-                  className="input"
+                  className="select"
                   value={summaryId}
                   onChange={(e) => selectSummary(e.target.value)}
                   disabled={createQuiz.isPending}
@@ -114,7 +114,7 @@ export default function QuizPage() {
               </button>
             </div>
             {createQuiz.isPending && (
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 Thường mất 15-40 giây. Câu hỏi chỉ dựa trên bản tóm tắt, không dùng kiến thức ngoài.
               </p>
             )}
@@ -125,16 +125,13 @@ export default function QuizPage() {
               <Card className="border-brand-200 bg-brand-50/50 dark:border-brand-900 dark:bg-brand-950/20">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">
-                      {quiz.title || 'Quiz ôn tập'}
-                    </p>
-                    <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                    <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
                       {questions.length} câu · đã trả lời {answeredCount}/{questions.length}
                     </h2>
                   </div>
                   {submitted && (
-                    <div className="rounded-2xl bg-white px-4 py-2 text-center shadow-sm dark:bg-slate-900">
-                      <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Điểm</p>
+                    <div className="rounded-lg bg-white px-4 py-2 text-center shadow-sm dark:bg-slate-900">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Điểm</p>
                       <p className="text-xl font-extrabold text-brand-600 dark:text-brand-300">
                         {score}/{questions.length}
                       </p>
@@ -181,7 +178,7 @@ export default function QuizPage() {
                         >
                           <span
                             className={clsx(
-                              'grid h-5 w-5 shrink-0 place-items-center rounded-md text-[10px] font-extrabold',
+                              'grid h-5 w-5 shrink-0 place-items-center rounded-md text-[11px] font-extrabold',
                               correct
                                 ? 'bg-emerald-600 text-white'
                                 : wrong
@@ -249,7 +246,7 @@ export default function QuizPage() {
                   Tạo bộ câu hỏi khác
                 </button>
                 {!submitted && answeredCount < questions.length && (
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     Còn {questions.length - answeredCount} câu chưa trả lời.
                   </span>
                 )}

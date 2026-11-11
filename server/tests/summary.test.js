@@ -132,6 +132,30 @@ describe('summaryToMarkdown', () => {
     expect(md).toContain('chỉ abstract');
     expect(md).toContain('Thiếu bảng số liệu');
   });
+
+  it('xuất phần đọc nhanh và hình/bảng', () => {
+    const md = summaryToMarkdown({
+      content: {
+        ...validSummary,
+        resultsOverview: 'Kết quả chính nghiêng về volume cao hơn.',
+        figures: [
+          {
+            label: 'Figure 1',
+            kind: 'figure',
+            page: 6,
+            title: 'Thay đổi nhận thức',
+            caption: 'Age-related change',
+            explanation: 'So sánh hai nhóm.',
+            whatToLookFor: 'Nhìn dấu *',
+          },
+        ],
+      },
+    });
+    expect(md).toContain('Đọc nhanh');
+    expect(md).toContain('Hình & bảng');
+    expect(md).toContain('Figure 1 (trang 6)');
+    expect(md).toContain('Cần chú ý');
+  });
 });
 
 describe('buildCacheKey', () => {

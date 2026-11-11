@@ -19,7 +19,7 @@ export default class ErrorBoundary extends Component {
       return (
         <div className="mx-auto max-w-lg py-20 text-center">
           <div className="card">
-            <h1 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h1 className="font-display text-[20px] font-semibold text-slate-900 dark:text-white">
               Có lỗi hiển thị trang này
             </h1>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">

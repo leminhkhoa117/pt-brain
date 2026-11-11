@@ -1,6 +1,13 @@
 /* PT Brain service worker — cache app shell + tài nguyên tĩnh, không cache API. */
-const CACHE = 'ptbrain-v1';
-const SHELL = ['/', '/manifest.webmanifest', '/favicon.svg', '/icons/icon-192.png'];
+const CACHE = 'ptbrain-v5';
+const SHELL = [
+  '/',
+  '/manifest.webmanifest',
+  '/theme-init.js',
+  '/favicon.png',
+  '/logo-mark.png',
+  '/icons/icon-192.png',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

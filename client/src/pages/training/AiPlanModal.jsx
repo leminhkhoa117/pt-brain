@@ -5,7 +5,9 @@ import MarkdownText from '../../components/MarkdownText.jsx';
 import { aiSuggestProgram, createProgram } from '../../api/training.js';
 import { getErrorMessage } from '../../api/client.js';
 import { GOAL_LABELS } from '../../lib/format.js';
+import { useAuth } from '../../hooks/useAuth.jsx';
 import { MUSCLE_LABELS_VI } from '@shared/training/planner.js';
+import { HEALTH_CONDITIONS, healthConditionLabel } from '@shared/health/conditions.js';
 
 const EQUIPMENT = [
   { value: 'barbell', label: 'Barbell' },
@@ -19,6 +21,7 @@ const EQUIPMENT = [
 
 export default function AiPlanModal({ onClose, onSaved }) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [form, setForm] = useState({
     name: '',
     goal: 'lean_bulk',
@@ -26,6 +29,8 @@ export default function AiPlanModal({ onClose, onSaved }) {
     daysPerWeek: 4,
     equipment: ['barbell', 'dumbbell', 'machine', 'cable'],
     sessionMinutes: 60,
+    healthConditions: user?.profile?.healthConditions || [],
+    conditionNotes: user?.profile?.conditionNotes || '',
   });
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
@@ -50,7 +55,11 @@ export default function AiPlanModal({ onClose, onSaved }) {
         days: preview.days,
         status: 'active',
         deloadEveryWeeks: 6,
-        notes: preview.rationale,
+        notes: `${preview.rationale || ''}${
+          form.healthConditions.length
+            ? `\n\nLưu ý sức khỏe: ${form.healthConditions.map(healthConditionLabel).join(', ')}.`
+            : ''
+        }`.slice(0, 2000),
       }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['programs'] });
@@ -67,15 +76,20 @@ export default function AiPlanModal({ onClose, onSaved }) {
         : [...prev.equipment, value],
     }));
 
+  const toggleCondition = (value) =>
+    setForm((prev) => ({
+      ...prev,
+      healthConditions: prev.healthConditions.includes(value)
+        ? prev.healthConditions.filter((v) => v !== value)
+        : [...prev.healthConditions, value],
+    }));
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 backdrop-blur-sm sm:items-center sm:p-4">
-      <div className="max-h-[92vh] w-full overflow-auto rounded-t-3xl bg-white p-5 shadow-2xl dark:bg-slate-900 sm:max-w-3xl sm:rounded-3xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 sm:items-center sm:p-4">
+      <div className="max-h-[92vh] w-full overflow-auto rounded-t-lg bg-white p-5 shadow-overlay dark:bg-slate-900 sm:max-w-3xl sm:rounded-lg">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600 dark:text-brand-300">
-              AI Plan Coach
-            </p>
-            <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
               AI đề xuất giáo án
             </h2>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -106,7 +120,7 @@ export default function AiPlanModal({ onClose, onSaved }) {
               </Field>
               <Field label="Mục tiêu">
                 <select
-                  className="input"
+                  className="select"
                   value={form.goal}
                   onChange={(e) => setForm((f) => ({ ...f, goal: e.target.value }))}
                 >
@@ -119,7 +133,7 @@ export default function AiPlanModal({ onClose, onSaved }) {
               </Field>
               <Field label="Trình độ">
                 <select
-                  className="input"
+                  className="select"
                   value={form.experience}
                   onChange={(e) => setForm((f) => ({ ...f, experience: e.target.value }))}
                 >
@@ -130,7 +144,7 @@ export default function AiPlanModal({ onClose, onSaved }) {
               </Field>
               <Field label="Số buổi/tuần">
                 <select
-                  className="input"
+                  className="select"
                   value={form.daysPerWeek}
                   onChange={(e) => setForm((f) => ({ ...f, daysPerWeek: Number(e.target.value) }))}
                 >
@@ -143,7 +157,7 @@ export default function AiPlanModal({ onClose, onSaved }) {
               </Field>
               <Field label="Thời gian mỗi buổi">
                 <select
-                  className="input"
+                  className="select"
                   value={form.sessionMinutes}
                   onChange={(e) => setForm((f) => ({ ...f, sessionMinutes: Number(e.target.value) }))}
                 >
@@ -174,6 +188,45 @@ export default function AiPlanModal({ onClose, onSaved }) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="mt-3 rounded-lg border border-amber-200/70 bg-amber-50/40 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="label !mb-0">Bệnh nền / chấn thương</p>
+                <span className="text-[11px] font-medium text-amber-700/80 dark:text-amber-300/80">
+                  AI sẽ loại bài không phù hợp
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {HEALTH_CONDITIONS.map((item) => {
+                  const active = form.healthConditions.includes(item.key);
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => toggleCondition(item.key)}
+                      className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold transition ${
+                        active
+                          ? 'border-amber-500 bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-200'
+                          : 'border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-400'
+                      }`}
+                    >
+                      {item.vi}
+                    </button>
+                  );
+                })}
+              </div>
+              <input
+                className="input mt-2 !py-1.5 text-xs"
+                placeholder="Ghi chú thêm: thoát vị L4-L5, đau khi cúi, bác sĩ cho tập nhẹ..."
+                value={form.conditionNotes}
+                maxLength={1000}
+                onChange={(e) => setForm((f) => ({ ...f, conditionNotes: e.target.value }))}
+              />
+              <p className="mt-1.5 text-[11px] leading-relaxed text-amber-800/80 dark:text-amber-200/70">
+                Đây là gợi ý an toàn chung, không thay thế đánh giá của bác sĩ/PT chuyên môn.
+              </p>
             </div>
 
             <button
@@ -221,11 +274,11 @@ export default function AiPlanModal({ onClose, onSaved }) {
                       <div key={`${day.name}-${exercise.name}`} className="flex flex-wrap items-center justify-between gap-2 text-xs">
                         <span className="text-slate-600 dark:text-slate-300">
                           {exercise.name}
-                          <span className="ml-1 text-slate-400">
+                          <span className="ml-1 text-slate-500 dark:text-slate-400">
                             ({MUSCLE_LABELS_VI[exercise.muscleGroup] || exercise.muscleGroup})
                           </span>
                         </span>
-                        <span className="text-slate-400">
+                        <span className="text-slate-500 dark:text-slate-400">
                           {exercise.sets} × {exercise.repRange.min}-{exercise.repRange.max} · RIR{' '}
                           {exercise.targetRir} · {exercise.restSec}s
                         </span>

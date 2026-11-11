@@ -44,10 +44,29 @@ export function summaryToMarkdown(summary, paper) {
 
   if (Array.isArray(c.mainResults) && c.mainResults.length) {
     lines.push('## Kết quả chính');
+    if (c.resultsOverview) {
+      lines.push(`> **Đọc nhanh:** ${c.resultsOverview}`);
+      lines.push('');
+    }
     for (const [index, item] of c.mainResults.entries()) {
       lines.push(`### ${index + 1}. ${item.finding}`);
       lines.push(`- **Số liệu:** ${item.numbers}`);
       lines.push(`- **Nghĩa là:** ${item.plainMeaning}`);
+      lines.push('');
+    }
+  }
+
+  if (Array.isArray(c.figures) && c.figures.length) {
+    lines.push('## Hình & bảng');
+    for (const figure of c.figures) {
+      lines.push(
+        `### ${figure.label}${figure.page ? ` (trang ${figure.page})` : ''}${
+          figure.title ? ` — ${figure.title}` : ''
+        }`,
+      );
+      if (figure.caption) lines.push(`- **Chú thích gốc:** ${figure.caption}`);
+      if (figure.explanation) lines.push(`- **Giải thích:** ${figure.explanation}`);
+      if (figure.whatToLookFor) lines.push(`- **Cần chú ý:** ${figure.whatToLookFor}`);
       lines.push('');
     }
   }

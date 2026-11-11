@@ -6,6 +6,19 @@ const optNumber = (min, max, message) =>
     z.number({ invalid_type_error: message }).min(min, message).max(max, message).optional(),
   );
 
+const MIN_AGE = 14;
+const MAX_AGE = 100;
+
+function ageFromBirthDate(value) {
+  const birth = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let years = now.getUTCFullYear() - birth.getUTCFullYear();
+  const monthDiff = now.getUTCMonth() - birth.getUTCMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getUTCDate() < birth.getUTCDate())) years -= 1;
+  return years;
+}
+
 export const bodyLogSchema = z.object({
   weightKg: z.preprocess(
     (v) => (v === '' || v == null ? undefined : Number(v)),
@@ -35,9 +48,14 @@ export const profileSchema = z.object({
   birthDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ngày sinh phải có dạng YYYY-MM-DD')
+    .refine((value) => {
+      const age = ageFromBirthDate(value);
+      return age !== null && age >= MIN_AGE && age <= MAX_AGE;
+    }, `Ngày sinh phải cho tuổi từ ${MIN_AGE} đến ${MAX_AGE}`)
     .optional()
     .or(z.literal('')),
   heightCm: optNumber(100, 250, 'Chiều cao 100-250 cm'),
+  weightKg: optNumber(20, 400, 'Cân nặng 20-400 kg'),
   activityLevel: z.enum(['sedentary', 'light', 'moderate', 'very_active', 'extra_active']),
   goal: z.enum(['cut', 'maintain', 'lean_bulk', 'bulk']),
   experience: z.enum(['beginner', 'intermediate', 'advanced']),

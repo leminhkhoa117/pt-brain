@@ -49,6 +49,11 @@ export function errorHandler(err, req, res, next) {
 
   if (status >= 500) {
     logger.error({ err, url: req.originalUrl, method: req.method }, 'Unhandled error');
+    // Không trả message nội bộ (đường dẫn file, query MongoDB, stack...) cho client.
+    // ApiError 5xx là lỗi có chủ đích (AI timeout, upstream) nên vẫn giữ message.
+    if (!(err instanceof ApiError)) {
+      message = 'Lỗi máy chủ, vui lòng thử lại sau.';
+    }
   }
 
   res.status(status).json({

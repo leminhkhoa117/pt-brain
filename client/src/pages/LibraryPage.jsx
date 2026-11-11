@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Icon, PageHeader, Spinner } from '../components/ui.jsx';
 import {
@@ -27,43 +27,58 @@ export default function LibraryPage() {
   const [onlyFavorite, setOnlyFavorite] = useState(false);
   const [error, setError] = useState(null);
 
-  const summariesQuery = useQuery({ queryKey: ['summaries'], queryFn: () => listSummaries() });
-  const items = useMemo(
-    () => summariesQuery.data?.summaries || [],
-    [summariesQuery.data],
-  );
-  const stats = summariesQuery.data?.stats || { total: items.length, favorites: 0 };
+  const deferredSearch = useDeferredValue(search);
+  const PAGE_SIZE = 40;
+  const summariesQuery = useInfiniteQuery({
+    queryKey: ['summaries', { q: deferredSearch.trim(), favorite: onlyFavorite }],
+    queryFn: ({ pageParam = 0 }) =>
+      listSummaries({
+        q: deferredSearch.trim() || undefined,
+        favorite: onlyFavorite ? 'true' : undefined,
+        limit: PAGE_SIZE,
+        offset: pageParam,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage.page?.hasMore) return undefined;
+      return allPages.reduce((total, page) => total + page.summaries.length, 0);
+    },
+  });
+  const pages = summariesQuery.data?.pages || [];
+  const items = pages.flatMap((page) => page.summaries);
+  const stats = pages[0]?.stats || { total: items.length, favorites: 0 };
+  const lastPage = pages.at(-1);
 
   const meta = useMutation({
-    mutationFn: ({ id, isFavorite }) => updateSummaryMeta(id, { isFavorite }),
+    mutationFn: ({ id, ...payload }) => updateSummaryMeta(id, payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['summaries'] }),
     onError: (err) => setError(getErrorMessage(err)),
   });
+
+  const addTag = (item) => {
+    const value = window.prompt('Nhập tag mới (tối đa 50 ký tự):', '');
+    const tag = value?.trim().slice(0, 50);
+    if (!tag || (item.tags || []).includes(tag)) return;
+    meta.mutate({
+      id: item.id,
+      isFavorite: item.isFavorite,
+      tags: [...(item.tags || []), tag],
+    });
+  };
+
+  const removeTag = (item, tag) => {
+    meta.mutate({
+      id: item.id,
+      isFavorite: item.isFavorite,
+      tags: (item.tags || []).filter((value) => value !== tag),
+    });
+  };
 
   const remove = useMutation({
     mutationFn: (id) => deleteSummary(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['summaries'] }),
     onError: (err) => setError(getErrorMessage(err)),
   });
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return items.filter((item) => {
-      if (onlyFavorite && !item.isFavorite) return false;
-      if (!q) return true;
-      const haystack = [
-        item.paper?.title,
-        item.paper?.journal,
-        item.paper?.doi,
-        item.tldr,
-        ...(item.tags || []),
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-      return haystack.includes(q);
-    });
-  }, [items, search, onlyFavorite]);
 
   return (
     <div>
@@ -85,15 +100,15 @@ export default function LibraryPage() {
 
       <Card className="mb-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex gap-0.5 rounded-md border border-line bg-surface p-0.5 dark:border-white/10 dark:bg-transparent">
             <button
               type="button"
               onClick={() => setOnlyFavorite(false)}
               className={clsx(
-                'rounded-full px-3 py-1.5 text-xs font-semibold transition',
+                'h-7 rounded px-2.5 text-[12px] font-medium transition-colors',
                 !onlyFavorite
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+                  ? 'bg-pine-700 text-white dark:bg-pine-400 dark:text-pine-950'
+                  : 'text-slate-600 hover:bg-paper-2 dark:text-slate-400 dark:hover:bg-white/[0.06]',
               )}
             >
               Tất cả
@@ -102,13 +117,13 @@ export default function LibraryPage() {
               type="button"
               onClick={() => setOnlyFavorite(true)}
               className={clsx(
-                'rounded-full px-3 py-1.5 text-xs font-semibold transition',
+                'h-7 rounded px-2.5 text-[12px] font-medium transition-colors',
                 onlyFavorite
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+                  ? 'bg-ochre-500 text-white dark:bg-ochre-400 dark:text-ochre-950'
+                  : 'text-slate-600 hover:bg-paper-2 dark:text-slate-400 dark:hover:bg-white/[0.06]',
               )}
             >
-              ★ Đã ghim
+              Đã ghim
             </button>
           </div>
           <div className="relative">
@@ -118,28 +133,34 @@ export default function LibraryPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <Icon name="search" className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-400" />
+            <Icon name="search" className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
           </div>
         </div>
       </Card>
+
+      {lastPage?.page?.hasMore && !summariesQuery.isFetching && (
+        <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
+          Đã tải {items.length}/{lastPage.stats.filtered ?? stats.total} kết quả phù hợp.
+        </p>
+      )}
 
       {summariesQuery.isLoading ? (
         <Card>
           <Spinner />
         </Card>
-      ) : !filtered.length ? (
+      ) : !items.length ? (
         <Card className="py-12 text-center">
           <Icon name="book" className="mx-auto h-10 w-10 text-slate-300 dark:text-slate-600" />
           <p className="mt-3 text-sm font-semibold text-slate-700 dark:text-slate-200">
-            {items.length ? 'Không có bài nào khớp bộ lọc.' : 'Chưa có bài nào được phân tích.'}
+            {stats.total ? 'Không có bài nào khớp bộ lọc.' : 'Chưa có bài nào được phân tích.'}
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Vào tab “Đọc & tóm tắt” để phân tích DOI/PDF đầu tiên.
           </p>
         </Card>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((item) => (
+          {items.map((item) => (
             <Card key={item.id} className="flex flex-col">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-1.5">
@@ -188,7 +209,7 @@ export default function LibraryPage() {
                 </p>
               </button>
 
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {item.paper?.journal || 'Không rõ tạp chí'}
                 {item.paper?.year ? ` · ${item.paper.year}` : ''}
                 {item.createdAt
@@ -202,18 +223,27 @@ export default function LibraryPage() {
                 </p>
               )}
 
-              {(item.tags || []).length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {item.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500 dark:bg-slate-800 dark:text-slate-400"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <div className="mt-2 flex flex-wrap items-center gap-1">
+                {(item.tags || []).map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => removeTag(item, tag)}
+                    title={`Bỏ tag #${tag}`}
+                    className="group inline-flex items-center gap-0.5 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-rose-950/40"
+                  >
+                    #{tag}
+                    <span className="opacity-0 transition-opacity group-hover:opacity-100">×</span>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addTag(item)}
+                  className="rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-[11px] text-slate-500 transition-colors hover:border-pine-500 hover:text-pine-700 dark:border-slate-600 dark:text-slate-400 dark:hover:border-pine-400 dark:hover:text-pine-300"
+                >
+                  + tag
+                </button>
+              </div>
 
               <div className="mt-3 flex items-center justify-between gap-1 border-t border-slate-100 pt-2 dark:border-slate-800">
                 <button
@@ -252,6 +282,25 @@ export default function LibraryPage() {
               </div>
             </Card>
           ))}
+        </div>
+      )}
+
+      {summariesQuery.hasNextPage && (
+        <div className="mt-5 flex justify-center">
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => summariesQuery.fetchNextPage()}
+            disabled={summariesQuery.isFetchingNextPage}
+          >
+            {summariesQuery.isFetchingNextPage ? (
+              <>
+                <Spinner className="h-4 w-4" /> Đang tải...
+              </>
+            ) : (
+              `Tải thêm (${items.length}/${lastPage?.stats?.filtered ?? stats.total})`
+            )}
+          </button>
         </div>
       )}
     </div>

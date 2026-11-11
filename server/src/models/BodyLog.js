@@ -25,16 +25,6 @@ const computedSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const postureItemSchema = new mongoose.Schema(
-  {
-    key: { type: String, required: true }, // ví dụ: 'squat_depth'
-    label: String,
-    ok: Boolean,
-    note: String,
-  },
-  { _id: false },
-);
-
 const photoSchema = new mongoose.Schema(
   {
     filename: { type: String, required: true },
@@ -59,7 +49,6 @@ const bodyLogSchema = new mongoose.Schema(
     calories: { type: Number, min: 0, max: 15000 },
     proteinG: { type: Number, min: 0, max: 1000 },
     notes: { type: String, maxlength: 2000 },
-    posture: [postureItemSchema],
     photos: { type: [photoSchema], default: [] },
     computed: { type: computedSchema, default: () => ({}) },
   },

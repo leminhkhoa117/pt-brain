@@ -5,6 +5,11 @@ import { computeProgramMetrics, gradeForScore } from '../training/programMetrics
 import { listExercises } from '../training/exerciseService.js';
 import { suggestProgram } from '../training/programService.js';
 import { ApiError } from '../../utils/ApiError.js';
+import {
+  HEALTH_CONDITION_MAP,
+  healthConditionLabel,
+  isExerciseAvoided,
+} from '../../../../shared/health/conditions.js';
 
 const EVIDENCE_IDS = ['E1', 'E2', 'E4', 'E5', 'E6', 'E8'];
 const EVIDENCE_TEXT = formatEvidence(getEvidence(EVIDENCE_IDS));
@@ -20,11 +25,11 @@ const planSchema = z.object({
           .array(
             z.object({
               name: z.string(),
-              sets: z.coerce.number().int().min(1).max(20).default(3),
-              repMin: z.coerce.number().int().min(1).max(30).default(8),
-              repMax: z.coerce.number().int().min(1).max(30).default(12),
-              targetRir: z.coerce.number().min(0).max(5).default(2),
-              restSec: z.coerce.number().min(30).max(300).default(120),
+              sets: z.coerce.number().default(3),
+              repMin: z.coerce.number().default(8),
+              repMax: z.coerce.number().default(12),
+              targetRir: z.coerce.number().default(2),
+              restSec: z.coerce.number().default(120),
             }),
           )
           .default([]),
@@ -70,14 +75,60 @@ function filterEvidenceIds(ids = []) {
   return Array.from(new Set((ids || []).filter((id) => EVIDENCE_IDS.includes(id))));
 }
 
+function planErrorText(error) {
+  if (error?.issues) {
+    return error.issues
+      .slice(0, 3)
+      .map((issue) => `${issue.path.join('.') || 'plan'}: ${issue.message}`)
+      .join('; ');
+  }
+  return error?.message || 'AI không trả về giáo án hợp lệ';
+}
+
+function healthSection({ conditions = [], notes = '' } = {}) {
+  const picked = (conditions || []).map((key) => HEALTH_CONDITION_MAP[key]).filter(Boolean);
+  if (!picked.length && !notes) return '';
+  return [
+    'TÌNH TRẠNG SỨC KHỎE CỦA NGƯỜI DÙNG (bắt buộc cá nhân hóa, ưu tiên hơn quy tắc volume):',
+    ...picked.map((item) => `- ${item.vi}: ${item.rules}`),
+    ...(notes ? [`- Ghi chú thêm: ${notes}`] : []),
+    '- Không chẩn đoán hay điều trị; không hứa hết đau. Nêu giới hạn và khuyên gặp bác sĩ/PT chuyên môn trước khi tập nặng.',
+    '',
+  ].join('\n');
+}
+
+function withSafetyCautions(cautions = [], { conditions = [], removed = [] } = {}) {
+  const labels = (conditions || []).map(healthConditionLabel).join(', ');
+  const list = [...(cautions || [])];
+  if (removed.length) {
+    list.push(
+      `Đã loại ${removed.length} bài (${Array.from(new Set(removed)).join(', ')}) vì không phù hợp với ${labels}.`,
+    );
+  }
+  if (conditions?.length) {
+    list.push('Giáo án cần bác sĩ/PT chuyên môn duyệt lại trước khi áp dụng vì có bệnh nền.');
+  }
+  return Array.from(new Set(list)).slice(0, 8);
+}
+
 export async function generatePlanProposal({ profile = {}, params = {} }) {
   const exercises = await listExercises();
-  const exerciseList = exercises.map((e) => ({
+  // Chỉ đưa vào prompt bài tập khớp dụng cụ để giảm token và tránh gợi ý sai.
+  const allowedEquipment = new Set([...(params.equipment || []), 'bodyweight']);
+  const usable = params.equipment?.length
+    ? exercises.filter((exercise) => (exercise.equipment || []).some((eq) => allowedEquipment.has(eq)))
+    : exercises;
+  const exerciseList = usable.map((e) => ({
     name: e.nameVi,
     muscles: e.primaryMuscles,
     equipment: e.equipment,
     compound: e.isCompound,
   }));
+
+  const conditions =
+    (profile.healthConditions?.length ? profile.healthConditions : params.healthConditions) || [];
+  const conditionNotes = profile.conditionNotes || params.conditionNotes || '';
+  const health = healthSection({ conditions, notes: conditionNotes });
 
   const prompt = `Bạn là huấn luyện viên lập giáo án dựa trên bằng chứng.
 QUY TẮC:
@@ -89,6 +140,7 @@ QUY TẮC:
 - Cá nhân hóa theo mục tiêu, trình độ, dụng cụ và thời gian.
 - Chỉ dùng bằng chứng dưới đây, trích ID [E1]... trong evidenceIds.
 
+${health}
 ${EVIDENCE_TEXT}
 
 HỒ SƠ: ${JSON.stringify(profile)}
@@ -105,20 +157,27 @@ Trả CHỈ JSON:
         { role: 'user', content: prompt },
       ],
       json: true,
-      maxTokens: 16000,
+      maxTokens: 12000,
       temperature: 0.2,
+      reasoningEffort: 'low',
+      timeoutMs: 240000,
     });
     const parsed = planSchema.parse(parseJsonLoose(response.text));
 
     const byName = new Map(exercises.map((e) => [normalizeName(e.nameVi), e]));
+    const removed = [];
     const days = parsed.days.slice(0, 7).map((day) => ({
       name: day.name.slice(0, 80),
       exercises: day.exercises
         .map((ex) => {
           const found = byName.get(normalizeName(ex.name));
           if (!found) return null;
-          const repMin = Math.min(ex.repMin, ex.repMax);
-          const repMax = Math.max(ex.repMin, ex.repMax);
+          if (isExerciseAvoided(found.nameEn, found.nameVi, conditions)) {
+            removed.push(found.nameVi);
+            return null;
+          }
+          const repMin = Math.min(30, Math.max(1, Math.min(ex.repMin, ex.repMax)));
+          const repMax = Math.min(30, Math.max(repMin, Math.max(ex.repMin, ex.repMax)));
           return {
             exerciseId: found._id,
             name: found.nameVi,
@@ -145,7 +204,7 @@ Trả CHỈ JSON:
       daysPerWeek: days.length,
       days,
       rationale: parsed.rationale,
-      cautions: parsed.cautions,
+      cautions: withSafetyCautions(parsed.cautions, { conditions, removed }),
       evidence: evidenceReferences(filterEvidenceIds(parsed.evidenceIds)),
       model: response.model,
       usage: response.usage,
@@ -158,6 +217,7 @@ Trả CHỈ JSON:
       daysPerWeek: params.daysPerWeek || 3,
       equipment: params.equipment || [],
       sessionMinutes: params.sessionMinutes || 60,
+      healthConditions: conditions,
     });
     return {
       source: 'fallback',
@@ -167,7 +227,17 @@ Trả CHỈ JSON:
       days: fallback.days,
       rationale:
         'AI không trả về giáo án hợp lệ nên hệ thống dùng quy tắc nội bộ (volume 10-20 set, 2 lần/nhóm cơ, ưu tiên compound).',
-      cautions: [error.message],
+      cautions: withSafetyCautions(
+        [
+          `AI plan không hợp lệ: ${planErrorText(error)}`,
+          ...(fallback.missingSlots
+            ? [
+                `Một số slot bị bỏ trống vì không có bài phù hợp dụng cụ đã chọn (${fallback.missingSlots} slot).`,
+              ]
+            : []),
+        ],
+        { conditions },
+      ),
       evidence: evidenceReferences(['E1', 'E2', 'E6']),
       model: 'rule-based',
       usage: null,
@@ -179,14 +249,18 @@ export async function evaluateProgram({ program, profile = {} }) {
   const exercises = await listExercises();
   const map = Object.fromEntries(exercises.map((e) => [e.nameVi, e]));
   const metrics = computeProgramMetrics(program.toObject ? program.toObject() : program, map);
+  const conditions = profile.healthConditions || [];
+  const health = healthSection({ conditions, notes: profile.conditionNotes || '' });
 
   const prompt = `Bạn là chuyên gia đánh giá giáo án tập luyện dựa trên bằng chứng.
 Hãy đánh giá giáo án dưới đây, chỉ dùng các bằng chứng được cung cấp.
 - Không tự bịa số liệu; dùng đúng metrics.
 - Nêu điểm mạnh, vấn đề, đề xuất hành động cụ thể, ưu tiên.
+- Nếu người dùng có bệnh nền, kiểm tra rõ bài nào chống chỉ định và đề xuất bài thay thế.
 - Nếu đề xuất thay đổi, nêu rõ nên tăng/giảm set, tần suất, RIR, thời gian nghỉ.
 - Trích dẫn bằng ID [E1]... trong evidenceIds; chỉ dùng ID có trong danh sách.
 
+${health}
 ${EVIDENCE_TEXT}
 
 HỒ SƠ: ${JSON.stringify(profile)}
@@ -204,6 +278,7 @@ Trả CHỈ JSON:
     json: true,
     maxTokens: 5000,
     temperature: 0.2,
+    timeoutMs: 240000,
   });
 
   let ai;

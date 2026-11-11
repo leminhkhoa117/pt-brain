@@ -2,9 +2,37 @@ node_modules/
 dist/
 build/
 coverage/
-.env
-.env.local
-*.log
-.DS_Store
 .vite/
+client/dist/
+
+# Biến môi trường & bí mật — không bao giờ commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+credentials.json
+
+# Dữ liệu người dùng tải lên
 uploads/
+server/uploads/
+client/uploads/
+
+# Log & file tạm
+*.log
+tmp-*
+tmp/
+server/tmp-*
+
+# Công cụ local
+.opencode/
+.impeccable/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# graphify's knowledge graph — regenerable, local only (run `graphify update .`)
+/graphify-out/

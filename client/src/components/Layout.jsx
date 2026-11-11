@@ -1,282 +1,332 @@
-import { useState } from 'react';
-import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useTheme } from '../hooks/useTheme.jsx';
 import { Icon } from './ui.jsx';
 import BrandLogo from './BrandLogo.jsx';
 import { initials } from '../lib/format.js';
+import { formatLongDate, todayKey } from '../lib/date.js';
 
-const PRIMARY = [
+const GROUPS = [
+  {
+    label: 'Hôm nay',
+    items: [{ to: '/', label: 'Tổng quan', icon: 'dashboard', end: true }],
+  },
+  {
+    label: 'Cơ thể',
+    items: [
+      { to: '/body-log', label: 'Theo dõi cơ thể', icon: 'activity' },
+      { to: '/body-assessment', label: 'AI thể trạng', icon: 'camera' },
+      { to: '/muscles', label: 'Cơ bắp 3D', icon: 'body' },
+    ],
+  },
+  {
+    label: 'Kế hoạch',
+    items: [
+      { to: '/nutrition', label: 'Dinh dưỡng', icon: 'utensils' },
+      { to: '/training', label: 'Giáo án', icon: 'dumbbell', trainingTab: 'planner' },
+      { to: '/training?tab=workout', label: 'Log buổi tập', icon: 'clipboard', trainingTab: 'workout' },
+    ],
+  },
+  {
+    label: 'Kiến thức',
+    items: [
+      { to: '/research', label: 'Nghiên cứu', icon: 'book' },
+      { to: '/learn', label: 'Học tập', icon: 'notebook' },
+    ],
+  },
+  {
+    label: 'Công cụ',
+    items: [{ to: '/calculators', label: 'Máy tính chỉ số', icon: 'calculator' }],
+  },
+];
+
+const MOBILE_NAV = [
   { to: '/', label: 'Tổng quan', icon: 'dashboard', end: true },
   { to: '/body-log', label: 'Cơ thể', icon: 'activity' },
-  { to: '/nutrition', label: 'Dinh dưỡng', icon: 'flame' },
-  { to: '/research', label: 'Nghiên cứu', icon: 'book' },
+  { to: '/nutrition', label: 'Dinh dưỡng', icon: 'utensils' },
   { to: '/training', label: 'Giáo án', icon: 'dumbbell' },
-  { to: '/learn', label: 'Học tập', icon: 'notebook' },
+  { to: '/research', label: 'Nghiên cứu', icon: 'book' },
 ];
 
-const MORE = [
-  { to: '/clients', label: 'Khách hàng', icon: 'users' },
-  { to: '/calculators', label: 'Máy tính chỉ số', icon: 'calculator' },
-  { to: '/settings', label: 'Cài đặt', icon: 'settings' },
-];
+function useActive() {
+  const location = useLocation();
+  const tab = new URLSearchParams(location.search).get('tab');
 
-const BODY_LINKS = [
-  { to: '/body-log', label: 'Theo dõi cơ thể', icon: 'activity' },
-  { to: '/body-assessment', label: 'AI thể trạng', icon: 'target' },
-];
+  return (item) => {
+    if (item.trainingTab) {
+      if (location.pathname !== '/training') return false;
+      const current = tab || 'planner';
+      if (item.trainingTab === 'planner') return current !== 'workout';
+      return current === item.trainingTab;
+    }
+    if (item.end) return location.pathname === item.to;
+    return location.pathname === item.to;
+  };
+}
 
-const ALL_NAV = [...PRIMARY, BODY_LINKS[1], ...MORE];
-const MOBILE_PATHS = ['/', '/body-log', '/nutrition', '/research', '/training'];
-const MOBILE_NAV = PRIMARY.filter((item) => MOBILE_PATHS.includes(item.to));
-
-function HeaderLink({ item, onClick }) {
+function NavItem({ item, active, onClick, rail = false }) {
   return (
-    <NavLink
+    <Link
       to={item.to}
-      end={item.end}
       onClick={onClick}
-      className={({ isActive }) =>
-        clsx(
-          'inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-semibold transition',
-          isActive
-            ? 'bg-brand-600 text-white shadow-[0_8px_20px_-10px_rgba(13,148,136,0.9)] dark:bg-brand-500'
-            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white',
-        )
-      }
+      title={rail ? item.label : undefined}
+      aria-current={active ? 'page' : undefined}
+      className={clsx(
+        'group relative flex h-9 items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-colors',
+        active
+          ? 'bg-white/[0.09] text-white'
+          : 'text-white/60 hover:bg-white/[0.05] hover:text-white/90',
+        rail && 'justify-center px-0',
+      )}
     >
-      <Icon name={item.icon} className="h-4 w-4" />
-      {item.label}
-    </NavLink>
+      <Icon
+        name={item.icon}
+        className={clsx('h-4 w-4 shrink-0', active ? 'text-pine-300' : 'text-white/45')}
+      />
+      {!rail && <span className="truncate">{item.label}</span>}
+      {!rail && active && <span className="ml-auto h-1 w-1 rounded-full bg-pine-300" />}
+    </Link>
   );
 }
 
-function MobileNavItem({ item }) {
+function SidebarContent({ onNavigate, rail = false }) {
+  const { user, logout } = useAuth();
+  const isActive = useActive();
+  const navigate = useNavigate();
+
   return (
-    <NavLink
-      to={item.to}
-      end={item.end}
-      className={({ isActive }) =>
-        clsx(
-          'flex flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[10px] font-semibold transition',
-          isActive
-            ? 'text-brand-700 dark:text-brand-300'
-            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200',
-        )
-      }
-    >
-      {({ isActive }) => (
-        <>
-          <span
-            className={clsx(
-              'grid h-8 w-8 place-items-center rounded-lg transition',
-              isActive
-                ? 'bg-gradient-to-br from-brand-500 to-teal-600 text-white shadow'
-                : 'bg-slate-100 text-slate-500 dark:bg-white/[0.06] dark:text-slate-400',
-            )}
-          >
-            <Icon name={item.icon} className="h-4 w-4" />
+    <div className="flex h-full flex-col">
+      <div className={clsx('flex h-14 items-center gap-2.5 border-b border-white/[0.08]', rail ? 'justify-center px-0' : 'px-4')}>
+        <Link to="/" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5">
+          <BrandLogo size={30} />
+          {!rail && (
+            <span className="min-w-0">
+              <span className="block truncate font-display text-[16px] font-semibold leading-none text-white">
+                PT Brain
+              </span>
+              <span className="mt-1 block truncate font-mono text-[11px] uppercase tracking-[0.14em] text-pine-300">
+                Evidence-based
+              </span>
+            </span>
+          )}
+        </Link>
+      </div>
+
+      <nav
+        aria-label="Điều hướng chính"
+        className={clsx('flex-1 overflow-y-auto pb-4', rail ? 'px-2 pt-4' : 'px-2')}
+      >
+        {GROUPS.map((group) => (
+          <div key={group.label}>
+            {!rail && <p className="nav-section">{group.label}</p>}
+            {rail && <div className="mx-2 my-3 border-t border-white/[0.07]" />}
+            <div className="space-y-0.5">
+              {group.items.map((item) => (
+                <NavItem
+                  key={item.to}
+                  item={item}
+                  active={isActive(item)}
+                  onClick={onNavigate}
+                  rail={rail}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      <div className={clsx('border-t border-white/[0.08] p-2', rail && 'px-1')}>
+        <Link
+          to="/settings"
+          onClick={onNavigate}
+          title="Cài đặt"
+          className={clsx(
+            'flex h-9 items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-colors',
+            'text-white/60 hover:bg-white/[0.05] hover:text-white',
+            rail && 'justify-center px-0',
+          )}
+        >
+          <Icon name="settings" className="h-4 w-4 shrink-0 text-white/45" />
+          {!rail && 'Cài đặt'}
+        </Link>
+
+        <div
+          className={clsx(
+            'mt-1 flex items-center gap-2.5 rounded-md px-2 py-2',
+            rail && 'justify-center px-0',
+          )}
+        >
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/15 bg-white/[0.06] font-mono text-[11px] font-medium text-white">
+            {initials(user?.name) || 'PT'}
           </span>
-          {item.label}
-        </>
-      )}
-    </NavLink>
+          {!rail && (
+            <>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[12px] font-medium text-white/90">{user?.name}</span>
+                <span className="block truncate text-[11px] text-white/40">{user?.email}</span>
+              </span>
+              <button
+                type="button"
+                title="Đăng xuất"
+                aria-label="Đăng xuất"
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }}
+                className="grid h-7 w-7 place-items-center rounded text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
+                <Icon name="logout" className="h-3.5 w-3.5" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function Layout({ children }) {
-  const { user, logout } = useAuth();
   const { isDark, toggle } = useTheme();
   const location = useLocation();
-  const navigate = useNavigate();
-  const [moreOpen, setMoreOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const logoutAndClose = () => {
-    setMenuOpen(false);
-    logout();
-    navigate('/login');
-  };
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname, location.search]);
+
+  const section =
+    (location.pathname === '/settings' ? 'Tài khoản' : null) ||
+    GROUPS.find((g) => g.items.some((i) => i.to.split('?')[0] === location.pathname))?.label ||
+    'PT Brain';
 
   return (
-    <div className="relative min-h-screen">
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-96 w-96 rounded-full bg-brand-400/10 blur-3xl dark:bg-brand-500/10" />
-        <div className="absolute right-0 top-1/3 h-80 w-80 rounded-full bg-teal-300/10 blur-3xl dark:bg-teal-400/[0.07]" />
-        <div className="surface-grid absolute inset-x-0 top-0 h-[420px] opacity-50 dark:opacity-30" />
-      </div>
+    <div className="min-h-screen bg-paper dark:bg-[#0e1211]">
+      {/* Desktop / tablet rail */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-16 border-r border-white/[0.06] bg-shell md:block lg:w-[248px]">
+        <div className="hidden h-full lg:block">
+          <SidebarContent />
+        </div>
+        <div className="h-full lg:hidden">
+          <SidebarContent rail />
+        </div>
+      </aside>
 
-      <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-[#f4f7f6]/85 backdrop-blur-xl dark:border-white/[0.05] dark:bg-[#070b10]/80">
-        <div className="mx-auto flex h-[68px] max-w-7xl items-center gap-3 px-4 lg:px-8">
-          <Link to="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setMenuOpen(false)}>
-            <BrandLogo size={38} glow />
-            <span className="hidden sm:block">
-              <span className="block text-[16px] font-extrabold leading-none tracking-tight text-slate-900 dark:text-white">
-                PT Brain
-              </span>
-              <span className="mt-1 block text-[9px] font-bold uppercase tracking-[0.16em] text-brand-600/80 dark:text-brand-300/80">
-                Evidence-based coaching
-              </span>
-            </span>
-          </Link>
-
-          <nav className="ml-2 hidden flex-1 items-center gap-0.5 lg:flex">
-            {PRIMARY.map((item) => (
-              <HeaderLink key={item.to} item={item} />
-            ))}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setMoreOpen((v) => !v)}
-                className={clsx(
-                  'inline-flex items-center gap-1 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition',
-                  moreOpen
-                    ? 'bg-slate-100 text-slate-900 dark:bg-white/[0.06] dark:text-white'
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white',
-                )}
-              >
-                Thêm
-                <Icon name="chevronDown" className="h-3.5 w-3.5" />
-              </button>
-              {moreOpen && (
-                <>
-                  <button
-                    type="button"
-                    className="fixed inset-0 z-30 cursor-default"
-                    aria-label="Đóng menu"
-                    onClick={() => setMoreOpen(false)}
-                  />
-                  <div className="absolute right-0 top-full z-40 mt-2 w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-white/10 dark:bg-slate-900">
-                    {MORE.map((item) => (
-                      <NavLink
-                        key={item.to}
-                        to={item.to}
-                        onClick={() => setMoreOpen(false)}
-                        className={({ isActive }) =>
-                          clsx(
-                            'flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-semibold',
-                            isActive
-                              ? 'bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300'
-                              : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/[0.06]',
-                          )
-                        }
-                      >
-                        <Icon name={item.icon} className="h-4 w-4" />
-                        {item.label}
-                      </NavLink>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </nav>
-
-          <div className="ml-auto flex items-center gap-2">
-            <span className="hidden items-center gap-1.5 rounded-full border border-brand-200/70 bg-brand-50/80 px-3 py-1.5 text-[10px] font-bold text-brand-700 dark:border-brand-800/60 dark:bg-brand-950/40 dark:text-brand-300 xl:inline-flex">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-500" />
-              DeepSeek V4.1 · Vision Gemini
-            </span>
+      <div className="md:pl-16 lg:pl-[248px]">
+        <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur-sm dark:border-white/[0.08] dark:bg-[#0e1211]/95">
+          <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 sm:px-6 lg:px-8">
             <button
               type="button"
-              onClick={toggle}
-              className="rounded-xl border border-slate-200/80 bg-white/80 p-2 text-slate-500 transition hover:text-slate-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-400 dark:hover:text-white"
-              title={isDark ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}
-              aria-label="Đổi chế độ sáng tối"
-            >
-              <Icon name={isDark ? 'sun' : 'moon'} className="h-4 w-4" />
-            </button>
-            <Link
-              to="/settings"
-              className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-teal-700 text-[11px] font-extrabold text-white shadow-sm"
-              title="Hồ sơ & cài đặt"
-            >
-              {initials(user?.name) || 'PT'}
-            </Link>
-            <button
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              className="rounded-xl border border-slate-200/80 bg-white/80 p-2 text-slate-500 lg:hidden dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-400"
+              onClick={() => setDrawerOpen(true)}
+              className="grid h-9 w-9 place-items-center rounded-md border border-line text-slate-600 md:hidden dark:border-white/10 dark:text-slate-300"
               aria-label="Mở menu"
             >
               <Icon name="menu" className="h-4 w-4" />
             </button>
+
+            <Link to="/" className="flex items-center gap-2 md:hidden">
+              <BrandLogo size={26} />
+              <span className="font-display text-[15px] font-semibold text-slate-900 dark:text-white">
+                PT Brain
+              </span>
+            </Link>
+
+            <div className="hidden min-w-0 items-center gap-2 md:flex">
+              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+                {section}
+              </span>
+              <Icon name="chevronRight" className="h-3 w-3 text-slate-300 dark:text-slate-600" />
+              <span className="truncate text-[12.5px] font-medium text-slate-600 dark:text-slate-300">
+                {formatLongDate(todayKey())}
+              </span>
+            </div>
+
+            <div className="ml-auto flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={toggle}
+                className="grid h-9 w-9 place-items-center rounded-md border border-line text-slate-500 transition-colors hover:bg-paper-2 hover:text-slate-900 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
+                title={isDark ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}
+                aria-label="Đổi chế độ sáng tối"
+              >
+                <Icon name={isDark ? 'sun' : 'moon'} className="h-4 w-4" />
+              </button>
+              <Link
+                to="/settings"
+                className="hidden items-center gap-2 rounded-md border border-line py-1 pl-1 pr-2.5 transition-colors hover:border-line-strong sm:flex dark:border-white/10 dark:hover:border-white/20"
+                title="Hồ sơ & cài đặt"
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-pine-700 font-mono text-[11px] font-medium text-white dark:bg-pine-500 dark:text-pine-950">
+                  <UserInitials />
+                </span>
+                <Icon name="chevronDown" className="h-3 w-3 text-slate-500 dark:text-slate-400" />
+              </Link>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-6 lg:px-8 lg:pb-14 lg:pt-8">
-        <div key={location.pathname} className="animate-fade-up">
-          {children}
-        </div>
-      </main>
+        <main className="mx-auto w-full max-w-[1320px] px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-14 lg:pt-8">
+          <div key={location.pathname}>
+            {children}
+          </div>
+        </main>
+      </div>
 
-      <nav className="fixed inset-x-3 bottom-3 z-30 rounded-2xl border border-slate-200/80 bg-white/[0.92] px-1.5 py-1.5 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/[0.92] lg:hidden">
+      {/* Mobile bottom nav */}
+      <nav
+        aria-label="Điều hướng nhanh"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden dark:border-white/[0.08] dark:bg-[#151b18]/95"
+      >
         <div className="mx-auto grid max-w-md grid-cols-5">
-          {MOBILE_NAV.map((item) => (
-            <MobileNavItem key={item.to} item={item} />
-          ))}
+          {MOBILE_NAV.map((item) => {
+            const active = item.end
+              ? location.pathname === item.to
+              : location.pathname.startsWith(item.to);
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={clsx(
+                  'flex flex-col items-center gap-1 py-2 text-[11px] font-medium',
+                  active ? 'text-pine-700 dark:text-pine-300' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500',
+                )}
+              >
+                <Icon name={item.icon} className="h-[18px] w-[18px]" />
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
-      {menuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+      {/* Mobile drawer */}
+      {drawerOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
-            onClick={() => setMenuOpen(false)}
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setDrawerOpen(false)}
             aria-label="Đóng menu"
           />
-          <div className="absolute inset-y-0 right-0 w-[290px] overflow-auto bg-white p-4 shadow-2xl dark:bg-slate-900">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <BrandLogo size={34} />
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">PT Brain</span>
-              </div>
-              <button type="button" className="btn-ghost !p-2" onClick={() => setMenuOpen(false)}>
-                <Icon name="close" className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="mt-5 space-y-1">
-              {ALL_NAV.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  onClick={() => setMenuOpen(false)}
-                  className={({ isActive }) =>
-                    clsx(
-                      'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold',
-                      isActive
-                        ? 'bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300'
-                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/[0.06]',
-                    )
-                  }
-                >
-                  <Icon name={item.icon} className="h-4 w-4" />
-                  {item.label}
-                </NavLink>
-              ))}
-            </div>
-
-            <div className="mt-5 rounded-2xl border border-slate-200 p-3 dark:border-white/10">
-              <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-                {user?.name}
-              </p>
-              <p className="truncate text-xs text-slate-400">{user?.email}</p>
-              <button
-                type="button"
-                onClick={logoutAndClose}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-600 dark:border-slate-700 dark:text-slate-300"
-              >
-                <Icon name="logout" className="h-4 w-4" />
-                Đăng xuất
-              </button>
-            </div>
+          <div className="absolute inset-y-0 left-0 w-[280px] bg-shell shadow-overlay">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(false)}
+              className="absolute right-2 top-3 z-10 grid h-8 w-8 place-items-center rounded text-white/60 hover:bg-white/[0.08] hover:text-white"
+              aria-label="Đóng menu"
+            >
+              <Icon name="close" className="h-4 w-4" />
+            </button>
+            <SidebarContent onNavigate={() => setDrawerOpen(false)} />
           </div>
         </div>
       )}
     </div>
   );
+}
+
+function UserInitials() {
+  const { user } = useAuth();
+  return <>{initials(user?.name) || 'PT'}</>;
 }

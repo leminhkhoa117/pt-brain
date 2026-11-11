@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/index.js",
+    "dev": "node --watch-path=src --watch-preserve-output src/index.js",
     "start": "node src/index.js",
     "test": "vitest run",
+    "test:unit": "vitest run --exclude tests/api.test.js --exclude tests/resumeJob.test.js",
     "test:watch": "vitest"
   },
   "dependencies": {

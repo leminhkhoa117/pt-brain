@@ -1,11 +1,13 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { HEALTH_CONDITION_KEYS } from '../../../shared/health/conditions.js';
 
 const profileSchema = new mongoose.Schema(
   {
     sex: { type: String, enum: ['male', 'female'] },
     birthDate: Date,
     heightCm: { type: Number, min: 100, max: 250 },
+    weightKg: { type: Number, min: 20, max: 400 },
     activityLevel: {
       type: String,
       enum: ['sedentary', 'light', 'moderate', 'very_active', 'extra_active'],
@@ -22,6 +24,11 @@ const profileSchema = new mongoose.Schema(
       default: 'beginner',
     },
     units: { type: String, enum: ['metric', 'imperial'], default: 'metric' },
+    healthConditions: {
+      type: [{ type: String, enum: HEALTH_CONDITION_KEYS }],
+      default: [],
+    },
+    conditionNotes: { type: String, maxlength: 1000, default: '' },
   },
   { _id: false },
 );

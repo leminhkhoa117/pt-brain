@@ -65,8 +65,12 @@ export function computeForLog(user, log) {
 
   const age = user.age();
   if (age && (profile.sex === 'male' || profile.sex === 'female')) {
-    computed.bmr = bmrMifflinStJeor({ sex: profile.sex, weightKg, heightCm, age });
-    computed.tdee = tdeeFromBmr(computed.bmr, profile.activityLevel || 'moderate');
+    try {
+      computed.bmr = bmrMifflinStJeor({ sex: profile.sex, weightKg, heightCm, age });
+      computed.tdee = tdeeFromBmr(computed.bmr, profile.activityLevel || 'moderate');
+    } catch {
+      // Hồ sơ chưa hợp lệ (tuổi/hoạt độ) không được chặn việc lưu cân nặng.
+    }
   }
 
   return computed;
@@ -94,10 +98,6 @@ export async function upsertBodyLog(user, dateKey, payload) {
       else next[key] = value;
     }
     log.measurements = next;
-  }
-
-  if (payload.posture !== undefined) {
-    log.posture = payload.posture;
   }
 
   log.computed = computeForLog(user, log);
@@ -163,15 +163,6 @@ export async function getSummary(userId, { days } = {}) {
     },
   };
 }
-
-/** Checklist tư thế mặc định (dùng cho form Body Check). */
-export const POSTURE_CHECKLIST = [
-  { key: 'stand_posture', label: 'Đứng thẳng: tai - vai - hông - mắt cá thẳng hàng' },
-  { key: 'squat_depth', label: 'Squat đạt độ sâu (đùi dưới song song)' },
-  { key: 'shoulder_mobility', label: 'Vai gập quá đầu không đau / không nhô vai' },
-  { key: 'hip_mobility', label: 'Hông gập đủ sâu khi ngồi xổm / hip hinge' },
-  { key: 'knee_tracking', label: 'Gối đi theo hướng mũi chân khi squat' },
-];
 
 export const CSV_COLUMNS = [
   { key: 'dateKey', label: 'Ngày' },

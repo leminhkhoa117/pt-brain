@@ -26,6 +26,10 @@ blockList.addAddress('::1', 'ipv6');
 blockList.addSubnet('fc00::', 7, 'ipv6');
 blockList.addSubnet('fe80::', 10, 'ipv6');
 blockList.addSubnet('ff00::', 8, 'ipv6');
+// IPv6 có thể ánh xạ tới IPv4 nội bộ (NAT64, 6to4, tài liệu).
+blockList.addSubnet('64:ff9b::', 96, 'ipv6');
+blockList.addSubnet('2002::', 16, 'ipv6');
+blockList.addSubnet('2001:db8::', 32, 'ipv6');
 
 export const USER_AGENT = `PTBrain/0.2 (mailto:${env.CONTACT_EMAIL})`;
 
@@ -47,6 +51,9 @@ export async function assertPublicUrl(raw) {
   if (!['http:', 'https:'].includes(url.protocol)) {
     throw ApiError.badRequest('Chỉ hỗ trợ URL http/https');
   }
+  if (url.username || url.password) {
+    throw ApiError.badRequest('URL không được chứa thông tin đăng nhập');
+  }
   const host = url.hostname.toLowerCase();
   if (host === 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) {
     throw ApiError.badRequest('Không cho phép URL nội bộ');
@@ -65,6 +72,45 @@ export async function assertPublicUrl(raw) {
     throw ApiError.badRequest('Không cho phép URL nội bộ');
   }
   return url;
+}
+
+/**
+ * Đọc body theo stream và dừng ngay khi vượt giới hạn. Không dùng arrayBuffer()
+ * trực tiếp vì server có thể trả Content-Length giả hoặc không khai báo, khiến
+ * một response rất lớn làm cạn RAM trước khi kiểm tra được kích thước.
+ */
+async function readBodyWithLimit(response, maxBytes) {
+  const declared = Number(response.headers.get('content-length') || 0);
+  if (declared && declared > maxBytes) {
+    throw new ApiError(413, 'SOURCE_TOO_LARGE', 'Nguồn quá lớn để xử lý');
+  }
+
+  if (!response.body) {
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (buffer.length > maxBytes) {
+      throw new ApiError(413, 'SOURCE_TOO_LARGE', 'Nguồn quá lớn để xử lý');
+    }
+    return buffer;
+  }
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  let size = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > maxBytes) {
+        await reader.cancel().catch(() => {});
+        throw new ApiError(413, 'SOURCE_TOO_LARGE', 'Nguồn quá lớn để xử lý');
+      }
+      chunks.push(Buffer.from(value));
+    }
+  } finally {
+    reader.releaseLock?.();
+  }
+  return Buffer.concat(chunks, size);
 }
 
 /**
@@ -98,14 +144,7 @@ export async function fetchBuffer(
       throw new ApiError(502, 'FETCH_FAILED', `Không tải được nguồn (HTTP ${response.status})`);
     }
 
-    const declared = Number(response.headers.get('content-length') || 0);
-    if (declared && declared > maxBytes) {
-      throw new ApiError(413, 'SOURCE_TOO_LARGE', 'Nguồn quá lớn để xử lý');
-    }
-    const buffer = Buffer.from(await response.arrayBuffer());
-    if (buffer.length > maxBytes) {
-      throw new ApiError(413, 'SOURCE_TOO_LARGE', 'Nguồn quá lớn để xử lý');
-    }
+    const buffer = await readBodyWithLimit(response, maxBytes);
     return {
       buffer,
       contentType: response.headers.get('content-type') || '',
@@ -116,7 +155,10 @@ export async function fetchBuffer(
 }
 
 /** Gọi API JSON tin cậy (Crossref, Europe PMC, Unpaywall...) với timeout và lỗi thống nhất. */
-export async function fetchJson(url, { timeout = 25000, headers = {} } = {}) {
+export async function fetchJson(
+  url,
+  { timeout = 25000, headers = {}, maxBytes = 2 * 1024 * 1024 } = {},
+) {
   let response;
   try {
     response = await fetch(url, {
@@ -129,8 +171,9 @@ export async function fetchJson(url, { timeout = 25000, headers = {} } = {}) {
   if (!response.ok) {
     throw new ApiError(502, 'UPSTREAM_ERROR', `Nguồn dữ liệu trả lỗi HTTP ${response.status}`);
   }
+  const buffer = await readBodyWithLimit(response, maxBytes);
   try {
-    return await response.json();
+    return JSON.parse(buffer.toString('utf8'));
   } catch {
     throw new ApiError(502, 'UPSTREAM_INVALID', 'Nguồn dữ liệu trả về không phải JSON');
   }

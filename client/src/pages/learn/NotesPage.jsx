@@ -139,7 +139,7 @@ export default function NotesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              <Icon name="search" className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-400" />
+              <Icon name="search" className="pointer-events-none absolute left-2.5 top-2 h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
             </form>
           </div>
 
@@ -189,7 +189,7 @@ export default function NotesPage() {
                             #{tag}
                           </span>
                         ))}
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
                           {formatDateKey(String(note.createdAt).slice(0, 10), true)}
                         </span>
                       </div>
@@ -218,7 +218,7 @@ export default function NotesPage() {
               </div>
             ))}
             {!notes.length && (
-              <p className="py-8 text-center text-sm text-slate-400">
+              <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
                 {query ? 'Không tìm thấy ghi chú phù hợp.' : 'Chưa có ghi chú nào.'}
               </p>
             )}

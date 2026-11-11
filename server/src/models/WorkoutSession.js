@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { CARDIO_KEYS } from '../../../shared/training/cardio.js';
 
 const setSchema = new mongoose.Schema(
   {
@@ -21,11 +22,25 @@ const workoutSessionSchema = new mongoose.Schema(
     dateKey: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ },
     programId: { type: mongoose.Schema.Types.ObjectId, ref: 'Program' },
     dayName: { type: String, default: '' },
+    kind: { type: String, enum: ['strength', 'cardio'], default: 'strength' },
+    // Cardio/hoạt động ngoài phòng gym: chạy, bơi, đạp xe...
+    activity: { type: String, enum: ['', ...CARDIO_KEYS], default: '' },
+    distanceKm: { type: Number, min: 0, max: 1000 },
+    intensity: {
+      type: String,
+      enum: ['light', 'moderate', 'vigorous'],
+      default: 'moderate',
+    },
+    caloriesBurned: { type: Number, min: 0, max: 20000, default: 0 },
+    caloriesSource: { type: String, enum: ['estimated', 'manual'], default: 'estimated' },
     sets: { type: [setSchema], default: [] },
     computed: {
       tonnage: { type: Number, default: 0 },
       setsByMuscle: { type: mongoose.Schema.Types.Mixed, default: {} },
       estimated1RMs: { type: mongoose.Schema.Types.Mixed, default: {} },
+      calories: { type: Number, default: 0 },
+      met: { type: Number, default: 0 },
+      paceMinPerKm: { type: Number, default: 0 },
     },
     notes: { type: String, default: '' },
     durationMin: { type: Number, min: 0, max: 600 },

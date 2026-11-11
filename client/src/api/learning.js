@@ -1,4 +1,4 @@
-import { api, unwrap } from './client.js';
+import { AI_TIMEOUT_MS, api, unwrap } from './client.js';
 
 export const listFlashcards = (due = false) =>
   api.get('/flashcards', { params: due ? { due: 'true' } : {} }).then(unwrap);
@@ -9,4 +9,5 @@ export const deleteFlashcard = (id) => api.delete(`/flashcards/${id}`).then(unwr
 export const reviewFlashcard = (id, quality) =>
   api.post(`/flashcards/${id}/review`, { quality }).then(unwrap);
 
-export const generateQuiz = (payload) => api.post('/quizzes', payload).then(unwrap);
+export const generateQuiz = (payload) =>
+  api.post('/quizzes', payload, { timeout: AI_TIMEOUT_MS }).then(unwrap);

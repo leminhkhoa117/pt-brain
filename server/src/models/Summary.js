@@ -31,6 +31,27 @@ const summarySchema = new mongoose.Schema(
       default: 'abstract',
     },
     pdfHash: { type: String, default: '' },
+    pdfPages: { type: Number, default: 0 },
+    // Nhãn + chú thích hình/bảng phát hiện từ nguồn, dùng để gắn số trang cho phần giải thích.
+    figureHints: {
+      type: [
+        {
+          label: { type: String, default: '' },
+          kind: { type: String, enum: ['figure', 'table'], default: 'figure' },
+          page: { type: Number, default: 0 },
+          caption: { type: String, default: '' },
+        },
+      ],
+      default: [],
+    },
+    // Bản dịch tiếng Việt của toàn văn/abstract, tạo theo yêu cầu và lưu lại để không dịch lại.
+    translation: {
+      text: { type: String, default: '' },
+      model: { type: String, default: '' },
+      chars: { type: Number, default: 0 },
+      truncated: { type: Boolean, default: false },
+      createdAt: { type: Date },
+    },
     tags: { type: [String], default: [] },
     isFavorite: { type: Boolean, default: false },
     savedAt: { type: Date, default: Date.now },

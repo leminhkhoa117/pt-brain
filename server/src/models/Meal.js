@@ -24,6 +24,7 @@ const mealSchema = new mongoose.Schema(
     },
     description: { type: String, default: '', maxlength: 1000 },
     notes: { type: String, default: '', maxlength: 2000 },
+    source: { type: String, enum: ['ai', 'manual'], default: 'ai' },
     image: { type: mongoose.Schema.Types.Mixed, default: null },
     analysis: {
       items: { type: [mealItemSchema], default: [] },

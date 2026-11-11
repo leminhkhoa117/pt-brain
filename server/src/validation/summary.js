@@ -54,6 +54,48 @@ const glossarySchema = z.preprocess((value) => {
     .filter((item) => item.en && item.vi && item.explanation);
 }, z.array(glossaryItemSchema).default([]));
 
+const figureItemSchema = z.preprocess(
+  (value) => {
+    if (typeof value === 'string') {
+      return {
+        label: value,
+        kind: /bảng|table/i.test(value) ? 'table' : 'figure',
+        title: '',
+        caption: '',
+        explanation: value,
+        whatToLookFor: '',
+        page: 0,
+      };
+    }
+    if (!value || typeof value !== 'object') return value;
+    const label = value.label || value.name || value.figure || value.table || '';
+    const kindText = `${value.kind || value.type || ''} ${label}`.toLowerCase();
+    return {
+      label: String(label || ''),
+      kind: /table|bảng/.test(kindText) ? 'table' : 'figure',
+      title: value.title || value.name || '',
+      caption: value.caption || value.captionOriginal || value.originalCaption || '',
+      explanation: value.explanation || value.meaning || value.description || '',
+      whatToLookFor: value.whatToLookFor || value.lookFor || value.note || '',
+      page: value.page || value.pageNumber || 0,
+    };
+  },
+  z.object({
+    label: z.string().min(1),
+    kind: z.enum(['figure', 'table']).default('figure'),
+    title: z.string().default(''),
+    caption: z.string().default(''),
+    explanation: z.string().default(''),
+    whatToLookFor: z.string().default(''),
+    page: z.coerce.number().int().min(0).catch(0).default(0),
+  }),
+);
+
+const figuresSchema = z.preprocess(
+  (value) => (Array.isArray(value) ? value : []),
+  z.array(figureItemSchema).max(12).default([]),
+);
+
 /**
  * Schema bản tóm tắt theo mục 6.4 của plan.
  * Có preprocess để chịu được các biến thể JSON nhỏ từ model (string thay vì object...).
@@ -99,8 +141,10 @@ export const summaryContentSchema = z.object({
   design: z.string().default('Không nêu trong bài'),
   intervention: z.string().default('Không nêu trong bài'),
   outcomes: z.string().default('Không nêu trong bài'),
+  resultsOverview: z.string().default(''),
   mainResults: z.array(resultItemSchema).min(1),
   secondaryResults: z.array(resultItemSchema).default([]),
+  figures: figuresSchema,
   authorsConclusion: z.string().default('Không nêu trong bài'),
   limitations: stringArray(/\n+/),
   conflictOfInterest: z.string().default('Không nêu trong bài'),
@@ -179,6 +223,16 @@ export const summaryMetaSchema = z
   .object({
     tags: z.array(z.string().trim().min(1).max(50)).max(20).optional(),
     isFavorite: z.boolean().optional(),
+  })
+  .strict();
+
+export const summaryListQuerySchema = z
+  .object({
+    q: z.string().trim().max(100).optional(),
+    favorite: z.enum(['true', 'false']).optional(),
+    tag: z.string().trim().max(50).optional(),
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+    offset: z.coerce.number().int().min(0).max(100000).optional(),
   })
   .strict();
 

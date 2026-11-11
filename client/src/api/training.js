@@ -1,4 +1,4 @@
-import { api, unwrap } from './client.js';
+import { AI_TIMEOUT_MS, api, unwrap } from './client.js';
 
 export const listExercises = (params = {}) =>
   api.get('/exercises', { params }).then(unwrap);
@@ -6,9 +6,9 @@ export const listExercises = (params = {}) =>
 export const suggestProgram = (payload) =>
   api.post('/programs/suggest', payload).then(unwrap);
 export const aiSuggestProgram = (payload) =>
-  api.post('/programs/suggest-ai', payload).then(unwrap);
+  api.post('/programs/suggest-ai', payload, { timeout: AI_TIMEOUT_MS }).then(unwrap);
 export const evaluateProgram = (id) =>
-  api.post(`/programs/${id}/evaluate`).then(unwrap);
+  api.post(`/programs/${id}/evaluate`, null, { timeout: AI_TIMEOUT_MS }).then(unwrap);
 export const getEvaluations = (id) =>
   api.get(`/programs/${id}/evaluations`).then(unwrap);
 export const listPrograms = () => api.get('/programs').then(unwrap);

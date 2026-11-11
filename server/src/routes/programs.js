@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimit.js';
 import { validate } from '../middleware/validate.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { programCreateSchema, programUpdateSchema, suggestProgramSchema } from '../validation/training.js';
@@ -10,13 +11,18 @@ const router = Router();
 router.use(requireAuth);
 
 router.post('/suggest', validate(suggestProgramSchema), asyncHandler(programs.suggest));
-router.post('/suggest-ai', validate(suggestProgramSchema), asyncHandler(programs.aiSuggest));
+router.post(
+  '/suggest-ai',
+  aiLimiter,
+  validate(suggestProgramSchema),
+  asyncHandler(programs.aiSuggest),
+);
 router.get('/', asyncHandler(programs.list));
 router.post('/', validate(programCreateSchema), asyncHandler(programs.create));
 router.get('/:id/volume', asyncHandler(programs.volume));
 router.get('/:id/suggestions', asyncHandler(programs.suggestions));
 router.post('/:id/apply-changes', validate(applyChangesSchema), asyncHandler(programs.applyChanges));
-router.post('/:id/evaluate', asyncHandler(programs.evaluate));
+router.post('/:id/evaluate', aiLimiter, asyncHandler(programs.evaluate));
 router.get('/:id/evaluations', asyncHandler(programs.evaluations));
 router.get('/:id', asyncHandler(programs.getOne));
 router.patch('/:id', validate(programUpdateSchema), asyncHandler(programs.update));

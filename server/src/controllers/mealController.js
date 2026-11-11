@@ -1,15 +1,21 @@
 import { fileURLToPath } from 'node:url';
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { Meal } from '../models/Meal.js';
 import { getUser } from '../services/authService.js';
 import { assertAiQuota, recordAiCall } from '../services/ai/quota.js';
-import { visionCompletion, parseJsonLoose } from '../services/ai/client.js';
-import { mealAnalysisSchema, mealFormSchema } from '../validation/vision.js';
+import { visionCompletion, chatCompletion, parseJsonLoose } from '../services/ai/client.js';
+import {
+  mealAnalysisSchema,
+  mealEstimateSchema,
+  mealFormSchema,
+  manualMealSchema,
+  manualMealUpdateSchema,
+} from '../validation/vision.js';
 import { formatEvidence, getEvidence } from '../research/evidenceBase.js';
 import { ApiError } from '../utils/ApiError.js';
 import { todayKeyVN } from '../utils/date.js';
-import { saveImageFile, removeImageFile } from '../utils/image.js';
+import { saveImageFile, removeImageFile, sendImageFile } from '../utils/image.js';
+import { sumFoods } from '../../../shared/nutrition/mealPlan.js';
 
 const DIR = fileURLToPath(new URL('../../uploads/meals/', import.meta.url));
 
@@ -54,6 +60,92 @@ async function analyzeMeal({ image, description, mealType, user }) {
     }
   }
   throw new ApiError(502, 'AI_INVALID_OUTPUT', `AI trả về dữ liệu bữa ăn không hợp lệ: ${lastError.message}`);
+}
+
+const ESTIMATE_SYSTEM = `Bạn là chuyên gia dinh dưỡng thể thao, ước tính calo và macro cho bữa ăn của người Việt.
+
+QUY TẮC:
+- Người dùng đã nhập tên món và khối lượng (gram). Tính calo, protein, carb, fat CHO ĐÚNG khối lượng đó.
+- Dùng giá trị tham chiếu thực tế (USDA / Bảng thành phần dinh dưỡng Việt Nam).
+- Nguyên liệu thô/khô (gạo sống, thịt sống, yến mạch khô): dùng giá trị ở trạng thái đó. Món đã nấu (cơm, phở, thịt nướng): dùng giá trị đã nấu. Nếu tên món mơ hồ, chọn cách hiểu phổ biến nhất và ghi vào assumptions.
+- Món hỗn hợp (bún bò, cơm tấm, bánh mì): ước tính theo công thức điển hình, nêu giả định chính (dầu, đường, phần thịt).
+- calories phải xấp xỉ 4*proteinG + 4*carbsG + 9*fatG.
+- Giữ đúng số món và đúng thứ tự người dùng nhập; không thêm/bớt món.
+- Làm tròn calo tới 1 kcal, macro tới 0,1 g.
+- Đây là ước lượng: dùng confidence low/medium/high và nêu caveats ngắn. Không đưa lời khuyên y tế.
+
+Trả về CHỈ JSON:
+{
+  "items": [
+    {"name":"...","calories":0,"proteinG":0,"carbsG":0,"fatG":0,"confidence":"low|medium|high"}
+  ],
+  "confidence": "low|medium|high",
+  "assumptions": ["..."],
+  "caveats": ["..."],
+  "disclaimer": "..."
+}`;
+
+async function estimateFromItems({ mealType, items, description, user }) {
+  const list = items
+    .map((item, index) => `${index + 1}. ${item.name} — ${item.grams} g`)
+    .join('\n');
+  const context = `Bữa: ${mealType}. Mục tiêu: ${user.profile?.goal || 'maintain'}. Mô tả thêm: ${
+    description || 'không có'
+  }.\nCác món người dùng đã nhập (giữ đúng thứ tự):\n${list}`;
+
+  let lastError;
+  for (let attempt = 0; attempt <= 1; attempt += 1) {
+    const response = await chatCompletion({
+      messages: [
+        { role: 'system', content: ESTIMATE_SYSTEM },
+        {
+          role: 'user',
+          content: attempt
+            ? `${context}\n\nLần trước lỗi: ${lastError.message}. Trả lời đúng JSON, đúng ${items.length} món.`
+            : context,
+        },
+      ],
+      json: true,
+      maxTokens: 2500,
+      temperature: 0.1,
+      reasoningEffort: 'low',
+    });
+    try {
+      const parsed = mealAnalysisSchema.parse(parseJsonLoose(response.text));
+      if (parsed.items.length !== items.length) {
+        throw new Error(`Cần đúng ${items.length} món, AI trả ${parsed.items.length} món`);
+      }
+      // Khối lượng do người dùng nhập là nguồn chuẩn, không để AI đổi.
+      const analysis = {
+        ...parsed,
+        items: parsed.items.map((item, index) => {
+          const grams = items[index].grams;
+          const scale = 100 / grams;
+          return {
+            ...item,
+            name: items[index].name,
+            grams,
+            portion: `${grams} g`,
+            // Giữ giá trị /100 g để client tự scale khi người dùng sửa khối lượng.
+            per100g: {
+              calories: Math.round((Number(item.calories) || 0) * scale),
+              proteinG: Math.round((Number(item.proteinG) || 0) * scale * 10) / 10,
+              carbsG: Math.round((Number(item.carbsG) || 0) * scale * 10) / 10,
+              fatG: Math.round((Number(item.fatG) || 0) * scale * 10) / 10,
+            },
+          };
+        }),
+      };
+      return { analysis, usage: response.usage, model: response.model };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw new ApiError(
+    502,
+    'AI_INVALID_OUTPUT',
+    `AI trả về dữ liệu bữa ăn không hợp lệ: ${lastError.message}`,
+  );
 }
 
 function withTotals(analysis) {
@@ -112,6 +204,69 @@ export async function create(req, res) {
   }
 }
 
+export async function estimate(req, res) {
+  const data = mealEstimateSchema.parse(req.body || {});
+  const user = await getUser(req.userId);
+
+  await assertAiQuota(req.userId, 'vision');
+  const result = await estimateFromItems({
+    mealType: data.mealType,
+    items: data.items,
+    description: data.description,
+    user,
+  });
+  await recordAiCall(req.userId, { kind: 'vision', usage: result.usage });
+
+  res.json({
+    data: {
+      analysis: withTotals(result.analysis),
+      model: result.model,
+    },
+  });
+}
+
+export async function createManual(req, res) {
+  const data = manualMealSchema.parse(req.body || {});
+  const analysis = manualAnalysis(data.items);
+  if (data.source === 'ai') {
+    analysis.confidence = data.confidence || 'medium';
+    analysis.assumptions = data.assumptions?.length
+      ? data.assumptions
+      : ['Số liệu do AI ước tính từ tên món và khối lượng bạn nhập.'];
+    analysis.caveats = ['Ước tính từ khẩu phần, có thể lệch do cách chế biến và nguyên liệu.'];
+    analysis.disclaimer = 'Đây là ước lượng dinh dưỡng, không phải phép đo chính xác.';
+  }
+  const meal = await Meal.create({
+    userId: req.userId,
+    dateKey: data.dateKey || todayKeyVN(),
+    mealType: data.mealType || 'lunch',
+    description: data.description,
+    notes: data.notes,
+    source: data.source,
+    analysis,
+  });
+  res.status(201).json({ data: { meal } });
+}
+
+function manualAnalysis(items) {
+  return {
+    items: items.map((item) => ({
+      name: item.name,
+      portion: item.portion || '',
+      calories: item.calories || 0,
+      proteinG: item.proteinG || 0,
+      carbsG: item.carbsG || 0,
+      fatG: item.fatG || 0,
+      confidence: 'high',
+    })),
+    totals: sumFoods(items),
+    confidence: 'high',
+    assumptions: ['Số liệu do bạn tự nhập, không phải AI ước tính từ ảnh.'],
+    caveats: [],
+    disclaimer: '',
+  };
+}
+
 export async function list(req, res) {
   const query = { userId: req.userId };
   if (req.query.date) query.dateKey = req.query.date;
@@ -141,16 +296,18 @@ export async function summary(req, res) {
 }
 
 export async function update(req, res) {
-  const allowed = {};
-  for (const key of ['mealType', 'description', 'notes']) {
-    if (req.body?.[key] !== undefined) allowed[key] = String(req.body[key]).slice(0, 2000);
-  }
-  const meal = await Meal.findOneAndUpdate(
-    { _id: req.params.id, userId: req.userId },
-    { $set: allowed },
-    { new: true },
-  );
+  const meal = await Meal.findOne({ _id: req.params.id, userId: req.userId });
   if (!meal) throw ApiError.notFound('Không tìm thấy bữa ăn');
+
+  const data = manualMealUpdateSchema.parse(req.body || {});
+  if (data.mealType !== undefined) meal.mealType = data.mealType;
+  if (data.description !== undefined) meal.description = data.description;
+  if (data.notes !== undefined) meal.notes = data.notes;
+  if (data.items !== undefined) {
+    meal.source = 'manual';
+    meal.analysis = manualAnalysis(data.items);
+  }
+  await meal.save();
   res.json({ data: { meal } });
 }
 
@@ -167,6 +324,5 @@ export async function servePhoto(req, res) {
     userId: req.userId,
   }).lean();
   if (!meal?.image?.filename) throw ApiError.notFound('Không tìm thấy ảnh');
-  res.setHeader('Cache-Control', 'private, max-age=3600');
-  res.sendFile(path.join(DIR, meal.image.filename));
+  await sendImageFile(req, res, DIR, meal.image.filename);
 }

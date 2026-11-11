@@ -8,6 +8,8 @@ const router = Router();
 router.use(requireAuth, calcLimiter);
 
 router.get('/history', asyncHandler(calc.listHistory));
+router.delete('/history', asyncHandler(calc.clearHistory));
+router.delete('/history/:id', asyncHandler(calc.deleteHistoryItem));
 router.post('/:type', asyncHandler(calc.calculate));
 
 export default router;

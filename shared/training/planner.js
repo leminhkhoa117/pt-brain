@@ -22,6 +22,7 @@ export const MUSCLE_LABELS_VI = {
   quads: 'Đùi trước',
   hamstrings: 'Đùi sau',
   glutes: 'Mông',
+  'thigh-inner': 'Đùi trong',
   calves: 'Bắp chân',
   core: 'Core',
 };
@@ -65,6 +66,15 @@ export function buildProgressionSuggestion({ lastSets = [], repMin = 8, repMax =
   const workingSets = lastSets.filter((s) => Number(s.reps) > 0);
 
   if (allAtTop && rirOnTarget) {
+    // Bài bodyweight (tạ = 0) không thể "tăng 2,5 kg"; hãy tăng rep hoặc độ khó.
+    if (!heaviest) {
+      return {
+        action: 'add_reps',
+        nextWeightKg: 0,
+        deltaKg: 0,
+        message: `Bài không dùng tạ đã đạt ${repMax} rep với RIR ≤ ${targetRir}. Thêm 1-2 rep, tăng thời gian giữ, hoặc chuyển sang biến thể khó hơn.`,
+      };
+    }
     let next = roundToStep(heaviest * 1.025, 2.5);
     if (next <= heaviest) next = heaviest + 2.5;
     return {

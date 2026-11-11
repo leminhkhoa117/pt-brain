@@ -72,6 +72,21 @@ describe('buildProgressionSuggestion', () => {
     });
     expect(result.action).toBe('add_reps');
   });
+
+  it('bài bodyweight đạt rep -> thêm rep, không cộng 2,5 kg', () => {
+    const result = buildProgressionSuggestion({
+      lastSets: [
+        { weightKg: 0, reps: 15, rir: 2 },
+        { weightKg: 0, reps: 15, rir: 2 },
+      ],
+      repMin: 10,
+      repMax: 15,
+      targetRir: 2,
+    });
+    expect(result.action).toBe('add_reps');
+    expect(result.nextWeightKg).toBe(0);
+    expect(result.message).toContain('biến thể khó hơn');
+  });
 });
 
 describe('roundToStep', () => {

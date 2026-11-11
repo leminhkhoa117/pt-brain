@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { dateKeySchema } from './date.js';
 
 const optionalMeasure = (min, max) => z.coerce.number().min(min).max(max).optional().nullable();
 
@@ -14,19 +15,6 @@ export const measurementsSchema = z
   .strict()
   .optional();
 
-export const postureSchema = z
-  .array(
-    z
-      .object({
-        key: z.string().min(1).max(60),
-        label: z.string().max(120).optional(),
-        ok: z.boolean().optional(),
-        note: z.string().max(500).optional(),
-      })
-      .strict(),
-  )
-  .optional();
-
 export const bodyLogSchema = z
   .object({
     weightKg: z.coerce.number().min(20, 'Cân nặng tối thiểu 20 kg').max(400),
@@ -38,14 +26,13 @@ export const bodyLogSchema = z
     calories: z.coerce.number().min(0).max(15000).optional().nullable(),
     proteinG: z.coerce.number().min(0).max(1000).optional().nullable(),
     notes: z.string().max(2000).optional().nullable(),
-    posture: postureSchema,
   })
   .strict();
 
 export const metricsRangeSchema = z
   .object({
-    from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-    to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    from: dateKeySchema.optional(),
+    to: dateKeySchema.optional(),
     days: z.coerce.number().int().min(1).max(3650).optional(),
   })
   .strict()

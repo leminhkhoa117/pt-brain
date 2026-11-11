@@ -1,4 +1,4 @@
-import { api, unwrap } from './client.js';
+import { AI_TIMEOUT_MS, api, unwrap } from './client.js';
 
 export const analyzeBody = async ({ files, views, goal, notes }) => {
   const form = new FormData();
@@ -7,14 +7,15 @@ export const analyzeBody = async ({ files, views, goal, notes }) => {
   if (goal) form.append('goal', goal);
   if (notes) form.append('notes', notes);
   return api
-    .post('/body-assessments', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+    .post('/body-assessments', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: AI_TIMEOUT_MS,
+    })
     .then(unwrap);
 };
 
-export const listBodyAssessments = () =>
-  api.get('/body-assessments').then(unwrap);
-export const deleteBodyAssessment = (id) =>
-  api.delete(`/body-assessments/${id}`).then(unwrap);
+export const listBodyAssessments = () => api.get('/body-assessments').then(unwrap);
+export const deleteBodyAssessment = (id) => api.delete(`/body-assessments/${id}`).then(unwrap);
 export const bodyAssessmentPhotoUrl = (id, filename) =>
   `${api.defaults.baseURL}/body-assessments/${id}/photos/${filename}`;
 
@@ -26,12 +27,22 @@ export const createMeal = async ({ file, mealType, description, notes, dateKey }
   form.append('notes', notes || '');
   if (dateKey) form.append('dateKey', dateKey);
   return api
-    .post('/meals', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+    .post('/meals', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: AI_TIMEOUT_MS,
+    })
     .then(unwrap);
 };
+export const createManualMeal = (payload) => api.post('/meals/manual', payload).then(unwrap);
+
+// Người dùng nhập tên món + khối lượng (gram), AI ước tính calo/macro.
+export const estimateMeal = ({ mealType, items, description, notes }) =>
+  api
+    .post('/meals/estimate', { mealType, items, description, notes }, { timeout: AI_TIMEOUT_MS })
+    .then(unwrap);
+
 export const listMeals = (date) => api.get('/meals', { params: { date } }).then(unwrap);
-export const mealSummary = (date) =>
-  api.get('/meals/summary', { params: { date } }).then(unwrap);
+export const mealSummary = (date) => api.get('/meals/summary', { params: { date } }).then(unwrap);
 export const updateMeal = (id, payload) => api.patch(`/meals/${id}`, payload).then(unwrap);
 export const deleteMeal = (id) => api.delete(`/meals/${id}`).then(unwrap);
 export const mealPhotoUrl = (id) => `${api.defaults.baseURL}/meals/${id}/photo`;
