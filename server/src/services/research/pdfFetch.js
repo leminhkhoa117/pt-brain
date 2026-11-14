@@ -4,6 +4,9 @@ import { parsePdfBuffer } from './pdf.js';
 const MAX_PDF_BYTES = 25 * 1024 * 1024;
 const MAX_HTML_BYTES = 4 * 1024 * 1024;
 const MIN_TEXT_CHARS = 800;
+const MAX_CANDIDATES = 5;
+const PER_CANDIDATE_TIMEOUT_MS = 7000;
+const TOTAL_BUDGET_MS = 12000;
 
 // Header giống trình duyệt chỉ dùng cho bước tải PDF/landing page. Các API JSON
 // vẫn dùng User-Agent "polite" của PT Brain.
@@ -58,6 +61,8 @@ async function downloadPdf(url, { maxBytes = MAX_PDF_BYTES } = {}) {
     maxBytes,
     accept: 'application/pdf,text/html;q=0.9,*/*;q=0.8',
     headers: BROWSER_HEADERS,
+    timeout: PER_CANDIDATE_TIMEOUT_MS,
+    retries: 0,
   });
 
   // Một số host trả HTML (trang trung gian/challenge) thay vì PDF; thử lấy
@@ -74,6 +79,8 @@ async function downloadPdf(url, { maxBytes = MAX_PDF_BYTES } = {}) {
       maxBytes,
       accept: 'application/pdf',
       headers: BROWSER_HEADERS,
+      timeout: PER_CANDIDATE_TIMEOUT_MS,
+      retries: 0,
     });
   }
 
@@ -89,8 +96,19 @@ export async function fetchFirstReadablePdf(
   { maxBytes = MAX_PDF_BYTES, minChars = MIN_TEXT_CHARS } = {},
 ) {
   const attempts = [];
+  const startedAt = Date.now();
+  const limited = candidates.slice(0, MAX_CANDIDATES);
 
-  for (const candidate of candidates) {
+  for (const candidate of limited) {
+    if (Date.now() - startedAt > TOTAL_BUDGET_MS) {
+      attempts.push({
+        source: candidate?.source || 'source',
+        url: candidate?.url || '',
+        result: `bỏ qua: hết ngân sách ${TOTAL_BUDGET_MS}ms`,
+      });
+      break;
+    }
+
     const url = String(candidate?.url || '').trim();
     if (!url) continue;
     const source = candidate.source || 'source';
@@ -103,6 +121,8 @@ export async function fetchFirstReadablePdf(
           maxBytes: MAX_HTML_BYTES,
           accept: 'text/html,application/xhtml+xml,*/*;q=0.8',
           headers: BROWSER_HEADERS,
+          timeout: PER_CANDIDATE_TIMEOUT_MS,
+          retries: 0,
         });
         pdfUrl = extractCitationPdfUrl(page.buffer.toString('utf8'), page.finalUrl || url);
         if (!pdfUrl) {

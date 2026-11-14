@@ -140,6 +140,7 @@ describe('assessFullText', () => {
   it('nhận PDF trực tiếp', () => {
     const info = assessFullText({ pdfUrl: 'https://repo.example/paper.pdf' });
     expect(info).toMatchObject({ hasFullText: true, fullTextSource: 'pdf' });
+    expect(info.fullTextLabel).toBe('Có PDF');
   });
 
   it('landing page không được tính là toàn văn chắc chắn', () => {

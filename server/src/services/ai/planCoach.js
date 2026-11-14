@@ -276,8 +276,9 @@ Trả CHỈ JSON:
       { role: 'user', content: prompt },
     ],
     json: true,
-    maxTokens: 5000,
+    maxTokens: 9000,
     temperature: 0.2,
+    reasoningEffort: 'low',
     timeoutMs: 240000,
   });
 

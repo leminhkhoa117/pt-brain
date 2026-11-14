@@ -59,7 +59,7 @@ export async function searchCrossref(query, { rows = 6, yearFrom, yearTo } = {})
     select: SELECT,
     mailto: env.CONTACT_EMAIL,
   });
-  const filters = [];
+  const filters = ['type:journal-article'];
   if (yearFrom) filters.push(`from-pub-date:${yearFrom}-01-01`);
   if (yearTo) filters.push(`until-pub-date:${yearTo}-12-31`);
   if (filters.length) params.set('filter', filters.join(','));

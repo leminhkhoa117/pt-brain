@@ -380,7 +380,7 @@ export default function FinderPage() {
                   onChange={(e) => setFilters((f) => ({ ...f, fullTextOnly: e.target.checked }))}
                   disabled={search.isPending}
                 />
-                Chỉ bài có toàn văn
+                Chỉ bài có toàn văn/PDF
               </label>
             </div>
           </div>
@@ -388,7 +388,7 @@ export default function FinderPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Kết quả luôn có link DOI/PubMed thật. Không có bài báo do AI tự sinh. Badge
-              “Toàn văn” nghĩa là hệ thống có PMCID hoặc PDF trực tiếp để đọc, không chỉ abstract.
+              “Toàn văn PMC” hoặc “Có PDF” nghĩa là hệ thống có nguồn đọc trực tiếp, không chỉ abstract.
             </p>
             <button type="submit" className="btn-primary" disabled={search.isPending}>
               {search.isPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="search" className="h-4 w-4" />}
@@ -626,7 +626,9 @@ export default function FinderPage() {
                         >
                           {item.fullTextLabel ||
                             (item.hasFullText
-                              ? 'Toàn văn'
+                              ? item.fullTextSource === 'pmc_xml'
+                                ? 'Toàn văn PMC'
+                                : 'Có PDF'
                               : item.hasFullTextLink
                                 ? 'Có link toàn văn'
                                 : 'Chỉ abstract')}

@@ -1,6 +1,7 @@
 import { env } from '../../config/env.js';
 import { fetchJson } from '../../utils/http.js';
 import { normalizeDoi } from '../../utils/doi.js';
+import { reconstructAbstract } from './openalex.js';
 
 const OPENALEX = 'https://api.openalex.org/works';
 const UNPAYWALL = 'https://api.unpaywall.org/v2';
@@ -126,7 +127,8 @@ export function dedupeCandidates(candidates = []) {
       kind: candidate.kind === 'landing' ? 'landing' : 'pdf',
     });
   }
-  return out;
+  // PDF trực tiếp trước, landing page sau — giảm số lần tải HTML và thời gian.
+  return out.sort((a, b) => Number(a.kind === 'landing') - Number(b.kind === 'landing'));
 }
 
 const shortId = (value) => String(value || '').split('/').pop();
@@ -156,6 +158,21 @@ export function mergeOpenAlexAvailability(items = [], works = []) {
 
     return {
       ...item,
+      title: item.title || work.title || work.display_name || '',
+      year: item.year || work.publication_year || undefined,
+      journal:
+        item.journal || work.primary_location?.source?.display_name || '',
+      abstract: item.abstract || reconstructAbstract(work.abstract_inverted_index),
+      authors:
+        item.authors?.length
+          ? item.authors
+          : (work.authorships || [])
+              .map((authorship) => authorship.author?.display_name)
+              .filter(Boolean)
+              .slice(0, 30),
+      volume: item.volume || work.biblio?.volume || '',
+      issue: item.issue || work.biblio?.issue || '',
+      pages: item.pages || work.biblio?.first_page || '',
       isOpenAccess: Boolean(item.isOpenAccess || oa.is_oa),
       oaStatus: item.oaStatus || oa.oa_status || '',
       pdfUrl,
@@ -181,7 +198,7 @@ export async function enrichFullTextAvailability(items = [], { fetchJsonImpl = f
 
   try {
     const data = await fetchJsonImpl(
-      `${OPENALEX}?filter=doi:${dois.join('|')}&select=doi,ids,open_access,best_oa_location,primary_location,is_retracted&per-page=${dois.length}&mailto=${encodeURIComponent(env.CONTACT_EMAIL)}`,
+      `${OPENALEX}?filter=doi:${dois.join('|')}&select=doi,ids,title,display_name,publication_year,authorships,abstract_inverted_index,biblio,open_access,best_oa_location,primary_location,is_retracted&per-page=${dois.length}&mailto=${encodeURIComponent(env.CONTACT_EMAIL)}`,
       { cacheTtlMs: 10 * 60 * 1000 },
     );
     return mergeOpenAlexAvailability(items, data?.results || []);

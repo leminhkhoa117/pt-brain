@@ -83,24 +83,47 @@ describe('dedupeCandidates', () => {
     expect(out).toHaveLength(2);
     expect(out[0].source).toBe('a');
   });
+
+  it('xếp PDF trực tiếp trước landing page', () => {
+    const out = dedupeCandidates([
+      { source: 'a', url: 'https://x.example/landing', kind: 'landing' },
+      { source: 'b', url: 'https://x.example/file.pdf', kind: 'pdf' },
+    ]);
+    expect(out.map((item) => item.kind)).toEqual(['pdf', 'landing']);
+  });
 });
 
 describe('mergeOpenAlexAvailability', () => {
-  it('gộp OA, PMCID, retraction và venue metrics theo DOI', () => {
+  it('gộp OA, PMCID, retraction, venue metrics và metadata còn thiếu', () => {
     const merged = mergeOpenAlexAvailability(
-      [{ doi: '10.1/ABC', isOpenAccess: false, pmcid: '' }],
+      [{ doi: '10.1/ABC', isOpenAccess: false, pmcid: '', title: 'Crossref title' }],
       [
         {
           doi: 'https://doi.org/10.1/abc',
           ids: { pmcid: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC123' },
+          title: 'OpenAlex title',
+          publication_year: 2021,
+          authorships: [{ author: { display_name: 'Test Author' } }],
+          abstract_inverted_index: { Background: [0], text: [1] },
+          biblio: { volume: '12', issue: '3', first_page: '100' },
           open_access: { is_oa: true, oa_status: 'green' },
           best_oa_location: { pdf_url: 'https://repo.example/a.pdf' },
           is_retracted: true,
-          primary_location: { source: { h_index: 42 } },
+          primary_location: {
+            source: { display_name: 'Test Journal', h_index: 42 },
+          },
         },
       ],
     );
     expect(merged[0]).toMatchObject({
+      title: 'Crossref title',
+      year: 2021,
+      journal: 'Test Journal',
+      abstract: 'Background text',
+      authors: ['Test Author'],
+      volume: '12',
+      issue: '3',
+      pages: '100',
       isOpenAccess: true,
       oaStatus: 'green',
       pdfUrl: 'https://repo.example/a.pdf',

@@ -65,6 +65,27 @@ async function post(body, sessionId, timeoutMs = env.AI_TIMEOUT_MS) {
 }
 
 /**
+ * Nếu model dùng hết token cho reasoning trước khi viết content, API trả
+ * finish_reason="length" và content rỗng. Thử lại một lần với budget lớn hơn
+ * thay vì báo lỗi ngay cho người dùng.
+ */
+export async function postWithRetry(body, sessionId, timeoutMs, postImpl = post) {
+  try {
+    return await postImpl(body, sessionId, timeoutMs);
+  } catch (error) {
+    const emptyByLength =
+      error?.code === 'AI_EMPTY' && error?.details?.finishReason === 'length';
+    if (!emptyByLength) throw error;
+
+    const retryBody = {
+      ...body,
+      max_tokens: Math.min(16000, Math.max(9000, (body.max_tokens || 0) * 2)),
+    };
+    return postImpl(retryBody, sessionId, timeoutMs);
+  }
+}
+
+/**
  * Gọi model qua API OpenAI-compatible của OpenCode Go.
  * json=true sẽ yêu cầu JSON mode; nếu model không hỗ trợ thì tự thử lại không JSON mode.
  */
@@ -96,7 +117,7 @@ export async function chatCompletion({
   if (reasoningEffort) body.reasoning_effort = reasoningEffort;
 
   try {
-    return await post(body, sessionId, timeoutMs);
+    return await postWithRetry(body, sessionId, timeoutMs);
   } catch (error) {
     const unsupportedReasoning =
       reasoningEffort &&
@@ -104,7 +125,7 @@ export async function chatCompletion({
       /reasoning|unknown|unsupported|invalid/i.test(error.message);
     if (unsupportedReasoning) {
       delete body.reasoning_effort;
-      return post(body, sessionId, timeoutMs);
+      return postWithRetry(body, sessionId, timeoutMs);
     }
     const unsupportedJsonMode =
       json &&
@@ -112,7 +133,7 @@ export async function chatCompletion({
       /response_format|json[_ ]?mode|not support/i.test(error.message);
     if (!unsupportedJsonMode) throw error;
     delete body.response_format;
-    return post(body, sessionId, timeoutMs);
+    return postWithRetry(body, sessionId, timeoutMs);
   }
 }
 

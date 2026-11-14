@@ -72,6 +72,8 @@ async function fetchPmcFullText(pmcid) {
   const { buffer } = await fetchBuffer(`${EUROPEPMC}/${pmcid}/fullTextXML`, {
     maxBytes: 8 * 1024 * 1024,
     accept: 'application/xml,text/xml',
+    timeout: 15000,
+    retries: 0,
   });
   const text = xmlToText(buffer.toString('utf8'));
   return text.length > 500 ? text : null;
@@ -438,6 +440,8 @@ export async function enrichPaperMetadata(
     const page = await fetchBuffer(paper.fullTextUrl, {
       maxBytes: 6 * 1024 * 1024,
       accept: 'text/html,application/xhtml+xml',
+      timeout: 15000,
+      retries: 0,
     }).catch(() => null);
     if (page) {
       const extracted = htmlToText(page.buffer.toString('utf8'));
@@ -451,6 +455,8 @@ export async function enrichPaperMetadata(
     const pdf = await fetchBuffer(paper.pdfUrl, {
       maxBytes: Math.min(env.PDF_MAX_MB, 30) * 1024 * 1024,
       accept: 'application/pdf',
+      timeout: 15000,
+      retries: 0,
     }).catch(() => null);
     if (pdf) {
       const parsed = await parsePdfBuffer(pdf.buffer).catch(() => null);
@@ -464,11 +470,17 @@ export async function enrichPaperMetadata(
   // Athenaeum-style fallback: thử mọi vị trí OA (OpenAlex locations, Unpaywall,
   // Semantic Scholar) thay vì chỉ best_oa_location. Giữ PMC XML ở ưu tiên đầu.
   if (!text) {
-    const candidates = dedupeCandidates([
+    const baseCandidates = dedupeCandidates([
       ...candidatesFromOpenAlex(openalex || {}),
       ...candidatesFromUnpaywall(oa || {}),
-      ...(await semanticScholarCandidates(doi)),
     ]);
+    // Semantic Scholar có rate limit thấp; chỉ gọi khi chưa có PDF trực tiếp.
+    const candidates = baseCandidates.some((candidate) => candidate.kind === 'pdf')
+      ? baseCandidates
+      : dedupeCandidates([
+          ...baseCandidates,
+          ...(await semanticScholarCandidates(doi)),
+        ]);
     if (candidates.length) {
       const pdf = await fetchFirstReadablePdf(candidates, {
         maxBytes: Math.min(env.PDF_MAX_MB, 30) * 1024 * 1024,
