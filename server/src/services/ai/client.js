@@ -202,6 +202,30 @@ export async function chatCompletionStream({
   }
 
   const contentType = response.headers.get('content-type') || '';
+
+  // Model reasoning có thể đốt hết max_tokens trước khi viết content. Với
+  // streaming, nếu chưa có delta nào thì fallback sang non-stream với budget lớn
+  // hơn thay vì trả lỗi rỗng cho UI.
+  const fallbackForLength = async () => {
+    const fallback = await chatCompletion({
+      messages,
+      temperature,
+      maxTokens: Math.min(16000, Math.max(9000, maxTokens * 2)),
+      sessionId,
+      model,
+      reasoningEffort,
+      timeoutMs,
+    });
+    onDelta?.(fallback.text);
+    return {
+      text: fallback.text,
+      model: fallback.model,
+      usage: fallback.usage,
+      finishReason: fallback.finishReason,
+      fallback: true,
+    };
+  };
+
   // Một số endpoint bỏ qua stream và trả JSON đầy đủ; vẫn xử lý được.
   if (!contentType.includes('text/event-stream')) {
     const raw = await response.text();
@@ -213,6 +237,7 @@ export async function chatCompletionStream({
     }
     const text = json?.choices?.[0]?.message?.content;
     if (typeof text !== 'string' || !text.trim()) {
+      if (json?.choices?.[0]?.finish_reason === 'length') return fallbackForLength();
       throw new ApiError(502, 'AI_EMPTY', 'AI trả về nội dung rỗng');
     }
     onDelta?.(text);
@@ -274,6 +299,7 @@ export async function chatCompletionStream({
   }
 
   if (!full.trim()) {
+    if (finishReason === 'length') return fallbackForLength();
     throw new ApiError(502, 'AI_EMPTY', `AI trả về nội dung rỗng (finish_reason: ${finishReason || 'unknown'})`, {
       finishReason,
     });

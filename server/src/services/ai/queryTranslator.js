@@ -24,7 +24,8 @@ export async function translateQuestion(question) {
     ],
     json: true,
     temperature: 0.3,
-    maxTokens: 800,
+    maxTokens: 2000,
+    reasoningEffort: 'low',
   });
 
   try {

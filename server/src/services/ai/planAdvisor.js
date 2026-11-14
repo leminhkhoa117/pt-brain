@@ -62,7 +62,8 @@ export async function proposePlanChanges({ content, program }) {
     ],
     json: true,
     temperature: 0.1,
-    maxTokens: 1500,
+    maxTokens: 4000,
+    reasoningEffort: 'low',
   });
 
   let parsed;

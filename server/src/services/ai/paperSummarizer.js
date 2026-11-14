@@ -409,7 +409,7 @@ export async function askAboutPaper({ content, sourceText, question, history = [
   const response = await chatCompletion({
     messages: buildAskMessages({ content, sourceText, question, history }),
     temperature: 0.4,
-    maxTokens: 1500,
+    maxTokens: 3000,
   });
 
   return { answer: response.text.trim(), usage: response.usage, model: response.model };
