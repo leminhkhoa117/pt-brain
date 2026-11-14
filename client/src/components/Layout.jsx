@@ -40,6 +40,10 @@ const GROUPS = [
     label: 'Công cụ',
     items: [{ to: '/calculators', label: 'Máy tính chỉ số', icon: 'calculator' }],
   },
+  {
+    label: 'Khám phá',
+    items: [{ to: '/welcome', label: 'Giới thiệu', icon: 'info' }],
+  },
 ];
 
 const MOBILE_NAV = [
@@ -49,6 +53,8 @@ const MOBILE_NAV = [
   { to: '/training', label: 'Giáo án', icon: 'dumbbell' },
   { to: '/research', label: 'Nghiên cứu', icon: 'book' },
 ];
+
+const NAV_COLLAPSED_KEY = 'ptbrain.navCollapsed';
 
 function useActive() {
   const location = useLocation();
@@ -74,24 +80,27 @@ function NavItem({ item, active, onClick, rail = false }) {
       title={rail ? item.label : undefined}
       aria-current={active ? 'page' : undefined}
       className={clsx(
-        'group relative flex h-9 items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-colors',
+        'group relative flex h-9 items-center gap-2.5 rounded-md px-2.5 text-[13px] font-medium transition-all duration-150',
         active
-          ? 'bg-white/[0.09] text-white'
-          : 'text-white/60 hover:bg-white/[0.05] hover:text-white/90',
+          ? 'bg-white/[0.11] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-r before:bg-pine-300'
+          : 'text-white/60 hover:bg-white/[0.06] hover:text-white/95',
         rail && 'justify-center px-0',
       )}
     >
       <Icon
         name={item.icon}
-        className={clsx('h-4 w-4 shrink-0', active ? 'text-pine-300' : 'text-white/45')}
+        className={clsx(
+          'h-4 w-4 shrink-0 transition-transform duration-150 group-hover:scale-105',
+          active ? 'text-pine-300' : 'text-white/50 group-hover:text-white/80',
+        )}
       />
       {!rail && <span className="truncate">{item.label}</span>}
-      {!rail && active && <span className="ml-auto h-1 w-1 rounded-full bg-pine-300" />}
+      {!rail && active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-pine-300" />}
     </Link>
   );
 }
 
-function SidebarContent({ onNavigate, rail = false }) {
+function SidebarContent({ onNavigate, rail = false, onCollapse, onExpand }) {
   const { user, logout } = useAuth();
   const isActive = useActive();
   const navigate = useNavigate();
@@ -112,6 +121,18 @@ function SidebarContent({ onNavigate, rail = false }) {
             </span>
           )}
         </Link>
+        {!rail && onCollapse && (
+          <button
+            type="button"
+            onClick={onCollapse}
+            title="Thu gọn thanh điều hướng"
+            aria-label="Thu gọn thanh điều hướng"
+            aria-expanded="true"
+            className="ml-auto hidden h-7 w-7 shrink-0 place-items-center rounded text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white lg:grid"
+          >
+            <Icon name="chevronRight" className="h-4 w-4 rotate-180" />
+          </button>
+        )}
       </div>
 
       <nav
@@ -138,6 +159,18 @@ function SidebarContent({ onNavigate, rail = false }) {
       </nav>
 
       <div className={clsx('border-t border-white/[0.08] p-2', rail && 'px-1')}>
+        {rail && onExpand && (
+          <button
+            type="button"
+            onClick={onExpand}
+            title="Mở rộng thanh điều hướng"
+            aria-label="Mở rộng thanh điều hướng"
+            aria-expanded="false"
+            className="mb-1 hidden h-9 w-full items-center justify-center rounded-md text-white/40 transition-colors hover:bg-white/[0.05] hover:text-white lg:flex"
+          >
+            <Icon name="chevronRight" className="h-4 w-4" />
+          </button>
+        )}
         <Link
           to="/settings"
           onClick={onNavigate}
@@ -191,35 +224,68 @@ export default function Layout({ children }) {
   const { isDark, toggle } = useTheme();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [navCollapsed, setNavCollapsed] = useState(() => {
+    try {
+      return window.localStorage.getItem(NAV_COLLAPSED_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     setDrawerOpen(false);
   }, [location.pathname, location.search]);
 
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(NAV_COLLAPSED_KEY, navCollapsed ? '1' : '0');
+    } catch {
+      // Trình duyệt chặn localStorage: chỉ mất trạng thái sau khi tải lại.
+    }
+  }, [navCollapsed]);
+
+  const isActive = useActive();
+  const activeItem = GROUPS.flatMap((g) => g.items).find((item) => isActive(item));
   const section =
     (location.pathname === '/settings' ? 'Tài khoản' : null) ||
     GROUPS.find((g) => g.items.some((i) => i.to.split('?')[0] === location.pathname))?.label ||
     'PT Brain';
+  const activeLabel =
+    location.pathname === '/settings' ? 'Hồ sơ & cài đặt' : activeItem?.label || null;
 
   return (
     <div className="min-h-screen bg-paper dark:bg-[#0e1211]">
       {/* Desktop / tablet rail */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-16 border-r border-white/[0.06] bg-shell md:block lg:w-[248px]">
-        <div className="hidden h-full lg:block">
-          <SidebarContent />
+      <aside
+        id="app-sidebar"
+        className={clsx(
+          'fixed inset-y-0 left-0 z-40 hidden w-16 border-r border-white/[0.08] bg-gradient-to-b from-[#111e19] via-[#0e1713] to-[#0a110e] transition-[width] duration-200 md:block',
+          navCollapsed ? 'lg:w-16' : 'lg:w-[248px]',
+        )}
+      >
+        <div className={clsx('h-full', navCollapsed ? 'hidden' : 'hidden lg:block')}>
+          <SidebarContent onCollapse={() => setNavCollapsed(true)} />
         </div>
-        <div className="h-full lg:hidden">
-          <SidebarContent rail />
+        <div className={clsx('h-full', navCollapsed ? 'block' : 'lg:hidden')}>
+          <SidebarContent
+            rail
+            onExpand={navCollapsed ? () => setNavCollapsed(false) : undefined}
+          />
         </div>
       </aside>
 
-      <div className="md:pl-16 lg:pl-[248px]">
-        <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur-sm dark:border-white/[0.08] dark:bg-[#0e1211]/95">
+      <div
+        className={clsx(
+          'transition-[padding] duration-200 md:pl-16',
+          navCollapsed ? 'lg:pl-16' : 'lg:pl-[248px]',
+        )}
+      >
+        <header className="sticky top-0 z-30 border-b border-line bg-paper/90 backdrop-blur-md dark:border-white/[0.08] dark:bg-[#0e1211]/90">
           <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 sm:px-6 lg:px-8">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className="grid h-9 w-9 place-items-center rounded-md border border-line text-slate-600 md:hidden dark:border-white/10 dark:text-slate-300"
+              className="grid h-9 w-9 place-items-center rounded-md border border-line bg-surface text-slate-600 md:hidden dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300"
               aria-label="Mở menu"
             >
               <Icon name="menu" className="h-4 w-4" />
@@ -233,11 +299,19 @@ export default function Layout({ children }) {
             </Link>
 
             <div className="hidden min-w-0 items-center gap-2 md:flex">
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+              <span className="rounded bg-paper-2 px-2 py-0.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.12em] text-pine-700 dark:bg-white/[0.06] dark:text-pine-300">
                 {section}
               </span>
-              <Icon name="chevronRight" className="h-3 w-3 text-slate-300 dark:text-slate-600" />
-              <span className="truncate text-[12.5px] font-medium text-slate-600 dark:text-slate-300">
+              {activeLabel && (
+                <>
+                  <Icon name="chevronRight" className="h-3 w-3 text-slate-300 dark:text-slate-600" />
+                  <span className="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-100">
+                    {activeLabel}
+                  </span>
+                </>
+              )}
+              <span className="mx-1 h-3 w-px bg-line dark:bg-white/[0.1]" aria-hidden="true" />
+              <span className="truncate font-mono text-[11.5px] text-slate-500 dark:text-slate-400">
                 {formatLongDate(todayKey())}
               </span>
             </div>
@@ -246,7 +320,7 @@ export default function Layout({ children }) {
               <button
                 type="button"
                 onClick={toggle}
-                className="grid h-9 w-9 place-items-center rounded-md border border-line text-slate-500 transition-colors hover:bg-paper-2 hover:text-slate-900 dark:border-white/10 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
+                className="grid h-9 w-9 place-items-center rounded-md border border-line bg-surface text-slate-500 transition-colors hover:border-line-strong hover:bg-paper-2 hover:text-slate-900 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-400 dark:hover:bg-white/[0.07] dark:hover:text-white"
                 title={isDark ? 'Chuyển sang nền sáng' : 'Chuyển sang nền tối'}
                 aria-label="Đổi chế độ sáng tối"
               >
@@ -254,12 +328,13 @@ export default function Layout({ children }) {
               </button>
               <Link
                 to="/settings"
-                className="hidden items-center gap-2 rounded-md border border-line py-1 pl-1 pr-2.5 transition-colors hover:border-line-strong sm:flex dark:border-white/10 dark:hover:border-white/20"
+                className="hidden items-center gap-2 rounded-md border border-line bg-surface py-1 pl-1 pr-2.5 transition-colors hover:border-line-strong hover:bg-paper-2 sm:flex dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
                 title="Hồ sơ & cài đặt"
               >
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-pine-700 font-mono text-[11px] font-medium text-white dark:bg-pine-500 dark:text-pine-950">
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-pine-700 font-mono text-[11px] font-medium text-white dark:bg-pine-500 dark:text-white">
                   <UserInitials />
                 </span>
+                <UserHeaderName />
                 <Icon name="chevronDown" className="h-3 w-3 text-slate-500 dark:text-slate-400" />
               </Link>
             </div>
@@ -267,7 +342,7 @@ export default function Layout({ children }) {
         </header>
 
         <main className="mx-auto w-full max-w-[1320px] px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-14 lg:pt-8">
-          <div key={location.pathname}>
+          <div key={location.pathname} className="animate-fade-up">
             {children}
           </div>
         </main>
@@ -329,4 +404,14 @@ export default function Layout({ children }) {
 function UserInitials() {
   const { user } = useAuth();
   return <>{initials(user?.name) || 'PT'}</>;
+}
+
+function UserHeaderName() {
+  const { user } = useAuth();
+  if (!user?.name) return null;
+  return (
+    <span className="hidden max-w-[130px] truncate text-[12px] font-medium text-slate-700 md:inline dark:text-slate-200">
+      {user.name}
+    </span>
+  );
 }

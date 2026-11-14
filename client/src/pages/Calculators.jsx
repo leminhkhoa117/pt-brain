@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, EmptyState, Field, Icon, InfoTip, PageHeader, Segmented, Spinner } from '../components/ui.jsx';
+import { useDialog } from '../components/DialogProvider.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { fetchSummary, saveMetric } from '../api/metrics.js';
 import { clearCalcHistory, deleteCalcHistory, fetchCalcHistory, runCalc } from '../api/calc.js';
@@ -101,6 +102,7 @@ function NumberField({ label, value, onChange, hint, error, ...props }) {
 }
 
 export default function Calculators() {
+  const dialog = useDialog();
   const { user, age: authAge } = useAuth();
   const queryClient = useQueryClient();
   const profile = user?.profile || {};
@@ -298,7 +300,15 @@ export default function Calculators() {
         onDelete={(id) => deleteHistory.mutate(id)}
         deletingId={deleteHistory.isPending ? deleteHistory.variables : null}
         onClear={() => {
-          if (window.confirm('Xóa toàn bộ lịch sử tính toán?')) clearHistory.mutate();
+          dialog
+            .confirm({
+              title: 'Xóa lịch sử tính toán',
+              message: 'Xóa toàn bộ lịch sử tính toán? Hành động không thể hoàn tác.',
+              confirmLabel: 'Xóa tất cả',
+            })
+            .then((ok) => {
+              if (ok) clearHistory.mutate();
+            });
         }}
         clearing={clearHistory.isPending}
       />
@@ -682,43 +692,44 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
 
         {calc && !calc.error && (
           <>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
-                <p className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line dark:border-white/[0.08] dark:bg-white/[0.08]">
+              <div className="bg-surface p-3.5 dark:bg-[#151b18]">
+                <p className="metric-label">
                   BMR
                   <InfoTip label="BMR (Basal Metabolic Rate)">
                     Năng lượng cơ thể dùng khi nghỉ hoàn toàn trong 24 giờ, tính theo Mifflin-St
                     Jeor từ giới tính, cân nặng, chiều cao và tuổi.
                   </InfoTip>
                 </p>
-                <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
+                <p className="mt-1.5 font-mono text-[24px] font-medium leading-none tracking-[-0.03em] tabular-nums text-slate-900 dark:text-white">
                   {formatNumber(calc.bmr, 0)}{' '}
-                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">kcal</span>
+                  <span className="font-sans text-xs font-medium text-slate-500 dark:text-slate-400">kcal</span>
                 </p>
               </div>
-              <div className="rounded-xl bg-brand-50 p-3 dark:bg-brand-950/50">
-                <p className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
+              <div className="border-t-2 border-t-pine-600 bg-surface p-3.5 dark:border-t-pine-400 dark:bg-[#151b18]">
+                <p className="metric-label text-pine-700 dark:text-pine-300">
                   TDEE
                   <InfoTip label="TDEE (Total Daily Energy Expenditure)">
                     Tổng năng lượng tiêu hao mỗi ngày = BMR × hệ số vận động. Đây là mức calo để giữ
                     cân, trước khi cộng/trừ theo mục tiêu.
                   </InfoTip>
                 </p>
-                <p className="mt-1 text-xl font-bold text-brand-700 dark:text-brand-200">
-                  {formatNumber(calc.tdee, 0)} <span className="text-xs font-medium">kcal</span>
+                <p className="mt-1.5 font-mono text-[24px] font-medium leading-none tracking-[-0.03em] tabular-nums text-pine-700 dark:text-pine-300">
+                  {formatNumber(calc.tdee, 0)} <span className="font-sans text-xs font-medium">kcal</span>
                 </p>
               </div>
             </div>
 
-            <div className="mt-3 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            <div className="mt-3 rounded-md border border-line bg-paper-2/50 p-3.5 dark:border-white/[0.08] dark:bg-white/[0.02]">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
                 Calo mục tiêu ({GOAL_LABELS[common.goal]})
               </p>
-              <p className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
-                {formatNumber(calc.target.min, 0)} – {formatNumber(calc.target.max, 0)} kcal/ngày
+              <p className="mt-1 font-mono text-[22px] font-medium tabular-nums text-slate-900 dark:text-white">
+                {formatNumber(calc.target.min, 0)} – {formatNumber(calc.target.max, 0)}{' '}
+                <span className="font-sans text-xs font-normal text-slate-500">kcal/ngày</span>
               </p>
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                Gợi ý giữa khoảng: {formatNumber(calc.target.recommended, 0)} kcal/ngày
+                Gợi ý giữa khoảng: <span className="num font-medium text-slate-700 dark:text-slate-200">{formatNumber(calc.target.recommended, 0)} kcal/ngày</span>
               </p>
             </div>
           </>
@@ -726,7 +737,7 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Chia macro</h2>
+        <h2 className="font-display text-[17px] font-semibold text-slate-900 dark:text-white">Chia macro</h2>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           Protein 1.6-2.2 g/kg, chất béo tối thiểu 0.6-1 g/kg, phần còn lại là carb. “g/kg” = gam
           trên mỗi kg cân nặng cơ thể.
@@ -736,7 +747,7 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
           <div>
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-slate-700 dark:text-slate-200">Protein</span>
-              <span className="font-semibold text-brand-600 dark:text-brand-300">
+              <span className="num font-semibold text-brand-600 dark:text-brand-300">
                 {proteinPerKg} g/kg
               </span>
             </div>
@@ -753,7 +764,7 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
           <div>
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-slate-700 dark:text-slate-200">Chất béo</span>
-              <span className="font-semibold text-brand-600 dark:text-brand-300">
+              <span className="num font-semibold text-brand-600 dark:text-brand-300">
                 {fatPerKg} g/kg
               </span>
             </div>
@@ -771,19 +782,19 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
 
         {calc?.macros && (
           <>
-            <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+            <div className="mt-5 grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-center dark:border-white/[0.08] dark:bg-white/[0.08]">
               {[
                 ['Protein', calc.macros.proteinG, 'g'],
                 ['Chất béo', calc.macros.fatG, 'g'],
                 ['Carb', calc.macros.carbG, 'g'],
               ].map(([label, value, unit]) => (
-                <div key={label} className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                <div key={label} className="bg-surface p-3 dark:bg-[#151b18]">
+                  <p className="font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
                     {label}
                   </p>
-                  <p className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
+                  <p className="mt-1 font-mono text-[22px] font-medium tabular-nums text-slate-900 dark:text-white">
                     {formatNumber(value, 0)}
-                    <span className="ml-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">{unit}</span>
+                    <span className="ml-0.5 font-sans text-xs font-medium text-slate-500 dark:text-slate-400">{unit}</span>
                   </p>
                 </div>
               ))}
@@ -938,13 +949,13 @@ function BodyComposition({ common, weight, height, onSave, isSaving }) {
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Kết quả</h2>
+        <h2 className="font-display text-[17px] font-semibold text-slate-900 dark:text-white">Kết quả</h2>
         {result?.error ? (
           <Alert tone="warning" className="mt-3">
             {result.error}
           </Alert>
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line dark:border-white/[0.08] dark:bg-white/[0.08]">
             {[
               [
                 'BMI',
@@ -984,18 +995,18 @@ function BodyComposition({ common, weight, height, onSave, isSaving }) {
             ]
               .filter(([, value]) => value !== undefined)
               .map(([label, value, unit, hint, info]) => (
-                <div key={label} className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
-                  <p className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                <div key={label} className="bg-surface p-3.5 dark:bg-[#151b18]">
+                  <p className="metric-label">
                     {label}
                     <InfoTip label={label}>{info}</InfoTip>
                   </p>
-                  <p className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
+                  <p className="mt-1.5 font-mono text-[22px] font-medium leading-none tracking-[-0.03em] tabular-nums text-slate-900 dark:text-white">
                     {formatNumber(value, 1)}
                     {unit && (
-                      <span className="ml-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">{unit}</span>
+                      <span className="ml-0.5 font-sans text-xs font-medium text-slate-500 dark:text-slate-400">{unit}</span>
                     )}
                   </p>
-                  {hint && <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{hint}</p>}
+                  {hint && <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">{hint}</p>}
                 </div>
               ))}
           </div>

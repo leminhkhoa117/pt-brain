@@ -1,0 +1,1169 @@
+{
+  "content": {
+    "metadata": {
+      "title": "The Effect of Weekly Set Volume on Strength Gain: A Meta-Analysis.",
+      "authors": [
+        "Ralston GW",
+        "Kilgore L",
+        "Wyatt FB",
+        "Baker JS"
+      ],
+      "year": 2017,
+      "journal": "Sports medicine (Auckland, N.Z.)",
+      "volume": "47",
+      "issue": "12",
+      "pages": "2585-2601",
+      "doi": "10.1007/s40279-017-0762-7"
+    },
+    "tldr": "Bài gộp 9 nghiên cứu trên nam giới để xem tổng số set mỗi tuần cho một bài tập ảnh hưởng thế nào đến mức tăng sức mạnh 1RM. Nhóm tập mức trung bình hoặc cao nhích hơn nhóm tập rất ít set, nhưng mức nhích được chính bài xếp vào loại 'trivial' (không đáng kể). Chỉ một phần rất nhỏ trong số nghiên cứu gốc có nhóm đối chứng, nên đây là xu hướng cần cân nhắc, chưa phải đơn thuốc số set.",
+    "researchQuestion": "Không nêu trong bài",
+    "studyType": "Tổng quan hệ thống + phân tích gộp (meta-analysis) với mô hình hiệu ứng ngẫu nhiên và meta-regression",
+    "evidenceLevel": {
+      "level": 2,
+      "explanation": "Là phân tích gộp nên đứng cao về hình thức, nhưng đầu vào là 9 nghiên cứu, trong đó 8 nghiên cứu không có nhóm đối chứng và chỉ 1 dùng thiết kế đối chứng ngẫu nhiên; toàn bộ đối tượng là nam. Vì vậy mức bằng chứng thực chất thấp hơn con số 'phân tích gộp' gợi ra."
+    },
+    "evidenceAxes": {
+      "design": {
+        "rating": "vừa",
+        "reason": "Có tìm kiếm hệ thống, mô hình hiệu ứng ngẫu nhiên, kiểm tra thiên lệch công bố và phân tích độ nhạy — cách làm chỉn chu. Nhưng thiết kế của các nghiên cứu gốc yếu: 8/9 không có nhóm đối chứng, chỉ 1 là RCT, không so sánh trực tiếp được mức trung bình với mức cao."
+      },
+      "certainty": {
+        "rating": "thấp",
+        "reason": "Số nghiên cứu ít, mẫu chỉ gồm nam, chênh lệch hiệu ứng ở mức trivial với cận dưới khoảng tin cậy sát 0, độ không đồng nhất giữa các nghiên cứu có lúc rất cao (I² tới 86%), và chính tác giả nêu khả năng tăng sức mạnh đến từ việc test 1RM lặp lại. Không thấy nêu tính cỡ mẫu hay khoảng tin cậy cho từng nghiên cứu gốc."
+      },
+      "relevance": {
+        "rating": "cao",
+        "reason": "Trả lời trực tiếp câu hỏi PT hay gặp: mỗi bài nên để bao nhiêu set mỗi tuần thì hợp lý cho mục tiêu tăng sức mạnh, và tách riêng bài đa khớp với bài cô lập."
+      }
+    },
+    "participants": {
+      "n": 223,
+      "description": "Toàn bộ là nam giới, lấy từ 9 nghiên cứu được đưa vào phân tích; tuổi trung bình 23.4 (±2.18) tuổi. Trong đó 4 nghiên cứu trên người đã qua huấn luyện, 5 nghiên cứu trên người chưa tập. [Nhận xét của AI] Mẫu trẻ và hẹp, nên kết quả không đại diện cho nữ, người lớn tuổi hay vận động viên trình độ cao."
+    },
+    "design": "[Dữ kiện] Tổng quan hệ thống kết hợp phân tích gộp hiệu ứng ngẫu nhiên (random-effects, ước lượng theo phương pháp DerSimonian và Laird) và meta-regression cho các biến điều tiết. Quy trình chọn bài: tìm được 6962 abstract/trích dẫn, sàng lọc còn 86 toàn văn, cuối cùng 9 nghiên cứu được đưa vào. Thời gian can thiệp của các nghiên cứu gốc từ 8 đến 26 tuần (trung bình 11.11 ± 5.7 tuần).",
+    "intervention": "[Dữ kiện] Cách chia liều: tính tổng số set của MỘT bài tập trong MỘT tuần, rồi chia ba mức — thấp (LWS) ≤5 set, trung bình (MWS) 5–9 set, cao (HWS) ≥10 set. So sánh cốt lõi là single-set (một set) với multiple-set (nhiều set) cho mỗi bài tập. [Dữ kiện] Bài không nêu tiêu chí dừng set của các nghiên cứu gốc (ví dụ thanh tạ ngừng di chuyển, nghỉ quá 1 giây ở vị trí duỗi, không gập hết tầm vận động), cũng không nêu mức tải % 1RM dùng trong từng nghiên cứu.",
+    "outcomes": "[Dữ kiện] Đầu ra chính là 1RM trước và sau can thiệp, phân tích theo: (1) gộp bài đa khớp và bài cô lập; (2) riêng bài đa khớp; (3) riêng bài cô lập; (4) 1RM theo đúng bài tập được huấn luyện ở từng nghiên cứu. [Dữ kiện] Bài cũng xét ảnh hưởng của giai đoạn huấn luyện (từ mới tập đến elite) và kiểm tra thiên lệch công bố.",
+    "measurementNote": "[Dữ kiện] Đại lượng đo là 1RM của chính bài tập được huấn luyện, đo trước và sau can thiệp, rồi quy thành chênh lệch trung bình và effect size theo mô hình hiệu ứng ngẫu nhiên phương sai nghịch đảo. [Dữ kiện] Bài phân loại độ lớn effect size thành các mức trivial / small / moderate / large (ngưỡng chi tiết xem phần thuật ngữ). Không nêu trong bài việc dùng encoder gắn lên quả tạ hay thiết bị đo vận tốc nào — đây là dữ liệu 1RM của từng nghiên cứu gốc.",
+    "resultsOverview": "[Dữ kiện] Nhìn chung, mức set trung bình và cao đều cho effect size trước–sau cao hơn mức thấp, nhưng khoảng cách giữa các mức rất nhỏ và bị chi phối bởi độ không đồng nhất giữa các nghiên cứu. Khi xét 1RM theo đúng từng bài tập, khác biệt không đạt ngưỡng ý nghĩa thống kê.",
+    "mainResults": [
+      {
+        "finding": "[Dữ kiện] Gộp cả bài đa khớp và bài cô lập: nhóm tập mức cao (gộp chung với mức trung bình) có mức tăng sức mạnh lớn hơn nhóm tập mức thấp, khác biệt có ý nghĩa thống kê nhưng độ lớn được xếp là 'trivial'.",
+        "numbers": "ES trước–sau: LWS 0.82 so với HWS 1.01; chênh lệch ES 0.19 (95% CI 0.06–0.30); p = 0.003; I² = 45%; 61 nhóm can thiệp từ 9 nghiên cứu.",
+        "plainMeaning": "[Nhận xét của AI] Chênh lệch có thật về mặt thống kê nhưng cực nhỏ: một khách tăng từ 4 set lên 12 set mỗi tuần cho một bài có thể chỉ nhích thêm được một chút trên bảng 1RM, không phải kiểu 'đổi đời'.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Khoảng tin cậy không chứa 0 và mô hình hiệu ứng ngẫu nhiên phù hợp, nhưng độ lớn trivial và độ không đồng nhất vừa phải; nhiều nghiên cứu gốc không có nhóm đối chứng."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "trivial effect (ES 0.18; 95% CI 0.06–0.30; p = 0.003)"
+      },
+      {
+        "finding": "[Dữ kiện] So riêng mức trung bình với mức thấp: nhóm mức trung bình nhích hơn một chút, khác biệt có ý nghĩa thống kê ở mức vừa phải, độ lớn trivial.",
+        "numbers": "ES trước–sau: LWS 0.83 so với MWS 0.98; chênh lệch 0.15 (95% CI 0.01–0.30); p = 0.04; I² = 74%; 7 nghiên cứu.",
+        "plainMeaning": "[Nhận xét của AI] Đây là so sánh thực dụng nhất cho khách bận rộn: nhảy từ ≤5 set lên 5–9 set mỗi tuần cho một bài là bước nhỏ, tốn ít thời gian, và vẫn nằm trong vùng có lợi theo dữ liệu.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Độ không đồng nhất cao (I² 74%) và p chỉ vừa chạm ngưỡng; cận dưới khoảng tin cậy sát 0, nên kết quả dễ đổi nếu thêm/bớt một nghiên cứu."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "trivial effect was observed (ES 0.15; 95% CI 0.01–0.30; p = 0.04)"
+      },
+      {
+        "finding": "[Dữ kiện] Xét riêng bài đa khớp (squat, bench, deadlift…): nhóm mức cao vẫn nhích hơn nhóm mức thấp, độ lớn trivial, nhưng độ không đồng nhất giữa các nghiên cứu rất cao.",
+        "numbers": "ES trước–sau: LWS 0.81 (95% CI 0.65–0.97) so với HWS 1.00 (95% CI 0.77–1.23); chênh lệch 0.19 (95% CI 0.01–0.34); p = 0.04; I² = 86%; 33 nhóm can thiệp từ 6 nghiên cứu.",
+        "plainMeaning": "[Nhận xét của AI] Với bài lớn, khác biệt gần như nằm trong sai số đo giữa các phòng tập; đừng dùng con số này để biện luận rằng khách phải tập gấp ba số set.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "I² 86% nghĩa là phần lớn khác biệt đến từ sự không đồng nhất giữa các nghiên cứu chứ không phải từ số set; cận dưới khoảng tin cậy sát 0."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "trivial effect was observed (ES 0.18; 95% CI 0.01–0.34; p = 0.04)"
+      },
+      {
+        "finding": "[Dữ kiện] Xét riêng bài cô lập (nhóm cơ nhỏ): nhóm mức cao vượt nhóm mức thấp rõ hơn một chút và được xếp là 'small' — mức lớn nhất trong các so sánh của bài; độ không đồng nhất bằng 0.",
+        "numbers": "ES trước–sau: LWS 0.95 (95% CI 0.30–1.60) so với HWS 1.10 (95% CI 0.26–1.94); chênh lệch 0.23 (95% CI 0.06–0.40); p = 0.008; I² = 0%; 28 nhóm can thiệp từ 5 nghiên cứu.",
+        "plainMeaning": "[Nhận xét của AI] Nếu khách có thời gian, thêm set cho bài cô lập (curl, extension, raise…) có vẻ 'ăn' hơn thêm set cho bài lớn — nhưng khoảng tin cậy hai bên rất rộng, nên đây là gợi ý nhỏ, không phải quy tắc.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "I² = 0% là điểm mạnh, nhưng chỉ 5 nghiên cứu, khoảng tin cậy của từng nhóm rất rộng, và trong dữ liệu có chỗ nhãn so sánh ghi mức trung bình trong khi giá trị trung bình lại là mức cao — cần đối chiếu bảng gốc."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "small effect was observed (ES 0.23; 95% CI 0.06–0.40; p = 0.008)"
+      },
+      {
+        "finding": "[Dữ kiện] Khi phân tích theo đúng bài tập được test ở từng nghiên cứu (exercise-specific 1RM), so sánh mức thấp với mức cao không đạt ngưỡng ý nghĩa thống kê.",
+        "numbers": "ES: LWS 0.80 (95% CI 0.47–1.13) so với HWS 0.97 (95% CI 0.68–1.26); chênh lệch 0.17 (95% CI −0.01 to 0.29); p = 0.06; I² = 70%; 55 nhóm can thiệp từ 9 nghiên cứu.",
+        "plainMeaning": "[Nhận xét của AI] Với một khách cụ thể trên một bài cụ thể, dữ liệu này chưa cho thấy khác biệt — đừng hứa với khách rằng tăng set chắc chắn giúp 1RM bài đó tăng thêm.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Bài báo cáo trung thực là không đạt ngưỡng, khoảng tin cậy chứa 0; nhưng I² 70% và cách gộp nhiều bài tập khác nhau làm kết quả khó diễn giải."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "trivial effect was observed (ES 0.14; 95% CI −0.01 to 0.29; p = 0.06)"
+      },
+      {
+        "finding": "[Dữ kiện] Kiểm tra thiên lệch công bố: không thấy bằng chứng về thiên lệch, biểu đồ funnel không bất đối xứng rõ.",
+        "numbers": "Egger's test p = 0.393.",
+        "plainMeaning": "[Nhận xét của AI] Đây là tin tốt nhưng nhẹ: với số nghiên cứu ít, phép thử này khó phát hiện bất đối xứng, nên không thể coi là 'đã sạch thiên lệch'.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Số nghiên cứu nhỏ làm sức mạnh của phép thử thấp; kết quả âm tính không loại trừ được thiên lệch."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "Results from an Egger’s test (p = 0.393) confirmed no evidence of publication bias"
+      }
+    ],
+    "secondaryResults": [
+      {
+        "finding": "[Dữ kiện] Phân tích độ nhạy: khi loại dữ liệu của Reid [24] ra khỏi mô hình, ảnh hưởng của số set mỗi tuần giảm đi — tức kết luận chính khá phụ thuộc vào một nghiên cứu. Bài không báo cáo giá trị p cho lần phân tích này.",
+        "numbers": "Không nêu trong bài",
+        "plainMeaning": "[Nhận xét của AI] Nếu một nghiên cứu duy nhất có thể kéo cả kết luận, thì xu hướng này chưa đủ chắc để dựng kế hoạch tập quanh nó.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Bài chỉ mô tả bằng lời, không kèm số liệu định lượng cho lần phân tích này."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "Removal of Reid [24] data reduced the impact"
+      },
+      {
+        "finding": "[Dữ kiện] Không thể so sánh trực tiếp mức trung bình với mức cao, và không thể kiểm tra riêng chênh lệch trước–sau của nhóm mức cao, vì dữ liệu nghiên cứu không đủ. [Tác giả diễn giải] Vì vậy mức trung bình và mức cao thường được gộp lại khi so với mức thấp.",
+        "numbers": "Không nêu trong bài",
+        "plainMeaning": "[Nhận xét của AI] Vì hai mức này bị gộp lại khi so sánh, đừng dùng bài để trả lời câu 'mức trung bình hay mức cao tốt hơn cho một bài cụ thể'.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Đây là giới hạn dữ liệu tác giả nêu rõ, không phải kết quả đo."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "not feasible due to limited study data"
+      }
+    ],
+    "figures": [],
+    "quickRead": {
+      "lines": [
+        "[Dữ kiện] Gộp các nghiên cứu lại: nhóm tập nhiều set hơn mỗi tuần có mức tăng sức mạnh nhỉnh hơn nhóm tập rất ít set.",
+        "[Dữ kiện] Nhưng mức nhỉnh đó được bài xếp vào loại 'trivial' — nhỏ đến mức gần như không phân biệt được trong phòng tập.",
+        "[Nhận xét của AI] Nền bằng chứng yếu (phần lớn nghiên cứu không có nhóm đối chứng, chỉ có nam), nên đọc như một xu hướng chứ không phải đơn thuốc số set."
+      ],
+      "readyForPt": "Dùng được một phần: đủ để giải thích cho khách vì sao tăng số set có thể giúp thêm chút, nhưng chưa đủ để chốt con số set cố định cho từng người."
+    },
+    "whyStudy": "[Tác giả diễn giải] Tác giả mở đầu bằng việc quan điểm đang lưu hành về liên hệ giữa số set và phát triển sức mạnh vẫn còn tranh cãi, và cái thiếu là một mối quan hệ được kiểm soát và định lượng giữa các biến huấn luyện sức mạnh. [Tác giả diễn giải] Bài cũng cảnh báo rằng đưa các nghiên cứu chất lượng thấp vào phân tích gộp có thể tạo ra kết luận sai lệch. Vì vậy nhóm tác giả gộp dữ liệu để so sánh ba mức khối lượng set mỗi tuần (thấp, trung bình, cao) trên cùng một thang đo là mức tăng 1RM trước–sau can thiệp.",
+    "mechanism": {
+      "summary": "[Tác giả diễn giải] Bài không đo bất kỳ cơ chế sinh lý nào; tác giả chỉ nêu vài cách giải thích khả dĩ cho việc nhóm nhiều set nhích hơn, và tất cả đều là giả thuyết chưa được đo trong bài.",
+      "steps": [
+        "[Tác giả diễn giải] Nguyên tắc đặc hiệu (principle of specificity): tập nhiều set hơn nghĩa là lặp lại chính động tác sẽ được test nhiều lần hơn, nên kỹ năng thực hiện động tác được 'dợt' nhiều hơn và điểm 1RM có thể nhích lên. Chưa được đo trong bài.",
+        "[Tác giả diễn giải] Chiều ngược lại: phần tăng sức mạnh quan sát được có thể do được test 1RM nhiều lần trong nghiên cứu (quen với bài test) chứ không phải thích nghi sinh lý. Chưa được đo.",
+        "[Tác giả diễn giải] Ở một số nghiên cứu dùng bài cô lập, tác giả nêu khả năng 'cross-over thần kinh' — tập một bên tay có thể kéo theo bên tay không tập cũng mạnh lên. Chưa được đo.",
+        "[Nhận xét của AI] Cách hiểu đời thường: nhiều set hơn = chạm tạ nhiều lần hơn, nên kỹ năng và độ quen với mức tạ tăng; nhưng đó là chuyện kỹ năng, không đồng nghĩa cơ to hơn."
+      ],
+      "whyWeightStaysStill": "Không áp dụng: bài không dùng dây đàn hồi hay thiết bị mắc nối tiếp, nên không có tình huống tạ đứng yên trong lúc dây căng.",
+      "analogy": "Giống tập ném bóng rổ: ném nhiều lần mỗi tuần sẽ quen tay hơn là ném ít lần — nhưng quen tay không có nghĩa là bắp tay to hơn."
+    },
+    "authorsConclusion": "[Tác giả diễn giải] Tập với khối lượng set mỗi tuần ở mức trung bình hoặc cao có hiệu quả nhỉnh hơn một chút so với mức thấp trong việc tạo tăng sức mạnh (theo phần Key Points của bài).",
+    "authorsView": {
+      "conclusion": "[Tác giả diễn giải] Mức trung bình (MWS) hoặc mức cao (HWS) tỏ ra nhỉnh hơn mức thấp (LWS) một cách khiêm tốn trong việc tăng sức mạnh; đây là kết luận dựa trên mức tăng 1RM đo được, không phải trên thay đổi khối cơ.",
+      "interpretations": [
+        "[Tác giả diễn giải] Quan điểm đang lưu hành về liên hệ giữa số set và phát triển sức mạnh vẫn còn tranh cãi, do thiếu một mối quan hệ được kiểm soát và định lượng.",
+        "[Tác giả diễn giải] Việc đưa các nghiên cứu chất lượng thấp vào phân tích gộp có thể tạo ra kết luận sai lệch.",
+        "[Tác giả diễn giải] Mức trung bình và mức cao 'có thể' (may) dẫn tới mức tăng sức mạnh lớn hơn mức thấp ở nam mới tập và trung cấp — đây là suy luận, chưa được kiểm chứng trực tiếp trong bài.",
+        "[Tác giả diễn giải] Phần tăng sức mạnh quan sát được có thể do việc test 1RM được lặp lại nhiều lần chứ không phải do thích nghi sinh lý khác.",
+        "[Tác giả diễn giải] Phần tăng sức mạnh cũng có thể được giải thích bằng nguyên tắc đặc hiệu (specificity).",
+        "[Tác giả diễn giải] Ở một số nghiên cứu bài cô lập, phần tăng có thể do cross-over thần kinh ở bên tay không được tập.",
+        "[Tác giả diễn giải] Nam giới được ghi nhận có sức mạnh và khối cơ lớn hơn nữ, nên dữ liệu trên nam không suy ra thẳng cho nữ."
+      ],
+      "applications": [
+        "[Tác giả diễn giải] Mức trung bình hoặc mức cao 'có thể' là liều phù hợp để tạo tăng sức mạnh ở nam đã qua huấn luyện — bài ghi rõ đây là đề xuất, chưa được đo trong nghiên cứu.",
+        "[Tác giả diễn giải] Ở nam mới tập và trung cấp, mức trung bình hiệu quả hơn mức thấp cho cả bài đa khớp lẫn bài cô lập (bài đánh dấu đây là nội dung đã được đo).",
+        "[Tác giả diễn giải] Với người ở mức trung gian, dữ liệu trước–sau cho thấy quan hệ liều–đáp ứng theo số set (đã được đo).",
+        "[Tác giả diễn giải] Bài 'thận trọng khuyến nghị' mức trung bình cho người mới, người mới chuyển sang tập kháng lực, hoặc người bị giới hạn thời gian — chưa được đo."
+      ]
+    },
+    "limitations": [
+      "[Tác giả nêu] Không thể so sánh mức trung bình với mức cao do dữ liệu nghiên cứu hạn chế.",
+      "[Tác giả nêu] Không thể kiểm tra riêng chênh lệch trước–sau của nhóm mức cao.",
+      "[Tác giả nêu] Số nghiên cứu phù hợp ít.",
+      "[Tác giả nêu] Chỉ 1 trong 9 nghiên cứu dùng thiết kế đối chứng ngẫu nhiên; 8 nghiên cứu còn lại không có nhóm đối chứng.",
+      "[Tác giả nêu] Mức tăng sức mạnh có thể do việc test 1RM lặp lại chứ không phải thích nghi sinh lý.",
+      "[Tác giả nêu] Thứ tự chương trình tập và loại bài tập kháng lực giữa các nhóm không tương đương.",
+      "[Tác giả nêu] Kết quả chỉ áp dụng cho bài cô lập liên quan tới nhóm cơ nhỏ.",
+      "[Tác giả nêu] Dữ liệu đáng tin cậy về các mức sức mạnh khác nhau sau huấn luyện ở nam và nữ còn hạn chế."
+    ],
+    "limitationsStructured": {
+      "authors": [
+        "[Tác giả diễn giải] Không so sánh được MWS với HWS; không kiểm tra riêng được chênh lệch trước–sau của HWS.",
+        "[Tác giả diễn giải] Số nghiên cứu phù hợp ít; chỉ 1/9 nghiên cứu là RCT, 8 nghiên cứu không có nhóm đối chứng.",
+        "[Tác giả diễn giải] Tăng sức mạnh có thể do test 1RM lặp lại.",
+        "[Tác giả diễn giải] Thứ tự chương trình và loại bài tập giữa các nhóm không tương đương.",
+        "[Tác giả diễn giải] Kết quả áp dụng cho bài cô lập với nhóm cơ nhỏ.",
+        "[Tác giả diễn giải] Dữ liệu về các mức sức mạnh khác nhau ở nam và nữ còn hạn chế."
+      ],
+      "ai": [
+        "[Nhận xét của AI] Toàn bộ đối tượng là nam, tuổi trung bình khoảng đầu hai mươi, nên không suy ra được cho nữ, người lớn tuổi hay vận động viên trình độ cao.",
+        "[Nhận xét của AI] 8/9 nghiên cứu không có nhóm đối chứng: không thể tách phần tăng do tập khỏi phần tăng do quen bài test và do các yếu tố khác.",
+        "[Nhận xét của AI] Đầu ra duy nhất là 1RM; không có dữ liệu khối cơ, nên mọi suy luận về phì đại đều nằm ngoài phạm vi bài.",
+        "[Nhận xét của AI] Chênh lệch hiệu ứng ở mức trivial với cận dưới khoảng tin cậy sát 0 ở nhiều so sánh; độ không đồng nhất có lúc rất cao.",
+        "[Nhận xét của AI] Phân tích độ nhạy cho thấy kết luận khá nhạy với một nghiên cứu duy nhất — dấu hiệu thiếu vững.",
+        "[Nhận xét của AI] Không thấy nêu tiêu chí dừng set, mức tải % 1RM, cách kiểm soát dinh dưỡng/giấc ngủ hay mức tuân thủ của người tập trong các nghiên cứu gốc.",
+        "[Nhận xét của AI] Có chỗ số liệu giữa phần chữ và bảng lệch nhau 0.01, và một mục con bị gán nhãn so sánh không khớp với giá trị trung bình được báo cáo — khi trích dẫn nên đối chiếu bảng gốc.",
+        "[Nhận xét của AI] Không nêu tính cỡ mẫu cho phân tích gộp."
+      ]
+    },
+    "conflictOfInterest": "Không nêu trong bài: dữ liệu không có mục tài trợ hay công bố xung đột lợi ích.",
+    "benefitSignals": {
+      "statement": "[Dữ kiện] Không nêu trong bài: không có câu nào về tài trợ, xung đột lợi ích, bằng phát minh hay sản phẩm mới/rẻ.",
+      "flags": []
+    },
+    "practicalTakeaways": [
+      "[Nhận xét của AI] Với khách bận, bước nâng hợp lý và ít rủi ro là từ rất ít set lên khoảng 5–9 set mỗi tuần cho một bài, thay vì nhảy thẳng lên mức rất cao.",
+      "[Nhận xét của AI] Đừng bán 'liều cao' như cam kết: dữ liệu chỉ cho thấy nhích nhẹ, và ở 1RM từng bài còn không phát hiện khác biệt.",
+      "[Nhận xét của AI] Ưu tiên thêm set cho bài cô lập nếu khách còn thời gian và hồi phục tốt — đây là chỗ dữ liệu nhích rõ nhất, dù khoảng tin cậy rộng.",
+      "[Nhận xét của AI] Vì kết quả là trung bình nhóm, hãy theo dõi từng khách: có người tăng 1RM rõ, có người gần như đứng yên — đừng suy từ con số trung bình ra từng người.",
+      "[Nhận xét của AI] Ghi lại số set mỗi tuần cho từng bài trong nhật ký tập, để sau này đối chiếu được với chính khách thay vì dựa vào trung bình của 9 nghiên cứu."
+    ],
+    "application": {
+      "supported": [
+        "[Dữ kiện] Trong tập hợp nghiên cứu này, nhóm tập nhiều set hơn mỗi tuần có effect size tăng 1RM trước–sau cao hơn nhóm tập rất ít set, với độ lớn trivial.",
+        "[Dữ kiện] Riêng ở bài cô lập, nhóm nhiều set hơn có effect size trước–sau cao hơn nhóm ít set, xếp loại 'small', và độ không đồng nhất bằng 0 — đây là chỗ dữ liệu ủng hộ thêm set mạnh nhất.",
+        "[Dữ kiện] Quan hệ liều–đáp ứng trước–sau theo số set mỗi tuần có được dữ liệu chống đỡ ở nhóm người tập mức trung gian.",
+        "[Dữ kiện] Với 1RM theo từng bài tập cụ thể, bài không phát hiện khác biệt giữa mức thấp và mức cao."
+      ],
+      "hypothesis": [
+        "[Tác giả diễn giải] Mức trung bình hoặc mức cao có thể là liều phù hợp cho nam đã qua huấn luyện — chưa được đo.",
+        "[Tác giả diễn giải] Mức trung bình có thể là lựa chọn thận trọng cho người mới, người mới chuyển sang tập kháng lực, hoặc người bị giới hạn thời gian — chưa được đo.",
+        "[Tác giả diễn giải] Người tập trình độ cao có thể dùng mức trung bình hoặc mức cao — chưa được đo.",
+        "[Tác giả diễn giải] Phần tăng sức mạnh có thể do test 1RM lặp lại hoặc do nguyên tắc đặc hiệu — chưa được đo.",
+        "[Tác giả diễn giải] Cross-over thần kinh ở bên tay không tập có thể góp phần vào kết quả của một số nghiên cứu bài cô lập — chưa được đo.",
+        "[Nhận xét của AI] Chiều ngược lại cũng chưa được đo: nếu tập quá nhiều set mà không kiểm soát hồi phục, phần lợi thu được có thể bị lấn át — bài không có dữ liệu về điểm này."
+      ],
+      "notYet": [
+        "[Nhận xét của AI] Chưa nên dùng bài này để chốt con số set cố định cho từng khách, vì chênh lệch trivial, độ không đồng nhất cao và kết luận nhạy với một nghiên cứu.",
+        "[Nhận xét của AI] Chưa nên áp cho khách nữ, người lớn tuổi hoặc vận động viên elite dựa trên bài này.",
+        "[Nhận xét của AI] Chưa nên khẳng định mức cao tốt hơn mức trung bình — chính bài nói không đủ dữ liệu để so sánh.",
+        "[Nhận xét của AI] Chưa nên dùng kết quả này để hứa hẹn tăng khối cơ, vì đầu ra chỉ là 1RM."
+      ],
+      "unanswered": [
+        "[Dữ kiện] Số set mỗi tuần ảnh hưởng thế nào đến phì đại (khối cơ, chu vi chi) — không được đo trong bài.",
+        "[Dữ kiện] Ngưỡng set tối ưu cho nữ, cho người lớn tuổi hơn và cho người tập lâu năm — bài không có dữ liệu.",
+        "[Dữ kiện] Tiêu chí dừng set, mức tải % 1RM, tempo, thời gian nghỉ và cách sắp xếp bài trong buổi — không nêu trong bài.",
+        "[Dữ kiện] So sánh trực tiếp mức trung bình với mức cao trên cùng một mẫu — bài nói không đủ dữ liệu để làm.",
+        "[Dữ kiện] Ảnh hưởng dài hạn (hơn vài tháng) và ảnh hưởng của việc tăng set dần theo tuần — không được đo."
+      ],
+      "notApplicableTo": "Nữ giới, người lớn tuổi, vận động viên trình độ cao, người tập vì mục tiêu phì đại hoặc giảm mỡ — bài không có dữ liệu cho các nhóm này."
+    },
+    "whoItDoesNotApplyTo": "Không áp dụng cho nữ, người lớn tuổi, vận động viên trình độ cao, người mục tiêu chính là phì đại, và bất kỳ ai mà bài tập/thiết bị khác xa các nghiên cứu gốc. Bài cũng không nói gì về người đang tập phục hồi chấn thương.",
+    "selfCheck": [
+      {
+        "question": "Khách hỏi: 'Tập 12 set mỗi tuần cho một bài có chắc chắn tốt hơn 4 set không?'. Trả lời đúng với bài này là gì?",
+        "answer": "Phải nói: dữ liệu gộp cho thấy nhóm nhiều set nhích hơn nhóm ít set, nhưng mức nhích được xếp là trivial; và khi xét 1RM theo đúng từng bài tập thì bài không phát hiện khác biệt. Vậy không thể cam kết chắc chắn."
+      },
+      {
+        "question": "Vì sao không được nói 'bài này chứng minh tập nhiều set giúp tăng cơ'?",
+        "answer": "Vì đầu ra chỉ là 1RM, không đo khối cơ; thêm nữa phần lớn nghiên cứu gốc không có nhóm đối chứng và chính tác giả nêu khả năng tăng sức mạnh do test 1RM lặp lại."
+      },
+      {
+        "question": "Một so sánh có p = 0.06 thì nên viết thế nào cho đúng?",
+        "answer": "Viết 'không phát hiện khác biệt' (hoặc 'chưa đạt ngưỡng ý nghĩa thống kê'), kèm khoảng tin cậy chứa 0 — tuyệt đối không biến nó thành khẳng định rằng hai nhóm giống hệt nhau hay không ảnh hưởng gì."
+      }
+    ],
+    "glossary": [
+      {
+        "en": "weekly set volume",
+        "vi": "khối lượng set mỗi tuần",
+        "explanation": "Tổng số set của một bài tập cụ thể trong một tuần, tính như một biến liên tục — không phải số set trong một buổi.",
+        "example": "Khách tập bench thứ Hai 4 set và thứ Năm 4 set thì khối lượng set mỗi tuần cho bench là 8."
+      },
+      {
+        "en": "effect size (ES)",
+        "vi": "độ lớn hiệu ứng",
+        "explanation": "Con số đo mức thay đổi đã được chuẩn hóa để so sánh giữa các nghiên cứu; bài xếp ≤0.2 là trivial, ≤0.5 là small, ≤0.8 là moderate và ≥0.8 là large.",
+        "example": "Hai khách cùng tăng 5 kg bench nhưng nền tạ khác nhau, nên phải quy về effect size mới so được công bằng."
+      },
+      {
+        "en": "trivial effect",
+        "vi": "hiệu ứng không đáng kể",
+        "explanation": "Mức nhỏ nhất trong thang effect size của bài — có thể có thật nhưng quá nhỏ để coi là lý do thay đổi kế hoạch tập.",
+        "example": "Tăng thêm 3 set mỗi tuần mà 1RM chỉ nhích hơn một chút trong sai số đo — đó là trivial."
+      },
+      {
+        "en": "random-effects model",
+        "vi": "mô hình hiệu ứng ngẫu nhiên",
+        "explanation": "Cách gộp các nghiên cứu có tính đến việc mỗi nghiên cứu có 'hiệu ứng thật' hơi khác nhau, thay vì giả định tất cả cùng một hiệu ứng.",
+        "example": "Nếu 5 phòng tập cùng dạy squat nhưng kỹ thuật mỗi nơi một khác, dùng mô hình hiệu ứng ngẫu nhiên sẽ công bằng hơn."
+      },
+      {
+        "en": "heterogeneity / I² statistic",
+        "vi": "độ không đồng nhất / chỉ số I²",
+        "explanation": "Mức khác nhau giữa các nghiên cứu về cùng một hiệu ứng; bài dùng I² > 50% để đánh dấu là có không đồng nhất.",
+        "example": "Cùng một bài bench nhưng nhóm này tập 3 buổi/tuần, nhóm kia 1 buổi/tuần — dữ liệu gộp lại sẽ 'lệch' và I² cao."
+      },
+      {
+        "en": "meta-regression",
+        "vi": "hồi quy gộp",
+        "explanation": "Kỹ thuật xem một yếu tố (như số set, thời gian can thiệp, trình độ) có liên quan đến độ lớn hiệu ứng hay không, trên dữ liệu của nhiều nghiên cứu.",
+        "example": "Muốn biết khách tập lâu năm có đáp ứng khác người mới không, người ta đưa 'trình độ' vào mô hình hồi quy gộp."
+      },
+      {
+        "en": "multi-joint exercise",
+        "vi": "bài tập đa khớp",
+        "explanation": "Động tác huy động từ hai khớp trở lên, thường là bài lớn.",
+        "example": "Squat, bench press, deadlift, row."
+      },
+      {
+        "en": "isolation exercise",
+        "vi": "bài tập cô lập",
+        "explanation": "Động tác chủ yếu xoay quanh một khớp, nhắm vào một nhóm cơ nhỏ.",
+        "example": "Curl tay trước, extension tay sau, lateral raise."
+      },
+      {
+        "en": "publication bias / file drawer problem",
+        "vi": "thiên lệch công bố / vấn đề 'ngăn kéo'",
+        "explanation": "Khuynh hướng các nghiên cứu có kết quả dương tính được đăng, còn kết quả không đâu ra thì nằm trong ngăn kéo — làm phân tích gộp bị lệch.",
+        "example": "10 huấn luyện viên thử một giáo án, 2 người thấy hiệu quả rồi đăng bài; 8 người không thấy gì thì im lặng — đọc tài liệu sẽ tưởng giáo án hay."
+      },
+      {
+        "en": "trim and fill",
+        "vi": "phương pháp trim and fill",
+        "explanation": "Kỹ thuật ước lượng xem nếu có nghiên cứu bị 'thiếu' do thiên lệch công bố thì kết luận có đổi không; bài dùng kèm biểu đồ funnel và kiểm định Egger.",
+        "example": "Như kiểm tra lại bảng điểm lớp khi nghi có bạn giấu bài kiểm tra điểm thấp."
+      },
+      {
+        "en": "graded dose–response relationship",
+        "vi": "quan hệ liều–đáp ứng theo bậc",
+        "explanation": "Ý niệm tăng liều (số set) theo bậc thì đáp ứng (tăng sức mạnh) cũng tăng theo bậc.",
+        "example": "Từ 3 set lên 6 set rồi 12 set mỗi tuần mà kết quả tăng dần đều — đó là liều–đáp ứng theo bậc."
+      },
+      {
+        "en": "neurological crossover",
+        "vi": "cross-over thần kinh",
+        "explanation": "Hiện tượng tập một bên chi mà bên đối diện không tập cũng mạnh lên phần nào, được cho là do tín hiệu thần kinh.",
+        "example": "Khách bó bột một tay, vẫn tập tay còn lại và thấy tay bó đỡ yếu hơn dự kiến."
+      },
+      {
+        "en": "effect size d",
+        "vi": "độ lớn ảnh hưởng (d)",
+        "explanation": "Độ lớn khác biệt đã chuẩn hóa; khoảng 0.2 nhỏ, 0.5 vừa, 0.8 lớn.",
+        "example": "d = 0.65 là mức vừa, không phải khác biệt khổng lồ."
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext",
+      "missingInfo": [
+        "Tiêu chí dừng set của các nghiên cứu gốc.",
+        "Mức tải % 1RM và cách sắp xếp bài trong buổi của từng nghiên cứu.",
+        "Dữ liệu về khối cơ/phì đại.",
+        "Số liệu riêng cho nữ hoặc nhóm tuổi khác.",
+        "Thông tin tài trợ và xung đột lợi ích."
+      ]
+    },
+    "verification": {
+      "passed": true,
+      "issues": [],
+      "factsWarnings": [
+        "Trích nguyên văn không khớp toàn văn: \"trivial effect (ES 0.18; 95% CI 0.06–0.30; p = 0.003)\"",
+        "Trích nguyên văn không khớp toàn văn: \"existing consensus ... remains controversial\"",
+        "Trích nguyên văn không khớp toàn văn: \"I2 > 50% used to indicate heterogeneity\""
+      ],
+      "rounds": 2
+    }
+  },
+  "facts": {
+    "metadata": {
+      "title": {
+        "value": "The Effect of Weekly Set Volume on Strength Gain: A Meta-Analysis.",
+        "page": 1,
+        "quote": ""
+      },
+      "authors": [
+        {
+          "value": "Ralston GW",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Kilgore L",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Wyatt FB",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Baker JS",
+          "page": 1,
+          "quote": ""
+        }
+      ],
+      "year": {
+        "value": "2017",
+        "page": 1,
+        "quote": ""
+      },
+      "journal": {
+        "value": "Sports medicine (Auckland, N.Z.)",
+        "page": 1,
+        "quote": ""
+      },
+      "volume": {
+        "value": "47",
+        "page": 1,
+        "quote": ""
+      },
+      "issue": {
+        "value": "12",
+        "page": 1,
+        "quote": ""
+      },
+      "pages": {
+        "value": "2585-2601",
+        "page": 1,
+        "quote": ""
+      },
+      "doi": {
+        "value": "10.1007/s40279-017-0762-7",
+        "page": 1,
+        "quote": ""
+      }
+    },
+    "study": {
+      "design": {
+        "value": "Meta-analysis (systematic review with random-effects meta-analysis and meta-regression)",
+        "page": 0,
+        "quote": "conduct a meta-analysis on the effects of low (LWS), medium (MWS) or high weekly set"
+      },
+      "participants": {
+        "n": 223,
+        "description": {
+          "value": "223 nam từ 9 nghiên cứu; tuổi trung bình 23.4 (±2.18) năm; 4 nghiên cứu trained, 5 untrained",
+          "page": 0,
+          "quote": "nine studies provided data on 223 male subjects"
+        }
+      },
+      "intervention": {
+        "value": "Huấn luyện sức mạnh với khối lượng set/tuần thấp, trung bình hoặc cao: LWS ≤5, MWS 5–9, HWS ≥10 set/bài/tuần",
+        "page": 0,
+        "quote": "LWS (≤5), MWS (5–9) or HWS (≥10)"
+      },
+      "device": {
+        "value": "",
+        "page": 0,
+        "quote": ""
+      },
+      "comparator": {
+        "value": "So sánh single-set với multiple-set; LWS làm tham chiếu so với MWS/HWS",
+        "page": 0,
+        "quote": "compared single versus multiple sets per exercise"
+      },
+      "outcomes": [
+        {
+          "value": "Sức mạnh 1RM trước–sau can thiệp",
+          "page": 0,
+          "quote": "pre- to post-1 RM measurement of muscular strength"
+        },
+        {
+          "value": "Sức mạnh 1RM theo bài đa khớp và cô lập",
+          "page": 0,
+          "quote": "multi-joint and isolation exercise-specific 1RM"
+        },
+        {
+          "value": "Exercise-specific 1RM",
+          "page": 0,
+          "quote": "Examination of the effects of weekly set volume on exercise-specific 1RM"
+        },
+        {
+          "value": "Muscular strength per exercise",
+          "page": 0,
+          "quote": "effects of LWS, MWS or HWS of strength training on muscular strength per exercise"
+        },
+        {
+          "value": "Strength gain in multi-joint versus isolation exercises",
+          "page": 0,
+          "quote": "magnitude of strength gain differs between multi-joint and isolation exercises"
+        },
+        {
+          "value": "Effect of stage of training on strength gain",
+          "page": 0,
+          "quote": "effect of stage of training (beginner through elite) on strength gain"
+        }
+      ],
+      "measurement": {
+        "value": "Chênh lệch trung bình trước–sau (MD), effect size (ES), mô hình random-effects inverse variance",
+        "page": 0,
+        "quote": "mean difference (MD) or change in post-intervention mean was calculated"
+      },
+      "setting": {
+        "value": "",
+        "page": 0,
+        "quote": ""
+      },
+      "duration": {
+        "value": "Thời gian can thiệp 8–26 tuần; trung bình 11.11 ± 5.7 tuần",
+        "page": 0,
+        "quote": "length of training ranged from 8 to 26 weeks"
+      },
+      "failureCriteria": {
+        "value": "",
+        "page": 0,
+        "quote": ""
+      }
+    },
+    "results": [
+      {
+        "id": "r0",
+        "outcome": "Chọn nghiên cứu",
+        "arms": [],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "6962 abstracts/citations; 86 full text; 9 nghiên cứu với 223 nam được đưa vào phân tích",
+        "page": 0,
+        "quote": "preliminary search yielded 6962 relevant abstracts and citations"
+      },
+      {
+        "id": "r1",
+        "outcome": "Xu hướng công bố (publication bias)",
+        "arms": [],
+        "p": "p = 0.393",
+        "d": "",
+        "ci": "",
+        "note": "Egger’s test; funnel plot không thấy bất đối xứng rõ",
+        "page": 0,
+        "quote": "Results from an Egger’s test (p = 0.393) confirmed no evidence of publication bias"
+      },
+      {
+        "id": "r2",
+        "outcome": "Phân tích độ nhạy (sensitivity analysis)",
+        "arms": [],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Loại dữ liệu Reid [24] làm giảm ảnh hưởng của số set/tuần; bài không nêu p",
+        "page": 0,
+        "quote": "Removal of Reid [24] data reduced the impact"
+      },
+      {
+        "id": "r3",
+        "outcome": "Sức mạnh tổng hợp đa khớp + cô lập: LWS vs HWS (MWS+HWS gộp)",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.82",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS",
+            "value": "1.01",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.003",
+        "d": "ES difference 0.19",
+        "ci": "95% CI 0.06–0.30",
+        "note": "I2=45%; 61 treatment groups từ 9 nghiên cứu; hiệu ứng trivial",
+        "page": 0,
+        "quote": "trivial effect (ES 0.18; 95% CI 0.06–0.30; p = 0.003)"
+      },
+      {
+        "id": "r4",
+        "outcome": "Sức mạnh tổng hợp đa khớp + cô lập: LWS vs MWS",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.83",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "MWS",
+            "value": "0.98",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.04",
+        "d": "ES difference = 0.15",
+        "ci": "95% CI 0.01–0.30",
+        "note": "I2=74%; 7 nghiên cứu; hiệu ứng trivial",
+        "page": 0,
+        "quote": "trivial effect was observed (ES 0.15; 95% CI 0.01–0.30; p = 0.04)"
+      },
+      {
+        "id": "r5",
+        "outcome": "Sức mạnh bài đa khớp: LWS vs HWS (MWS+HWS gộp)",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.81",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS",
+            "value": "1.00",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.04",
+        "d": "ES difference 0.19",
+        "ci": "95% CI 0.01–0.34",
+        "note": "I2=86%; 33 treatment groups từ 6 nghiên cứu; hiệu ứng trivial",
+        "page": 0,
+        "quote": "trivial effect was observed (ES 0.18; 95% CI 0.01–0.34; p = 0.04)"
+      },
+      {
+        "id": "r6",
+        "outcome": "Sức mạnh bài cô lập: LWS vs MWS",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.95",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS (bài ghi)",
+            "value": "1.10",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.008",
+        "d": "ES difference 0.15",
+        "ci": "95% CI 0.06–0.40",
+        "note": "I2=0%; 28 treatment groups từ 5 nghiên cứu; mục là LWS vs MWS nhưng bài ghi mean ES cho HWS",
+        "page": 0,
+        "quote": "small effect was observed (ES 0.23; 95% CI 0.06–0.40; p = 0.008)"
+      },
+      {
+        "id": "r7",
+        "outcome": "Sức mạnh 1RM theo từng bài: LWS vs HWS (MWS+HWS gộp)",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.80",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS",
+            "value": "0.97",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.06",
+        "d": "ES difference 0.17",
+        "ci": "95% CI −0.01 to 0.29",
+        "note": "I2=70%; 55 treatment groups từ 9 nghiên cứu; hiệu ứng trivial",
+        "page": 0,
+        "quote": "trivial effect was observed (ES 0.14; 95% CI −0.01 to 0.29; p = 0.06)"
+      },
+      {
+        "id": "r1",
+        "outcome": "ES 1RM theo bài tập: LWS so với HWS",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.80",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS",
+            "value": "0.97",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "LWS 95% CI 0.47–1.13; HWS 95% CI 0.68–1.26",
+        "note": "",
+        "page": 0,
+        "quote": "LWS was 0.80 (95% CI 0.47–1.13) compared with HWS (0.97; 95% CI 0.68–1.26)"
+      },
+      {
+        "id": "r2",
+        "outcome": "ES 1RM bài tập multi-joint chỉ: LWS so với HWS",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.81",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS",
+            "value": "1.00",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "LWS 95% CI 0.65–0.97; HWS 95% CI 0.77–1.23",
+        "note": "",
+        "page": 0,
+        "quote": "LWS multi-joint-only exercises pre- to post-intervention was 0.81 (95% CI 0.65–0.97)"
+      },
+      {
+        "id": "r3",
+        "outcome": "ES so sánh HWS với LWS đối chứng",
+        "arms": [
+          {
+            "name": "HWS vs LWS",
+            "value": "0.18",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.04",
+        "d": "0.18",
+        "ci": "95% CI 0.01–0.34",
+        "note": "trivial ES; HWS more effective",
+        "page": 0,
+        "quote": "trivial ES of 0.18 (95% CI 0.01–0.34; p = 0.04)"
+      },
+      {
+        "id": "r4",
+        "outcome": "ES so sánh MWS với LWS đối chứng",
+        "arms": [
+          {
+            "name": "MWS vs LWS",
+            "value": "0.15",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.04",
+        "d": "0.15",
+        "ci": "95% CI 0.01–0.30",
+        "note": "trivial ES; MWS marginally more effective",
+        "page": 0,
+        "quote": "trivial ES of 0.15 (95% CI 0.01–0.30; p = 0.04)"
+      },
+      {
+        "id": "r5",
+        "outcome": "ES 1RM bài tập isolation: LWS so với HWS",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.95",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS",
+            "value": "1.10",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "LWS 95% CI 0.30–1.60; HWS 95% CI 0.26–1.94",
+        "note": "",
+        "page": 0,
+        "quote": "0.95 (95% CI 0.30–1.60) for LWS compared with 1.10 (95% CI 0.26–1.94)"
+      },
+      {
+        "id": "r6",
+        "outcome": "ES so sánh HWS với LWS đối chứng cho bài tập isolation",
+        "arms": [
+          {
+            "name": "HWS vs LWS",
+            "value": "0.23",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.008",
+        "d": "0.23",
+        "ci": "95% CI 0.06–0.40",
+        "note": "small ES; HWS more effective",
+        "page": 0,
+        "quote": "small ES of 0.23 (95% CI 0.06–0.40; p = 0.008)"
+      },
+      {
+        "id": "r7",
+        "outcome": "ES trước-sau cho bài tập multi-joint và isolation kết hợp",
+        "arms": [
+          {
+            "name": "LWS",
+            "value": "0.82",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "MWS",
+            "value": "0.98",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "HWS",
+            "value": "1.01",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "MWS và HWS cao hơn LWS",
+        "page": 0,
+        "quote": "ES 0.98, 1.01 vs 0.82, respectively"
+      },
+      {
+        "id": "r8",
+        "outcome": "ES so sánh HWS với LWS đối chứng cho multi-joint và isolation kết hợp",
+        "arms": [
+          {
+            "name": "HWS vs LWS",
+            "value": "0.18",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p = 0.003",
+        "d": "0.18",
+        "ci": "95% CI 0.06–0.30",
+        "note": "trivial ES; HWS more effective",
+        "page": 0,
+        "quote": "trivial ES of 0.18 (95% CI 0.06–0.30; p = 0.003)"
+      }
+    ],
+    "authors": {
+      "conclusion": {
+        "value": "Medium (MWS) hoặc high weekly set (HWS) có hiệu quả nhỉnh hơn low weekly set (LWS) trong tạo tăng sức mạnh",
+        "page": 0,
+        "quote": "Medium (MWS) or high weekly set (HWS) strength training is marginally more effective",
+        "source": "Key Points"
+      },
+      "interpretations": [
+        {
+          "value": "Sự đồng thuận hiện có về liên hệ giữa số set và phát triển sức mạnh vẫn còn tranh cãi",
+          "page": 0,
+          "quote": "existing consensus ... remains controversial",
+          "source": "Introduction"
+        },
+        {
+          "value": "Điều này do thiếu mối quan hệ được kiểm soát và định lượng giữa các biến huấn luyện sức mạnh",
+          "page": 0,
+          "quote": "This is due to the lack of a controlled and quantified relationship",
+          "source": "Introduction"
+        },
+        {
+          "value": "Việc đưa các nghiên cứu chất lượng thấp vào meta-analysis có thể tạo kết luận sai lệch",
+          "page": 0,
+          "quote": "The inclusion of low-quality studies within a meta-analysis can introduce spurious conclusions",
+          "source": "Introduction"
+        },
+        {
+          "value": "MWS and HWS may lead to larger strength gains than LWS in novice and intermediate male trainees",
+          "page": 0,
+          "quote": "MWS and HWS strength training may lead to larger strength gains than LWS",
+          "source": ""
+        },
+        {
+          "value": "LWS per exercise appears less effective than MWS/HWS",
+          "page": 0,
+          "quote": "LWS strength training per exercise appears to be less effective",
+          "source": ""
+        },
+        {
+          "value": "Data suggest MWS and HWS produce marginally superior results compared with LWS",
+          "page": 0,
+          "quote": "MWS and HWS strength training produce marginally superior results compared with LWS",
+          "source": ""
+        },
+        {
+          "value": "Strength increases may be due to repeated 1RM testing rather than other physiological adaptations",
+          "page": 0,
+          "quote": "strength increases may be due to the repeated 1RM testing rather than other physiological adaptations",
+          "source": ""
+        },
+        {
+          "value": "Increase in strength could be attributed to the principle of specificity",
+          "page": 0,
+          "quote": "could be attributed to the principle of specificity",
+          "source": ""
+        },
+        {
+          "value": "Increase in some isolation studies may be due to neurological crossover in the untrained contralateral arm",
+          "page": 0,
+          "quote": "may have been due to neurological crossover in the untrained contralateral arm",
+          "source": ""
+        },
+        {
+          "value": "Men have reported greater muscle strength and size than women",
+          "page": 0,
+          "quote": "Men have reported greater muscle strength and size than women",
+          "source": ""
+        }
+      ],
+      "applications": [
+        {
+          "value": "MWS hoặc HWS có thể là liều phù hợp để tạo tăng sức mạnh ở nam đã qua huấn luyện",
+          "page": 0,
+          "quote": "MWS or HWS training may be an appropriate dose to produce strength gains",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Ở nam mới tập và trung cấp, MWS hiệu quả hơn LWS cho cả bài đa khớp và bài cô lập",
+          "page": 0,
+          "quote": "MWS training is more effective than LWS training for both multi-joint and isolation exercises",
+          "measured": true,
+          "source": ""
+        },
+        {
+          "value": "Với người ở mức trung gian, dữ liệu hiện có cho thấy quan hệ liều–đáp ứng trước–sau theo số set",
+          "page": 0,
+          "quote": "existing data provide evidence of a pre- to post-graded set dose–response relationship",
+          "measured": true,
+          "source": ""
+        },
+        {
+          "value": "Cautiously advocate MWS for beginners, novice trainers, or time-dependent trainers",
+          "page": 0,
+          "quote": "cautiously advocates the use of MWS for beginners, novice trainers, or the time-dependent trainer",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Well-trained individuals may use either MWS or HWS",
+          "page": 0,
+          "quote": "For well-trained individuals, the use of either MWS or HWS strength training may be appropriate",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "MWS or HWS appropriate for trainees in the middle ground (not novice, not advanced)",
+          "page": 0,
+          "quote": "MWS or HWS strength training is appropriate for this group",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Advanced trainees may consider either MWS or HWS",
+          "page": 0,
+          "quote": "the employment of either MWS or HWS may be considered",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Researchers should be cautious with mixed model meta-analyses",
+          "page": 0,
+          "quote": "researchers should be cautious when performing mixed model meta-analyses",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Need more investigations and replication studies with appropriate designs and comparable samples",
+          "page": 0,
+          "quote": "more investigations and replication studies using appropriate study designs and comparable subject samples are required",
+          "measured": false,
+          "source": ""
+        }
+      ],
+      "limitations": [
+        {
+          "value": "Không thể so sánh MWS với HWS do dữ liệu nghiên cứu hạn chế",
+          "page": 0,
+          "quote": "not feasible due to limited study data",
+          "source": "Results"
+        },
+        {
+          "value": "Không thể kiểm tra khác biệt HWS trước–sau do dữ liệu nghiên cứu hạn chế",
+          "page": 0,
+          "quote": "Examination of HWS pre- to post-intervention strength differences was not feasible",
+          "source": "Results"
+        },
+        {
+          "value": "Number of suitable studies was small",
+          "page": 0,
+          "quote": "the number of suitable studies was small",
+          "source": ""
+        },
+        {
+          "value": "Only one of nine included papers used a randomised control design",
+          "page": 0,
+          "quote": "One of the nine included research papers used a randomised control design",
+          "source": ""
+        },
+        {
+          "value": "Eight included studies did not include a control group",
+          "page": 0,
+          "quote": "The other eight did not include a control group",
+          "source": ""
+        },
+        {
+          "value": "Strength increases may be due to repeated 1RM testing rather than other physiological adaptations",
+          "page": 0,
+          "quote": "strength increases may be due to the repeated 1RM testing",
+          "source": ""
+        },
+        {
+          "value": "Programme order and type of RT exercise between groups were not equivalent",
+          "page": 0,
+          "quote": "Variation in programme order and the type of RT exercise between groups was not equivalent",
+          "source": ""
+        },
+        {
+          "value": "Results are applicable to isolation exercises involving smaller muscle groups",
+          "page": 0,
+          "quote": "results are applicable to isolation exercises involving smaller muscle groups",
+          "source": ""
+        },
+        {
+          "value": "Limited reliable data on different levels of strength after RT in men and women",
+          "page": 0,
+          "quote": "Limited reliable data exist concerning the different levels of strength",
+          "source": ""
+        }
+      ],
+      "benefitSignals": []
+    },
+    "sections": {
+      "introduction": true,
+      "methods": true,
+      "results": true,
+      "discussion": true,
+      "practicalApplications": true,
+      "conclusion": true,
+      "limitations": true
+    },
+    "glossaryCandidates": [
+      {
+        "value": "weekly set volume",
+        "page": 0,
+        "quote": "total sets per RT exercise per week as a continuous variable",
+        "source": ""
+      },
+      {
+        "value": "effect size (ES)",
+        "page": 0,
+        "quote": "ESs of ≤0.2, ≤0.5, ≤0.8 and ≥0.8 were considered trivial, small, moderate and large",
+        "source": ""
+      },
+      {
+        "value": "random-effects model",
+        "page": 0,
+        "quote": "random-effects model estimated using the DerSimonian and Laird method",
+        "source": ""
+      },
+      {
+        "value": "heterogeneity",
+        "page": 0,
+        "quote": "Heterogeneity refers to the existence of variation between studies on the main effects being evaluated",
+        "source": ""
+      },
+      {
+        "value": "I2 statistic",
+        "page": 0,
+        "quote": "I2 > 50% used to indicate heterogeneity",
+        "source": ""
+      },
+      {
+        "value": "meta-regression",
+        "page": 0,
+        "quote": "Separate meta-regressions on ESs were performed with the following moderator variables",
+        "source": ""
+      },
+      {
+        "value": "multi-joint exercise",
+        "page": 0,
+        "quote": "multi-joint exercises were combined into a sub-group analysis",
+        "source": ""
+      },
+      {
+        "value": "isolation exercise",
+        "page": 0,
+        "quote": "isolation exercises were combined into a separate sub-group analysis",
+        "source": ""
+      },
+      {
+        "value": "file drawer problem",
+        "page": 0,
+        "quote": "account for the ‘file drawer problem’",
+        "source": ""
+      },
+      {
+        "value": "trim and fill",
+        "page": 0,
+        "quote": "Trim and fill funnel plots and Egger’s tests were performed",
+        "source": ""
+      },
+      {
+        "value": "graded dose–response relationship",
+        "page": 0,
+        "quote": "support for the conventional view of a graded dose–response relationship",
+        "source": ""
+      },
+      {
+        "value": "multi-joint",
+        "page": 0,
+        "quote": "multi-joint and isolation exercises",
+        "source": ""
+      },
+      {
+        "value": "isolation exercises",
+        "page": 0,
+        "quote": "isolation exercises on pre- to post-intervention strength gains in males",
+        "source": ""
+      },
+      {
+        "value": "publication bias",
+        "page": 0,
+        "quote": "The possibility of publication bias was assessed",
+        "source": ""
+      },
+      {
+        "value": "coefficients of variation (CV)",
+        "page": 0,
+        "quote": "available data are from coefficients of variation (CV) of pre- and post-training strength measures",
+        "source": ""
+      },
+      {
+        "value": "maximal voluntary isometric contraction (MVC)",
+        "page": 0,
+        "quote": "maximal voluntary isometric contraction (MVC) testing on upper body isolation exercise",
+        "source": ""
+      },
+      {
+        "value": "RT",
+        "page": 0,
+        "quote": "Set volume in RT has historically been an often-debated issue",
+        "source": ""
+      },
+      {
+        "value": "RCT",
+        "page": 0,
+        "quote": "more RCT investigations were conducted on same age/sex",
+        "source": ""
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext"
+    }
+  },
+  "usage": {
+    "input": 69023,
+    "output": 68745,
+    "cost": 0
+  },
+  "model": "deepseek-v4.1-flash",
+  "promptVersion": "v3"
+}

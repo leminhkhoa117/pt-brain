@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, Icon, InfoTip, LoadingBlock, PageHeader } from '../components/ui.jsx';
+import { useDialog } from '../components/DialogProvider.jsx';
 import { Link } from 'react-router-dom';
 import {
   deleteMetricPhoto,
@@ -75,6 +76,7 @@ function NumField({ label, error, ...props }) {
 }
 
 export default function BodyLog() {
+  const dialog = useDialog();
   const queryClient = useQueryClient();
   const [date, setDate] = useState(todayKey());
   const [form, setForm] = useState(emptyForm);
@@ -247,8 +249,8 @@ export default function BodyLog() {
               <LoadingBlock label="Đang tải bản ghi..." />
             ) : (
               <form onSubmit={onSubmit} className="space-y-6" noValidate>
-                <section>
-                  <h3 className="mb-3 font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
+                <section className="border-t border-line pt-5 dark:border-white/[0.08]">
+                  <h3 className="mb-3 font-display text-[17px] font-semibold text-slate-900 dark:text-slate-100">
                     Chỉ số chính
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -275,8 +277,8 @@ export default function BodyLog() {
                   </div>
                 </section>
 
-                <section>
-                  <h3 className="mb-1 font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
+                <section className="border-t border-line pt-5 dark:border-white/[0.08]">
+                  <h3 className="mb-1 font-display text-[17px] font-semibold text-slate-900 dark:text-slate-100">
                     Số đo (cm)
                   </h3>
                   <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
@@ -296,8 +298,8 @@ export default function BodyLog() {
                   </div>
                 </section>
 
-                <section>
-                  <h3 className="mb-3 font-display text-[16px] font-semibold text-slate-900 dark:text-slate-100">
+                <section className="border-t border-line pt-5 dark:border-white/[0.08]">
+                  <h3 className="mb-3 font-display text-[17px] font-semibold text-slate-900 dark:text-slate-100">
                     Lối sống &amp; dinh dưỡng
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-3">
@@ -497,7 +499,15 @@ export default function BodyLog() {
                       type="button"
                       className="absolute right-1 top-1 rounded-full bg-slate-950/60 p-1 text-white opacity-0 transition group-hover:opacity-100"
                       onClick={() => {
-                        if (window.confirm('Xóa ảnh này?')) removePhoto.mutate(photo.filename);
+                        dialog
+                          .confirm({
+                            title: 'Xóa ảnh tiến độ',
+                            message: 'Xóa ảnh này? Hành động không thể hoàn tác.',
+                            confirmLabel: 'Xóa ảnh',
+                          })
+                          .then((ok) => {
+                            if (ok) removePhoto.mutate(photo.filename);
+                          });
                       }}
                       aria-label="Xóa ảnh"
                     >

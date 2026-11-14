@@ -7,7 +7,10 @@ export function todayKey(date = new Date()) {
 
 export function formatDateKey(key, withYear = false) {
   if (!key) return '—';
-  const [y, m, d] = key.split('-');
+  const value = String(key);
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return value;
+  const [, y, m, d] = match;
   return withYear ? `${d}/${m}/${y}` : `${d}/${m}`;
 }
 

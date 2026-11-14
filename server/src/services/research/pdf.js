@@ -13,6 +13,8 @@ import {
   storedFileExists,
 } from '../fileStore.js';
 import { extractFigureHintsFromPages } from './figures.js';
+import { orderPageItems } from './pdfLayout.js';
+import { doiFromFilename } from '../../utils/doi.js';
 
 const require = createRequire(import.meta.url);
 // Import trực tiếp lib để tránh đoạn debug của package khi chạy như entrypoint
@@ -176,21 +178,15 @@ export function inferTitleFromPage(pageText = '') {
 }
 
 function pageTextRenderer(pageTexts) {
-  return (pageData) =>
-    pageData
-      .getTextContent({ normalizeWhitespace: false, disableCombineTextItems: false })
-      .then((textContent) => {
-        let lastY;
-        let raw = '';
-        for (const item of textContent.items) {
-          if (lastY == item.transform[5] || !lastY) raw += item.str;
-          else raw += `\n${item.str}`;
-          lastY = item.transform[5];
-        }
-        const pageText = normalizeText(raw);
-        pageTexts[pageData.pageNumber - 1] = pageText;
-        return pageText;
-      });
+  return async (pageData) => {
+    const textContent = await pageData.getTextContent({
+      normalizeWhitespace: false,
+      disableCombineTextItems: false,
+    });
+    const ordered = orderPageItems(textContent.items, pageData.view?.[3]);
+    pageTexts[pageData.pageNumber - 1] = normalizeText(ordered.text);
+    return pageTexts[pageData.pageNumber - 1];
+  };
 }
 
 /** Trích text từ PDF. PDF scan không có text sẽ trả lỗi rõ ràng (chưa hỗ trợ OCR). */
@@ -203,7 +199,12 @@ export async function parsePdfBuffer(buffer, { filename = '' } = {}) {
   } catch (error) {
     throw new ApiError(422, 'PDF_PARSE_FAILED', `Không đọc được PDF: ${error.message}`);
   }
-  const text = normalizeText(data.text || '');
+  // Giữ marker trang để model trích dẫn đúng trang và để verifier đối chiếu.
+  const text = normalizeText(
+    pageTexts
+      .map((pageText, index) => `[[page ${index + 1}]]\n${pageText || ''}`)
+      .join('\n\n'),
+  );
   if (text.length < 200) {
     throw new ApiError(
       422,
@@ -212,17 +213,15 @@ export async function parsePdfBuffer(buffer, { filename = '' } = {}) {
     );
   }
   const infoTitle = data.info?.Title ? cleanPdfTitle(data.info.Title) : '';
-  const fileTitle = cleanPdfTitle(filename);
   const inferredTitle = inferTitleFromPage(pageTexts[0] || '');
-  const title = isMeaningfulTitle(infoTitle)
-    ? infoTitle
-    : isMeaningfulTitle(fileTitle)
-      ? fileTitle
-      : inferredTitle;
+  // Không dùng tên file làm tiêu đề: tên file thường là mã bài ("JSC201360 2449..2455").
+  const title = isMeaningfulTitle(infoTitle) ? infoTitle : inferredTitle;
   return {
     text,
+    pageTexts,
     pages: data.numpages || 0,
     title,
+    doiFromFilename: doiFromFilename(filename),
     hash: sha256(buffer),
     figureHints: extractFigureHintsFromPages(pageTexts),
   };

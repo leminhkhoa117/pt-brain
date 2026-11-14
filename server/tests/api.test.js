@@ -90,6 +90,7 @@ describe('PT Brain API integration', () => {
 
     userId = res.body.data.user._id;
     expect(res.body.data.user.email).toBe('api-test@example.com');
+    expect(res.body.data.user.onboardingRequired).toBe(true);
     expect(res.body.data.user).not.toHaveProperty('passwordHash');
     expect(res.body.data.user).not.toHaveProperty('refreshTokenHash');
   });
@@ -121,6 +122,11 @@ describe('PT Brain API integration', () => {
     const usage = await agent.get('/api/me/ai-usage').expect(200);
     expect(usage.body.data.summarize).toBe(0);
     expect(usage.body.data.limit).toBeGreaterThan(0);
+
+    const seen = await agent.post('/api/me/welcome-seen').expect(200);
+    expect(seen.body.data.user.onboardingRequired).toBe(false);
+    const meAfter = await agent.get('/api/me').expect(200);
+    expect(meAfter.body.data.user.onboardingRequired).toBe(false);
   });
 
   it('lưu và đọc BodyLog, summary metrics', async () => {

@@ -10,6 +10,7 @@ const router = Router();
 router.use(requireAuth);
 router.get('/me', asyncHandler(me.getMe));
 router.get('/me/ai-usage', asyncHandler(me.getMyAiUsage));
+router.post('/me/welcome-seen', asyncHandler(me.markIntroSeen));
 router.patch('/me', validate(updateMeSchema), asyncHandler(me.updateMe));
 router.delete('/me', asyncHandler(me.deleteMe));
 

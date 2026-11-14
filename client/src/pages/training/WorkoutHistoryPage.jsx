@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, Icon, InfoTip, PageHeader, Spinner } from '../../components/ui.jsx';
+import { useDialog } from '../../components/DialogProvider.jsx';
 import { deleteWorkout, listPrograms, listWorkouts } from '../../api/training.js';
 import { getErrorMessage } from '../../api/client.js';
 import { formatDateKey } from '../../lib/date.js';
@@ -9,6 +10,7 @@ import { formatNumber } from '../../lib/format.js';
 import { CARDIO_BY_KEY } from '@shared/training/cardio.js';
 
 export default function WorkoutHistoryPage() {
+  const dialog = useDialog();
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(null);
   const [error, setError] = useState(null);
@@ -234,8 +236,13 @@ export default function WorkoutHistoryPage() {
                     <button
                       type="button"
                       className="btn-ghost mt-2 !px-2 !py-1 text-xs text-rose-500"
-                      onClick={() => {
-                        if (window.confirm('Xóa buổi tập này?')) remove.mutate(workout._id);
+                      onClick={async () => {
+                        const ok = await dialog.confirm({
+                          title: 'Xóa buổi tập',
+                          message: 'Xóa buổi tập này? Hành động không thể hoàn tác.',
+                          confirmLabel: 'Xóa buổi tập',
+                        });
+                        if (ok) remove.mutate(workout._id);
                       }}
                     >
                       <Icon name="trash" className="h-3.5 w-3.5" />

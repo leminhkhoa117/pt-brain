@@ -5,6 +5,7 @@ import {
   fetchMe,
   loginRequest,
   logoutRequest,
+  markWelcomeSeen,
   registerRequest,
   updateMe,
 } from '../api/auth.js';
@@ -87,14 +88,41 @@ export function AuthProvider({ children }) {
     return data.user;
   }, []);
 
+  const completeWelcome = useCallback(async () => {
+    const data = await markWelcomeSeen();
+    setUser(data.user);
+    setAge(data.age);
+    return data.user;
+  }, []);
+
   const removeAccount = useCallback(async () => {
     await deleteAccount();
     resetSession();
   }, [resetSession]);
 
   const value = useMemo(
-    () => ({ user, age, loading, login, register, logout, saveProfile, removeAccount }),
-    [user, age, loading, login, register, logout, saveProfile, removeAccount],
+    () => ({
+      user,
+      age,
+      loading,
+      login,
+      register,
+      logout,
+      saveProfile,
+      completeWelcome,
+      removeAccount,
+    }),
+    [
+      user,
+      age,
+      loading,
+      login,
+      register,
+      logout,
+      saveProfile,
+      completeWelcome,
+      removeAccount,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

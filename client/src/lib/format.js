@@ -22,6 +22,17 @@ export function initials(name = '') {
     .join('');
 }
 
+/** Hiển thị DOI giữ chữ hoa mã publisher: 10.1519/jsc... -> 10.1519/JSC... */
+export function formatDoi(value = '') {
+  const doi = String(value)
+    .trim()
+    .replace(/^https?:\/\/(dx\.)?doi\.org\//i, '')
+    .replace(/^doi:\s*/i, '');
+  const match = doi.match(/^(10\.\d{4,9}\/)([a-z]{2,8})(\.[-._;()/:a-z0-9]+)$/i);
+  if (!match) return doi;
+  return `${match[1]}${match[2].toUpperCase()}${match[3]}`;
+}
+
 export const GOAL_LABELS = {
   cut: 'Giảm mỡ',
   maintain: 'Duy trì',

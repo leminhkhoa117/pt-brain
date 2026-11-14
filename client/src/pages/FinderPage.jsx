@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../components/ui.jsx';
+import { useDialog } from '../components/DialogProvider.jsx';
 import { createPaper, searchResearch } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
 import MarkdownText from '../components/MarkdownText.jsx';
-import { formatNumber } from '../lib/format.js';
+import { formatNumber, formatDoi } from '../lib/format.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import {
   addSearchHistory,
@@ -27,7 +28,7 @@ const LEVEL_STYLES = {
 
 const STAGES = [
   'AI đang dịch câu hỏi sang truy vấn học thuật',
-  'Đang gọi PubMed, Europe PMC và OpenAlex',
+  'Đang gọi PubMed, Europe PMC, OpenAlex và Crossref',
   'Đang gộp kết quả và xếp hạng bằng code',
   'AI đang viết mô tả và tổng hợp bằng chứng',
 ];
@@ -37,6 +38,7 @@ const buildFilters = (filters) => {
   if (filters.yearFrom) result.yearFrom = Number(filters.yearFrom);
   if (filters.yearTo) result.yearTo = Number(filters.yearTo);
   if (filters.openAccessOnly) result.openAccessOnly = true;
+  if (filters.fullTextOnly) result.fullTextOnly = true;
   if (filters.maxLevel) result.maxLevel = Number(filters.maxLevel);
   return result;
 };
@@ -47,6 +49,7 @@ const EMPTY_FILTERS = {
   yearFrom: '',
   yearTo: '',
   openAccessOnly: false,
+  fullTextOnly: false,
   maxLevel: '',
 };
 
@@ -54,6 +57,7 @@ const toFormFilters = (filters = {}) => ({
   yearFrom: filters.yearFrom ? String(filters.yearFrom) : '',
   yearTo: filters.yearTo ? String(filters.yearTo) : '',
   openAccessOnly: Boolean(filters.openAccessOnly),
+  fullTextOnly: Boolean(filters.fullTextOnly),
   maxLevel: filters.maxLevel ? String(filters.maxLevel) : '',
 });
 
@@ -69,7 +73,97 @@ const formatSavedAt = (value) => {
   });
 };
 
+function LandscapeList({ title, items, empty }) {
+  return (
+    <div>
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        {title}
+      </h4>
+      {items?.length ? (
+        <ul className="mt-1.5 space-y-1.5">
+          {items.map((item, index) => (
+            <li key={`${item.doi || item.title}-${index}`} className="text-xs leading-relaxed">
+              {item.doi ? (
+                <a
+                  href={`https://doi.org/${item.doi}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-slate-800 hover:text-brand-700 dark:text-slate-100 dark:hover:text-brand-300"
+                >
+                  {item.title}
+                </a>
+              ) : (
+                <span className="font-medium text-slate-800 dark:text-slate-100">{item.title}</span>
+              )}
+              <span className="text-slate-500 dark:text-slate-400">
+                {item.year ? ` · ${item.year}` : ''}
+                {item.citationCount ? ` · ${formatNumber(item.citationCount, 0)} trích dẫn` : ''}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{empty}</p>
+      )}
+    </div>
+  );
+}
+
+function LandscapeCard({ landscape }) {
+  if (!landscape) return null;
+  const { seminal = [], recent = [], venues = [], authors = [] } = landscape;
+  if (!seminal.length && !recent.length && !venues.length && !authors.length) return null;
+  return (
+    <Card className="mt-4">
+      <div className="flex items-center gap-2">
+        <Icon name="book" className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+          Bức tranh nghiên cứu
+        </h3>
+      </div>
+      <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+        Tổng hợp bằng code từ danh sách kết quả, không dùng AI và không thêm bài ngoài danh sách.
+      </p>
+      <div className="mt-3 grid gap-4 md:grid-cols-2">
+        <LandscapeList title="Bài nền tảng" items={seminal} empty="Chưa có bài cũ nổi bật." />
+        <LandscapeList title="Mới nhất" items={recent} empty="Chưa có bài trong 3 năm gần đây." />
+      </div>
+      {(venues.length > 0 || authors.length > 0) && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Tạp chí
+            </h4>
+            <ul className="mt-1.5 space-y-1 text-xs text-slate-600 dark:text-slate-300">
+              {venues.map((item) => (
+                <li key={item.venue} className="flex justify-between gap-2">
+                  <span className="truncate">{item.venue}</span>
+                  <span className="shrink-0 text-slate-400">{item.count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Tác giả
+            </h4>
+            <ul className="mt-1.5 space-y-1 text-xs text-slate-600 dark:text-slate-300">
+              {authors.map((item) => (
+                <li key={item.author} className="flex justify-between gap-2">
+                  <span className="truncate">{item.author}</span>
+                  <span className="shrink-0 text-slate-400">{item.count}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 export default function FinderPage() {
+  const dialog = useDialog();
   const navigate = useNavigate();
   const { user } = useAuth();
   const userId = user?._id || 'anon';
@@ -196,7 +290,7 @@ export default function FinderPage() {
     <div>
       <PageHeader
         title="Tìm nghiên cứu"
-        subtitle="Hỏi bằng tiếng Việt, nhận danh sách nghiên cứu thật từ PubMed, Europe PMC và OpenAlex. Hệ thống xếp hạng bằng code, AI chỉ viết mô tả."
+        subtitle="Hỏi bằng tiếng Việt, nhận danh sách nghiên cứu thật từ PubMed, Europe PMC, OpenAlex và Crossref. Hệ thống xếp hạng bằng code, AI chỉ viết mô tả."
         actions={
           data?.quota ? (
             <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -267,7 +361,7 @@ export default function FinderPage() {
                 <option value="4">Mức 1-4</option>
               </select>
             </Field>
-            <div className="flex items-end pb-1">
+            <div className="flex flex-col justify-end gap-1.5 pb-1">
               <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                 <input
                   type="checkbox"
@@ -278,12 +372,23 @@ export default function FinderPage() {
                 />
                 Chỉ open access
               </label>
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                  checked={filters.fullTextOnly}
+                  onChange={(e) => setFilters((f) => ({ ...f, fullTextOnly: e.target.checked }))}
+                  disabled={search.isPending}
+                />
+                Chỉ bài có toàn văn
+              </label>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Kết quả luôn có link DOI/PubMed thật. Không có bài báo do AI tự sinh.
+              Kết quả luôn có link DOI/PubMed thật. Không có bài báo do AI tự sinh. Badge
+              “Toàn văn” nghĩa là hệ thống có PMCID hoặc PDF trực tiếp để đọc, không chỉ abstract.
             </p>
             <button type="submit" className="btn-primary" disabled={search.isPending}>
               {search.isPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="search" className="h-4 w-4" />}
@@ -330,8 +435,13 @@ export default function FinderPage() {
             <button
               type="button"
               className="btn-ghost !px-2.5 !py-1.5 text-xs text-slate-500 hover:text-rose-500 dark:text-slate-400"
-              onClick={() => {
-                if (window.confirm('Xóa toàn bộ lịch sử tìm kiếm?')) {
+              onClick={async () => {
+                const ok = await dialog.confirm({
+                  title: 'Xóa lịch sử tìm kiếm',
+                  message: 'Xóa toàn bộ lịch sử tìm kiếm trên thiết bị này?',
+                  confirmLabel: 'Xóa lịch sử',
+                });
+                if (ok) {
                   clearSearchHistory(userId);
                   setHistory([]);
                 }
@@ -470,6 +580,8 @@ export default function FinderPage() {
             </Card>
           )}
 
+          <LandscapeCard landscape={data.landscape} />
+
           {!results.length && (
             <Alert tone="info" className="mt-4">
               Không có kết quả phù hợp. Thử bỏ lọc hoặc dùng câu hỏi rộng hơn.
@@ -492,11 +604,33 @@ export default function FinderPage() {
                         <span className={clsx('badge', LEVEL_STYLES[item.evidenceLevel] || LEVEL_STYLES[5])}>
                           Mức {item.evidenceLevel}/5
                         </span>
-                        {item.isOpenAccess && (
-                          <span className="badge bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                            Open access
+                        {item.isRetracted && (
+                          <span className="badge bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                            Đã bị rút
                           </span>
                         )}
+                        {item.isOpenAccess && (
+                          <span className="badge bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                            OA{item.oaStatus ? ` · ${item.oaStatus}` : ''}
+                          </span>
+                        )}
+                        <span
+                          className={clsx(
+                            'badge',
+                            item.hasFullText
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                              : item.hasFullTextLink
+                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                                : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
+                          )}
+                        >
+                          {item.fullTextLabel ||
+                            (item.hasFullText
+                              ? 'Toàn văn'
+                              : item.hasFullTextLink
+                                ? 'Có link toàn văn'
+                                : 'Chỉ abstract')}
+                        </span>
                         <span className="badge bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                           {formatNumber(item.citationCount || 0, 0)} trích dẫn
                         </span>
@@ -526,7 +660,8 @@ export default function FinderPage() {
                         {(item.authors || []).length > 3 ? ' và cộng sự' : ''}
                         {item.journal ? ` · ${item.journal}` : ''}
                         {item.year ? ` · ${item.year}` : ''}
-                        {item.doi ? ` · DOI ${item.doi}` : ''}
+                        {item.doi ? ` · DOI ${formatDoi(item.doi)}` : ''}
+                        {item.providers?.length ? ` · ${item.providers.join(' + ')}` : ''}
                       </p>
 
                       {item.viSummary && (

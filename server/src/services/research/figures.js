@@ -35,11 +35,19 @@ function captionFrom(lines, startIndex) {
   const parts = first ? [first] : [];
   let length = first.length;
 
+  // Chú thích ngắn kiểu "Experimental setup." thường là trọn câu; không dán body text phía sau.
+  if (first.length <= 60 && /[.!?]$/.test(first)) {
+    return cleanLine(first).slice(0, MAX_CAPTION);
+  }
+
   for (let i = startIndex + 1; i < lines.length && parts.length < 4; i += 1) {
     const next = cleanLine(lines[i]);
     if (!next) break;
     if (NEXT_LABEL.test(next) || STOP_LINE.test(next)) break;
     if (/^(doi|https?:\/\/|www\.)/i.test(next)) break;
+    if (/^(during|in the present|the present|these data|subjects were|participants were)\b/i.test(next)) {
+      break;
+    }
     if (length + next.length > MAX_CAPTION) break;
     parts.push(next);
     length += next.length;

@@ -12,6 +12,8 @@ const summarySchema = new mongoose.Schema(
     basedOn: { type: String, enum: ['fulltext', 'abstract_only'], default: 'abstract_only' },
     // JSON theo schema mục 6.4 của plan, validate bằng zod ở Giai đoạn 2
     content: { type: mongoose.Schema.Types.Mixed, required: true },
+    // Dữ kiện thuần bước 1 (có trang + trích nguyên văn) để audit/đối chiếu.
+    facts: { type: mongoose.Schema.Types.Mixed },
     status: {
       type: String,
       enum: ['processing', 'ready', 'failed'],
@@ -20,6 +22,10 @@ const summarySchema = new mongoose.Schema(
     },
     progress: { type: String, default: '' },
     error: { type: String, default: '' },
+    // Bản chưa qua kiểm tra tự động: vẫn lưu để đọc/đối chiếu, nhưng không cho áp dụng vào giáo án.
+    needsReview: { type: Boolean, default: false },
+    // Người dùng xác nhận đã đối chiếu PDF gốc; mở khoá áp dụng.
+    reviewedAt: { type: Date },
     // Nội dung nguồn để đọc đối chiếu và hỏi đáp.
     // Chỉ lưu fulltext khi là open access hoặc PDF do chính người dùng tải lên;
     // bài paywall chỉ lưu abstract (không lưu nguyên văn có bản quyền).

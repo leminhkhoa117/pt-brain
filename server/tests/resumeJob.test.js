@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 process.env.NODE_ENV = 'test';
 
 vi.mock('../src/services/ai/paperSummarizer.js', () => ({
+  PROMPT_VERSION: 'test',
   summarizePaper: vi.fn(async () => ({
     content: {
       metadata: { title: 'Resume test', authors: [], year: 2026, journal: '', doi: '' },

@@ -12,13 +12,15 @@ export default function SourcePane({
   translateError = '',
 }) {
   const [query, setQuery] = useState('');
-  const normalized = text || 'Không có nội dung nguồn được lưu cho bài này.';
+  const cleanPages = (value = '') =>
+    String(value).replace(/\[\[page\s+(\d+)\]\]\s*/gi, '\n— Trang $1 —\n');
+  const normalized = cleanPages(text) || 'Không có nội dung nguồn được lưu cho bài này.';
   const chars = normalized.length;
   const display =
     normalized.length > 120000
       ? `${normalized.slice(0, 120000)}\n\n[…đã rút gọn để hiển thị. Tải bài gốc để đọc phần còn lại…]`
       : normalized;
-  const translationText = translation?.text || '';
+  const translationText = cleanPages(translation?.text || '');
 
   const matches = useMemo(() => {
     if (!query.trim()) return 0;
@@ -72,7 +74,7 @@ export default function SourcePane({
         </p>
       )}
 
-      <div className="mt-3 max-h-[55vh] flex-1 overflow-auto rounded-xl bg-slate-50 p-3 dark:bg-slate-950/50">
+      <div className="mt-3 max-h-[55vh] flex-1 overflow-auto rounded-md border border-line bg-paper-2/50 p-3.5 dark:border-white/[0.08] dark:bg-white/[0.02]">
         <pre className="whitespace-pre-wrap break-words font-sans text-[13px] leading-6 text-slate-700 dark:text-slate-300">
           {display}
         </pre>
@@ -81,7 +83,7 @@ export default function SourcePane({
         Mẹo: dùng ô tìm kiếm để đối chiếu nhanh một con số trong bản tóm tắt với bài gốc.
       </p>
 
-      <div className="mt-3 rounded-xl border border-brand-200/70 bg-brand-50/50 p-3 dark:border-brand-900/70 dark:bg-brand-950/30">
+      <div className="mt-3 rounded-md border border-brand-200/70 bg-brand-50/45 p-3.5 dark:border-brand-900/70 dark:bg-brand-950/30">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">

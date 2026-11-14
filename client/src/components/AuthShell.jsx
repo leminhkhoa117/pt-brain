@@ -50,17 +50,24 @@ export default function AuthShell({ title, subtitle, children, footer }) {
         </div>
       </div>
 
-      <aside className="relative hidden flex-col justify-between border-l border-line bg-shell px-10 py-12 text-white lg:flex xl:px-14">
-        <div>
+      <aside className="hero-surface relative hidden flex-col justify-between overflow-hidden border-l border-line px-10 py-12 text-white lg:flex xl:px-14">
+        <div className="hero-atmosphere pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div className="hero-aurora -right-24 -top-24 h-72 w-72" />
+          <div className="hero-aurora hero-aurora-b -bottom-24 left-8 h-64 w-64" />
+        </div>
+        <div className="hero-noise pointer-events-none absolute inset-0" aria-hidden="true" />
+
+        <div className="relative">
           <h2 className="max-w-[380px] font-display text-[34px] font-semibold leading-[1.15] tracking-[-0.02em]">
             Bằng chứng, con số và giáo án trong cùng một cuốn sổ.
           </h2>
-          <p className="mt-4 max-w-[360px] text-[13px] leading-relaxed text-white/60">
+          <p className="mt-4 max-w-[360px] text-[13px] leading-relaxed text-white/70">
             Từ câu hỏi tiếng Việt đến nghiên cứu thật, từ chỉ số cơ thể đến buổi tập hôm nay.
           </p>
         </div>
 
-        <ul className="my-10 divide-y divide-white/[0.08] border-y border-white/[0.08]">
+        <ul className="relative my-10 divide-y divide-white/[0.08] border-y border-white/[0.08] bg-white/[0.02] px-4 rounded-lg backdrop-blur-[2px]">
           {HIGHLIGHTS.map((item, index) => (
             <li key={item.label} className="flex gap-3 py-3.5">
               <span className="mt-0.5 font-mono text-[11px] tabular-nums text-pine-200/80">
@@ -68,14 +75,14 @@ export default function AuthShell({ title, subtitle, children, footer }) {
               </span>
               <Icon name={item.icon} className="mt-0.5 h-4 w-4 shrink-0 text-pine-300" />
               <div>
-                <p className="text-[12.5px] font-semibold text-white/90">{item.label}</p>
-                <p className="mt-0.5 text-[12px] leading-relaxed text-white/60">{item.text}</p>
+                <p className="text-[12.5px] font-semibold text-white/95">{item.label}</p>
+                <p className="mt-0.5 text-[12px] leading-relaxed text-white/65">{item.text}</p>
               </div>
             </li>
           ))}
         </ul>
 
-        <div className="flex items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.1em] text-white/55">
+        <div className="relative flex items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.1em] text-white/60">
           <span>PT Brain · 2026</span>
           <span className="inline-flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-pine-300" />

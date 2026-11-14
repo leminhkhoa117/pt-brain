@@ -48,6 +48,30 @@ describe('PDF export', () => {
     expect(buffer.subarray(0, 5).toString()).toBe('%PDF-');
   });
 
+  it('tạo PDF kèm phụ lục facts để audit', async () => {
+    const buffer = await buildSummaryPdf(
+      {
+        ...summary,
+        facts: {
+          study: { design: { value: 'RCT' }, participants: { n: 20 } },
+          results: [
+            {
+              outcome: 'Số lần lặp',
+              arms: [{ name: 'A', value: '12.4', sd: '3.1' }],
+              p: 'p<0.01',
+              page: 4,
+              quote: 'the number of repetitions',
+            },
+          ],
+          authors: { conclusion: { value: 'Kết luận gốc' } },
+        },
+      },
+      { title: 'Paper', doi: '10.1000/test' },
+    );
+    expect(buffer.subarray(0, 5).toString()).toBe('%PDF-');
+    expect(buffer.length).toBeGreaterThan(2500);
+  });
+
   it('tạo PDF báo cáo BodyLog với nhiều dòng', async () => {
     const logs = Array.from({ length: 3 }, (_, i) => ({
       dateKey: `2026-10-0${i + 1}`,

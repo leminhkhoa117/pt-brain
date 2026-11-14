@@ -13,7 +13,7 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 | Database | MongoDB 7 (local hoặc Atlas) |
 | AI | OpenCode Go – API OpenAI-compatible, model `deepseek-v4.1-flash` (key chỉ ở backend) |
 | Nguồn nghiên cứu | PubMed E-utilities, Europe PMC, OpenAlex, Unpaywall, Crossref, DOI resolver |
-| Test | Vitest – 183 test (unit + API integration) |
+| Test | Vitest – 185 test (unit + API integration) |
 | Tooling | ESLint 9 (flat config), Prettier, Docker Compose |
 
 ## Giao diện & logo
@@ -77,8 +77,8 @@ Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`doc
 ## Lệnh
 
 ```bash
-npm run test        # 175 test (unit + API integration; cần MongoDB)
-npm run test:unit   # 166 unit test, không cần MongoDB
+npm run test        # 225 test (unit + API integration; cần MongoDB)
+npm run test:unit   # 208 unit test, không cần MongoDB
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
 npm run format      # Prettier
@@ -129,12 +129,15 @@ pt-brain/
 ### Giai đoạn 2 — Research Reader
 - Input: DOI/link PubMed–PMC–doi.org, PDF ≤ 20 MB, hoặc văn bản/abstract.
 - Ingest: Europe PMC full text XML → PDF OA → abstract; Crossref/Unpaywall fallback; chống SSRF, giới hạn dung lượng, timeout.
-- Tóm tắt theo schema JSON cố định, validate zod, retry 1 lần, cache theo DOI/hash file, giới hạn quota AI/ngày.
-- Bài dài: trích dữ kiện theo từng đoạn rồi tổng hợp để không mất số liệu.
+- Tóm tắt theo **pipeline 3 bước**: (1) trích dữ kiện thuần JSON — mỗi trường có số trang + trích nguyên văn; (2) viết cho PT theo cấu trúc trang mới; (3) kiểm tra tự động số liệu/nhãn/lặp/mục thiếu, tự sửa tối đa 2 vòng. Validate zod, cache theo DOI/hash file **+ prompt version**, giới hạn quota AI/ngày.
+- PDF hai cột được đọc theo **bố cục cột** (không lẫn chú thích hình); text có marker `[[page N]]` để trích dẫn đúng trang. Bài dài: trích dữ kiện theo từng đoạn rồi gộp để không mất số liệu.
+- Metadata lấy từ **Crossref** (kể cả khi PDF không in DOI): tiêu đề, tác giả, năm, tập(số), trang, DOI; không dùng tên file làm tiêu đề.
 - UI chia đôi (tóm tắt | bài gốc), tìm trong bài, xuất Markdown/PDF.
 - **Bản dịch tiếng Việt**: nút "Dịch bài này" ngay dưới bài gốc; dịch toàn văn/abstract theo đoạn (tối đa 40.000 ký tự), giữ nguyên số liệu, lưu vào `Summary.translation` để không dịch lại. Có nút **Tải bản dịch** xuất file `.txt` (kèm tiêu đề và ghi chú nếu bản dịch bị giới hạn độ dài).
 - **Hình & bảng**: trích nhãn + chú thích + số trang từ PDF/HTML, AI giải thích bằng tiếng Việt và nêu điểm cần chú ý. PDF tải lên được lưu ngoài public và mở đúng trang qua route có auth; bài từ link mở ở trang gốc.
-- **Kết quả dễ đọc**: thêm “Đọc nhanh” cho cả phần kết quả, bảng giải thích p/KTC 95%/effect size, và thẻ kết quả ưu tiên “Nghĩa là” trước phần số liệu gốc.
+- **Kết quả dễ đọc**: mỗi kết quả theo khuôn Dữ kiện → Nghĩa là gì trong phòng tập → Mức chắc chắn; nhãn [Dữ kiện]/[Tác giả diễn giải]/[Nhận xét của AI]; thuật ngữ khó có tooltip tại chỗ.
+- **Mức bằng chứng 3 trục**: Thiết kế / Độ chắc chắn / Liên quan tới PT, mỗi trục cao–vừa–thấp kèm lý do; thay cho “Mức bằng chứng x/5” không tiêu chí.
+- Nếu kiểm tra tự động fail sau 2 vòng: vẫn lưu để đọc/export, gắn `needsReview`, khoá “Áp dụng vào plan”; export Markdown/PDF có **phụ lục facts** để audit.
 - **Chat hỏi đáp theo từng bài**: lịch sử lưu riêng trong `Summary.qa`, AI nhớ cả nội dung bài + các câu hỏi trước; bài dài được chọn đoạn thông minh (giữ đầu, Results/Discussion/Conclusion và mẫu đều phần còn lại) trước khi đưa vào ngữ cảnh. Có nút xóa lịch sử.
 - Nhãn rõ **“chỉ dựa trên abstract”** khi không có toàn văn; mọi số liệu yêu cầu giữ nguyên.
 
@@ -174,10 +177,13 @@ pt-brain/
 ### Nâng cấp sau Phase 6
 
 - **Nav bar lên header**: bỏ sidebar, menu ngang 6 mục chính + “Thêm”, mobile có bottom nav và drawer.
+- **Trang giới thiệu onboarding**: tài khoản mới được đưa qua `/welcome` trước khi vào Tổng quan; trang có mục đích, vòng lặp sử dụng, 4 bước chức năng kèm minh hoạ/mũi tên, hướng dẫn bắt đầu và nút “Bắt đầu theo dõi”. Tài khoản cũ vào thẳng dashboard nhưng luôn có link “Giới thiệu” trong nhóm Khám phá trên thanh điều hướng.
 - **AI đánh giá thể trạng qua ảnh**: 1-4 ảnh (trước/nghiêng/sau), phân tích dựa trên hồ sơ + mục tiêu; trả % mỡ dạng **khoảng** + độ tin cậy, nhận xét cơ/tư thế, ưu tiên, điều chỉnh tập/dinh dưỡng; ảnh lưu riêng tư và xóa được.
 - **Calo từ ảnh bữa ăn**: nhận diện món, khẩu phần, calo/macro, giả định và độ tin cậy; lưu ảnh + thông tin bữa; tổng calo/protein trong ngày so với mục tiêu.
 - **Trang Buổi tập & Bài tập**: lịch sử buổi tập có chi tiết set, tonnage, xóa; thư viện 110 bài tập lọc theo cơ/dụng cụ.
 - **Cardio ngoài phòng gym**: log chạy bộ, đi bộ, bơi, đạp xe, chèo thuyền, nhảy dây, yoga... với thời gian/quãng đường/cường độ; ước tính calo theo MET và pace (ví dụ chạy 3 km/15 phút ≈ 219 kcal với người 70 kg), hoặc nhập calo thủ công từ đồng hồ. Lịch sử có tổng calo vận động; editor giáo án cho phép gắn cardio vào từng ngày (ví dụ Chủ nhật chạy bộ) và log nhanh từ plan.
+- **Chat streaming & bố cục Reader**: câu trả lời hỏi đáp bài báo hiện dần từng đoạn qua SSE (không còn chờ cả cục), có con trỏ stream và có thể dừng khi đổi bài. Trang Nghiên cứu đặt **tóm tắt và chat AI song song ở trên**, bài gốc + bản dịch tiếng Việt + ghi chú ở dưới.
+- **Hộp thoại trong app**: thay toàn bộ `window.confirm/prompt` bằng modal đồng bộ giao diện cho xóa dữ liệu, đổi tên/tag, sửa ghi chú...; hỗ trợ Esc/Hủy, nút nguy hiểm màu đỏ và nhập liệu có validate độ dài.
 - **Tự tạo giáo án**: mở form trống, thêm ngày, chọn bài qua popup thư viện (tab nhóm cơ, tìm kiếm, lọc dụng cụ), đặt set/rep/RIR/rest rồi lưu.
 - **Sửa giáo án**: đổi tên/mục tiêu/deload, thêm/xóa ngày, thêm/xóa bài, chỉnh set/rep/RIR/rest; chọn bài bằng popup thay vì dropdown.
 - **AI đề xuất giáo án**: dựa trên hồ sơ, dụng cụ, thời gian và evidence base; preview, có thể lưu hoặc để hệ thống fallback theo quy tắc nếu AI lỗi.
@@ -216,6 +222,7 @@ GET    /api/health/live       # liveness không phụ thuộc DB
 
 POST   /api/auth/register | /login | /refresh | /logout
 GET    /api/me        PATCH /api/me        DELETE /api/me
+POST   /api/me/welcome-seen                  GET /api/me/ai-usage
 
 POST   /api/calc/:type?save=true          GET /api/calc/history
 DELETE /api/calc/history/:id              DELETE /api/calc/history
@@ -229,6 +236,7 @@ POST   /api/summaries (JSON | multipart PDF)   GET /api/summaries?q=&favorite=&t
 GET    /api/summaries/:id                      DELETE /api/summaries/:id
 PATCH  /api/summaries/:id                      # ghim (isFavorite) + tags
 POST   /api/summaries/:id/ask
+POST   /api/summaries/:id/ask/stream        # SSE: event delta / done / error
 POST   /api/summaries/:id/apply-to-plan
 POST   /api/summaries/:id/retry              DELETE /api/summaries/:id/chat
 GET    /api/summaries/:id/export.md            GET /api/summaries/:id/export.pdf
@@ -275,7 +283,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 
 ## Kiểm chứng
 
-- `npm run test`: **183/183 pass** — công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, trích hình/bảng, ranker, progression, SM-2, PDF, quiz, retrieval, plan metrics/evidence, apply changes, cửa sổ tuần và điểm bám meal plan, validate chat cơ bắp, validate ước tính calo, API integration (auth, metrics, program, library, xóa tài khoản).
+- `npm run test`: **225/225 pass** - công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, trích hình/bảng, ranker, progression, SM-2, PDF, quiz, retrieval, plan metrics/evidence, apply changes, cửa sổ tuần và điểm bám meal plan, validate chat cơ bắp, validate ước tính calo, API integration (auth, metrics, program, library, xóa tài khoản), pipeline research 3 bước + golden sample (crossover, quan sát, RCT, SR/MA, meta-analysis).
 - `npm run lint`: 0 lỗi.
 - `npm run build`: thành công; tách chunk react/charts/query.
 - E2E với MongoDB + AI thật:

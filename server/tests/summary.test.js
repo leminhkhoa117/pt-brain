@@ -108,6 +108,12 @@ describe('parseJsonLoose', () => {
   it('ném lỗi khi không có JSON', () => {
     expect(() => parseJsonLoose('không có gì')).toThrow();
   });
+
+  it('cứu JSON bị cắt cụt', () => {
+    expect(parseJsonLoose('{"a":1,"b":"value')).toEqual({ a: 1, b: 'value' });
+    expect(parseJsonLoose('{"a":1,"b":')).toEqual({ a: 1, b: null });
+    expect(parseJsonLoose('{"a":[1,2,')).toEqual({ a: [1, 2] });
+  });
 });
 
 describe('summaryToMarkdown', () => {
@@ -156,20 +162,51 @@ describe('summaryToMarkdown', () => {
     expect(md).toContain('Figure 1 (trang 6)');
     expect(md).toContain('Cần chú ý');
   });
+
+  it('xuất phụ lục facts để audit', () => {
+    const md = summaryToMarkdown({
+      content: validSummary,
+      facts: {
+        study: { design: { value: 'RCT' }, participants: { n: 20 } },
+        results: [
+          {
+            outcome: 'Số lần lặp',
+            arms: [{ name: 'A', value: '12.4', sd: '3.1' }],
+            p: 'p<0.01',
+            page: 4,
+            quote: 'the number of repetitions',
+          },
+        ],
+        authors: { conclusion: { value: 'Kết luận gốc' } },
+      },
+    });
+    expect(md).toContain('Phụ lục — Dữ kiện kiểm chứng');
+    expect(md).toContain('Số lần lặp');
+    expect(md).toContain('Kết luận gốc');
+    expect(md).toContain('JSON dữ kiện đầy đủ');
+  });
 });
 
 describe('buildCacheKey', () => {
-  it('ưu tiên DOI và chuẩn hóa lowercase', () => {
-    expect(buildCacheKey({ paper: { doi: '10.1000/ABC' }, text: 'x' })).toBe('doi:10.1000/abc');
+  it('ưu tiên DOI và chuẩn hóa lowercase, kèm version', () => {
+    expect(buildCacheKey({ paper: { doi: '10.1000/ABC' }, text: 'x' })).toBe(
+      'doi:10.1000/abc:v3',
+    );
   });
 
   it('dùng hash PDF khi không có DOI', () => {
-    expect(buildCacheKey({ paper: {}, pdfHash: 'abc123', text: 'x' })).toBe('pdf:abc123');
+    expect(buildCacheKey({ paper: {}, pdfHash: 'abc123', text: 'x' })).toBe('pdf:abc123:v3');
   });
 
   it('dùng hash text khi không có DOI/PDF/URL', () => {
     const key = buildCacheKey({ paper: {}, text: 'nội dung' });
-    expect(key).toMatch(/^text:[a-f0-9]{40}$/);
+    expect(key).toMatch(/^text:[a-f0-9]{40}:v3$/);
     expect(buildCacheKey({ paper: {}, text: 'nội dung' })).toBe(key);
+  });
+
+  it('đổi prompt version thì đổi cache key', () => {
+    const a = buildCacheKey({ paper: { doi: '10.1000/abc' } }, 'v3');
+    const b = buildCacheKey({ paper: { doi: '10.1000/abc' } }, 'v4');
+    expect(a).not.toBe(b);
   });
 });

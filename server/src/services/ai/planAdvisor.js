@@ -31,6 +31,7 @@ export async function proposePlanChanges({ content, program }) {
         role: 'system',
         content: `Bạn là huấn luyện viên đọc nghiên cứu và đề xuất chỉnh giáo án một cách thận trọng.
 - Chỉ dùng kết luận trong bản tóm tắt được cung cấp. Không thêm kiến thức ngoài.
+- Chỉ đề xuất từ applicationSupported/practicalTakeaways; KHÔNG dùng applicationHypothesis (chưa được đo).
 - Chỉ đề xuất thay đổi cho ngày/bài CÓ THẬT trong giáo án (đúng tên).
 - Chỉ dùng 4 field: "sets", "targetRir", "repMin", "repMax".
 - Giới hạn: sets 1-20, targetRir 0-5, repMin/repMax 1-30.
@@ -44,9 +45,18 @@ export async function proposePlanChanges({ content, program }) {
         content: `BẢN TÓM TẮT NGHIÊN CỨU:\n${JSON.stringify({
           tldr: content.tldr,
           practicalTakeaways: content.practicalTakeaways,
+          applicationSupported: content.application?.supported,
+          applicationHypothesis: content.application?.hypothesis,
           whoItDoesNotApplyTo: content.whoItDoesNotApplyTo,
+          evidenceAxes: content.evidenceAxes,
           evidenceLevel: content.evidenceLevel,
-          limitations: content.limitations,
+          limitations:
+            content.limitations?.length
+              ? content.limitations
+              : [
+                  ...(content.limitationsStructured?.authors || []),
+                  ...(content.limitationsStructured?.ai || []),
+                ],
         })}\n\nGIÁO ÁN HIỆN TẠI:\n${JSON.stringify(programPayload)}`,
       },
     ],

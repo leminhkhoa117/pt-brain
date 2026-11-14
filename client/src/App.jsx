@@ -19,6 +19,7 @@ const NutritionPage = lazy(() => import('./pages/NutritionPage.jsx'));
 const BodyAssessmentPage = lazy(() => import('./pages/BodyAssessmentPage.jsx'));
 const MusclePage = lazy(() => import('./pages/MusclePage.jsx'));
 const Settings = lazy(() => import('./pages/Settings.jsx'));
+const Welcome = lazy(() => import('./pages/Welcome.jsx'));
 
 function PageFallback() {
   return (
@@ -46,6 +47,10 @@ function ProtectedLayout() {
   const location = useLocation();
   if (loading) return <Splash />;
   if (!user) return <Navigate to="/login" replace />;
+  // Tài khoản mới luôn xem giới thiệu trước; tài khoản cũ không có cờ này.
+  if (user.onboardingRequired === true && location.pathname !== '/welcome') {
+    return <Navigate to="/welcome" replace />;
+  }
   return (
     <Layout>
       <ErrorBoundary key={location.pathname}>
@@ -88,6 +93,7 @@ export default function App() {
         <Route path="/learn" element={<Learn />} />
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/welcome" element={<Welcome />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

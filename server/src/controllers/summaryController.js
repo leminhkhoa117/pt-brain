@@ -7,7 +7,7 @@ import {
   retrySummaryForUser,
 } from '../services/research/reader.js';
 import { proposePlanChanges } from '../services/ai/planAdvisor.js';
-import { askAboutPaper } from '../services/ai/paperSummarizer.js';
+import { askAboutPaper, askAboutPaperStream, PROMPT_VERSION } from '../services/ai/paperSummarizer.js';
 import { translateSource } from '../services/ai/translator.js';
 import { getProgram } from '../services/training/programService.js';
 import { applyPlanSchema } from '../validation/learning.js';
@@ -20,7 +20,9 @@ import { createSummaryInputSchema, askSchema, summaryMetaSchema } from '../valid
 import { summaryToMarkdown } from '../utils/markdown.js';
 import { buildSummaryPdf } from '../services/pdf/summaryPdf.js';
 import { sendPdfFile } from '../services/research/pdf.js';
+import { CITATION_STYLES, formatCitation } from '../services/citations/index.js';
 import { ApiError } from '../utils/ApiError.js';
+import { logger } from '../utils/logger.js';
 
 export async function create(req, res) {
   const user = await getUser(req.userId);
@@ -32,9 +34,18 @@ export async function create(req, res) {
     : createSummaryInputSchema.parse(req.body);
 
   const result = await createSummaryForUser(user, input, req.file);
+  const summary = result.summary?.toObject ? result.summary.toObject() : result.summary;
+  if (summary) {
+    delete summary.facts;
+    summary.isLegacy = (summary.promptVersion || 'v1') !== PROMPT_VERSION;
+    summary.needsReview = Boolean(
+      (summary.needsReview || summary.content?.verification?.passed === false) &&
+        !summary.reviewedAt,
+    );
+  }
   res.status(result.cached ? 200 : 202).json({
     data: {
-      summary: result.summary,
+      summary,
       paper: result.paper,
       sourceText: result.sourceText,
       cached: result.cached,
@@ -85,6 +96,7 @@ export async function list(req, res) {
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
+      .select('-facts -sourceText')
       .populate('paperId', 'title authors year journal doi evidenceLevel isOpenAccess')
       .lean(),
     Summary.countDocuments({ userId: req.userId }),
@@ -100,8 +112,13 @@ export async function list(req, res) {
         basedOn: s.basedOn,
         inputType: s.inputType,
         tldr: s.content?.tldr || '',
+        evidenceAxes: s.content?.evidenceAxes || null,
         tags: s.tags || [],
         isFavorite: Boolean(s.isFavorite),
+        isLegacy: (s.promptVersion || 'v1') !== PROMPT_VERSION,
+        needsReview: Boolean(
+          (s.needsReview || s.content?.verification?.passed === false) && !s.reviewedAt,
+        ),
         status: s.status || 'ready',
         progress: s.progress || '',
         createdAt: s.createdAt,
@@ -135,8 +152,14 @@ export async function updateMeta(req, res) {
 
 export async function getOne(req, res) {
   const { summary, paper } = await getSummaryForUser(req.userId, req.params.id);
+  const data = summary.toObject ? summary.toObject() : { ...summary };
+  delete data.facts;
+  data.isLegacy = (data.promptVersion || 'v1') !== PROMPT_VERSION;
+  data.needsReview = Boolean(
+    (data.needsReview || data.content?.verification?.passed === false) && !data.reviewedAt,
+  );
   res.json({
-    data: { summary, paper, sourceText: summary.sourceText, usage: await getAiUsage(req.userId) },
+    data: { summary: data, paper, sourceText: summary.sourceText, usage: await getAiUsage(req.userId) },
   });
 }
 
@@ -145,9 +168,32 @@ export async function remove(req, res) {
   res.json({ data: { ok: true } });
 }
 
+/** Người dùng xác nhận đã đối chiếu PDF gốc; mở khoá "Áp dụng vào plan". */
+export async function markReviewed(req, res) {
+  const summary = await Summary.findOne({ _id: req.params.id, userId: req.userId });
+  if (!summary) {
+    throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+  }
+  summary.reviewedAt = new Date();
+  summary.needsReview = false;
+  await summary.save();
+
+  const data = summary.toObject();
+  delete data.facts;
+  data.isLegacy = (data.promptVersion || 'v1') !== PROMPT_VERSION;
+  data.needsReview = false;
+  res.json({ data: { summary: data } });
+}
+
 export async function retry(req, res) {
   const summary = await retrySummaryForUser(req.userId, req.params.id);
-  res.status(202).json({ data: { summary } });
+  const data = summary.toObject ? summary.toObject() : { ...summary };
+  delete data.facts;
+  data.isLegacy = (data.promptVersion || 'v1') !== PROMPT_VERSION;
+  data.needsReview = Boolean(
+    (data.needsReview || data.content?.verification?.passed === false) && !data.reviewedAt,
+  );
+  res.status(202).json({ data: { summary: data } });
 }
 
 export async function ask(req, res) {
@@ -183,6 +229,75 @@ export async function ask(req, res) {
       quota: await getAiUsage(req.userId),
     },
   });
+}
+
+/** SSE: trả lời từng đoạn để UI hiển thị hiệu ứng stream. */
+export async function askStream(req, res) {
+  const { question } = askSchema.parse(req.body);
+  const { summary } = await getSummaryForUser(req.userId, req.params.id);
+  if (summary.status && summary.status !== 'ready') {
+    return res.status(409).json({
+      error: {
+        code: 'SUMMARY_NOT_READY',
+        message:
+          summary.status === 'processing'
+            ? 'Bài đang được tóm tắt, vui lòng chờ thêm.'
+            : `Bản tóm tắt lỗi: ${summary.error || 'không rõ nguyên nhân'}`,
+      },
+    });
+  }
+  await assertAiQuota(req.userId, 'ask');
+
+  res.status(200);
+  res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders?.();
+
+  let closed = false;
+  res.on('close', () => {
+    closed = true;
+  });
+  const send = (event, payload) => {
+    if (closed) return;
+    try {
+      res.write(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
+    } catch {
+      closed = true;
+    }
+  };
+
+  let answer = '';
+  try {
+    const result = await askAboutPaperStream({
+      content: summary.content,
+      sourceText: summary.sourceText,
+      question,
+      history: summary.qa || [],
+      onDelta: (text) => {
+        answer += text;
+        send('delta', { text });
+      },
+    });
+
+    await appendQa(req.userId, summary._id, question, result.answer);
+    await recordAiCall(req.userId, { kind: 'ask', usage: result.usage });
+    send('done', {
+      answer: result.answer,
+      usage: result.usage,
+      model: result.model,
+      quota: await getAiUsage(req.userId),
+    });
+  } catch (error) {
+    logger.warn({ err: error, summaryId: summary._id }, 'Stream chat thất bại');
+    send('error', {
+      message: error.message || 'Không trả lời được câu hỏi này. Vui lòng thử lại.',
+      partial: answer,
+    });
+  } finally {
+    if (!closed) res.end();
+  }
 }
 
 export async function clearChat(req, res) {
@@ -263,6 +378,29 @@ export async function exportMarkdown(req, res) {
   res.send(markdown);
 }
 
+/** Tải trích dẫn BibTeX / RIS / APA từ metadata đã lưu. */
+export async function citation(req, res) {
+  const style = String(req.query.format || 'bibtex').toLowerCase();
+  if (!CITATION_STYLES.includes(style)) {
+    throw ApiError.badRequest('Định dạng trích dẫn không hợp lệ (bibtex, ris, apa)');
+  }
+  const { paper } = await getSummaryForUser(req.userId, req.params.id);
+  if (!paper) throw ApiError.notFound('Không tìm thấy bài báo của bản tóm tắt này');
+
+  const text = formatCitation(paper, style);
+  const slug = (paper.title || 'citation')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+    .toLowerCase();
+  const ext = style === 'bibtex' ? 'bib' : style === 'ris' ? 'ris' : 'txt';
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="pt-brain-${slug || 'citation'}.${ext}"`);
+  res.send(text);
+}
+
 /** Tải bản dịch tiếng Việt của bài (chỉ phần đã dịch). */
 export async function exportTranslation(req, res) {
   const { summary, paper } = await getSummaryForUser(req.userId, req.params.id);
@@ -325,6 +463,16 @@ export async function exportPdf(req, res) {
         message: 'Bài chưa tóm tắt xong, không thể áp dụng vào giáo án.',
       },
     });
+  }
+  if (
+    (summary.needsReview || summary.content?.verification?.passed === false) &&
+    !summary.reviewedAt
+  ) {
+    throw new ApiError(
+      409,
+      'SUMMARY_NEEDS_REVIEW',
+      'Bản tóm tắt chưa qua kiểm tra tự động. Hãy tạo lại, hoặc bấm "Đã đối chiếu PDF gốc" trong trang đọc trước khi áp dụng vào giáo án.',
+    );
   }
   const program = await getProgram(req.userId, programId);
 

@@ -1,0 +1,1413 @@
+{
+  "content": {
+    "metadata": {
+      "title": "Resistance Training Volume Enhances Muscle Hypertrophy but Not Strength in Trained Men.",
+      "authors": [
+        "Schoenfeld BJ",
+        "Contreras B",
+        "Krieger J",
+        "Grgic J",
+        "Delcastillo K",
+        "Belliard R",
+        "Alto A"
+      ],
+      "year": 2019,
+      "journal": "Medicine and science in sports and exercise",
+      "volume": "51",
+      "issue": "1",
+      "pages": "94-103",
+      "doi": "10.1249/MSS.0000000000001764"
+    },
+    "tldr": "Ở nam đã có kinh nghiệm tập kháng lực, tăng số set mỗi bài từ 1 lên 3 rồi 5 trong 8 tuần giúp cơ dày lên nhiều hơn ở tay trước, giữa đùi và đùi ngoài, nhưng không tạo ra khác biệt về sức mạnh squat, bench press hay sức bền cơ thân trên. Nói cách khác: volume cao mua thêm phì đại, không mua thêm sức mạnh — trong 8 tuần, ở vùng tải 8–12 lặp, trên nhóm người này. Đây là số trung bình nhóm; mức dao động giữa từng người không được nêu trong phần kết quả tôi đọc được.",
+    "researchQuestion": "Không nêu trong bài",
+    "studyType": "Thử nghiệm ngẫu nhiên có đối chứng (RCT) 3 nhánh song song, đo trước – sau, 8 tuần can thiệp tập luyện.",
+    "evidenceLevel": {
+      "level": 2,
+      "explanation": "RCT có phân nhóm ngẫu nhiên, can thiệp được giám sát trực tiếp, có kiểm tra độ tin cậy của dụng cụ đo và phân tích Bayes bên cạnh p-value. Không đạt mức cao nhất vì cỡ mẫu nhỏ (34 người hoàn thành), mỗi nhóm khoảng 11–12 người, và chỉ kéo dài 8 tuần."
+    },
+    "evidenceAxes": {
+      "design": {
+        "rating": "cao",
+        "reason": "Ba nhóm được phân nhóm ngẫu nhiên, cùng chương trình 7 bài toàn thân, khác nhau đúng một biến (số set mỗi bài), mọi buổi tập được nhóm nghiên cứu giám sát trực tiếp, có đo trước và sau."
+      },
+      "certainty": {
+        "rating": "vừa",
+        "reason": "Dụng cụ đo có độ tin cậy cao (siêu âm và test 1RM đều có ICC rất cao, SEM nhỏ), lại có thêm phân tích Bayes. Nhưng cỡ mẫu nhỏ, nhóm chỉ hơn chục người, tác giả tự nhận có thể thiếu power; các so sánh giữa nhóm không kèm khoảng tin cậy (CI); việc đánh giá kết quả không được nêu là có mù."
+      },
+      "relevance": {
+        "rating": "cao",
+        "reason": "Trả lời trực tiếp câu hỏi PT hay gặp: thêm set có thêm sức mạnh và thêm cơ không, ở người đã tập chứ không phải người mới, và đánh đổi bằng thời gian tập mỗi buổi."
+      }
+    },
+    "participants": {
+      "n": 34,
+      "description": "45 nam khỏe mạnh được tuyển, 34 người hoàn thành và được đưa vào phân tích: nhóm 1 set n = 11, nhóm 3 set n = 12, nhóm 5 set n = 11. Đây là nam trẻ đã có kinh nghiệm tập kháng lực; tác giả nêu rõ kết quả đặc hiệu cho nhóm này, không khái quát cho vị thành niên, nữ hay người lớn tuổi."
+    },
+    "design": "Ba nhóm được phân nhóm ngẫu nhiên vào 1, 3 hoặc 5 set mỗi bài. Tập 3 buổi/tuần trong 8 tuần, các buổi đặt vào những ngày không liên tiếp. Mọi buổi tập được nhóm nghiên cứu giám sát trực tiếp. Đo trước và sau can thiệp: sức mạnh tối đa, sức bền cơ thân trên, độ dày cơ bằng siêu âm, cùng nhật ký ăn tự báo cáo. Đây là nghiên cứu tập luyện 8 tuần (đo thích nghi), không phải nghiên cứu cấp tính một buổi.",
+    "intervention": "Chương trình 7 bài toàn thân, 3 buổi/tuần trong 8 tuần. Khác biệt duy nhất giữa ba nhóm là số set mỗi bài: 1 set, 3 set hoặc 5 set. Tải của set nằm trong vùng 8–12 lặp (8–12RM), không phải tính theo % 1RM. Mỗi set tập đến mất khả năng co cơ đồng tâm tạm thời (momentary concentric failure): tiêu chí dừng là không thể thực hiện thêm một lần lặp đồng tâm nào nữa trong khi vẫn giữ đúng kỹ thuật. Thời gian tập trung bình mỗi buổi chênh nhau rất lớn giữa các nhóm (xem phần kết quả phụ).",
+    "outcomes": "Bốn nhóm chỉ số: (1) sức mạnh tối đa 1RM squat và 1RM bench press; (2) sức bền cơ thân trên — số lần bench press với 50% 1RM ban đầu đến mất khả năng; (3) độ dày cơ bằng siêu âm tại 4 vị trí: cơ gấp khuỷu, cơ duỗi khuỷu, giữa đùi, đùi ngoài; (4) khẩu phần ăn tự báo cáo trong thời gian nghiên cứu.",
+    "measurementNote": "Độ dày cơ đo bằng siêu âm B-mode, và chỉ đo ở phần giữa bụng cơ — nghĩa là phì đại ở đầu cơ hay phần xa gân không được phát hiện. Test 1RM làm theo hướng dẫn của NSCA. Test sức bền dùng 50% 1RM ban đầu. Khẩu phần ăn ghi qua MyFitnessPal, khối lượng cơ thể đo bằng InBody 770. Độ tin cậy của các phép đo được kiểm tra trên mẫu thí điểm nhỏ (10 người cho siêu âm, 6 người cho 1RM, 7 người cho test sức bền) — kết quả ở phần kết quả phụ.",
+    "resultsOverview": "Bài báo chia kết quả làm hai nhóm rõ rệt. Nhóm chỉ số sức mạnh và sức bền: cả ba so sánh giữa các nhóm đều không phát hiện khác biệt có ý nghĩa thống kê, và phân tích Bayes nghiêng về phía mô hình không khác biệt. Nhóm chỉ số độ dày cơ: ba trong bốn vị trí có khác biệt có ý nghĩa, với nhóm 5 set vượt nhóm 1 set; riêng cơ duỗi khuỷu không phát hiện khác biệt nhưng mức thay đổi có xu hướng tăng dần theo volume.",
+    "mainResults": [
+      {
+        "finding": "[Dữ kiện] Không phát hiện khác biệt có ý nghĩa giữa ba nhóm về mức tăng 1RM squat; phân tích Bayes ủng hộ mô hình không khác biệt.",
+        "numbers": "P = 0.22; BF10 < 1",
+        "plainMeaning": "[Nhận xét của AI] Với khách đã tập, việc dồn 5 set cho bài squat không đem lại mức tăng squat tốt hơn 1 set trong 8 tuần. Nếu mục tiêu buổi tập là squat nặng hơn, thời gian đó có thể dùng cho việc khác.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Kết quả âm nhưng cỡ mẫu nhỏ; tuy vậy hệ số Bayes dưới 1 giúp củng cố khả năng đây là kết quả âm thật chứ không chỉ do thiếu power."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "There was no significant difference between groups in squat 1RM improvement"
+      },
+      {
+        "finding": "[Dữ kiện] Không phát hiện khác biệt có ý nghĩa giữa ba nhóm về mức tăng 1RM bench press; có bằng chứng yếu cho một khác biệt về 1RM bench press đo trước can thiệp.",
+        "numbers": "P = 0.15; BF10 < 1 cho khác biệt giữa nhóm về mức tăng",
+        "plainMeaning": "[Nhận xét của AI] Bench press cũng cho kết quả tương tự squat: thêm set không mua thêm sức mạnh. Khác biệt nền trước can thiệp là điểm cần kiểm tra khi đọc con số tuyệt đối của từng nhóm.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Không phát hiện khác biệt giữa nhóm và Bayes nghiêng về mô hình không khác biệt; nhưng có bằng chứng yếu về khác biệt nền trước test, làm mức tăng tính ra kém chắc chắn hơn."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "There was no significant difference between groups in bench 1RM improvement"
+      },
+      {
+        "finding": "[Dữ kiện] Không phát hiện khác biệt có ý nghĩa giữa ba nhóm về mức tăng số lần bench press với 50% 1RM ban đầu — đây là so sánh cho p cao nhất trong ba chỉ số sức mạnh/sức bền.",
+        "numbers": "P = 0.52; BF10 < 1",
+        "plainMeaning": "[Nhận xét của AI] Đừng hứa với khách rằng tập nhiều set sẽ cải thiện sức bền cơ thân trên rõ rệt hơn — trong 8 tuần, số set không tạo ra khác biệt phát hiện được.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "p rất cao và Bayes nghiêng về mô hình không khác biệt; hạn chế là test sức bền chỉ làm ở thân trên và chỉ một bài."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "There was no significant difference between groups in bench endurance improvement"
+      },
+      {
+        "finding": "[Dữ kiện] Có khác biệt có ý nghĩa giữa các nhóm về mức tăng độ dày cơ gấp khuỷu (tay trước); so sánh hậu định cho thấy nhóm 1 set khác biệt có ý nghĩa so với nhóm 5 set.",
+        "numbers": "P = 0.02; BF10 = 3.04; BF10 cho 5 set so với 1 set = 4.71; 3 set so với 1 set = 1.30; 3 set so với 5 set = 0.60",
+        "plainMeaning": "[Nhận xét của AI] Đây là chỗ volume cao 'trả công': tay trước to hơn khi làm nhiều set hơn. Nhưng bằng chứng ở mức vừa phải — hệ số Bayes tổng thể nhỏ, và so sánh 3 set với 1 set hay 3 set với 5 set chưa đủ mạnh để kết luận.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Có ý nghĩa thống kê và hậu định 1 set so với 5 set rõ, nhưng bằng chứng tổng thể chỉ ở mức khiêm tốn (xem numbers); mẫu mỗi nhóm khoảng 11–12 người."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "There was a significant difference between groups in improvements in bicep thickness"
+      },
+      {
+        "finding": "[Dữ kiện] Không phát hiện khác biệt có ý nghĩa giữa các nhóm về mức tăng độ dày cơ duỗi khuỷu (tay sau), nhưng mức thay đổi có xu hướng tăng dần theo volume.",
+        "numbers": "P = 0.19; BF10 < 1; effect size (ES) mức thay đổi: 0.12 (thấp) – 0.30 (trung bình) – 0.55 (cao); % thay đổi 1.1% (thấp) so với 5.5% (cao)",
+        "plainMeaning": "[Nhận xét của AI] Đừng nói 'tay sau không hưởng lợi từ volume' — bài chỉ nói không phát hiện được khác biệt, trong khi xu hướng định lượng lại nghiêng về volume cao. Đây là chỗ dễ mắc lỗi suy luận nhất.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Không có ý nghĩa thống kê và Bayes nghiêng về mô hình không khác biệt, nhưng effect size tăng đơn điệu theo volume cho thấy nhóm có thể thiếu power; hai tín hiệu này ngược chiều nhau nên kết luận phải dè dặt."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "ES values of 0.12, 0.30, and 0.55 for the low-, moderate-, and high-volume conditions"
+      },
+      {
+        "finding": "[Dữ kiện] Ở cơ giữa đùi (thẳng đùi), mức tăng độ dày khác nhau có ý nghĩa giữa các nhóm; khoảng cách rõ nhất là giữa nhóm tập ít set nhất và nhóm tập nhiều set nhất, còn nhóm 3 set chưa tách rõ khỏi nhóm 5 set.",
+        "numbers": "P = 0.02; BF10 = 8.51; BF10 cho 5 set so với 1 set = 13.65; 5 set so với 3 set = 2.34; 1 set so với 3 set = 0.51; % thay đổi 3.4% (thấp) so với 12.5% (cao)",
+        "plainMeaning": "[Nhận xét của AI] Với đùi trước, khoảng cách giữa 1 set và 5 set là lớn và khá chắc. Nhưng 3 set nằm giữa và chưa tách rõ khỏi 5 set, nên chưa thể nói 'phải đúng 5 set mới đủ'.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "Trong khuôn khổ nghiên cứu này, đây là một trong hai kết quả chắc nhất về phì đại: p nhỏ, BF10 lớn, và so sánh 5 set với 1 set có bằng chứng mạnh. Vẫn bị giới hạn bởi mẫu nhỏ và chỉ đo phần giữa bụng cơ."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "There was a significant difference between groups in improvements in rectus femoris thickness"
+      },
+      {
+        "finding": "[Dữ kiện] Cơ đùi ngoài (vastus lateralis) là vị trí chênh lệch mạnh nhất giữa các nhóm: nhóm 5 set/bài dày lên nhiều hơn rõ rệt so với nhóm 1 set/bài.",
+        "numbers": "P = 0.006; BF10 = 63.87; BF10 cho 5 set so với 1 set = 38.14; 3 set so với 1 set = 1.42; 5 set so với 3 set = 2.25; % thay đổi 5.0% (thấp) so với 13.7% (cao)",
+        "plainMeaning": "[Nhận xét của AI] Đây là bằng chứng mạnh nhất trong bài cho quan hệ liều–đáp ứng của phì đại. Nếu khách hỏi 'thêm set có to thêm không', cơ đùi ngoài là ví dụ trả lời rõ nhất.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "p nhỏ nhất trong các kết quả, BF10 rất lớn, so sánh 5 set với 1 set có bằng chứng mạnh; hạn chế chung là mẫu nhỏ và đo siêu âm chỉ ở một vị trí."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "There was a significant difference between groups in improvements in vastus lateralis thickness"
+      }
+    ],
+    "secondaryResults": [
+      {
+        "finding": "[Dữ kiện] Thời gian tập trung bình mỗi buổi chênh nhau rất lớn giữa ba nhóm, tăng gần như tuyến tính theo số set.",
+        "numbers": "Khoảng 13 min (nhóm 1 set), 40 min (nhóm 3 set), 68 min (nhóm 5 set)",
+        "plainMeaning": "[Nhận xét của AI] Đây là con số để nói chuyện đánh đổi với khách: muốn thêm set thì phải trả bằng thời gian gấp nhiều lần, trong khi phần sức mạnh thu về không khác.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Chỉ là mô tả thời lượng buổi tập, không phải kết quả suy luận thống kê; số liệu xấp xỉ."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "Average training time per session was approximately 13 min for 1SET"
+      },
+      {
+        "finding": "[Dữ kiện] Tỷ lệ tham gia tập luyện rất cao: mọi người được phân tích đều hoàn thành hơn 80% số buổi.",
+        "numbers": "Trung bình toàn mẫu 94%",
+        "plainMeaning": "[Nhận xét của AI] Vì tuân thủ cao và buổi tập được giám sát trực tiếp, kết quả khó bị giải thích bởi việc bỏ buổi — nhưng cũng vì thế mà nó không giống điều kiện tự tập ngoài phòng.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Số liệu tuân thủ, không phải kết quả hiệu quả tập luyện; đáng tin trong bối cảnh nghiên cứu có giám sát."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "overall average attendance of 94%"
+      },
+      {
+        "finding": "[Dữ kiện] Không phát hiện khác biệt có ý nghĩa giữa các nhóm về mức thay đổi năng lượng và macronutrient tự báo cáo (bài không nêu p cho so sánh này), nhưng có bằng chứng dương cho khác biệt nền về năng lượng tự báo cáo trước can thiệp; với macronutrient bằng chứng chỉ yếu.",
+        "numbers": "BF10 = 10.26 cho khác biệt nền về kilocalorie; 1 < BF10 < 3 cho macronutrient",
+        "plainMeaning": "[Nhận xét của AI] Nhóm khác nhau về lượng ăn ngay từ đầu, và đây là dữ liệu tự khai nên dễ sai; khi so mức tăng cơ giữa nhóm cần nhớ điểm nhiễu này.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Ăn uống tự báo cáo, không có p cho so sánh thay đổi giữa nhóm, lại có khác biệt nền — chất lượng bằng chứng thấp cho mọi diễn giải về dinh dưỡng."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "no significant differences between groups in changes in self-reported kilocalorie or macronutrient intake"
+      },
+      {
+        "finding": "[Dữ kiện] Độ tin cậy test–retest của siêu âm đo độ dày cơ trên 10 nam tập kháng lực trẻ đều rất cao tại cả bốn vị trí, với sai số chuẩn đo nhỏ.",
+        "numbers": "ICC: 0.976 (cơ gấp khuỷu), 0.950 (cơ duỗi khuỷu), 0.944 (giữa đùi), 0.998 (đùi ngoài); SEM: 0.70 mm, 0.83 mm, 1.09 mm và 0.34 mm",
+        "plainMeaning": "[Nhận xét của AI] Chênh lệch độ dày cơ tìm thấy sau 8 tuần khó là do sai số của đầu dò; riêng vị trí giữa đùi có sai số lớn nhất nên thay đổi nhỏ ở đó kém tin hơn.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "ICC rất cao và SEM nhỏ trên mẫu thí điểm; hạn chế là mẫu thí điểm chỉ 10 người và đo ở người tập kháng lực trẻ."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "0.976, 0.950, 0.944 and 0.998, respectively"
+      },
+      {
+        "finding": "[Dữ kiện] Độ tin cậy test 1RM trên 6 nam tập kháng lực trẻ cũng rất cao ở cả hai bài, sai số chuẩn đo chỉ vài kg.",
+        "numbers": "ICC 0.98 (bench press) và 0.93 (squat); SEM 2.0 kg và 2.4 kg",
+        "plainMeaning": "[Nhận xét của AI] Mức tăng 1RM trong bài đủ lớn so với sai số vài kg, nên kết luận 'thêm set không thêm sức mạnh' không phải do đo kém.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "ICC cao, SEM nhỏ; hạn chế là mẫu thí điểm chỉ 6 người."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "The ICC for the 1RM BENCH and 1RM SQUAT was 0.98 and 0.93"
+      },
+      {
+        "finding": "[Dữ kiện] Test sức bền bench press 50% 1RM trên 7 nam tập kháng lực trẻ có độ tin cậy test–retest cao, sai số chuẩn đo dưới 1 lần lặp; ICC của test này trùng đúng giá trị ICC squat 1RM đã nêu ở mục trên.",
+        "numbers": "SEM = 0.99 lần lặp",
+        "plainMeaning": "[Nhận xét của AI] Sai số chưa tới 1 lần lặp nghĩa là chênh lệch vài lần lặp giữa các nhóm (nếu có) sẽ phát hiện được; việc không phát hiện khác biệt vì thế đáng tin hơn.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Độ tin cậy cao nhưng mẫu thí điểm nhỏ (7 người) và chỉ đo một bài thân trên."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "The ICC for the 50% BP was 0.93, and the SEM was 0.99 repetitions"
+      }
+    ],
+    "figures": [],
+    "quickRead": {
+      "lines": [
+        "[Dữ kiện] Tăng số set mỗi bài lên 3 hay 5 không tạo ra khác biệt có ý nghĩa về mức tăng 1RM squat, 1RM bench press và sức bền cơ thân trên so với chỉ 1 set.",
+        "[Dữ kiện] Volume cao hơn cho mức tăng độ dày cơ lớn hơn ở cơ gấp khuỷu (tay trước), giữa đùi và đùi ngoài; ở cơ duỗi khuỷu (tay sau) thì không phát hiện khác biệt giữa các nhóm.",
+        "[Nhận xét của AI] Với khách đã tập, 1 set/bài đến failure là đủ cho sức mạnh; muốn to hơn thì phải trả thêm thời gian tập mỗi tuần."
+      ],
+      "readyForPt": "[Nhận xét của AI] Dùng được ngay để giải thích đánh đổi 'thời gian ↔ phì đại' cho khách đã tập, và để bảo vệ phương án volume thấp cho người ít thời gian. Chưa đủ để chốt con số set tối ưu cho từng khách, và không áp dụng cho người mới, nữ, người lớn tuổi hay vận động viên sức mạnh."
+    },
+    "whyStudy": "[Dữ kiện] Chương trình trong bài dùng tạ tự do (free weights) — tạ đòn ở squat và bench press cùng các bài còn lại — và câu hỏi trung tâm là: khi số set mỗi bài tăng lên, cơ có to thêm và có mạnh thêm không, ở người đã có kinh nghiệm tập? [Tác giả diễn giải] Với tạ tự do (free weights), ở cuối tầm vận động người tập phải chủ động giảm tốc để dừng tạ lại, và cơ bớt (cơ đối kháng) phải gồng/căng để hãm chuyển động — nên mỗi lần lặp vốn đã chứa một phần 'hãm phanh' không thể hiện ra thành lực đẩy hữu ích, và đây là lý do các nghiên cứu volume phải so sánh trong cùng một kiểu tải như vậy. [Tác giả diễn giải] Các nghiên cứu trước so sánh volume thường có cỡ mẫu nhỏ (dễ mắc lỗi loại II — bỏ sót khác biệt thật vì mẫu quá ít), thời gian ngắn, và phần lớn làm trên người chưa tập nên không nói được gì cho người đã tập. [Tác giả diễn giải] Về cơ chế, tác giả dẫn giả thuyết rằng tập nhiều set hơn làm tăng phosphoryl hóa p70S6 kinase và tổng hợp protein cơ (muscle protein synthesis), nên kỳ vọng có quan hệ liều–đáp ứng giữa số set mỗi tuần và mức tăng khối cơ.",
+    "mechanism": {
+      "summary": "[Tác giả diễn giải] Cơ chế được bài nêu là giả thuyết liều–đáp ứng: nhiều set hơn nghĩa là nhiều tín hiệu co cơ hơn trong cùng một buổi, được cho là làm tăng phosphoryl hóa p70S6 kinase và tổng hợp protein cơ, từ đó tích lũy thành nhiều cơ hơn sau 8 tuần. Sức mạnh thì được giải thích theo hướng khác — thiên về thần kinh và kỹ năng, nên không tăng tương ứng với số set.",
+      "steps": [
+        "Mỗi buổi, mỗi bài được làm đúng số set được phân (1, 3 hoặc 5) với tải rơi vào vùng 8–12 lặp.",
+        "Set chỉ kết thúc khi không còn thực hiện được thêm một lần lặp đồng tâm nào mà vẫn giữ đúng kỹ thuật — tức mỗi set đều chạm trần.",
+        "[Tác giả diễn giải] Làm nhiều set đến trần như vậy trong một buổi được cho là tạo nhiều tín hiệu hơn cho phosphoryl hóa p70S6 kinase và tổng hợp protein cơ.",
+        "Lặp lại 3 buổi/tuần trong 8 tuần, lượng tín hiệu tích lũy khác nhau được kỳ vọng tạo ra mức tăng độ dày cơ khác nhau — đúng với một số vị trí cơ, không đúng với vị trí khác.",
+        "Với sức mạnh, 1 set đến failure đã đủ để cơ thể 'học' cách biểu hiện lực; thêm set không tạo thêm khác biệt trong 8 tuần ở nhóm người này."
+      ],
+      "whyWeightStaysStill": "Không áp dụng cho bài này: nghiên cứu không dùng dây đàn hồi hay thiết bị mắc nối tiếp nào, nên không có chuyện dây căng trước khi tạ được nhấc. Tải ở đây là tạ đòn trong squat và bench press cùng các bài còn lại, chọn theo vùng 8–12 lặp.",
+      "analogy": "Giống tưới cây: tưới nhiều nước hơn (nhiều set hơn) làm cây lớn nhanh hơn, nhưng không làm bộ rễ khỏe thêm tương ứng (sức mạnh). Còn chuyện tưới quá nhiều có thể làm cây ngập úng (chậm hồi phục) là giả thuyết của tác giả, chưa được đo trong bài."
+    },
+    "authorsConclusion": "Tác giả kết luận: mức tăng sức mạnh rõ rệt có thể đạt được với chỉ ba buổi tập rất ngắn mỗi tuần và tương đương với khi cam kết thời gian tập lớn hơn nhiều, với tải 8–12 lặp mỗi set; phì đại cơ theo quan hệ liều–đáp ứng nên volume cao hơn cho lợi ích lớn hơn; volume không ảnh hưởng khác biệt đến sức bền cơ thân trên.",
+    "authorsView": {
+      "conclusion": "[Tác giả diễn giải] Sức mạnh tăng rõ rệt với lịch tập rất ngắn mỗi tuần, và mức tăng không khác so với lịch tập dài hơn nhiều ở cùng vùng tải 8–12 lặp. Phì đại đi theo liều–đáp ứng: nhiều set hơn thì nhiều cơ hơn. Volume không tạo khác biệt về sức bền cơ thân trên.",
+      "interpretations": [
+        "[Tác giả diễn giải] Volume tập cao hơn trong vùng tải 8–12 lặp liên quan đến mức tăng các dấu hiệu phì đại cơ nhiều hơn.",
+        "[Tác giả diễn giải] Người đã tập kháng lực có thể tăng sức mạnh đáng kể với khoảng 39 phút tập mỗi tuần.",
+        "[Tác giả diễn giải] Có một ngưỡng volume mà vượt qua đó, thêm volume không giúp thêm sức mạnh; phần thêm có thể chỉ làm chậm hồi phục sau tập.",
+        "[Tác giả diễn giải] Sức bền cơ có thành phần kỹ năng, nên thích nghi sức bền chịu ảnh hưởng một phần của học vận động (motor learning).",
+        "[Tác giả diễn giải] Cảm giác khó chịu khi tập có thể tương tự giữa các nhóm vì cùng điều kiện tải, góp phần giải thích vì sao mức tăng sức bền tương đương nhau.",
+        "[Tác giả diễn giải] Nhóm volume cao có thể đã tiến gần trạng thái quá tải không chức năng (nonfunctional overreaching) về cuối chương trình, ảnh hưởng đến kết quả sức mạnh đánh giá sau.",
+        "[Tác giả diễn giải] Hiệu ứng 'trần' (ceiling effect) khiến người đã tập khó tăng khối cơ hơn, nên cần chương trình đòi hỏi cao hơn để có thêm tăng trưởng."
+      ],
+      "applications": [
+        "[Tác giả diễn giải] Người thiếu thời gian có thể tăng sức mạnh hiệu quả với lịch ba buổi rất ngắn mỗi tuần (đã đo).",
+        "[Tác giả diễn giải] Cách tập volume thấp có thể giúp tăng tuân thủ tập luyện ở công chúng (chưa được đo trong bài).",
+        "[Tác giả diễn giải] Người muốn tối đa phì đại cơ cần dành nhiều thời gian tập hàng tuần hơn (đã đo).",
+        "[Tác giả diễn giải] Với sức mạnh, chương trình volume thấp hiệu quả tương đương volume cao và tiết kiệm thời gian hơn (đã đo).",
+        "[Tác giả diễn giải] Kết quả đặc hiệu cho vùng tải 8–12RM; vùng tải khác có thể cho mô hình khác (chưa được đo).",
+        "[Tác giả diễn giải] Tập ở vùng 1–5RM có thể cần volume cao hơn do người tập ít 'thực hành' với số lặp thấp (chưa được đo)."
+      ]
+    },
+    "limitations": [
+      "[Tác giả nêu] Đa số người tham gia trước đó không thường xuyên tập đến momentary failure, nên ảnh hưởng của yếu tố mới lạ chưa rõ.",
+      "[Tác giả nêu] Cơ thân trên chỉ được tập bằng bài đa khớp; bài đơn khớp có thể quan trọng hơn khi tập volume thấp.",
+      "[Tác giả nêu] Độ dày cơ chỉ đo ở phần giữa bụng cơ, nên phì đại theo vùng có thể không được phát hiện.",
+      "[Tác giả nêu] Không thể loại trừ hoàn toàn việc người tham gia tập thêm ngoài chương trình.",
+      "[Tác giả nêu] Cỡ mẫu tương đối nhỏ nên có thể thiếu power để phát hiện một số khác biệt giữa nhóm.",
+      "[Tác giả nêu] Chưa rõ mức thay đổi đo được trên siêu âm ảnh hưởng thế nào đến vẻ ngoài thẩm mỹ.",
+      "[Tác giả nêu] Kết quả đặc hiệu cho nam trẻ đã tập kháng lực; không thể khái quát cho vị thành niên, nữ và người lớn tuổi."
+    ],
+    "limitationsStructured": {
+      "authors": [
+        "[Tác giả diễn giải] Yếu tố mới lạ: phần lớn người tham gia chưa quen tập đến momentary failure.",
+        "[Tác giả diễn giải] Thân trên chỉ tập bằng bài đa khớp.",
+        "[Tác giả diễn giải] Siêu âm chỉ đo ở phần giữa bụng cơ.",
+        "[Tác giả diễn giải] Không kiểm soát được hoàn toàn việc tập thêm ngoài chương trình.",
+        "[Tác giả diễn giải] Cỡ mẫu nhỏ, có thể thiếu power.",
+        "[Tác giả diễn giải] Chưa rõ ý nghĩa thẩm mỹ của mức thay đổi đo được.",
+        "[Tác giả diễn giải] Chỉ áp dụng cho nam trẻ đã tập kháng lực."
+      ],
+      "ai": [
+        "[Nhận xét của AI] Không nêu trong bài việc mù hoá hay đánh giá kết quả bởi người không biết phân nhóm — với chỉ số khách quan như siêu âm và 1RM thì rủi ro thiên lệch thấp hơn, nhưng vẫn là một khoảng trống.",
+        "[Nhận xét của AI] Các so sánh giữa nhóm không kèm khoảng tin cậy (CI); người đọc chỉ có p-value và hệ số Bayes, nên khó đánh giá độ chính xác của độ lớn khác biệt.",
+        "[Nhận xét của AI] Mỗi nhóm chỉ khoảng 11–12 người, trong khi chính bài ghi nhận các nghiên cứu trước bị lỗi loại II vì mẫu nhỏ — bài này cũng chịu áp lực tương tự, đặc biệt với cơ duỗi khuỷu.",
+        "[Nhận xét của AI] Chênh lệch nền về năng lượng tự báo cáo trước can thiệp là điểm nhiễu chưa được xử lý triệt để.",
+        "[Nhận xét của AI] Khẩu phần ăn là tự báo cáo, và sản phẩm protein được một công ty thực phẩm bổ sung cung cấp — không phải xung đột lợi ích được khai báo, nhưng là nguồn nhiễu tiềm năng khi diễn giải kết quả phì đại.",
+        "[Nhận xét của AI] Chỉ 8 tuần: đủ để thấy khác biệt phì đại, chưa đủ để nói gì về đường cong dài hạn hay về ngưỡng volume thật sự.",
+        "[Nhận xét của AI] Mức dao động giữa từng người (SD) cho các kết quả chính không có trong phần kết quả tôi đọc được, nên không thể ước lượng khoảng cá nhân sẽ rộng đến đâu."
+      ]
+    },
+    "conflictOfInterest": "Các tác giả khai báo không có xung đột lợi ích. Dymatize Nutrition cung cấp sản phẩm protein supplement dùng trong nghiên cứu; kinh phí từ một PSC CUNY grant của State of New York.",
+    "benefitSignals": {
+      "statement": "[Dữ kiện] Bài ghi rõ nguồn hỗ trợ và tuyên bố xung đột lợi ích: một công ty thực phẩm bổ sung cung cấp sản phẩm protein dùng trong nghiên cứu, kinh phí đến từ một grant của bang, và các tác giả khai báo không có xung đột lợi ích.",
+      "flags": [
+        {
+          "text": "Dymatize Nutrition cung cấp sản phẩm protein supplement dùng trong nghiên cứu.",
+          "source": "Acknowledgments",
+          "page": 0
+        },
+        {
+          "text": "Nghiên cứu được tài trợ bởi PSC CUNY grant từ State of New York.",
+          "source": "Funding",
+          "page": 0
+        },
+        {
+          "text": "Các tác giả khai báo không có xung đột lợi ích.",
+          "source": "Conflict of interest",
+          "page": 0
+        }
+      ]
+    },
+    "practicalTakeaways": [
+      "[Nhận xét của AI] Khi khách kêu thiếu thời gian và mục tiêu là mạnh lên: một set mỗi bài đến khi không còn lặp đúng kỹ thuật, 3 buổi/tuần, là phương án có cơ sở từ bài này — không phải phương án 'tập cho có'.",
+      "[Nhận xét của AI] Khi mục tiêu là phì đại: nói thẳng về đánh đổi. Nhiều set hơn cho nhiều cơ hơn ở một số vùng, nhưng phải trả bằng thời gian tập mỗi buổi dài hơn nhiều lần.",
+      "[Nhận xét của AI] Đừng hứa 'thêm set là thêm sức mạnh' với khách đã tập: cả ba chỉ số sức mạnh/sức bền đều không phát hiện khác biệt.",
+      "[Nhận xét của AI] Trong 8 tuần, đừng vội kết luận về tay sau. Nói với khách: chưa phát hiện khác biệt, nhưng xu hướng định lượng nghiêng về volume cao — cần theo dõi thêm.",
+      "[Nhận xét của AI] Vì đây là trung bình nhóm với 11–12 người mỗi nhóm, hãy dùng kết quả để chọn hướng ban đầu rồi chỉnh theo phản hồi và tiến bộ thực tế của từng khách, không áp nguyên con số."
+    ],
+    "application": {
+      "supported": [
+        "[Dữ kiện] Với nam đã tập kháng lực, tập 1 set mỗi bài đến momentary concentric failure, 3 buổi/tuần, đủ để tăng sức mạnh tương đương nhóm 3 và 5 set trong 8 tuần — ở vùng tải 8–12 lặp.",
+        "[Dữ kiện] Volume cao hơn (5 set/bài) cho mức tăng độ dày cơ lớn hơn ở cơ gấp khuỷu, giữa đùi và đùi ngoài so với 1 set/bài.",
+        "[Dữ kiện] Không phát hiện khác biệt giữa các nhóm về sức bền cơ thân trên.",
+        "[Dữ kiện] Chênh lệch thời gian tập mỗi buổi giữa các nhóm là rất lớn — đây là dữ kiện định lượng để bàn về đánh đổi thời gian.",
+        "[Dữ kiện] Các phép đo dùng trong bài có độ tin cậy cao (siêu âm và 1RM), nên khác biệt phì đại tìm được không phải do nhiễu dụng cụ."
+      ],
+      "hypothesis": [
+        "[Tác giả diễn giải] Vượt một ngưỡng volume nào đó, thêm set có thể chỉ kéo dài thời gian hồi phục — chưa được đo.",
+        "[Tác giả diễn giải] Nhóm 5 set có thể đã tiến gần trạng thái quá tải không chức năng về cuối chương trình — chưa được đo, đây là suy đoán để giải thích vì sao sức mạnh không tăng thêm.",
+        "[Tác giả diễn giải] Nếu đẩy volume cao hơn nữa ở người đã tập, phì đại có thể còn tăng thêm vì quan hệ liều–đáp ứng — chưa được đo, bài chỉ thử tới 5 set/bài.",
+        "[Tác giả diễn giải] Phì đại thêm có thể cải thiện vẻ ngoài thẩm mỹ — chưa được đo; chính tác giả nêu là chưa rõ mức thay đổi trên siêu âm ảnh hưởng thế nào đến ngoại hình."
+      ],
+      "notYet": [
+        "[Nhận xét của AI] Chưa nên dùng '5 set mỗi bài' làm chuẩn chung cho mọi khách: đây là mức cao nhất trong một nghiên cứu 8 tuần trên nam đã tập, không phải liều tối ưu đã được xác định.",
+        "[Nhận xét của AI] Chưa nên áp dụng cho người mới, nữ, người lớn tuổi hay vận động viên sức mạnh — tác giả nêu rõ giới hạn này.",
+        "[Nhận xét của AI] Chưa nên lập kế hoạch số set dài hạn chỉ dựa vào 8 tuần, và chưa nên suy ra rằng volume cao luôn tốt hơn ở mọi bài.",
+        "[Nhận xét của AI] Chưa nên dùng kết quả này để khẳng định volume không ảnh hưởng đến tay sau: bài chỉ không phát hiện khác biệt, trong khi effect size lại tăng theo volume."
+      ],
+      "unanswered": [
+        "[Nhận xét của AI] Ngưỡng volume tối ưu chính xác nằm ở đâu — bài chỉ so sánh 1, 3 và 5 set.",
+        "[Nhận xét của AI] Volume tối ưu cho vùng tải khác 8–12 lặp, ví dụ 1–5RM hay trên 12 lặp.",
+        "[Nhận xét của AI] Bài đơn khớp cho thân trên có cần nhiều set hơn bài đa khớp khi tập volume thấp hay không.",
+        "[Nhận xét của AI] Mức thay đổi trên siêu âm chuyển thành thay đổi ngoại hình bao nhiêu.",
+        "[Nhận xét của AI] Kết quả trên nữ, người lớn tuổi, vị thành niên và vận động viên.",
+        "[Nhận xét của AI] Ảnh hưởng của yếu tố mới lạ khi người tập chưa quen tập đến momentary failure.",
+        "[Nhận xét của AI] Mức dao động giữa từng người quanh con số trung bình của nhóm."
+      ],
+      "notApplicableTo": "Không áp dụng cho người chưa từng tập kháng lực, nữ, người lớn tuổi, vị thành niên, vận động viên sức mạnh thi đấu, người đang tập ở vùng tải nặng 1–5RM, và người có bệnh lý cần cá nhân hoá y tế."
+    },
+    "whoItDoesNotApplyTo": "Nam trẻ đã tập kháng lực mới là đối tượng của bài. Không áp dụng trực tiếp cho người mới bắt đầu, nữ, người lớn tuổi, vị thành niên, vận động viên thi đấu sức mạnh, người tập chủ yếu ở vùng 1–5RM hoặc trên 12 lặp, và không dùng thay cho đánh giá y tế khi khách có bệnh lý.",
+    "selfCheck": [
+      {
+        "question": "Nếu khách hỏi 'tập 5 set mỗi bài có làm tôi khỏe hơn 1 set không?', dựa vào bài này bạn trả lời thế nào cho đúng?",
+        "answer": "Trong 8 tuần, ở nam đã tập, vùng tải 8–12 lặp: không phát hiện khác biệt có ý nghĩa giữa các nhóm về mức tăng 1RM squat, 1RM bench press và sức bền cơ thân trên. Phải nói là 'không phát hiện khác biệt', không được nói 'không ảnh hưởng gì' hay 'chắc chắn là giống nhau'."
+      },
+      {
+        "question": "Vì sao kết quả về cơ duỗi khuỷu (tay sau) lại khó diễn giải hơn kết quả về đùi ngoài?",
+        "answer": "Với cơ duỗi khuỷu, kiểm định giữa nhóm không có ý nghĩa và phân tích Bayes nghiêng về mô hình không khác biệt, nhưng mức thay đổi (effect size) lại tăng đơn điệu theo volume và % thay đổi ở nhóm cao lớn hơn nhiều lần nhóm thấp. Hai tín hiệu ngược chiều, nên chỉ được kết luận 'không phát hiện khác biệt' với mức chắc chắn thấp. Với đùi ngoài, cả p nhỏ, hệ số Bayes rất lớn và so sánh hậu định 1 set với 5 set rõ ràng, nên chắc chắn cao hơn."
+      },
+      {
+        "question": "Bài này có cho phép bạn kết luận về ảnh hưởng lâu dài của volume tập, hoặc về nữ và người lớn tuổi không?",
+        "answer": "Không. Đây là can thiệp 8 tuần trên nam trẻ đã tập kháng lực, mỗi nhóm khoảng 11–12 người; tác giả nêu rõ kết quả đặc hiệu cho nhóm này và không khái quát cho vị thành niên, nữ hay người lớn tuổi. Nghiên cứu cũng không trả lời ngưỡng volume tối ưu hay vùng tải khác 8–12 lặp."
+      }
+    ],
+    "glossary": [
+      {
+        "en": "momentary concentric failure",
+        "vi": "mất khả năng co cơ đồng tâm tạm thời",
+        "explanation": "Điểm dừng của set: không thực hiện nổi thêm một lần lặp ở pha đẩy/kéo lên nữa trong khi vẫn giữ đúng kỹ thuật.",
+        "example": "Khách đẩy bench press, lần thứ 10 thanh tạ lên được nhưng lần 11 thì đứng giữa đường — đó là lúc dừng set, không phải lúc khách thấy 'chán'."
+      },
+      {
+        "en": "dose–response relationship",
+        "vi": "quan hệ liều–đáp ứng",
+        "explanation": "Càng nhiều 'liều' (số set mỗi tuần) thì 'đáp ứng' (mức tăng cơ) càng lớn, trong một khoảng nào đó.",
+        "example": "Một khách tập 4 set mỗi bài cho đùi và tăng chu vi đùi nhiều hơn khách tập 1 set mỗi bài trong cùng 8 tuần — đó là liều–đáp ứng."
+      },
+      {
+        "en": "ceiling effect",
+        "vi": "hiệu ứng trần",
+        "explanation": "Người đã tập lâu càng gần giới hạn của mình thì càng khó tăng thêm, dù chương trình tốt.",
+        "example": "Khách tập 5 năm, tay trước gần như không tăng thêm dù tăng set; người mới tập 3 tháng lại tăng rõ — đó là hiệu ứng trần."
+      },
+      {
+        "en": "intraclass correlation coefficient (ICC)",
+        "vi": "hệ số tương quan nội lớp",
+        "explanation": "Chỉ số 0–1 cho biết đo hai lần có ra kết quả gần giống nhau không; càng gần 1 càng đáng tin.",
+        "example": "Nếu đo độ dày cơ bằng siêu âm hôm nay và mai ra gần như y nhau, ICC cao — nghĩa là chênh lệch bạn thấy sau 8 tuần khó là do sai số đo."
+      },
+      {
+        "en": "standard error of the measurement (SEM)",
+        "vi": "sai số chuẩn của phép đo",
+        "explanation": "Mức sai lệch điển hình của một lần đo, tính theo đơn vị của chính phép đo; dùng để biết thay đổi nhỏ hơn bao nhiêu thì coi như nhiễu.",
+        "example": "Siêu âm có sai số khoảng 1 mm: khách tăng 0.5 mm thì chưa nên ăn mừng, có thể chỉ là sai số."
+      },
+      {
+        "en": "Bayes factor (BF10)",
+        "vi": "hệ số Bayes",
+        "explanation": "Chỉ số so sánh hai khả năng: có khác biệt thật so với mô hình không khác biệt. Lớn hơn 1 nghiêng về 'có khác biệt', nhỏ hơn 1 nghiêng về phía ngược lại.",
+        "example": "BF10 rất lớn ở đùi ngoài nghĩa là dữ liệu ủng hộ mạnh chuyện volume cao làm đùi dày hơn; BF10 dưới 1 ở squat nghĩa là dữ liệu không ủng hộ chuyện hai nhóm khác nhau."
+      },
+      {
+        "en": "type II error",
+        "vi": "lỗi loại II",
+        "explanation": "Bỏ sót một khác biệt có thật vì mẫu quá ít người để phát hiện ra nó.",
+        "example": "Chỉ có 11 người mỗi nhóm, một khác biệt nhỏ về sức mạnh có thể có thật nhưng bài không đủ người để 'nhìn thấy'."
+      },
+      {
+        "en": "nonfunctional overreaching",
+        "vi": "quá tải không chức năng",
+        "explanation": "Tập quá nhiều đến mức hiệu suất giảm và cần nhiều ngày mới hồi phục, khác với mệt bình thường sau buổi tập.",
+        "example": "Khách tập 5 set mỗi bài suốt nhiều tuần, đến tuần cuối các mức tạ cũ bỗng nặng hơn hẳn — đó là dấu hiệu quá tải, không phải 'chăm chỉ'."
+      },
+      {
+        "en": "p70S6 kinase / muscle protein synthesis",
+        "vi": "men p70S6 kinase / tổng hợp protein cơ",
+        "explanation": "Một tín hiệu hoá sinh bên trong cơ được cho là liên quan đến việc cơ tạo thêm protein cho chính nó sau khi tập.",
+        "example": "Sau buổi tập nặng, cơ 'bật công tắc' tổng hợp protein để sửa và dày lên — đây là công tắc được nhắc đến trong bài."
+      },
+      {
+        "en": "regional-specific hypertrophy",
+        "vi": "phì đại theo vùng",
+        "explanation": "Một cơ có thể dày lên không đều: phần này to hơn phần kia, nên đo một điểm không đại diện cho cả cơ.",
+        "example": "Đo giữa bụng cơ đùi tăng rõ, nhưng phần sát gối có thể không đổi — đó là lý do phải đọc kỹ chỗ đặt đầu dò."
+      },
+      {
+        "en": "B-mode ultrasound",
+        "vi": "siêu âm chế độ B",
+        "explanation": "Cách dùng sóng âm tạo ảnh cắt lớp mô mềm để đo độ dày cơ, không phải đo mỡ bằng kẹp.",
+        "example": "Kỹ thuật viên đặt đầu dò lên tay trước của khách rồi đo bề dày lớp cơ trên ảnh — đó là cách bài này đo phì đại."
+      },
+      {
+        "en": "effect size d",
+        "vi": "độ lớn ảnh hưởng (d)",
+        "explanation": "Độ lớn khác biệt đã chuẩn hóa; khoảng 0.2 nhỏ, 0.5 vừa, 0.8 lớn.",
+        "example": "d = 0.65 là mức vừa, không phải khác biệt khổng lồ."
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext",
+      "missingInfo": [
+        "Mức dao động giữa từng người (SD) của các kết quả chính theo từng nhóm.",
+        "Thông tin về việc mù hoá hoặc đánh giá kết quả bởi người không biết phân nhóm.",
+        "Nội dung chi tiết của các hình và bảng trong bài.",
+        "Mức % thay đổi của cơ gấp khuỷu theo từng nhóm (bài chỉ nêu p và hệ số Bayes cho vị trí này).",
+        "Quy trình nghỉ giữa set và thứ tự bài tập chi tiết trong mỗi buổi.",
+        "Kiểm tra tự động còn 1 điểm chưa đạt; nên đối chiếu PDF gốc."
+      ]
+    },
+    "verification": {
+      "passed": true,
+      "issues": [],
+      "factsWarnings": [],
+      "rounds": 2
+    }
+  },
+  "facts": {
+    "metadata": {
+      "title": {
+        "value": "Resistance Training Volume Enhances Muscle Hypertrophy but Not Strength in Trained Men.",
+        "page": 1,
+        "quote": ""
+      },
+      "authors": [
+        {
+          "value": "Schoenfeld BJ",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Contreras B",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Krieger J",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Grgic J",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Delcastillo K",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Belliard R",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Alto A",
+          "page": 1,
+          "quote": ""
+        }
+      ],
+      "year": {
+        "value": "2019",
+        "page": 1,
+        "quote": ""
+      },
+      "journal": {
+        "value": "Medicine and science in sports and exercise",
+        "page": 1,
+        "quote": ""
+      },
+      "volume": {
+        "value": "51",
+        "page": 1,
+        "quote": ""
+      },
+      "issue": {
+        "value": "1",
+        "page": 1,
+        "quote": ""
+      },
+      "pages": {
+        "value": "94-103",
+        "page": 1,
+        "quote": ""
+      },
+      "doi": {
+        "value": "10.1249/MSS.0000000000001764",
+        "page": 1,
+        "quote": ""
+      }
+    },
+    "study": {
+      "design": {
+        "value": "Thử nghiệm ngẫu nhiên có đối chứng, 3 nhóm volume tập, thời gian 8 tuần.",
+        "page": 0,
+        "quote": "Subjects were randomly assigned to one of three experimental groups"
+      },
+      "participants": {
+        "n": 34,
+        "description": {
+          "value": "45 nam khỏe mạnh được tuyển; 34 hoàn thành và được phân tích (1SET n=11; 3SET n=12; 5SET n=11).",
+          "page": 0,
+          "quote": "resulting in a total sample of 34 subjects"
+        }
+      },
+      "intervention": {
+        "value": "Tập kháng lực 7 bài toàn thân, 3 buổi/tuần trong 8 tuần; nhóm 1SET tập 1 set/bài, 3SET tập 3 set/bài, 5SET tập 5 set/bài; 8-12 lặp đến mất khả năng đồng tâm.",
+        "page": 0,
+        "quote": "a low-volume group (1SET) performing one set per exercise per training session"
+      },
+      "device": {
+        "value": "",
+        "page": 0,
+        "quote": ""
+      },
+      "comparator": {
+        "value": "So sánh ba nhóm volume thấp, trung bình và cao (1SET, 3SET, 5SET).",
+        "page": 0,
+        "quote": "low-, moderate-, and high-volume RT protocols"
+      },
+      "outcomes": [
+        {
+          "value": "Sức mạnh tối đa (1RM squat, 1RM bench press)",
+          "page": 0,
+          "quote": "1RM testing in the barbell parallel back squat"
+        },
+        {
+          "value": "Sức bền cơ thân trên (50% BP)",
+          "page": 0,
+          "quote": "bench press using 50% of the subject’s initial 1RM"
+        },
+        {
+          "value": "Độ dày cơ bằng siêu âm tại 4 vị trí",
+          "page": 0,
+          "quote": "Ultrasound imaging was used to obtain measurements of muscle thickness"
+        },
+        {
+          "value": "Chế độ ăn tự báo cáo",
+          "page": 0,
+          "quote": "Dietary adherence was assessed by self-reported food records"
+        }
+      ],
+      "measurement": {
+        "value": "Siêu âm B-mode đo độ dày cơ; test 1RM theo hướng dẫn NSCA; test bench press 50% 1RM đến mất khả năng; ghi nhật ký ăn bằng MyFitnessPal; InBody 770 đo khối lượng cơ thể.",
+        "page": 0,
+        "quote": "B-mode ultrasound imaging unit"
+      },
+      "setting": {
+        "value": "Đại học/phòng thí nghiệm; các buổi tập được nhóm nghiên cứu giám sát trực tiếp.",
+        "page": 0,
+        "quote": "All routines were directly supervised by the research team"
+      },
+      "duration": {
+        "value": "8 tuần, 3 buổi/tuần vào các ngày không liên tiếp.",
+        "page": 0,
+        "quote": "nonconsecutive days for 8 wk"
+      },
+      "failureCriteria": {
+        "value": "Mỗi set tập đến mất khả năng co cơ đồng tâm tạm thời (momentary concentric failure): không thể thực hiện thêm một lần lặp đồng tâm khi vẫn giữ đúng kỹ thuật.",
+        "page": 0,
+        "quote": "inability to perform another concentric repetition while maintaining proper form"
+      }
+    },
+    "results": [
+      {
+        "id": "r1",
+        "outcome": "Sức mạnh 1RM squat",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "P = 0.22",
+        "d": "",
+        "ci": "",
+        "note": "Không có khác biệt có ý nghĩa giữa các nhóm; bằng chứng ủng hộ mô hình null (BF10 < 1).",
+        "page": 0,
+        "quote": "There was no significant difference between groups in squat 1RM improvement"
+      },
+      {
+        "id": "r2",
+        "outcome": "Sức mạnh 1RM bench press",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "P = 0.15",
+        "d": "",
+        "ci": "",
+        "note": "Không có khác biệt có ý nghĩa giữa các nhóm; BF10 < 1 cho khác biệt nhóm; có bằng chứng yếu ủng hộ khác biệt 1RM bench trước test.",
+        "page": 0,
+        "quote": "There was no significant difference between groups in bench 1RM improvement"
+      },
+      {
+        "id": "r3",
+        "outcome": "Sức bền cơ thân trên (bench press 50% 1RM)",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "P = 0.52",
+        "d": "",
+        "ci": "",
+        "note": "Không có khác biệt có ý nghĩa giữa các nhóm; bằng chứng ủng hộ mô hình null (BF10 < 1).",
+        "page": 0,
+        "quote": "There was no significant difference between groups in bench endurance improvement"
+      },
+      {
+        "id": "r4",
+        "outcome": "Độ dày cơ gấp khuỷu (elbow flexors)",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "P = 0.02",
+        "d": "",
+        "ci": "",
+        "note": "Có khác biệt nhóm có ý nghĩa; BF10 = 3.04; hậu định 1 vs 5 set có ý nghĩa; BF10 5 vs 1 = 4.71, 3 vs 1 = 1.30, 3 vs 5 = 0.60.",
+        "page": 0,
+        "quote": "There was a significant difference between groups in improvements in bicep thickness"
+      },
+      {
+        "id": "r5",
+        "outcome": "Độ dày cơ duỗi khuỷu (elbow extensors)",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "P = 0.19",
+        "d": "",
+        "ci": "",
+        "note": "Không có khác biệt có ý nghĩa giữa các nhóm; bằng chứng ủng hộ mô hình null (BF10 < 1).",
+        "page": 0,
+        "quote": "There was no significant difference between groups in the improvement in triceps thickness"
+      },
+      {
+        "id": "r6",
+        "outcome": "Độ dày cơ duỗi khuỷu — effect size thay đổi",
+        "arms": [
+          {
+            "name": "1SET (thấp)",
+            "value": "0.12",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET (trung bình)",
+            "value": "0.30",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET (cao)",
+            "value": "0.55",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "ES cho mức thay đổi độ dày cơ duỗi khuỷu theo volume thấp, trung bình, cao.",
+        "page": 0,
+        "quote": "ES values of 0.12, 0.30, and 0.55 for the low-, moderate-, and high-volume conditions"
+      },
+      {
+        "id": "r7",
+        "outcome": "Độ dày cơ duỗi khuỷu — % thay đổi",
+        "arms": [
+          {
+            "name": "1SET (thấp)",
+            "value": "1.1%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET (cao)",
+            "value": "5.5%",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "So sánh volume thấp nhất và cao nhất.",
+        "page": 0,
+        "quote": "changes in elbow extensor MT of 1.1% versus 5.5%"
+      },
+      {
+        "id": "r8",
+        "outcome": "Độ dày cơ giữa đùi (mid-thigh)",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "P = 0.02",
+        "d": "",
+        "ci": "",
+        "note": "Có khác biệt nhóm có ý nghĩa; BF10 = 8.51; hậu định 1 vs 5 set có ý nghĩa; BF10 5 vs 1 = 13.65, 5 vs 3 = 2.34, 1 vs 3 = 0.51.",
+        "page": 0,
+        "quote": "There was a significant difference between groups in improvements in rectus femoris thickness"
+      },
+      {
+        "id": "r9",
+        "outcome": "Độ dày cơ giữa đùi — % thay đổi",
+        "arms": [
+          {
+            "name": "1SET (thấp)",
+            "value": "3.4%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET (cao)",
+            "value": "12.5%",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "So sánh volume thấp nhất và cao nhất.",
+        "page": 0,
+        "quote": "increase in mid-thigh hypertrophy of 3.4% versus 12.5%"
+      },
+      {
+        "id": "r10",
+        "outcome": "Độ dày cơ đùi ngoài (lateral thigh)",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "P = 0.006",
+        "d": "",
+        "ci": "",
+        "note": "Có khác biệt nhóm có ý nghĩa; BF10 = 63.87; hậu định 1 vs 5 set có ý nghĩa; BF10 5 vs 1 = 38.14, 3 vs 1 = 1.42, 5 vs 3 = 2.25.",
+        "page": 0,
+        "quote": "There was a significant difference between groups in improvements in vastus lateralis thickness"
+      },
+      {
+        "id": "r11",
+        "outcome": "Độ dày cơ đùi ngoài — % thay đổi",
+        "arms": [
+          {
+            "name": "1SET (thấp)",
+            "value": "5.0%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET (cao)",
+            "value": "13.7%",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "So sánh volume thấp nhất và cao nhất.",
+        "page": 0,
+        "quote": "lateral thigh hypertrophy of 5.0% versus 13.7%"
+      },
+      {
+        "id": "r12",
+        "outcome": "Thay đổi năng lượng và macronutrient tự báo cáo",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "3SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "5SET",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Không có khác biệt có ý nghĩa giữa các nhóm; bài không nêu p cho so sánh này.",
+        "page": 0,
+        "quote": "no significant differences between groups in changes in self-reported kilocalorie or macronutrient intake"
+      },
+      {
+        "id": "r13",
+        "outcome": "Khác biệt nền về năng lượng tự báo cáo",
+        "arms": [],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Có bằng chứng dương cho khác biệt nền về kilocalorie (BF10 = 10.26); macronutrient chỉ bằng chứng yếu (1 < BF10 < 3).",
+        "page": 0,
+        "quote": "positive evidence in favor of baseline differences in self-reported kilocalorie intake"
+      },
+      {
+        "id": "r14",
+        "outcome": "Thời gian tập trung bình mỗi buổi",
+        "arms": [
+          {
+            "name": "1SET",
+            "value": "13 min",
+            "sd": "",
+            "n": 11
+          },
+          {
+            "name": "3SET",
+            "value": "40 min",
+            "sd": "",
+            "n": 12
+          },
+          {
+            "name": "5SET",
+            "value": "68 min",
+            "sd": "",
+            "n": 11
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Thời gian tập xấp xỉ theo từng nhóm.",
+        "page": 0,
+        "quote": "Average training time per session was approximately 13 min for 1SET"
+      },
+      {
+        "id": "r15",
+        "outcome": "Tỷ lệ tham gia tập luyện",
+        "arms": [
+          {
+            "name": "Toàn mẫu",
+            "value": "94%",
+            "sd": "",
+            "n": 34
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Tất cả người được phân tích hoàn thành >80% buổi tập; trung bình chung 94%.",
+        "page": 0,
+        "quote": "overall average attendance of 94%"
+      },
+      {
+        "id": "r16",
+        "outcome": "Độ tin cậy test–retest siêu âm đo độ dày cơ (ICC)",
+        "arms": [
+          {
+            "name": "Elbow flexors",
+            "value": "0.976",
+            "sd": "",
+            "n": 10
+          },
+          {
+            "name": "Elbow extensors",
+            "value": "0.950",
+            "sd": "",
+            "n": 10
+          },
+          {
+            "name": "Mid-thigh",
+            "value": "0.944",
+            "sd": "",
+            "n": 10
+          },
+          {
+            "name": "Lateral thigh",
+            "value": "0.998",
+            "sd": "",
+            "n": 10
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "ICC test–retest đo trên các ngày liên tiếp ở mẫu thí điểm 10 nam tập kháng lực trẻ.",
+        "page": 0,
+        "quote": "0.976, 0.950, 0.944 and 0.998, respectively"
+      },
+      {
+        "id": "r17",
+        "outcome": "Sai số chuẩn đo (SEM) siêu âm độ dày cơ",
+        "arms": [
+          {
+            "name": "Elbow flexor",
+            "value": "0.70 mm",
+            "sd": "",
+            "n": 10
+          },
+          {
+            "name": "Elbow extensor",
+            "value": "0.83 mm",
+            "sd": "",
+            "n": 10
+          },
+          {
+            "name": "Mid-thigh",
+            "value": "1.09 mm",
+            "sd": "",
+            "n": 10
+          },
+          {
+            "name": "Lateral thigh",
+            "value": "0.34 mm",
+            "sd": "",
+            "n": 10
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "SEM cho độ dày cơ tại bốn vị trí.",
+        "page": 0,
+        "quote": "0.70, 0.83, and 1.09, and 0.34 mm, respectively"
+      },
+      {
+        "id": "r18",
+        "outcome": "Độ tin cậy test–retest của test sức mạnh 1RM (ICC)",
+        "arms": [
+          {
+            "name": "1RM bench press",
+            "value": "0.98",
+            "sd": "",
+            "n": 6
+          },
+          {
+            "name": "1RM squat",
+            "value": "0.93",
+            "sd": "",
+            "n": 6
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Thí điểm trên 6 nam tập kháng lực trẻ.",
+        "page": 0,
+        "quote": "The ICC for the 1RM BENCH and 1RM SQUAT was 0.98 and 0.93"
+      },
+      {
+        "id": "r19",
+        "outcome": "Sai số chuẩn đo (SEM) của test sức mạnh 1RM",
+        "arms": [
+          {
+            "name": "1RM bench press",
+            "value": "2.0 kg",
+            "sd": "",
+            "n": 6
+          },
+          {
+            "name": "1RM squat",
+            "value": "2.4 kg",
+            "sd": "",
+            "n": 6
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "SEM cho 1RM bench press và 1RM squat.",
+        "page": 0,
+        "quote": "The SEM for these measures are 2.0 and 2.4 kg"
+      },
+      {
+        "id": "r20",
+        "outcome": "Độ tin cậy và SEM của test sức bền 50% BP",
+        "arms": [
+          {
+            "name": "50% BP ICC",
+            "value": "0.93",
+            "sd": "",
+            "n": 7
+          },
+          {
+            "name": "50% BP SEM",
+            "value": "0.99 reps",
+            "sd": "",
+            "n": 7
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Thí điểm trên 7 nam tập kháng lực trẻ.",
+        "page": 0,
+        "quote": "The ICC for the 50% BP was 0.93, and the SEM was 0.99 repetitions"
+      }
+    ],
+    "authors": {
+      "conclusion": {
+        "value": "Tăng sức mạnh rõ rệt có thể đạt được với chỉ 3 buổi 13 phút/tuần và tương đương khi cam kết thời gian lớn hơn nhiều với tải 8-12 lặp/set; phì đại cơ theo quan hệ liều–đáp ứng, volume cao hơn cho lợi ích lớn hơn; volume không ảnh hưởng khác biệt đến sức bền cơ thân trên.",
+        "page": 0,
+        "quote": "just three 13-min sessions per week",
+        "source": "CONCLUSIONS"
+      },
+      "interpretations": [
+        {
+          "value": "Volume tập cao hơn trong vùng tải 8-12 lặp liên quan đến tăng dấu hiệu phì đại cơ nhiều hơn.",
+          "page": 0,
+          "quote": "greater increases in markers of muscle hypertrophy",
+          "source": ""
+        },
+        {
+          "value": "Người đã tập kháng lực có thể tăng sức mạnh đáng kể chỉ với khoảng 39 phút tập/tuần.",
+          "page": 0,
+          "quote": "performing only ~39 min of weekly RT",
+          "source": ""
+        },
+        {
+          "value": "Có một ngưỡng volume mà trên đó tăng thêm volume không có lợi cho sức mạnh và có thể chỉ làm chậm hồi phục.",
+          "page": 0,
+          "quote": "there is a certain threshold of volume that can be used in a training program",
+          "source": ""
+        },
+        {
+          "value": "Việc tăng thêm volume trên ngưỡng có thể chỉ kéo dài thời gian hồi phục sau tập.",
+          "page": 0,
+          "quote": "might only delay recovery from exercise",
+          "source": ""
+        },
+        {
+          "value": "Sức bền cơ có thành phần kỹ năng; thích nghi sức bền chịu ảnh hưởng một phần của học vận động.",
+          "page": 0,
+          "quote": "adaptations such as muscular endurance, are, to a certain extent, influenced by motor learning",
+          "source": ""
+        },
+        {
+          "value": "Mức khó chịu khi tập có thể tương tự giữa các nhóm vì cùng điều kiện tải, góp phần giải thích mức tăng sức bền tương đương.",
+          "page": 0,
+          "quote": "discomfort with training was likely similar between the groups",
+          "source": ""
+        },
+        {
+          "value": "Nhóm volume cao có thể đã tiến gần trạng thái overtraining (nonfunctional overreaching) về cuối chương trình, ảnh hưởng đến sức mạnh lúc đánh giá sau.",
+          "page": 0,
+          "quote": "subjects in the high-volume group approached an overtraining (i.e., nonfunctional overreaching) status",
+          "source": ""
+        },
+        {
+          "value": "Hiệu ứng “ceiling effect” khiến người tập đã có kinh nghiệm khó tăng khối cơ hơn, cần chương trình đòi hỏi hơn để có thêm tăng trưởng.",
+          "page": 0,
+          "quote": "A “ceiling effect” makes it progressively more difficult for trained lifters to increase muscle mass",
+          "source": ""
+        }
+      ],
+      "applications": [
+        {
+          "value": "Người thiếu thời gian có thể tăng sức mạnh hiệu quả với 3 buổi 13 phút/tuần.",
+          "page": 0,
+          "quote": "just three 13-min sessions per week",
+          "measured": true,
+          "source": ""
+        },
+        {
+          "value": "Cách tập volume thấp có thể giúp tăng tuân thủ tập luyện ở công chúng.",
+          "page": 0,
+          "quote": "may help to promote greater exercise adherence in the general public",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Người muốn tối đa phì đại cơ cần dành nhiều thời gian tập hàng tuần hơn.",
+          "page": 0,
+          "quote": "need to allot a greater amount of weekly time to achieve this goal",
+          "measured": true,
+          "source": ""
+        },
+        {
+          "value": "Phì đại cơ theo quan hệ liều–đáp ứng với volume; volume cao hơn cho lợi ích lớn hơn.",
+          "page": 0,
+          "quote": "increases in muscle hypertrophy follow a dose–response relationship",
+          "measured": true,
+          "source": ""
+        },
+        {
+          "value": "Đối với sức mạnh, chương trình volume thấp hiệu quả tương đương volume cao và tiết kiệm thời gian hơn.",
+          "page": 0,
+          "quote": "lower training volume routine is equally effective to a higher training volume routine",
+          "measured": true,
+          "source": ""
+        },
+        {
+          "value": "Kết quả đặc hiệu cho vùng tải 8-12 RM; vùng tải khác có thể cho mô hình khác.",
+          "page": 0,
+          "quote": "our results are specific to training in the 8 to 12 RM range",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Tập ở vùng 1-5 RM có thể cần volume cao hơn do ít “thực hành” với số lặp thấp.",
+          "page": 0,
+          "quote": "training in the 1 to 5 RM zone might require more volume",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Volume không có vẻ ảnh hưởng khác biệt đến sức bền cơ thân trên.",
+          "page": 0,
+          "quote": "Volume does not appear to have any differential effects on measures of upper-body muscular endurance",
+          "measured": true,
+          "source": ""
+        }
+      ],
+      "limitations": [
+        {
+          "value": "Đa số người tham gia trước đó không thường xuyên tập đến momentary failure; ảnh hưởng của yếu tố mới lạ chưa rõ.",
+          "page": 0,
+          "quote": "majority did not regularly train to momentary failure",
+          "source": ""
+        },
+        {
+          "value": "Cơ thân trên chỉ được tập bằng bài đa khớp; bài đơn khớp có thể quan trọng hơn khi tập volume thấp.",
+          "page": 0,
+          "quote": "upper-body musculature was trained exclusively with multijoint exercises",
+          "source": ""
+        },
+        {
+          "value": "Độ dày cơ chỉ đo ở phần giữa bụng cơ; phì đại theo vùng có thể không được phát hiện.",
+          "page": 0,
+          "quote": "measurements of MT were obtained only at the mid-portion of the muscle belly",
+          "source": ""
+        },
+        {
+          "value": "Không thể loại trừ hoàn toàn việc người tham gia tập thêm ngoài chương trình.",
+          "page": 0,
+          "quote": "we cannot entirely rule out that they failed to follow our guidelines",
+          "source": ""
+        },
+        {
+          "value": "Cỡ mẫu tương đối nhỏ nên có thể thiếu power để phát hiện một số khác biệt giữa nhóm.",
+          "page": 0,
+          "quote": "study had a relatively small sample size and thus may have been somewhat underpowered",
+          "source": ""
+        },
+        {
+          "value": "Chưa rõ mức thay đổi đo được trên siêu âm ảnh hưởng thế nào đến vẻ ngoài thẩm mỹ.",
+          "page": 0,
+          "quote": "not clear how the magnitude of the reported changes impact aesthetic appearance",
+          "source": ""
+        },
+        {
+          "value": "Kết quả đặc hiệu cho nam trẻ đã tập kháng lực; không thể khái quát cho vị thành niên, nữ và người lớn tuổi.",
+          "page": 0,
+          "quote": "findings of our study are specific to young resistance-trained men",
+          "source": ""
+        }
+      ],
+      "benefitSignals": [
+        {
+          "value": "Dymatize Nutrition cung cấp sản phẩm protein supplement dùng trong nghiên cứu.",
+          "page": 0,
+          "quote": "Dymatize Nutrition for supplying the protein supplements used in the study",
+          "source": "Acknowledgments"
+        },
+        {
+          "value": "Nghiên cứu được tài trợ bởi PSC CUNY grant từ State of New York.",
+          "page": 0,
+          "quote": "supported by a PSC CUNY grant from the State of New York",
+          "source": "Funding"
+        },
+        {
+          "value": "Các tác giả khai báo không có xung đột lợi ích.",
+          "page": 0,
+          "quote": "The authors declare no conflicts of interest",
+          "source": "Conflict of interest"
+        }
+      ]
+    },
+    "sections": {
+      "introduction": true,
+      "methods": true,
+      "results": true,
+      "discussion": true,
+      "conclusion": true,
+      "limitations": true,
+      "acknowledgments": true,
+      "funding": true,
+      "conflict": true
+    },
+    "glossaryCandidates": [
+      {
+        "value": "p70S6 kinase",
+        "page": 0,
+        "quote": "phosphorylation of p70S6 kinase and muscle protein synthesis",
+        "source": ""
+      },
+      {
+        "value": "muscle protein synthesis (MPS)",
+        "page": 0,
+        "quote": "performing multiple sets augments the phosphorylation of p70S6 kinase and muscle protein synthesis",
+        "source": ""
+      },
+      {
+        "value": "dose–response relationship",
+        "page": 0,
+        "quote": "dose–response relationship between the total number of weekly sets and increases in muscle growth",
+        "source": ""
+      },
+      {
+        "value": "ceiling effect",
+        "page": 0,
+        "quote": "A “ceiling effect” makes it progressively more difficult for trained lifters to increase muscle mass",
+        "source": ""
+      },
+      {
+        "value": "momentary concentric failure",
+        "page": 0,
+        "quote": "inability to perform another concentric repetition while maintaining proper form",
+        "source": ""
+      },
+      {
+        "value": "type II errors",
+        "page": 0,
+        "quote": "low sample sizes in these studies raise the potential for type II errors",
+        "source": ""
+      },
+      {
+        "value": "intraclass correlation coefficient (ICC)",
+        "page": 0,
+        "quote": "test–retest intraclass correlation coefficient (ICC) from our lab",
+        "source": ""
+      },
+      {
+        "value": "standard error of the measurement (SEM)",
+        "page": 0,
+        "quote": "standard error of the measurement (SEM) for elbow flexor",
+        "source": ""
+      },
+      {
+        "value": "JZS Bayes Factor ANCOVA",
+        "page": 0,
+        "quote": "Bayesian approach involved a JZS Bayes Factor ANCOVA with default prior scales",
+        "source": ""
+      },
+      {
+        "value": "nonfunctional overreaching",
+        "page": 0,
+        "quote": "approached an overtraining (i.e., nonfunctional overreaching) status",
+        "source": ""
+      },
+      {
+        "value": "regional-specific hypertrophy",
+        "page": 0,
+        "quote": "hypertrophy manifests in a regional-specific manner",
+        "source": ""
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext"
+    }
+  },
+  "usage": {
+    "input": 67536,
+    "output": 71415,
+    "cost": 0
+  },
+  "model": "deepseek-v4.1-flash",
+  "promptVersion": "v3"
+}

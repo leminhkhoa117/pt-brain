@@ -122,9 +122,9 @@ export default function Dashboard() {
       )}
 
       {/* Signature: ruled measurement strip */}
-      <section className="overflow-hidden rounded-lg border border-line dark:border-white/[0.08]" aria-label="Chỉ số mới nhất">
+      <section className="panel overflow-hidden p-0" aria-label="Chỉ số mới nhất">
         <div className="grid grid-cols-2 gap-px bg-line dark:bg-white/[0.08] lg:grid-cols-4">
-          <div className="bg-surface dark:bg-[#151b18]">
+          <div className="border-t-2 border-t-pine-600 bg-surface dark:border-t-pine-400 dark:bg-[#151b18]">
             <Stat
               label="Cân nặng"
               value={latest ? formatNumber(latest.weightKg, 1) : '—'}
@@ -279,8 +279,11 @@ export default function Dashboard() {
                 action: 'Máy tính TDEE',
               },
             ].map((step, index) => (
-              <li key={step.text} className="flex items-start gap-3 px-4 py-3 sm:px-5">
-                <span className="mt-0.5 font-mono text-[11px] tabular-nums text-slate-500 dark:text-slate-400">
+              <li
+                key={step.text}
+                className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-paper-2/40 sm:px-5 dark:hover:bg-white/[0.015]"
+              >
+                <span className="mt-0.5 rounded bg-paper-2 px-1.5 py-0.5 font-mono text-[10.5px] tabular-nums text-slate-600 dark:bg-white/[0.06] dark:text-slate-300">
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <p className="min-w-0 flex-1 text-[12.5px] leading-relaxed text-slate-600 dark:text-slate-300">
@@ -288,9 +291,9 @@ export default function Dashboard() {
                 </p>
                 <Link
                   to={step.to}
-                  className="shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-pine-700 hover:underline dark:text-pine-300"
+                  className="shrink-0 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-pine-700 hover:underline dark:text-pine-300"
                 >
-                  {step.action}
+                  {step.action} →
                 </Link>
               </li>
             ))}

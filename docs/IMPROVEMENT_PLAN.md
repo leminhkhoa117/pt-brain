@@ -7,7 +7,7 @@
 
 | Hạng mục | Kết quả |
 | --- | --- |
-| Test | **183/183 pass** (21 file, Vitest; đã có API integration với MongoDB thật) |
+| Test | **185/185 pass** (22 file, Vitest; đã có API integration với MongoDB thật) |
 | ESLint | 0 lỗi |
 | Production build | Thành công; entry chính giảm từ ~786 KB xuống ~94 KB sau khi lazy-load route |
 | Bảo mật dependency | 1 high (`zod < 4.6.6`), 2 moderate (`react-router < 7.18.5`) — cần lộ trình nâng cấp |
@@ -50,11 +50,14 @@ Các lỗi dưới đây đã được fix trực tiếp, có test hoặc kiểm
 | 28 | Giáo án bodyweight-only bị trống slot nhưng không giải thích | `server/src/services/training/programService.js`, `server/src/services/ai/planCoach.js` | Trả `missingSlots`, cảnh báo rõ trong preview/cautions |
 | 29 | Chuỗi giả định bữa ăn bị lặp dấu chấm | `client/src/pages/NutritionPage.jsx` | Bỏ dấu chấm thừa trong JSX |
 | 30 | Chưa log được cardio ngoài gym, chưa theo dõi calo vận động và chưa đưa cardio vào giáo án | `shared/training/cardio.js`, `server/src/models/WorkoutSession.js`, `server/src/models/Program.js`, `client/src/pages/training/*` | Thêm log cardio (chạy/bơi/đạp xe...), ước tính MET + pace, cho nhập calo thủ công, tổng calo trong lịch sử, cardio trong editor giáo án và log nhanh từ plan |
+| 31 | Tài khoản mới vào thẳng dashboard, không có trang giới thiệu/hướng dẫn | `client/src/pages/Welcome.jsx`, `server/src/models/User.js`, `server/src/routes/me.js`, `client/src/App.jsx`, `client/src/components/Layout.jsx` | Thêm `/welcome` với 3 section, minh hoạ SVG + mũi tên; tài khoản mới bị redirect vào welcome đến khi bấm “Bắt đầu theo dõi”; tài khoản cũ vào thẳng dashboard và vẫn có link “Giới thiệu” trên nav |
+| 32 | Toàn bộ xác nhận/nhập liệu dùng `window.confirm/prompt` native, lệch giao diện | `client/src/components/DialogProvider.jsx` + 10 file gọi | Thêm `useDialog()` với confirm/prompt/alert dạng modal; hỗ trợ Esc/Hủy, focus input, nút nguy hiểm đỏ; thay toàn bộ lời gọi native |
+| 33 | Chat bài báo trả lời một cục, bố cục Reader đặt chat dưới bài gốc | `server/src/services/ai/client.js`, `paperSummarizer.js`, `server/src/controllers/summaryController.js`, `client/src/api/summaries.js`, `AskPanel.jsx`, `ReaderPage.jsx` | Thêm SSE stream (`ask/stream`) + `chatCompletionStream`; chat hiển thị dần; đổi layout thành tóm tắt + chat song song trên, bài gốc/dịch/ghi chú dưới |
 
 ### Kiểm chứng sau khi sửa
 
 ```bash
-npm run test     # 183/183 pass
+npm run test     # 185/185 pass
 npm run lint     # 0 lỗi
 npm run build    # thành công, entry ~94 KB
 ```

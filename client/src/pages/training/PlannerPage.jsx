@@ -17,6 +17,7 @@ import { getErrorMessage } from '../../api/client.js';
 import { GOAL_LABELS } from '../../lib/format.js';
 import { MUSCLE_LABELS_VI, SPLIT_LABELS } from '@shared/training/planner.js';
 import { CARDIO_BY_KEY } from '@shared/training/cardio.js';
+import { useDialog } from '../../components/DialogProvider.jsx';
 
 const EQUIPMENT = [
   { value: 'barbell', label: 'Barbell' },
@@ -160,6 +161,7 @@ function ProgramDays({ days }) {
 }
 
 export default function PlannerPage() {
+  const dialog = useDialog();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [showWizard, setShowWizard] = useState(false);
@@ -535,7 +537,15 @@ export default function PlannerPage() {
                     type="button"
                     className="btn-ghost btn-sm text-vermilion-600 dark:text-vermilion-300"
                     onClick={() => {
-                      if (window.confirm('Xóa giáo án này?')) remove.mutate(selectedId);
+                      dialog
+                        .confirm({
+                          title: 'Xóa giáo án',
+                          message: 'Xóa giáo án này? Các buổi tập đã log vẫn được giữ.',
+                          confirmLabel: 'Xóa giáo án',
+                        })
+                        .then((ok) => {
+                          if (ok) remove.mutate(selectedId);
+                        });
                     }}
                   >
                     <Icon name="trash" className="h-3.5 w-3.5" />

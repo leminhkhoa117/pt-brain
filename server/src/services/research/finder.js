@@ -4,7 +4,10 @@ import { summarizeSearchResults, synthesizeAnswer } from '../ai/finderSummarizer
 import { searchPubMed } from './pubmed.js';
 import { searchEuropePmc } from './europepmc.js';
 import { searchOpenAlex } from './openalex.js';
+import { searchCrossref } from './crossref.js';
 import { dedupeResults, rankResults } from './ranker.js';
+import { enrichFullTextAvailability } from './oaCandidates.js';
+import { buildLandscape } from './landscape.js';
 import { ApiError } from '../../utils/ApiError.js';
 
 const addUsage = (...items) =>
@@ -23,6 +26,7 @@ async function collectFromSources(queries, { yearFrom, yearTo }) {
     tasks.push(searchPubMed(query, { retmax: 6, yearFrom, yearTo }));
     tasks.push(searchEuropePmc(query, { pageSize: 6, yearFrom, yearTo }));
     tasks.push(searchOpenAlex(query, { perPage: 6, yearFrom, yearTo }));
+    tasks.push(searchCrossref(query, { rows: 6, yearFrom, yearTo }));
   }
   const settled = await Promise.allSettled(tasks);
   const results = [];
@@ -60,8 +64,10 @@ export async function findResearch(user, { question, queries: providedQueries, f
 
   const { results: rawResults, failures, calls } = await collectFromSources(queries, filters);
   const deduped = dedupeResults(rawResults);
-  const ranked = rankResults(deduped, filters);
+  const enriched = await enrichFullTextAvailability(deduped);
+  const ranked = rankResults(enriched, filters);
   const top = ranked.slice(0, 8);
+  const landscape = buildLandscape(ranked);
 
   if (!top.length) {
     return {
@@ -72,6 +78,7 @@ export async function findResearch(user, { question, queries: providedQueries, f
       total: 0,
       scanned: rawResults.length,
       results: [],
+      landscape,
       synthesis:
         'Không tìm thấy bài nào khớp bộ lọc hiện tại. Hãy thử bỏ lọc năm/open access hoặc đổi cách hỏi.',
       usage,
@@ -104,6 +111,7 @@ export async function findResearch(user, { question, queries: providedQueries, f
     total: ranked.length,
     scanned: rawResults.length,
     results,
+    landscape,
     synthesis: synthesis.answer,
     usage,
     model,

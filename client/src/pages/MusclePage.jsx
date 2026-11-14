@@ -9,11 +9,10 @@ export default function MusclePage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Giải phẫu tương tác"
         title="Cơ bắp 3D"
         subtitle="Human Atlas: 2.234 mảnh giải phẫu, 15 hệ cơ quan và 3.432 cấu trúc được đặt tên. Bấm vào cơ để xem metadata, tách lớp, phóng to hoặc tìm bất kỳ cấu trúc nào."
         actions={
-          <span className="badge bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+          <span className="badge badge-pine">
             BodyParts3D 4.0 · CC BY 4.0
           </span>
         }

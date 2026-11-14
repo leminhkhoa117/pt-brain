@@ -32,28 +32,39 @@ export async function searchOpenAlex(query, { perPage = 8, yearFrom, yearTo } = 
   if (filters.length) params.set('filter', filters.join(','));
 
   const data = await fetchJson(`${OPENALEX}?${params.toString()}`);
-  return (data?.results || []).map((work) => {
-    const types = [work.type].filter(Boolean);
-    return {
-      title: normalizeText(work.title || work.display_name || ''),
-      authors: (work.authorships || [])
-        .map((a) => a.author?.display_name)
-        .filter(Boolean)
-        .slice(0, 30),
-      year: work.publication_year || undefined,
-      journal: normalizeText(work.primary_location?.source?.display_name || ''),
-      doi: normalizeDoi(work.doi || ''),
-      pmid: '',
-      pmcid: '',
-      url: work.doi || work.id || '',
-      abstract: reconstructAbstract(work.abstract_inverted_index),
-      publicationTypes: types,
-      evidenceLevel: evidenceLevelFromPublicationTypes(types).level,
-      citationCount: work.cited_by_count || 0,
-      isOpenAccess: Boolean(work.open_access?.is_oa),
-      fullTextUrl: work.open_access?.oa_url || '',
-      pdfUrl: work.best_oa_location?.pdf_url || '',
-      source: 'openalex',
-    };
-  });
+  return (data?.results || []).map(mapOpenAlexWork);
+}
+
+/** Map một `work` OpenAlex sang shape kết quả dùng chung trong Finder/Reader. */
+export function mapOpenAlexWork(work = {}) {
+  const types = [work.type].filter(Boolean);
+  return {
+    title: normalizeText(work.title || work.display_name || ''),
+    authors: (work.authorships || [])
+      .map((a) => a.author?.display_name)
+      .filter(Boolean)
+      .slice(0, 30),
+    year: work.publication_year || undefined,
+    journal: normalizeText(work.primary_location?.source?.display_name || ''),
+    journalHIndex: work.primary_location?.source?.h_index ?? undefined,
+    journalImpact2yr: work.primary_location?.source?.summary_stats?.['2yr_mean_citedness'] ?? undefined,
+    doi: normalizeDoi(work.doi || ''),
+    pmid: String(work.ids?.pmid || '')
+      .replace(/^https?:\/\/pubmed\.ncbi\.nlm\.nih\.gov\//, '')
+      .replace(/\/$/, ''),
+    pmcid: String(work.ids?.pmcid || '')
+      .replace(/^https?:\/\/www\.ncbi\.nlm\.nih\.gov\/pmc\/articles\//, '')
+      .replace(/\/$/, ''),
+    url: work.doi || work.id || '',
+    abstract: reconstructAbstract(work.abstract_inverted_index),
+    publicationTypes: types,
+    evidenceLevel: evidenceLevelFromPublicationTypes(types).level,
+    citationCount: work.cited_by_count || 0,
+    isOpenAccess: Boolean(work.open_access?.is_oa),
+    oaStatus: work.open_access?.oa_status || '',
+    isRetracted: Boolean(work.is_retracted),
+    fullTextUrl: work.open_access?.oa_url || '',
+    pdfUrl: work.best_oa_location?.pdf_url || '',
+    source: 'openalex',
+  };
 }

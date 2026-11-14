@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Icon, PageHeader, Spinner } from '../components/ui.jsx';
+import { useDialog } from '../components/DialogProvider.jsx';
 import {
   deleteSummary,
   listSummaries,
+  summaryCitationUrl,
   summaryPdfUrl,
   updateSummaryMeta,
 } from '../api/summaries.js';
@@ -21,6 +23,7 @@ const LEVEL_STYLES = {
 };
 
 export default function LibraryPage() {
+  const dialog = useDialog();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
@@ -55,8 +58,14 @@ export default function LibraryPage() {
     onError: (err) => setError(getErrorMessage(err)),
   });
 
-  const addTag = (item) => {
-    const value = window.prompt('Nhập tag mới (tối đa 50 ký tự):', '');
+  const addTag = async (item) => {
+    const value = await dialog.prompt({
+      title: 'Thêm tag cho bài',
+      message: 'Tag giúp bạn tìm lại bài nhanh hơn.',
+      placeholder: 'Ví dụ: hypertrophy, volume, đau lưng',
+      maxLength: 50,
+      confirmLabel: 'Thêm tag',
+    });
     const tag = value?.trim().slice(0, 50);
     if (!tag || (item.tags || []).includes(tag)) return;
     meta.mutate({
@@ -164,9 +173,30 @@ export default function LibraryPage() {
             <Card key={item.id} className="flex flex-col">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className={clsx('badge', LEVEL_STYLES[item.paper?.evidenceLevel] || LEVEL_STYLES[5])}>
-                    Mức {item.paper?.evidenceLevel || '?'}
-                  </span>
+                  {item.evidenceAxes?.design?.reason ? (
+                    <span
+                      className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                      title={`Thiết kế: ${item.evidenceAxes.design?.rating || '?'} · Độ chắc chắn: ${
+                        item.evidenceAxes.certainty?.rating || '?'
+                      } · Liên quan: ${item.evidenceAxes.relevance?.rating || '?'}`}
+                    >
+                      3 trục bằng chứng
+                    </span>
+                  ) : (
+                    <span className={clsx('badge', LEVEL_STYLES[item.paper?.evidenceLevel] || LEVEL_STYLES[5])}>
+                      Mức {item.paper?.evidenceLevel || '?'}
+                    </span>
+                  )}
+                  {item.isLegacy && (
+                    <span className="badge bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                      Bản cũ
+                    </span>
+                  )}
+                  {item.needsReview && (
+                    <span className="badge bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
+                      Cần đối chiếu
+                    </span>
+                  )}
                   {item.basedOn === 'abstract_only' && (
                     <span className="badge bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
                       Abstract
@@ -269,11 +299,39 @@ export default function LibraryPage() {
                   >
                     .pdf
                   </a>
+                  <a
+                    href={summaryCitationUrl(item.id, 'bibtex')}
+                    className="btn-ghost !px-2 !py-1 text-xs"
+                    title="Tải BibTeX (.bib)"
+                  >
+                    .bib
+                  </a>
+                  <a
+                    href={summaryCitationUrl(item.id, 'ris')}
+                    className="btn-ghost !px-2 !py-1 text-xs"
+                    title="Tải RIS (.ris)"
+                  >
+                    .ris
+                  </a>
+                  <a
+                    href={summaryCitationUrl(item.id, 'apa')}
+                    className="btn-ghost !px-2 !py-1 text-xs"
+                    title="Tải trích dẫn APA"
+                  >
+                    .apa
+                  </a>
                   <button
                     type="button"
                     className="btn-ghost !px-2 !py-1 text-xs text-rose-500"
-                    onClick={() => {
-                      if (window.confirm('Xóa bài này khỏi thư viện?')) remove.mutate(item.id);
+                    title="Xóa bài khỏi thư viện"
+                    aria-label="Xóa bài khỏi thư viện"
+                    onClick={async () => {
+                      const ok = await dialog.confirm({
+                        title: 'Xóa bài khỏi thư viện',
+                        message: 'Xóa bài này khỏi thư viện? Bản tóm tắt và PDF đã lưu sẽ bị xóa.',
+                        confirmLabel: 'Xóa bài',
+                      });
+                      if (ok) remove.mutate(item.id);
                     }}
                   >
                     <Icon name="trash" className="h-3.5 w-3.5" />

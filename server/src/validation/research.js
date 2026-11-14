@@ -9,6 +9,7 @@ export const researchSearchSchema = z
         yearFrom: z.coerce.number().int().min(1900).max(2100).optional(),
         yearTo: z.coerce.number().int().min(1900).max(2100).optional(),
         openAccessOnly: z.boolean().optional(),
+        fullTextOnly: z.boolean().optional(),
         maxLevel: z.coerce.number().int().min(1).max(5).optional(),
       })
       .strict()
@@ -42,5 +43,13 @@ export const paperCreateSchema = z
       .enum(['pubmed', 'europepmc', 'openalex', 'manual'])
       .optional()
       .default('manual'),
+  })
+  .strict();
+
+export const researchGraphSchema = z
+  .object({
+    doi: z.string().trim().min(3).max(300),
+    kind: z.enum(['references', 'citations', 'related']).default('references'),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
   })
   .strict();

@@ -14,7 +14,9 @@ import {
 import SummaryView from '../components/research/SummaryView.jsx';
 import SourcePane from '../components/research/SourcePane.jsx';
 import AskPanel from '../components/research/AskPanel.jsx';
+import RelatedWorks from '../components/research/RelatedWorks.jsx';
 import ApplyPlanModal from '../components/research/ApplyPlanModal.jsx';
+import { useDialog } from '../components/DialogProvider.jsx';
 import {
   createNote,
   createSummary,
@@ -23,6 +25,7 @@ import {
   getSummary,
   listSummaries,
   listTerms,
+  markSummaryReviewed,
   retrySummary,
   summaryTranslationUrl,
   translateSummary,
@@ -91,6 +94,7 @@ function NoteBox({ summaryId, paperId }) {
 }
 
 export default function ReaderPage() {
+  const dialog = useDialog();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -101,11 +105,11 @@ export default function ReaderPage() {
   const [title, setTitle] = useState('');
   const [file, setFile] = useState(null);
   const [active, setActive] = useState(null);
-  const [pane, setPane] = useState('summary');
   const [error, setError] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [loadingId, setLoadingId] = useState(null);
   const [applyOpen, setApplyOpen] = useState(false);
+  const [chatFocusSignal, setChatFocusSignal] = useState(0);
 
   const listQuery = useQuery({ queryKey: ['summaries'], queryFn: () => listSummaries() });
   const termsQuery = useQuery({ queryKey: ['terms'], queryFn: listTerms });
@@ -133,7 +137,6 @@ export default function ReaderPage() {
       .then((data) => {
         if (!cancelled) {
           setActive(data);
-          setPane('summary');
         }
       })
       .catch((err) => {
@@ -153,7 +156,6 @@ export default function ReaderPage() {
     mutationFn: createSummary,
     onSuccess: (data) => {
       setActive(data);
-      setPane('summary');
       setError(null);
       setLink('');
       setText('');
@@ -240,6 +242,15 @@ export default function ReaderPage() {
     onError: (err) => setError(getErrorMessage(err)),
   });
 
+  const reviewMutation = useMutation({
+    mutationFn: () => markSummaryReviewed(active.summary._id),
+    onSuccess: (data) => {
+      setActive((prev) => (prev ? { ...prev, summary: data.summary } : prev));
+      queryClient.invalidateQueries({ queryKey: ['summaries'] });
+    },
+    onError: (err) => setError(getErrorMessage(err)),
+  });
+
   useEffect(() => {
     if (!createMutation.isPending) {
       setElapsed(0);
@@ -278,7 +289,6 @@ export default function ReaderPage() {
     try {
       const data = await getSummary(id);
       setActive(data);
-      setPane('summary');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setError(getErrorMessage(err));
@@ -373,15 +383,6 @@ export default function ReaderPage() {
                 ← Thư viện
               </button>
             </div>
-            <Segmented
-              className="lg:hidden"
-              options={[
-                { value: 'summary', label: 'Tóm tắt' },
-                { value: 'source', label: 'Bài gốc' },
-              ]}
-              value={pane}
-              onChange={setPane}
-            />
           </div>
 
           {active.summary.status === 'processing' ? (
@@ -424,8 +425,8 @@ export default function ReaderPage() {
             </Alert>
           ) : (
           <>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className={pane === 'source' ? 'hidden lg:block' : ''}>
+          <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(340px,400px)]">
+            <div className="min-w-0 space-y-4">
               <SummaryView
                 summary={active.summary}
                 paper={active.paper}
@@ -433,28 +434,29 @@ export default function ReaderPage() {
                 savingTerm={saveTermMutation.isPending ? saveTermMutation.variables?.en : null}
                 onSaveTerm={(term) => saveTermMutation.mutate(term)}
                 deleting={deleteMutation.isPending}
-                onDelete={() => {
-                  if (window.confirm('Xóa bản tóm tắt này?')) {
-                    deleteMutation.mutate(active.summary._id);
-                  }
+                onDelete={async () => {
+                  const ok = await dialog.confirm({
+                    title: 'Xóa bản tóm tắt',
+                    message: 'Xóa bản tóm tắt này khỏi thư viện?',
+                    confirmLabel: 'Xóa bản tóm tắt',
+                  });
+                  if (ok) deleteMutation.mutate(active.summary._id);
                 }}
                 onApply={() => setApplyOpen(true)}
-                onAsk={() =>
-                  document
-                    .getElementById('paper-chat')
-                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }
-                onRefresh={() => {
-                  if (
-                    window.confirm(
+                onAsk={() => setChatFocusSignal((value) => value + 1)}
+                onRefresh={async () => {
+                  const ok = await dialog.confirm({
+                    title: 'Tạo lại bản tóm tắt',
+                    message:
                       'Tạo lại bản tóm tắt bằng AI? Việc này tốn 1 lượt tóm tắt và có thể mất 1–2 phút. Bản dịch đã lưu vẫn được giữ.',
-                    )
-                  ) {
-                    retryMutation.mutate();
-                  }
+                    confirmLabel: 'Tạo lại',
+                  });
+                  if (ok) retryMutation.mutate();
                 }}
                 refreshing={retryMutation.isPending || translateMutation.isPending}
                 favorite={Boolean(active.summary.isFavorite)}
+                reviewing={reviewMutation.isPending}
+                onReview={() => reviewMutation.mutate()}
                 onToggleFavorite={() =>
                   metaMutation.mutate({
                     id: active.summary._id,
@@ -462,9 +464,7 @@ export default function ReaderPage() {
                   })
                 }
               />
-            </div>
 
-            <div className={pane === 'summary' ? 'hidden lg:block' : ''}>
               <SourcePane
                 text={active.sourceText}
                 url={active.paper?.url || active.summary.sourceUrl}
@@ -477,15 +477,23 @@ export default function ReaderPage() {
                   translateMutation.isError ? getErrorMessage(translateMutation.error) : ''
                 }
               />
+
               <NoteBox summaryId={active.summary._id} paperId={active.paper?._id} />
+              <RelatedWorks doi={active.paper?.doi} />
             </div>
-          </div>
-          <div className="mt-4">
-            <AskPanel
-              summaryId={active.summary._id}
-              initialQa={active.summary.qa || []}
-              sourceChars={active.sourceText?.length || 0}
-            />
+
+            {/* Desktop: bám theo khi cuộn bài. Mobile: thanh chat nổi phía trên bottom nav. */}
+            <aside
+              aria-label="Hỏi AI về bài này"
+              className="max-lg:fixed max-lg:inset-x-2 max-lg:bottom-[calc(4rem+env(safe-area-inset-bottom))] max-lg:z-40 lg:sticky lg:top-20 lg:self-start"
+            >
+              <AskPanel
+                summaryId={active.summary._id}
+                initialQa={active.summary.qa || []}
+                sourceChars={active.sourceText?.length || 0}
+                focusSignal={chatFocusSignal}
+              />
+            </aside>
           </div>
           </>
           )}
@@ -641,29 +649,52 @@ export default function ReaderPage() {
                   key={item.id}
                   type="button"
                   onClick={() => loadSaved(item.id)}
-                  className="card group text-left transition hover:border-brand-300 hover:shadow-soft dark:hover:border-brand-800"
+                  className="card group flex flex-col justify-between text-left transition-colors hover:border-pine-600/60 hover:bg-paper-2/30 dark:hover:border-pine-400/50 dark:hover:bg-white/[0.02]"
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                      Mức {item.paper?.evidenceLevel || '?'}
-                    </span>
-                    {item.basedOn === 'abstract_only' && (
-                      <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-500">
-                        Abstract
-                      </span>
-                    )}
-                    {loadingId === item.id && <Spinner className="h-4 w-4" />}
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      {item.evidenceAxes?.design?.reason ? (
+                        <span
+                          className="badge badge-pine"
+                          title={`Thiết kế: ${item.evidenceAxes.design?.rating || '?'} · Độ chắc chắn: ${
+                            item.evidenceAxes.certainty?.rating || '?'
+                          } · Liên quan: ${item.evidenceAxes.relevance?.rating || '?'}`}
+                        >
+                          3 trục
+                        </span>
+                      ) : (
+                        <span className="badge badge-neutral">
+                          Mức {item.paper?.evidenceLevel || '?'}
+                        </span>
+                      )}
+                      {item.isLegacy ? (
+                        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                          Bản cũ
+                        </span>
+                      ) : null}
+                      {item.needsReview ? (
+                        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-rose-500">
+                          Cần đối chiếu
+                        </span>
+                      ) : null}
+                      {item.basedOn === 'abstract_only' && (
+                        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                          Abstract
+                        </span>
+                      )}
+                      {loadingId === item.id && <Spinner className="h-4 w-4" />}
+                    </div>
+                    <p className="mt-2.5 line-clamp-2 font-display text-[16px] font-semibold leading-snug text-slate-900 group-hover:text-pine-700 dark:text-slate-100 dark:group-hover:text-pine-300">
+                      {item.paper?.title || 'Không rõ tiêu đề'}
+                    </p>
+                    <p className="mt-1 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                      {item.paper?.journal || 'Không rõ tạp chí'}
+                      {item.paper?.year ? ` · ${item.paper.year}` : ''}
+                      {item.createdAt ? ` · lưu ${formatDateKey(String(item.createdAt).slice(0, 10))}` : ''}
+                    </p>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm font-semibold leading-snug text-slate-800 group-hover:text-brand-700 dark:text-slate-100 dark:group-hover:text-brand-300">
-                    {item.paper?.title || 'Không rõ tiêu đề'}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    {item.paper?.journal || 'Không rõ tạp chí'}
-                    {item.paper?.year ? ` · ${item.paper.year}` : ''}
-                    {item.createdAt ? ` · lưu ${formatDateKey(String(item.createdAt).slice(0, 10))}` : ''}
-                  </p>
                   {item.tldr && (
-                    <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                    <p className="mt-2.5 line-clamp-3 border-t border-line/70 pt-2.5 text-xs leading-relaxed text-slate-500 dark:border-white/[0.06] dark:text-slate-400">
                       {item.tldr}
                     </p>
                   )}

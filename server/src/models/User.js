@@ -46,6 +46,9 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true, select: false },
     name: { type: String, required: true, trim: true, maxlength: 80 },
     profile: { type: profileSchema, default: () => ({}) },
+    // Chỉ tài khoản mới đăng ký mới bị đưa qua trang giới thiệu lần đầu.
+    // Tài khoản cũ không có field này sẽ coi như false và vào thẳng dashboard.
+    onboardingRequired: { type: Boolean, default: false },
     refreshTokenHash: { type: String, select: false },
     refreshTokenExpiresAt: { type: Date, select: false },
   },

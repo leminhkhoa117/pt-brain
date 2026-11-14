@@ -12,6 +12,7 @@ import {
   Segmented,
   Spinner,
 } from '../components/ui.jsx';
+import { useDialog } from '../components/DialogProvider.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import {
   createManualMeal,
@@ -119,6 +120,7 @@ function Progress({ value, max, label, unit, info }) {
 }
 
 export default function NutritionPage() {
+  const dialog = useDialog();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [date, setDate] = useState(todayKey());
@@ -499,7 +501,7 @@ export default function NutritionPage() {
                     return (
                       <div
                         key={index}
-                        className="space-y-2 rounded-xl border border-slate-200 p-2.5 dark:border-slate-800"
+                        className="space-y-2 rounded-md border border-line bg-paper-2/35 p-2.5 dark:border-white/[0.08] dark:bg-white/[0.02]"
                       >
                         <div className="flex items-center gap-1.5">
                           <input
@@ -570,12 +572,12 @@ export default function NutritionPage() {
                 </div>
 
                 {estimateMeta && (
-                  <div className="rounded-xl border border-brand-200/70 bg-brand-50/70 p-2.5 dark:border-brand-900/60 dark:bg-brand-950/30">
+                  <div className="rounded-md border border-brand-200/70 bg-brand-50/60 p-2.5 dark:border-brand-900/60 dark:bg-brand-950/30">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-bold text-brand-700 dark:text-brand-300">
+                      <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.06em] text-brand-700 dark:text-brand-300">
                         AI ước tính · tin cậy {estimateMeta.confidence}
                       </span>
-                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="num text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                         {formatNumber(estimateTotals.calories, 0)} kcal
                       </span>
                     </div>
@@ -593,15 +595,15 @@ export default function NutritionPage() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-slate-50 p-2 text-center text-[11px] dark:bg-white/[0.04]">
-                  <span>
-                    P <b>{formatNumber(estimateTotals.proteinG, 0)}</b> g
+                <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-center font-mono text-[11.5px] dark:border-white/[0.08] dark:bg-white/[0.08]">
+                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                    P <b className="text-slate-900 dark:text-white">{formatNumber(estimateTotals.proteinG, 0)}</b> g
                   </span>
-                  <span>
-                    C <b>{formatNumber(estimateTotals.carbsG, 0)}</b> g
+                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                    C <b className="text-slate-900 dark:text-white">{formatNumber(estimateTotals.carbsG, 0)}</b> g
                   </span>
-                  <span>
-                    F <b>{formatNumber(estimateTotals.fatG, 0)}</b> g
+                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                    F <b className="text-slate-900 dark:text-white">{formatNumber(estimateTotals.fatG, 0)}</b> g
                   </span>
                 </div>
 
@@ -666,7 +668,7 @@ export default function NutritionPage() {
                   {manualItems.map((item, index) => (
                     <div
                       key={index}
-                      className="space-y-2 rounded-xl border border-slate-200 p-2.5 dark:border-slate-800"
+                      className="space-y-2 rounded-md border border-line bg-paper-2/35 p-2.5 dark:border-white/[0.08] dark:bg-white/[0.02]"
                     >
                       <div className="flex items-center gap-1.5">
                         <input
@@ -726,15 +728,15 @@ export default function NutritionPage() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-slate-50 p-2 text-center text-[11px] dark:bg-white/[0.04]">
-                  <span>
-                    P <b>{formatNumber(manualTotals.proteinG, 0)}</b> g
+                <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-center font-mono text-[11.5px] dark:border-white/[0.08] dark:bg-white/[0.08]">
+                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                    P <b className="text-slate-900 dark:text-white">{formatNumber(manualTotals.proteinG, 0)}</b> g
                   </span>
-                  <span>
-                    C <b>{formatNumber(manualTotals.carbsG, 0)}</b> g
+                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                    C <b className="text-slate-900 dark:text-white">{formatNumber(manualTotals.carbsG, 0)}</b> g
                   </span>
-                  <span>
-                    F <b>{formatNumber(manualTotals.fatG, 0)}</b> g
+                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                    F <b className="text-slate-900 dark:text-white">{formatNumber(manualTotals.fatG, 0)}</b> g
                   </span>
                 </div>
 
@@ -867,10 +869,19 @@ export default function NutritionPage() {
                         <button
                           type="button"
                           className="btn-ghost btn-sm"
-                          onClick={() => {
-                            const value = window.prompt('Sửa ghi chú bữa ăn', meal.notes || '');
-                            if (value !== null)
+                          onClick={async () => {
+                            const value = await dialog.prompt({
+                              title: 'Sửa ghi chú bữa ăn',
+                              message: 'Ghi chú giúp bạn nhớ khẩu phần hoặc hoàn cảnh bữa ăn.',
+                              defaultValue: meal.notes || '',
+                              placeholder: 'Ví dụ: ăn ngoài, có sốt, ước lượng...',
+                              multiline: true,
+                              maxLength: 2000,
+                              confirmLabel: 'Lưu ghi chú',
+                            });
+                            if (value !== null) {
                               edit.mutate({ id: meal._id, payload: { notes: value } });
+                            }
                           }}
                         >
                           Sửa
@@ -879,8 +890,13 @@ export default function NutritionPage() {
                           type="button"
                           className="btn-ghost btn-sm text-vermilion-600 dark:text-vermilion-300"
                           aria-label="Xóa bữa ăn"
-                          onClick={() => {
-                            if (window.confirm('Xóa bữa ăn này?')) remove.mutate(meal._id);
+                          onClick={async () => {
+                            const ok = await dialog.confirm({
+                              title: 'Xóa bữa ăn',
+                              message: 'Xóa bữa ăn này? Tổng calo trong ngày sẽ được cập nhật lại.',
+                              confirmLabel: 'Xóa bữa ăn',
+                            });
+                            if (ok) remove.mutate(meal._id);
                           }}
                         >
                           <Icon name="trash" className="h-3.5 w-3.5" />

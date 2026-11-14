@@ -1,6 +1,8 @@
 import PDFDocument from 'pdfkit';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { formatDoiForDisplay } from '../../utils/doi.js';
+import { buildFactsAudit } from '../../utils/factsExport.js';
 
 const FONT_DIR = fileURLToPath(new URL('../../../assets/fonts/', import.meta.url));
 const FONT_REGULAR = path.join(FONT_DIR, 'NotoSans-Regular.ttf');
@@ -82,23 +84,49 @@ export function buildSummaryPdf(summary, paper) {
   doc.font('NotoBold').fontSize(17).fillColor('#0f172a').text(title, { lineGap: 2 });
   doc.moveDown(0.3);
 
-  const authors = (meta.authors || paper?.authors || []).slice(0, 8).join(', ');
+  const authors = (meta.authors || paper?.authors || []).join(', ');
   doc.font('Noto').fontSize(9).fillColor('#64748b');
   doc.text(
-    [authors, meta.journal || paper?.journal, meta.year || paper?.year, meta.doi || paper?.doi]
+    [
+      authors,
+      meta.journal || paper?.journal,
+      meta.year || paper?.year,
+      meta.volume || paper?.volume
+        ? `${meta.volume || paper?.volume}${
+            meta.issue || paper?.issue ? `(${meta.issue || paper?.issue})` : ''
+          }`
+        : '',
+      meta.pages || paper?.pages ? `tr. ${meta.pages || paper?.pages}` : '',
+      meta.doi || paper?.doi
+        ? `DOI ${formatDoiForDisplay(meta.doi || paper?.doi)}`
+        : 'DOI không nêu',
+    ]
       .filter(Boolean)
       .join(' · '),
   );
   doc.moveDown(0.4);
-  doc
-    .font('NotoBold')
-    .fontSize(9)
-    .fillColor('#0f766e')
-    .text(
-      `Mức bằng chứng ${c.evidenceLevel?.level ?? '?'}/5 · ${
-        c.confidence?.basedOn === 'abstract_only' ? 'Chỉ dựa trên abstract' : 'Dựa trên toàn văn'
-      }`,
-    );
+
+  if (c.evidenceAxes) {
+    const axisLabels = {
+      design: 'Thiết kế',
+      certainty: 'Độ chắc chắn',
+      relevance: 'Liên quan tới PT',
+    };
+    for (const [key, label] of Object.entries(axisLabels)) {
+      const axis = c.evidenceAxes[key];
+      if (axis?.reason) labelValue(doc, `${label} (${axis.rating})`, axis.reason);
+    }
+  } else {
+    doc
+      .font('NotoBold')
+      .fontSize(9)
+      .fillColor('#0f766e')
+      .text(
+        `Mức bằng chứng ${c.evidenceLevel?.level ?? '?'}/5 · ${
+          c.confidence?.basedOn === 'abstract_only' ? 'Chỉ dựa trên abstract' : 'Dựa trên toàn văn'
+        }`,
+      );
+  }
 
   if (c.confidence?.basedOn === 'abstract_only') {
     doc.moveDown(0.3);
@@ -109,13 +137,20 @@ export function buildSummaryPdf(summary, paper) {
       .text('Lưu ý: bản tóm tắt này chỉ dựa trên abstract, có thể thiếu thiết kế chi tiết và bảng số liệu.');
   }
 
-  doc.moveDown(0.8);
-  doc.font('Noto').fontSize(10.5).fillColor('#0f172a');
-  doc.text(clean(c.tldr), { lineGap: 3 });
+  if (c.quickRead?.lines?.length) {
+    heading(doc, '30 giây');
+    bullets(doc, c.quickRead.lines);
+    if (c.quickRead.readyForPt) labelValue(doc, 'Dùng được cho PT chưa?', c.quickRead.readyForPt);
+  } else {
+    doc.moveDown(0.8);
+    doc.font('Noto').fontSize(10.5).fillColor('#0f172a');
+    doc.text(clean(c.tldr), { lineGap: 3 });
+  }
 
-  heading(doc, 'Câu hỏi nghiên cứu');
-  paragraph(doc, c.researchQuestion);
-  heading(doc, 'Thiết kế & đối tượng');
+  heading(doc, 'Vì sao làm nghiên cứu');
+  paragraph(doc, c.whyStudy || c.researchQuestion);
+
+  heading(doc, 'Họ đã làm gì');
   labelValue(doc, 'Loại nghiên cứu', c.studyType);
   if (c.participants) {
     labelValue(
@@ -127,8 +162,17 @@ export function buildSummaryPdf(summary, paper) {
   labelValue(doc, 'Thiết kế', c.design);
   labelValue(doc, 'Can thiệp', c.intervention);
   labelValue(doc, 'Chỉ số đo', c.outcomes);
+  labelValue(doc, 'Nơi đo', c.measurementNote);
 
-  heading(doc, 'Kết quả chính');
+  if (c.mechanism?.summary || c.mechanism?.steps?.length) {
+    heading(doc, 'Cơ chế can thiệp');
+    paragraph(doc, c.mechanism.summary);
+    bullets(doc, c.mechanism.steps || []);
+    labelValue(doc, 'Vì sao tạ đứng yên lúc đầu', c.mechanism.whyWeightStaysStill);
+    labelValue(doc, 'So sánh đời thường', c.mechanism.analogy);
+  }
+
+  heading(doc, 'Kết quả');
   if (c.resultsOverview) {
     doc
       .font('Noto')
@@ -145,6 +189,12 @@ export function buildSummaryPdf(summary, paper) {
       lineGap: 2,
     });
     paragraph(doc, `Nghĩa là: ${item.plainMeaning}`, { size: 9, color: '#475569' });
+    if (item.certainty) {
+      paragraph(doc, `Mức chắc chắn: ${item.certainty.rating} — ${item.certainty.reason}`, {
+        size: 8.5,
+        color: '#64748b',
+      });
+    }
     doc.moveDown(0.25);
   }
 
@@ -171,31 +221,119 @@ export function buildSummaryPdf(summary, paper) {
     bullets(doc, c.secondaryResults.map((item) => `${item.finding} — ${item.numbers}`));
   }
 
-  heading(doc, 'Kết luận của tác giả');
-  paragraph(doc, c.authorsConclusion);
+  heading(doc, 'Tác giả diễn giải');
+  paragraph(doc, c.authorsView?.conclusion || c.authorsConclusion);
+  if (c.authorsView?.interpretations?.length) {
+    labelValue(doc, 'Cách tác giả giải thích', '');
+    bullets(doc, c.authorsView.interpretations);
+  }
+  if (c.authorsView?.applications?.length) {
+    labelValue(doc, 'Ứng dụng tác giả nêu', '');
+    bullets(doc, c.authorsView.applications);
+  }
 
-  if (Array.isArray(c.limitations) && c.limitations.length) {
+  if (c.limitationsStructured?.authors?.length || c.limitationsStructured?.ai?.length) {
+    heading(doc, 'Hạn chế');
+    if (c.limitationsStructured.authors?.length) {
+      labelValue(doc, 'Tác giả nêu', '');
+      bullets(doc, c.limitationsStructured.authors);
+    }
+    if (c.limitationsStructured.ai?.length) {
+      labelValue(doc, 'AI nhận thấy', '');
+      bullets(doc, c.limitationsStructured.ai);
+    }
+  } else if (Array.isArray(c.limitations) && c.limitations.length) {
     heading(doc, 'Hạn chế');
     bullets(doc, c.limitations);
   }
 
-  heading(doc, 'Xung đột lợi ích');
-  paragraph(doc, c.conflictOfInterest);
-
-  if (Array.isArray(c.practicalTakeaways) && c.practicalTakeaways.length) {
+  if (c.application) {
+    heading(doc, 'Áp dụng cho PT');
+    const groups = [
+      ['supported', 'Có cơ sở'],
+      ['hypothesis', 'Chỉ là giả thuyết'],
+      ['notYet', 'Chưa nên áp dụng'],
+      ['unanswered', 'Bài không trả lời'],
+    ];
+    for (const [key, label] of groups) {
+      const items = c.application[key] || [];
+      labelValue(doc, label, items.length ? '' : 'Không có ý nào.');
+      bullets(doc, items);
+    }
+    labelValue(
+      doc,
+      'Không áp dụng cho',
+      c.application.notApplicableTo || c.whoItDoesNotApplyTo,
+    );
+  } else if (Array.isArray(c.practicalTakeaways) && c.practicalTakeaways.length) {
     heading(doc, 'Ứng dụng thực tế');
     bullets(doc, c.practicalTakeaways);
   }
 
-  heading(doc, 'Không áp dụng cho');
-  paragraph(doc, c.whoItDoesNotApplyTo);
+  heading(doc, 'Lợi ích & tài trợ');
+  paragraph(doc, c.benefitSignals?.statement || c.conflictOfInterest);
+  if (c.benefitSignals?.flags?.length) {
+    bullets(
+      doc,
+      c.benefitSignals.flags.map(
+        (flag) =>
+          `${flag.text}${flag.source ? ` (${flag.source}${flag.page ? `, tr. ${flag.page}` : ''})` : ''}`,
+      ),
+    );
+  }
+
+  if (c.selfCheck?.length) {
+    heading(doc, '3 câu tự kiểm tra');
+    c.selfCheck.forEach((item, index) => {
+      doc.font('NotoBold').fontSize(9.5).fillColor('#1e293b').text(`${index + 1}. ${item.question}`);
+      paragraph(doc, item.answer, { size: 9, color: '#475569' });
+    });
+  }
 
   if (Array.isArray(c.glossary) && c.glossary.length) {
     heading(doc, 'Thuật ngữ');
     bullets(
       doc,
-      c.glossary.map((term) => `${term.en} (${term.vi}): ${term.explanation}`),
+      c.glossary.map(
+        (term) =>
+          `${term.en} (${term.vi}): ${term.explanation}${term.example ? ` Ví dụ: ${term.example}` : ''}`,
+      ),
     );
+  }
+
+  if (summary.facts) {
+    const audit = buildFactsAudit(summary.facts);
+    heading(doc, 'Phụ lục — Dữ kiện kiểm chứng (audit)');
+    labelValue(doc, 'Thiết kế', audit.design);
+    labelValue(doc, 'Đối tượng', audit.participants);
+    labelValue(doc, 'Can thiệp', audit.intervention);
+    labelValue(doc, 'Thiết bị', audit.device);
+    labelValue(doc, 'Đo lường', audit.measurement);
+    labelValue(doc, 'Tiêu chí dừng set', audit.failureCriteria);
+    if (audit.results.length) {
+      labelValue(doc, 'Kết quả gốc', '');
+      audit.results.slice(0, 12).forEach((row) => {
+        const parts = [
+          `${row.index}. ${row.outcome}`,
+          row.arms,
+          row.test || row.note,
+          row.page ? `tr. ${row.page}` : '',
+          row.quote ? `“${row.quote}”` : '',
+        ].filter(Boolean);
+        bullets(doc, [parts.join(' — ')]);
+      });
+      if (audit.results.length > 12) {
+        paragraph(doc, `… còn ${audit.results.length - 12} kết quả khác trong JSON dữ kiện.`, {
+          size: 8.5,
+          color: '#64748b',
+        });
+      }
+    }
+    labelValue(doc, 'Kết luận tác giả (facts)', audit.conclusion);
+    if (audit.benefitSignals.length) {
+      labelValue(doc, 'Dấu hiệu lợi ích (facts)', '');
+      bullets(doc, audit.benefitSignals);
+    }
   }
 
   heading(doc, 'Độ tin cậy');
@@ -206,6 +344,13 @@ export function buildSummaryPdf(summary, paper) {
       : 'Không có thông tin thiếu được ghi nhận.',
     { size: 9, color: '#64748b' },
   );
+  if (c.verification?.factsWarnings?.length) {
+    paragraph(
+      doc,
+      `${c.verification.factsWarnings.length} trích nguyên văn chưa khớp hoàn toàn; nên đối chiếu PDF gốc.`,
+      { size: 8.5, color: '#b45309' },
+    );
+  }
 
   doc.moveDown(1);
   doc

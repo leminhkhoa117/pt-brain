@@ -9,6 +9,7 @@
 | Khu vực | Luồng đã kiểm tra | Kết quả |
 | --- | --- | --- |
 | Đăng ký / đăng nhập | Đăng ký, redirect Settings, đăng xuất, đăng nhập lại, refresh token sau khi access token hết hạn | OK |
+| Trang giới thiệu | Tài khoản mới tự vào `/welcome`, xem 3 section + minh hoạ/mũi tên, bấm “Bắt đầu theo dõi” → `/`, đăng nhập lại vào thẳng dashboard; link “Giới thiệu” vẫn mở lại được | OK |
 | Hồ sơ | Lưu giới tính, ngày sinh, chiều cao, cân nặng, mục tiêu, kinh nghiệm, bệnh nền | OK |
 | Dashboard | Hiển thị dữ liệu, ghi nhanh cân nặng, MA7, BMI/% mỡ, heatmap, gợi ý việc cần làm | OK |
 | Máy tính | 1RM (Epley/Brzycki), lưu lịch sử, Calo & macro, thành phần cơ thể, vùng nhịp tim | OK |
@@ -19,7 +20,8 @@
 | Log cardio | Chạy bộ 3 km/15 phút → 219 kcal (ước tính MET/pace); bơi 40 phút nhập tay 321 kcal; xem tổng calo và chi tiết trong lịch sử | OK |
 | Thư viện bài tập | 110 bài, lọc theo nhóm cơ/dụng cụ | OK |
 | Thư viện nghiên cứu | 45 bản ghi seed, tải 40 → “Tải thêm” → 45, search “Bài 44” → 1, favorite filter, thêm/xóa tag | OK |
-| Reader | Mở bài từ thư viện, xem tóm tắt, bài gốc, ghi chú, chat panel | OK |
+| Reader | Mở bài từ thư viện; tóm tắt và chat AI song song trên; bài gốc + bản dịch + ghi chú ở dưới; chat stream hiện dần từng đoạn (fake AI SSE) | OK |
+| Hộp thoại | Xác nhận xóa lịch sử chat bằng modal mới, Hủy không xóa, xác nhận thì xóa; prompt thêm tag nhập liệu trong modal | OK |
 | Học tập | Thêm thuật ngữ, tạo flashcard, ôn SM-2, tạo ghi chú | OK |
 | Cơ bắp 3D | Trang `/muscles`, canvas Three.js, danh sách 15 hệ cơ quan, tìm kiếm | OK |
 | Cài đặt | AI usage card, dark mode, xuất CSV, xóa tài khoản | OK |
@@ -61,7 +63,7 @@
 ## Kết quả cuối
 
 ```bash
-npm run test     # 183/183 pass
+npm run test     # 185/185 pass
 npm run lint     # 0 lỗi
 npm run build    # thành công
 ```

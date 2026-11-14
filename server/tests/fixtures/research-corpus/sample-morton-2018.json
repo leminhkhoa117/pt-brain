@@ -1,0 +1,1394 @@
+{
+  "content": {
+    "metadata": {
+      "title": "A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults.",
+      "authors": [
+        "Morton RW",
+        "Murphy KT",
+        "McKellar SR",
+        "Schoenfeld BJ",
+        "Henselmans M",
+        "Helms E",
+        "Aragon AA",
+        "Devries MC",
+        "Banfield L",
+        "Krieger JW",
+        "Phillips SM"
+      ],
+      "year": 2018,
+      "journal": "British journal of sports medicine",
+      "volume": "52",
+      "issue": "6",
+      "pages": "376-384",
+      "doi": "10.1136/bjsports-2017-097608"
+    },
+    "tldr": "[Dữ kiện] Bài gộp các thử nghiệm ngẫu nhiên ở người lớn khỏe mạnh: bổ sung protein giúp tăng thêm một phần khối cơ không mỡ và sức mạnh 1RM khi tập kháng lực. [Tác giả diễn giải] Hiệu quả rõ hơn ở người trẻ hoặc đã tập; bản thân tập kháng lực vẫn là yếu tố tạo khác biệt lớn hơn nhiều.",
+    "researchQuestion": "Không nêu trong bài",
+    "studyType": "Tổng quan hệ thống, phân tích gộp (meta-analysis) và hồi quy gộp (meta-regression) của các thử nghiệm ngẫu nhiên có đối chứng.",
+    "evidenceLevel": {
+      "level": 1,
+      "explanation": "Đây là tổng quan hệ thống và phân tích gộp của các thử nghiệm ngẫu nhiên có đối chứng — thiết kế mạnh nhất cho câu hỏi can thiệp. Tuy vậy, chất lượng từng thử nghiệm, độ không đồng nhất và khác biệt cách đo làm mức chắc chắn không tuyệt đối."
+    },
+    "evidenceAxes": {
+      "design": {
+        "rating": "cao",
+        "reason": "Tổng quan hệ thống, phân tích gộp và hồi quy gộp của thử nghiệm ngẫu nhiên có đối chứng; có phân tích độ nhạy và đánh giá nguy cơ thiên lệch."
+      },
+      "certainty": {
+        "rating": "vừa",
+        "reason": "Cỡ mẫu lớn nhưng nhiều thử nghiệm thiếu mù, cách đo 1RM khác nhau, độ không đồng nhất còn đáng kể, một số mô hình có ít nghiên cứu và một số kết quả mất ý nghĩa trong phân tích độ nhạy."
+      },
+      "relevance": {
+        "rating": "cao",
+        "reason": "Trả lời trực tiếp câu hỏi PT hay gặp: bổ sung protein có giúp tăng thêm cơ và sức mạnh khi khách tập kháng lực hay không."
+      }
+    },
+    "participants": {
+      "n": 1863,
+      "description": "[Dữ kiện] 49 thử nghiệm từ 17 quốc gia; tuổi trung bình 35±20; 10 thử nghiệm trên người đã tập; 14 nhóm toàn nữ; công bố từ 1962 đến 2016."
+    },
+    "design": "[Dữ kiện] Tổng quan hệ thống, phân tích gộp và hồi quy gộp của các thử nghiệm ngẫu nhiên có đối chứng. Can thiệp tập kháng lực kéo dài 6–52 tuần (13±8). Nhóm so sánh nhận cùng chương trình tập nhưng không bổ sung protein hoặc dùng giả dược.",
+    "intervention": "[Dữ kiện] Tập kháng lực kèm bổ sung protein. Liều bổ sung dao động 4–106 g/ngày (36±30; người trẻ 42±32; người lớn tuổi 20±18). Liều sau tập dao động 5–44 g (24±11; người trẻ 24±12; người lớn tuổi 23±10).",
+    "outcomes": "[Dữ kiện] Các chỉ số được gộp: sức mạnh 1RM; co cơ tự nguyện tối đa (MVC); tổng khối lượng cơ thể; khối lượng không mỡ (FFM); khối lượng mỡ; diện tích cắt ngang sợi cơ; diện tích cắt ngang toàn bộ cơ giữa xương đùi.",
+    "measurementNote": "[Dữ kiện] 1RM đo bằng các bài test 1RM; MVC đo bằng dynamometer; thành phần cơ thể đo bằng DXA, hydrodensitometry hoặc BodPod; diện tích cắt ngang đo bằng MRI/CT và sinh thiết cơ.",
+    "resultsOverview": "[Dữ kiện] Protein có tín hiệu tích cực lên 1RM và FFM, nhưng hiệu ứng nhỏ so với tập kháng lực. Nhiều so sánh ở người chưa tập hoặc lớn tuổi không đạt ý nghĩa thống kê; với MVC và tổng khối lượng cơ thể, phân tích gộp không phát hiện khác biệt.",
+    "mainResults": [
+      {
+        "finding": "[Dữ kiện] Bổ sung protein tăng thêm mức cải thiện 1RM so với đối chứng khi gộp các thử nghiệm; mức tăng do tập kháng lực đơn thuần lớn hơn nhiều.",
+        "numbers": "MD 2.49 kg (95% CI 0.64–4.33), p=0.01 trên 28 nghiên cứu; tập kháng lực đơn thuần: 27±22 kg; phần thêm của protein: 9%.",
+        "plainMeaning": "[Nhận xét của AI] Với PT: đây là chênh lệch trung bình, không phải cam kết từng khách sẽ tăng thêm; đừng bán protein như yếu tố chính.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Nhiều thử nghiệm được gộp, nhưng độ không đồng nhất và cách đo 1RM khác nhau."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "MD: 2.49 kg (0.64, 4.33), p=0.01; figure 2"
+      },
+      {
+        "finding": "[Dữ kiện] FFM tăng thêm có ý nghĩa khi gộp chung; khi tách nhóm, tín hiệu rõ ở người đã tập, còn người chưa tập thì không đạt ý nghĩa thống kê.",
+        "numbers": "Tổng: MD 0.30 kg (95% CI 0.09–0.52), p=0.007; chưa tập: 0.15 kg (−0.02–0.31), p=0.08; đã tập: 1.05 kg (0.61–1.50), p<0.0001.",
+        "plainMeaning": "[Nhận xét của AI] Khi khách đã có nền tập, protein có thể là phần đáng bàn; với người mới, đừng hứa hiệu ứng rõ.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Kết quả tổng có ý nghĩa nhưng phân nhóm chưa tập không đạt ý nghĩa và có khác biệt giữa các thử nghiệm."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "FFM (MD: 0.30 kg (0.09, 0.52), p=0.007; figure 3)"
+      },
+      {
+        "finding": "[Dữ kiện] Hai chỉ số MVC và tổng khối lượng cơ thể không cho thấy tín hiệu có ý nghĩa thống kê trong phân tích gộp.",
+        "numbers": "MVC: SMD 0.04, p=0.54; tổng khối lượng cơ thể: MD 0.11 kg (−0.23–0.46), p=0.52.",
+        "plainMeaning": "[Nhận xét của AI] Đừng dùng MVC hay cân nặng làm thước đo chính để đánh giá protein; 1RM và FFM phù hợp hơn.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Không phát hiện khác biệt, nhưng cách đo MVC khác nhau và tổng cân nặng là chỉ số thô."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "MVC (SMD: 0.04 (-0.09, 0.16), p=0.54)."
+      },
+      {
+        "finding": "[Dữ kiện] Có chênh lệch về diện tích cắt ngang sợi cơ và diện tích cắt ngang toàn bộ cơ giữa xương đùi trong phân tích chính; hiệu ứng sợi cơ mất ý nghĩa khi thêm một nghiên cứu trong phân tích độ nhạy.",
+        "numbers": "Sợi cơ: MD 310 µm2 (95% CI 51–570), p=0.02; cơ giữa xương đùi: MD 7.2 mm2 (0.20–14.30), p=0.04; sợi cơ khi thêm Mitchell et al.: 153 µm2 (−137–443), p=0.30.",
+        "plainMeaning": "[Nhận xét của AI] Tín hiệu mô học không vững; đừng dùng để khẳng định chắc chắn protein làm dày cơ.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Hiệu ứng sợi cơ mất ý nghĩa trong phân tích độ nhạy; số nghiên cứu cho mô học ít hơn các chỉ số khác."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "fibre CSA (MD: 310 µm 2 (51, 570), p=0.02"
+      },
+      {
+        "finding": "[Dữ kiện] Hiệu ứng FFM lớn hơn ở người trẻ và người đã tập; tuổi và tình trạng tập có liên quan trong hồi quy gộp.",
+        "numbers": "Người >45 tuổi: MD 0.06 kg (95% CI −0.14–0.26); người <45 tuổi: 0.55 kg (0.30–0.81); khác biệt giữa nhóm tuổi p=0.003; tuổi cho FFM: coeff −0.01 (−0.02–0.00), p=0.02; tình trạng tập cho FFM: coeff 0.75, p=0.03.",
+        "plainMeaning": "[Nhận xét của AI] Với khách lớn tuổi, protein có thể vẫn quan trọng cho sức khỏe nhưng đừng kỳ vọng mức tăng FFM như người trẻ dựa riêng trên bài này.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Có phân nhóm và hồi quy gộp, nhưng dữ liệu người lớn tuổi ít hơn và độ không đồng nhất giữa nhóm tuổi cao."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "old (>45; 67±7 years; MD: 0.06 (-0.14, 0.26)) and young"
+      },
+      {
+        "finding": "[Dữ kiện] Bài tìm điểm gãy về lượng protein nền cho FFM, nhưng mô hình hai pha không đạt ý nghĩa thống kê; lượng protein nền có liên quan đến FFM trong mô hình đơn biến.",
+        "numbers": "Điểm gãy: 1.62 g/kg/ngày (95% CI 1.03–2.20), p=0.079; lượng protein nền cho FFM: liên quan có ý nghĩa thống kê, p=0.045.",
+        "plainMeaning": "[Nhận xét của AI] Con số này là gợi ý từ mô hình, không phải ngưỡng đã được chứng minh; cần đọc như giả thuyết.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Mô hình hai pha không đạt ý nghĩa thống kê; đây là phân tích hồi quy trên dữ liệu gộp, không phải thử nghiệm liều chuẩn."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "break point=1.62 (1.03, 2.20) g/kg/day, slope=1.75, R 2 =0.19"
+      },
+      {
+        "finding": "[Dữ kiện] Có độ không đồng nhất giữa các thử nghiệm, và mô hình đa biến với các yếu tố chính không giải thích được phương sai của hiệu ứng 1RM và FFM.",
+        "numbers": "1RM: I2=33%, p=0.003; sợi cơ: I2=68%, p=0.0006; đa biến 1RM p=0.77; FFM p=0.12; whole-body: I2=2%, Adj. R2=76%, p=0.01; supervised: I2=5%, Adj. R2=58%, p=0.047.",
+        "plainMeaning": "[Nhận xét của AI] Kết quả không đồng nhất nghĩa là cùng một liều protein có thể cho kết quả khác nhau tùy chương trình tập; PT nên xem chương trình tập là nền.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Phân tích gộp có kiểm tra độ không đồng nhất và hồi quy gộp, nhưng nhiều yếu tố chưa được giải thích."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "1RM (χ 2 =53.49, I 2 =33%, p=0.003) and fibre CSA"
+      }
+    ],
+    "secondaryResults": [
+      {
+        "finding": "[Dữ kiện] Tách theo tình trạng tập, 1RM chỉ có tín hiệu ở nhóm đã tập; nhóm chưa tập không đạt ý nghĩa thống kê.",
+        "numbers": "Chưa tập: MD 0.99 kg (95% CI −0.27–2.25), p=0.12; đã tập: MD 4.27 kg (0.61–7.94), p=0.02.",
+        "plainMeaning": "[Nhận xét của AI] Với người mới, đừng dùng protein như lý do chính để hứa tăng 1RM rõ.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Là phân nhóm của phân tích gộp; nhóm chưa tập không đạt ý nghĩa."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "untrained: 0.99 kg (−0.27, 2.25), p=0.12"
+      },
+      {
+        "finding": "[Dữ kiện] Khối lượng mỡ thấp hơn ở nhóm bổ sung protein so với đối chứng.",
+        "numbers": "MD −0.41 kg (95% CI −0.70–−0.13), p=0.005.",
+        "plainMeaning": "[Nhận xét của AI] Chênh lệch nhỏ; không nên biến protein thành chiến lược giảm mỡ chính.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Có ý nghĩa thống kê nhưng mức chênh lệch nhỏ và phụ thuộc cách đo thành phần cơ thể."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "FM (MD: −0.41 kg (−0.70,–0.13), p=0.005)"
+      },
+      {
+        "finding": "[Dữ kiện] Nhóm bổ sung protein tăng lượng protein ăn vào; nhóm đối chứng gần như không đổi; khác biệt giữa nhóm có ý nghĩa.",
+        "numbers": "Nhóm protein: 23±41 g/ngày (khoảng −25 đến 158), p=0.004; đối chứng: 1±14 g/ngày (khoảng −17 đến 40), p=0.83; giữa nhóm p=0.01. Tương đối: cả hai khởi đầu 1.4 g/kg/ngày; nhóm protein lên 1.8±0.7 (Δ 0.3±0.5, p=0.002); đối chứng còn 1.3±0.3 (Δ −0.02±0.1, p=0.48); giữa nhóm p<0.001.",
+        "plainMeaning": "[Nhận xét của AI] Bài xác nhận can thiệp protein thực sự làm tăng lượng protein ăn vào, không chỉ là nhãn dán.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Dựa trên báo cáo lượng ăn vào, có thể sai lệch do tự khai hoặc công cụ khác nhau."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "23±41 g/day; −25 g/day to 158 g/day; p=0.004"
+      },
+      {
+        "finding": "[Dữ kiện] Không phát hiện khác biệt về thay đổi năng lượng ăn vào giữa nhóm protein và đối chứng.",
+        "numbers": "Nhóm protein Δ: 50±293 kcal/ngày; đối chứng Δ: 70±231 kcal/ngày; p=0.71.",
+        "plainMeaning": "[Nhận xét của AI] Đừng giải thích kết quả chỉ bằng việc nhóm protein ăn nhiều calo hơn; bài không phát hiện khác biệt đó.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Không phát hiện khác biệt, nhưng báo cáo năng lượng có sai số lớn."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "Δ protein group: 50±293 kcal/day, Δ control group: 70±231 kcal/day, p=0.71"
+      },
+      {
+        "finding": "[Dữ kiện] Các yếu tố đơn lẻ không giải thích được hiệu ứng 1RM: protein nền, tuổi, tình trạng tập và liều protein sau tập.",
+        "numbers": "Protein nền: coeff 2.85 (−8.15–13.84), p=0.59; tuổi: 0.01 (−0.09–0.11), p=0.78; tình trạng tập: 5.77 (−2.96–7.13), p=0.40; liều sau tập: 0.13 (−0.04–0.31), p=0.13.",
+        "plainMeaning": "[Nhận xét của AI] Không nên chọn liều protein chỉ dựa trên một yếu tố đơn lẻ từ bài này.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Là các hồi quy đơn biến; không phát hiện liên quan nhưng không loại trừ ảnh hưởng nhỏ."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "baseline protein intake (21 studies, 814 participants, p=0.59)"
+      },
+      {
+        "finding": "[Dữ kiện] Liều protein sau tập không liên quan đến FFM trong hồi quy gộp đơn biến.",
+        "numbers": "Coeff 0.02 (95% CI −0.01–0.04), p=0.25.",
+        "plainMeaning": "[Nhận xét của AI] Đừng dùng con số liều sau tập làm căn cứ duy nhất để tối ưu FFM.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Không phát hiện liên quan; khoảng tin cậy còn rộng."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "postexercise protein dose was the only covariate that did not influence the efficacy"
+      },
+      {
+        "finding": "[Dữ kiện] Không yếu tố nào trong hồi quy gộp giải thích được phương sai của diện tích cắt ngang sợi cơ.",
+        "numbers": "Tuổi: I2=65%, Adj. R2=−3%, p=0.50; protein nền: I2=43%, Adj. R2=−44%, p=0.84; liều sau tập: I2=77%, Adj. R2=−38%, p=0.92; tình trạng tập: I2=71%, Adj. R2=−24%, p=0.94.",
+        "plainMeaning": "[Nhận xét của AI] Kết quả mô học còn nhiều nhiễu; PT không nên dùng để cá nhân hóa liều.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Số nghiên cứu ít, độ không đồng nhất cao và không yếu tố nào giải thích được phương sai."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "age (10 studies, 474 participants, I 2 =65%, Adj. R 2 =-3%, p=0.50)"
+      },
+      {
+        "finding": "[Dữ kiện] Ở người trẻ, lượng protein nền có liên quan nghịch với FFM; ở người lớn tuổi, liên quan không rõ.",
+        "numbers": "Người trẻ: slope=−1.54 g/kg/ngày, R2=0.17, df=34; người lớn tuổi: slope=0.16, R2=0.04, df=14; p=0.042.",
+        "plainMeaning": "[Nhận xét của AI] Đây là tín hiệu hồi quy, không phải bằng chứng can thiệp; không dùng để nói “ăn ít protein thì tốt hơn”.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Hồi quy quan sát trên dữ liệu gộp, R2 thấp và số quan sát ở người lớn tuổi ít."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "young (slope=−1.54 g/kg/day, R 2 =0.17, df=34) and old (slope=0.16 g/kg/day, R 2 =0.04, df=14)"
+      },
+      {
+        "finding": "[Dữ kiện] Tập kháng lực đơn thuần đã tăng FFM; phần thêm của protein là một tỷ lệ nhỏ so với nền tập.",
+        "numbers": "Tập kháng lực đơn thuần: 1.1±1.2 kg; phần thêm của protein: 27%.",
+        "plainMeaning": "[Nhận xét của AI] PT nên đặt chương trình tập làm trung tâm, protein là phần hỗ trợ.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Dựa trên tổng hợp các thử nghiệm; mức tăng nền có dao động giữa người."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "RET alone ... resulted in an increase in FFM (1.1±1.2 kg)"
+      },
+      {
+        "finding": "[Dữ kiện] Bài báo cáo phần trăm tăng thêm do protein cho diện tích cắt ngang sợi cơ và cơ giữa xương đùi.",
+        "numbers": "Sợi cơ: 38%; cơ giữa xương đùi: 14%.",
+        "plainMeaning": "[Nhận xét của AI] Đây là tỷ lệ tương đối, không phải mức chắc chắn cho từng khách; đọc cùng phân tích độ nhạy.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Tỷ lệ phần trăm dựa trên mô hình gộp; hiệu ứng sợi cơ không bền trong phân tích độ nhạy."
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": "fibre CSA by 310 µm 2 (38%; see online supplementary figure 2 : panel A) and mid-femur CSA by 7.2 mm 2 (14%"
+      }
+    ],
+    "figures": [],
+    "quickRead": {
+      "lines": [
+        "[Dữ kiện] Bổ sung protein giúp tăng thêm một phần khối cơ không mỡ và sức mạnh 1RM khi tập kháng lực kéo dài.",
+        "[Dữ kiện] Hiệu ứng rõ hơn ở người đã tập và người trẻ; ở người chưa tập hoặc lớn tuổi, nhiều so sánh không đạt ý nghĩa thống kê.",
+        "[Tác giả diễn giải] Tập kháng lực đơn thuần vẫn tạo phần lớn thay đổi; protein là phần bổ sung, không phải yếu tố thay thế."
+      ],
+      "readyForPt": "[Nhận xét của AI] Dùng được để giải thích vai trò của protein trong buổi tư vấn, nhưng không dùng con số trung bình để hứa hẹn hoặc cá nhân hóa liều cho từng khách."
+    },
+    "whyStudy": "[Tác giả diễn giải] Nhóm tác giả muốn biết bổ sung protein có làm tăng thêm khối cơ và sức mạnh khi tập kháng lực hay không, và hiệu quả có phụ thuộc vào liều, tuổi, tình trạng tập luyện hoặc lượng protein nền hay không. [Dữ kiện] Bài tổng quan các thử nghiệm ngẫu nhiên so sánh cùng một chương trình tập kháng lực có bổ sung protein với nhóm tập giống hệt nhưng không bổ sung hoặc dùng giả dược. [Tác giả diễn giải] Họ cũng kiểm tra ngưỡng protein và các yếu tố có thể giải thích vì sao các thử nghiệm cho kết quả khác nhau.",
+    "mechanism": {
+      "summary": "[Dữ kiện] Đây là tổng quan gộp thử nghiệm, không thử một thiết bị hay dây đàn hồi. “Cơ chế” được kiểm tra là so sánh nhóm tập kháng lực + bổ sung protein với nhóm tập kháng lực + giả dược/không bổ sung.",
+      "steps": [
+        "[Dữ kiện] Gộp các thử nghiệm ngẫu nhiên có cùng kiểu can thiệp tập kháng lực, khác nhau ở việc có bổ sung protein hay không.",
+        "[Dữ kiện] Tính chênh lệch trung bình (MD) hoặc chênh lệch chuẩn hóa (SMD) cho sức mạnh và khối cơ giữa hai nhóm.",
+        "[Tác giả diễn giải] Dùng phân nhóm và hồi quy gộp để xem tuổi, tình trạng tập, liều protein và lượng protein nền có giải thích khác biệt giữa các thử nghiệm hay không."
+      ],
+      "whyWeightStaysStill": "Không áp dụng — bài không có tạ hoặc dây đàn hồi để mô tả trạng thái đứng yên lúc bắt đầu.",
+      "analogy": "Giống như so nhiều lớp học dùng cùng một giáo án tập, một nửa lớp được phát thêm “nguyên liệu” protein; bài xem lớp có thêm nguyên liệu tiến bộ hơn bao nhiêu so với lớp không có."
+    },
+    "authorsConclusion": "[Tác giả diễn giải] Bổ sung protein giúp tăng thêm khối cơ và sức mạnh trong tập kháng lực kéo dài. Hiệu quả rõ hơn ở người trẻ hoặc đã tập so với người lớn tuổi hoặc chưa tập. Tác giả kết luận bổ sung protein có thể đủ và cần nếu lượng protein ăn vào thấp hơn ngưỡng họ đề xuất; nhưng bản thân tập kháng lực là yếu tố mạnh hơn nhiều. Họ cũng lưu ý dữ liệu ở nữ ít hơn nam.",
+    "authorsView": {
+      "conclusion": "[Tác giả diễn giải] Bổ sung protein có lợi nhỏ cho khối cơ và sức mạnh khi tập kháng lực; tập kháng lực đơn thuần vẫn là yếu tố tạo khác biệt lớn hơn.",
+      "interpretations": [
+        "[Tác giả diễn giải] Hiệu quả khác nhau theo tuổi và tình trạng tập; đây là diễn giải từ phân nhóm và hồi quy gộp, không phải thử nghiệm riêng cho từng nhóm.",
+        "[Tác giả diễn giải] Khi lượng protein nền thấp, bổ sung protein có thể là phần cần thiết; khi nền đã đủ, bài không chứng minh thêm protein tạo thêm lợi ích lớn.",
+        "[Tác giả diễn giải] Khác biệt giới chưa rõ vì dữ liệu ở nữ ít hơn nam."
+      ],
+      "applications": [
+        "[Tác giả diễn giải] Có thể xem xét bổ sung protein cho người tập kháng lực có lượng protein ăn vào thấp.",
+        "[Tác giả diễn giải] Không nên đặt protein ngang hàng với chương trình tập; tập kháng lực là nền."
+      ]
+    },
+    "limitations": [],
+    "limitationsStructured": {
+      "authors": [
+        "[Tác giả diễn giải] Dữ liệu ở nữ ít hơn nam; kết luận về khác biệt giới chỉ dựa trên dữ liệu hạn chế."
+      ],
+      "ai": [
+        "[Nhận xét của AI] Nhiều thử nghiệm thiếu mù người tham gia hoặc người đánh giá, làm tăng nguy cơ thiên lệch.",
+        "[Nhận xét của AI] 1RM được đo bằng nhiều loại test khác nhau; liều protein, thời gian tập và chương trình tập rất khác nhau.",
+        "[Nhận xét của AI] Độ không đồng nhất còn đáng kể; một số mô hình hồi quy gộp có ít nghiên cứu.",
+        "[Nhận xét của AI] Hiệu ứng mô học mất ý nghĩa trong phân tích độ nhạy; không nên xem là bằng chứng chắc chắn.",
+        "[Nhận xét của AI] Kết quả là trung bình nhóm; dao động giữa từng người có thể lớn hơn nhiều so với chênh lệch trung bình."
+      ]
+    },
+    "conflictOfInterest": "[Dữ kiện] Không nêu rõ tuyên bố xung đột lợi ích của nhóm tác giả trong phần trích xuất; bài có đánh giá xung đột lợi ích của các nghiên cứu gốc.",
+    "benefitSignals": {
+      "statement": "[Dữ kiện] Bài không nêu rõ nguồn tài trợ hay bằng sáng chế trong phần dữ kiện trích xuất; có mô tả đánh giá nguy cơ thiên lệch và xung đột lợi ích của các nghiên cứu gốc.",
+      "flags": [
+        {
+          "text": "Giới hạn ở nghiên cứu có ít lĩnh vực nguy cơ cao hoặc không rõ, phần lớn do xung đột lợi ích và thiếu mù.",
+          "source": "phần phương pháp/đánh giá nguy cơ thiên lệch",
+          "page": 0
+        },
+        {
+          "text": "Dùng WebPlotDigitizer để trích dữ liệu khi không có trong bảng hoặc chữ.",
+          "source": "phần phương pháp",
+          "page": 0
+        }
+      ]
+    },
+    "practicalTakeaways": [
+      "[Nhận xét của AI] Đặt tập kháng lực làm nền; protein là phần bổ sung, không phải thứ thay thế.",
+      "[Nhận xét của AI] Khi khách đã tập lâu, có thể rà lượng protein ăn vào; với người mới, đừng hứa kết quả rõ.",
+      "[Nhận xét của AI] Đừng dùng MVC hay cân nặng để đánh giá hiệu quả protein; theo dõi 1RM và FFM nếu có điều kiện.",
+      "[Nhận xét của AI] Kết quả mô học không vững; không dùng để khẳng định chắc chắn.",
+      "[Nhận xét của AI] Kết quả là trung bình; dao động giữa người lớn, không cá nhân hóa máy móc."
+    ],
+    "application": {
+      "supported": [
+        "[Dữ kiện] Bổ sung protein tạo chênh lệch trung bình nhỏ có ý nghĩa thống kê cho 1RM tổng và FFM tổng khi tập kháng lực.",
+        "[Dữ kiện] Hiệu ứng FFM rõ hơn ở người đã tập; ở người chưa tập, so sánh không đạt ý nghĩa thống kê.",
+        "[Dữ kiện] Kết quả trên MVC và tổng khối lượng cơ thể không đạt ngưỡng ý nghĩa thống kê, nên hai chỉ số này không phải chỗ dựa để đánh giá bổ sung protein.",
+        "[Dữ kiện] Kiểu chương trình tập (toàn thân hay không) và việc có người giám sát giải thích được một phần khác biệt giữa các thử nghiệm về hiệu quả lên 1RM."
+      ],
+      "hypothesis": [
+        "[Tác giả diễn giải] Bổ sung protein có thể giúp tăng thêm phì đại khi nền protein thấp — chưa được đo trực tiếp trong một thử nghiệm liều riêng.",
+        "[Tác giả diễn giải] Ở người lớn tuổi, lợi ích FFM có thể nhỏ hơn — chưa được đo đủ để cá nhân hóa.",
+        "[Nhận xét của AI] Nếu khách đã ăn đủ protein, thêm protein có thể không thêm lợi ích — chưa được đo trong bài; đây là giả thuyết cần kiểm tra."
+      ],
+      "notYet": [
+        "[Nhận xét của AI] Chưa nên áp đặt một ngưỡng protein cố định cho mọi khách dựa trên bài này.",
+        "[Nhận xét của AI] Chưa nên dùng kết quả diện tích cắt ngang sợi cơ để khẳng định chắc chắn protein làm dày cơ.",
+        "[Nhận xét của AI] Chưa nên bỏ qua tổng năng lượng và chương trình tập để chỉ tập trung vào protein."
+      ],
+      "unanswered": [
+        "[Dữ kiện] Bài không trả lời thời điểm uống protein tối ưu trong ngày.",
+        "[Dữ kiện] Bài không trả lời nên chia protein thành bao nhiêu bữa.",
+        "[Dữ kiện] Bài không trả lời loại protein nào tốt hơn.",
+        "[Dữ kiện] Bài không trả lời khác biệt giới đủ mạnh để cá nhân hóa.",
+        "[Dữ kiện] Bài không trả lời tác dụng phụ hoặc an toàn dài hạn của liều cao."
+      ],
+      "notApplicableTo": "[Nhận xét của AI] Người không phải người lớn khỏe mạnh; người có bệnh lý cần cá nhân hóa protein; bài không nêu dữ kiện cho các nhóm này."
+    },
+    "whoItDoesNotApplyTo": "[Nhận xét của AI] Không áp dụng cho trẻ vị thành niên, thai kỳ, người có bệnh thận hoặc bệnh lý cần hạn chế protein; bài không nêu các nhóm này.",
+    "selfCheck": [
+      {
+        "question": "Vì sao không được nói “protein không ảnh hưởng” khi kết quả kiểm định không đạt ngưỡng ý nghĩa thống kê?",
+        "answer": "Vì việc kiểm định không đạt ngưỡng chỉ có nghĩa là chưa phát hiện được khác biệt, không chứng minh rằng hai nhóm thực sự giống nhau."
+      },
+      {
+        "question": "Kết quả nào cho thấy tập kháng lực vẫn là yếu tố chính?",
+        "answer": "Mức tăng 1RM và FFM do tập kháng lực đơn thuần lớn hơn phần thêm của protein; tác giả kết luận tập là yếu tố mạnh hơn."
+      },
+      {
+        "question": "Vì sao kết quả diện tích cắt ngang sợi cơ phải đọc thận trọng?",
+        "answer": "Vì hiệu ứng mất ý nghĩa trong phân tích độ nhạy khi thêm một nghiên cứu, và hồi quy gộp không giải thích được phương sai."
+      }
+    ],
+    "glossary": [
+      {
+        "en": "Systematic review",
+        "vi": "Tổng quan hệ thống",
+        "explanation": "Cách tìm và gộp tài liệu theo quy trình định trước, nhằm giảm việc chọn nghiên cứu theo cảm tính.",
+        "example": "Như lập danh sách tất cả bài tập có cùng chủ đề theo tiêu chí rõ ràng, thay vì chỉ chọn bài mình thích."
+      },
+      {
+        "en": "Meta-analysis",
+        "vi": "Phân tích gộp",
+        "explanation": "Dùng thống kê để gộp kết quả nhiều nghiên cứu thành một ước lượng chung.",
+        "example": "Như cộng kết quả nhiều lớp học cùng giáo án để xem xu hướng chung."
+      },
+      {
+        "en": "Meta-regression",
+        "vi": "Hồi quy gộp",
+        "explanation": "Kiểm tra xem đặc điểm của nghiên cứu hoặc người tập có liên quan đến mức hiệu quả khác nhau không.",
+        "example": "Xem lớp có giáo viên kèm sát có tiến bộ khác lớp tự tập không."
+      },
+      {
+        "en": "Randomised controlled trial",
+        "vi": "Thử nghiệm ngẫu nhiên có đối chứng",
+        "explanation": "Nghiên cứu chia người tham gia ngẫu nhiên vào nhóm can thiệp và nhóm so sánh.",
+        "example": "Như bốc thăm chia hai nhóm cùng tập, một nhóm thêm protein."
+      },
+      {
+        "en": "Mean difference",
+        "vi": "Chênh lệch trung bình",
+        "explanation": "Hiệu số giữa trung bình hai nhóm, giữ nguyên đơn vị đo.",
+        "example": "Chênh lệch số kg tạ nâng được giữa nhóm có và không bổ sung."
+      },
+      {
+        "en": "Standardised mean difference",
+        "vi": "Chênh lệch chuẩn hóa",
+        "explanation": "Chênh lệch đã chia cho độ dao động, dùng khi các nghiên cứu đo bằng thang khác nhau.",
+        "example": "So mức cải thiện giữa bài đo bằng máy khác nhau sau khi quy về cùng thang."
+      },
+      {
+        "en": "Fat-free mass",
+        "vi": "Khối lượng không mỡ",
+        "explanation": "Phần khối lượng cơ thể không tính mỡ, gồm cơ, xương, nước và nội tạng.",
+        "example": "Cân nặng giảm nhưng FFM giữ nguyên có thể là giảm mỡ, không mất cơ."
+      },
+      {
+        "en": "Maximum voluntary contraction",
+        "vi": "Co cơ tự nguyện tối đa",
+        "explanation": "Lực co cơ lớn nhất đo bằng dynamometer trong điều kiện kiểm soát.",
+        "example": "Bóp tay vào máy đo lực hết sức để xem lực tối đa."
+      },
+      {
+        "en": "Cross-sectional area",
+        "vi": "Diện tích cắt ngang",
+        "explanation": "Diện tích mặt cắt của sợi cơ hoặc bó cơ, thường dùng để ước lượng độ lớn cơ.",
+        "example": "Như cắt ngang một bó dây thừng để xem bó to lên hay không."
+      },
+      {
+        "en": "Heterogeneity",
+        "vi": "Độ không đồng nhất",
+        "explanation": "Mức khác biệt giữa kết quả các nghiên cứu, ngoài dao động ngẫu nhiên.",
+        "example": "Cùng một giáo án nhưng lớp thì tiến bộ nhiều, lớp tiến bộ ít vì khác người tập."
+      },
+      {
+        "en": "Break point",
+        "vi": "Điểm gãy",
+        "explanation": "Mốc mà đường hồi quy đổi độ dốc, gợi ý một ngưỡng có thể có.",
+        "example": "Như mức nước mà cây bắt đầu ngừng lớn nhanh hơn dù tưới thêm."
+      },
+      {
+        "en": "Dual-energy X-ray absorptiometry",
+        "vi": "Hấp thụ tia X năng lượng kép",
+        "explanation": "Cách đo thành phần cơ thể bằng tia X năng lượng thấp để ước lượng mỡ và khối không mỡ.",
+        "example": "Như máy quét cơ thể cho ra tỷ lệ mỡ và khối cơ ước lượng."
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext",
+      "missingInfo": [
+        "Không nêu tỷ lệ nữ/nam chi tiết trong toàn bộ mẫu.",
+        "Không nêu thời điểm uống protein tối ưu trong ngày.",
+        "Không nêu loại protein và chất lượng protein cụ thể.",
+        "Không nêu tác dụng phụ hoặc chỉ số an toàn dài hạn.",
+        "Không nêu mức tuân thủ can thiệp chi tiết cho từng thử nghiệm."
+      ]
+    },
+    "verification": {
+      "passed": true,
+      "issues": [],
+      "factsWarnings": [
+        "Trích nguyên văn không khớp toàn văn: \"whether the RET was whole-body ... or supervised ... explained part of the variance\"",
+        "Trích nguyên văn không khớp toàn văn: \"average RET-induced increase ... was 27 kg (mean±SD; 27±22 kg)\"",
+        "Trích nguyên văn không khớp toàn văn: \"RET alone ... resulted in an increase in FFM (1.1±1.2 kg)\""
+      ],
+      "rounds": 1
+    }
+  },
+  "facts": {
+    "metadata": {
+      "title": {
+        "value": "A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults.",
+        "page": 1,
+        "quote": ""
+      },
+      "authors": [
+        {
+          "value": "Morton RW",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Murphy KT",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "McKellar SR",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Schoenfeld BJ",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Henselmans M",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Helms E",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Aragon AA",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Devries MC",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Banfield L",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Krieger JW",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Phillips SM",
+          "page": 1,
+          "quote": ""
+        }
+      ],
+      "year": {
+        "value": "2018",
+        "page": 1,
+        "quote": ""
+      },
+      "journal": {
+        "value": "British journal of sports medicine",
+        "page": 1,
+        "quote": ""
+      },
+      "volume": {
+        "value": "52",
+        "page": 1,
+        "quote": ""
+      },
+      "issue": {
+        "value": "6",
+        "page": 1,
+        "quote": ""
+      },
+      "pages": {
+        "value": "376-384",
+        "page": 1,
+        "quote": ""
+      },
+      "doi": {
+        "value": "10.1136/bjsports-2017-097608",
+        "page": 1,
+        "quote": ""
+      }
+    },
+    "study": {
+      "design": {
+        "value": "Systematic review, meta-analysis and meta-regression of randomised controlled trials",
+        "page": 0,
+        "quote": "Any randomised controlled trials (RCTs) that combined a RET and protein supplement intervention"
+      },
+      "participants": {
+        "n": 1863,
+        "description": {
+          "value": "49 studies from 17 countries; 1863 participants (35±20 years); 10 studies in resistance-trained participants; 14 study groups exclusively female; publications 1962-2016",
+          "page": 0,
+          "quote": "There was a total of 1863 participants (mean±SD; 35±20 years)."
+        }
+      },
+      "intervention": {
+        "value": "RET plus protein supplementation; supplement 4-106 g/day (36±30 g/day; young 42±32; old 20±18); postexercise 5-44 g (24±11 g; young 24±12; old 23±10)",
+        "page": 0,
+        "quote": "A range of 4 g to 106 g of protein was supplemented per day"
+      },
+      "device": {
+        "value": "",
+        "page": 0,
+        "quote": ""
+      },
+      "comparator": {
+        "value": "Identical RET intervention but non-supplemented or placebo-supplemented",
+        "page": 0,
+        "quote": "comparator group received an identical RET intervention but was non-supplemented or placebo-supplemented"
+      },
+      "outcomes": [
+        {
+          "value": "1RM strength",
+          "page": 0,
+          "quote": "one-repetition-maximum strength (1RM; measured by any 1RM strength test)"
+        },
+        {
+          "value": "MVC",
+          "page": 0,
+          "quote": "maximum voluntary contraction (MVC; measured by both isokinetic and/or isometric contractions"
+        },
+        {
+          "value": "Total body mass",
+          "page": 0,
+          "quote": "total body mass (TBM; measured by any scale)"
+        },
+        {
+          "value": "Fat-free mass",
+          "page": 0,
+          "quote": "fat-free mass (FFM) and bone-free mass"
+        },
+        {
+          "value": "Fat mass",
+          "page": 0,
+          "quote": "fat mass (FM; measured by DXA, hydrodensitometry and/or BodPod)"
+        },
+        {
+          "value": "Muscle fibre CSA",
+          "page": 0,
+          "quote": "muscle fibre cross-sectional area (CSA; measured in any fibre subtype"
+        },
+        {
+          "value": "Mid-femur whole muscle CSA",
+          "page": 0,
+          "quote": "mid-femur whole muscle CSA (mid-femur CSA, measured by MRI and/or CT)"
+        }
+      ],
+      "measurement": {
+        "value": "1RM tests; MVC by dynamometer; body composition by DXA, hydrodensitometry or BodPod; CSA by MRI/CT and biopsies",
+        "page": 0,
+        "quote": "measured by dual-energy X-ray absorptiometry (DXA), hydrodensitometry, or whole-body air plethysmography"
+      },
+      "setting": {
+        "value": "17 countries; literature search in Medline, Embase, CINAHL and SportDiscus current to January 2017",
+        "page": 0,
+        "quote": "A total of 49 studies from 17 countries met the inclusion criteria"
+      },
+      "duration": {
+        "value": "RET interventions 6-52 weeks (13±8 weeks)",
+        "page": 0,
+        "quote": "RET interventions lasted from 6 weeks to 52 weeks (13±8 weeks)"
+      },
+      "failureCriteria": {
+        "value": "",
+        "page": 0,
+        "quote": ""
+      }
+    },
+    "results": [
+      {
+        "id": "r1",
+        "outcome": "Sức mạnh 1RM (tổng)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control (tổng)",
+            "value": "MD 2.49 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.01",
+        "d": "",
+        "ci": "95% CI 0.64-4.33",
+        "note": "Random-effects meta-analysis; bảng 1 ghi 28 studies cho mô hình không covariate.",
+        "page": 0,
+        "quote": "MD: 2.49 kg (0.64, 4.33), p=0.01; figure 2"
+      },
+      {
+        "id": "r2",
+        "outcome": "Sức mạnh 1RM ở nhóm chưa tập (untrained)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control (untrained)",
+            "value": "MD 0.99 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.12",
+        "d": "",
+        "ci": "95% CI -0.27 to 2.25",
+        "note": "Không có ý nghĩa thống kê.",
+        "page": 0,
+        "quote": "untrained: 0.99 kg (−0.27, 2.25), p=0.12"
+      },
+      {
+        "id": "r3",
+        "outcome": "Sức mạnh 1RM ở nhóm đã tập (trained)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control (trained)",
+            "value": "MD 4.27 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.02",
+        "d": "",
+        "ci": "95% CI 0.61-7.94",
+        "note": "",
+        "page": 0,
+        "quote": "trained: 4.27 kg (0.61, 7.94), p=0.02"
+      },
+      {
+        "id": "r4",
+        "outcome": "MVC (maximum voluntary contraction)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control",
+            "value": "SMD 0.04",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.54",
+        "d": "SMD",
+        "ci": "95% CI -0.09 to 0.16",
+        "note": "Không có ảnh hưởng có ý nghĩa.",
+        "page": 0,
+        "quote": "MVC (SMD: 0.04 (-0.09, 0.16), p=0.54)."
+      },
+      {
+        "id": "r5",
+        "outcome": "Tổng khối lượng cơ thể (TBM)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control",
+            "value": "MD 0.11 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.52",
+        "d": "",
+        "ci": "95% CI -0.23 to 0.46",
+        "note": "Không có ý nghĩa thống kê.",
+        "page": 0,
+        "quote": "TBM (MD: 0.11 kg (−0.23, 0.46), p=0.52)"
+      },
+      {
+        "id": "r6",
+        "outcome": "Khối lượng không mỡ (FFM), tổng",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control (tổng)",
+            "value": "MD 0.30 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.007",
+        "d": "",
+        "ci": "95% CI 0.09-0.52",
+        "note": "",
+        "page": 0,
+        "quote": "FFM (MD: 0.30 kg (0.09, 0.52), p=0.007; figure 3)"
+      },
+      {
+        "id": "r7",
+        "outcome": "FFM ở nhóm chưa tập (untrained)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control (untrained)",
+            "value": "MD 0.15 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.08",
+        "d": "",
+        "ci": "95% CI -0.02 to 0.31",
+        "note": "Không có ý nghĩa thống kê.",
+        "page": 0,
+        "quote": "untrained: 0.15 kg (−0.02, 0.31), p=0.08"
+      },
+      {
+        "id": "r8",
+        "outcome": "FFM ở nhóm đã tập (trained)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control (trained)",
+            "value": "MD 1.05 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p<0.0001",
+        "d": "",
+        "ci": "95% CI 0.61-1.50",
+        "note": "",
+        "page": 0,
+        "quote": "trained: 1.05 kg (0.61, 1.50), p<0.0001"
+      },
+      {
+        "id": "r9",
+        "outcome": "Khối lượng mỡ (FM)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control",
+            "value": "MD -0.41 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.005",
+        "d": "",
+        "ci": "95% CI -0.70 to -0.13",
+        "note": "",
+        "page": 0,
+        "quote": "FM (MD: −0.41 kg (−0.70,–0.13), p=0.005)"
+      },
+      {
+        "id": "r10",
+        "outcome": "Diện tích cắt ngang sợi cơ (fibre CSA)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control",
+            "value": "MD 310 µm2",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.02",
+        "d": "",
+        "ci": "95% CI 51-570",
+        "note": "",
+        "page": 0,
+        "quote": "fibre CSA (MD: 310 µm 2 (51, 570), p=0.02"
+      },
+      {
+        "id": "r11",
+        "outcome": "CSA toàn bộ cơ giữa xương đùi (mid-femur CSA)",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control",
+            "value": "MD 7.2 mm2",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.04",
+        "d": "",
+        "ci": "95% CI 0.20-14.30",
+        "note": "",
+        "page": 0,
+        "quote": "mid-femur CSA (MD: 7.2 mm 2 (0.20, 14.30), p=0.04"
+      },
+      {
+        "id": "r12",
+        "outcome": "Fibre CSA trong phân tích độ nhạy khi thêm Mitchell et al.",
+        "arms": [
+          {
+            "name": "Protein supplementation vs control (có Mitchell)",
+            "value": "MD 153 µm2",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.30",
+        "d": "",
+        "ci": "95% CI -137 to 443",
+        "note": "Hiệu ứng có ý nghĩa trước đó bị mất khi thêm Mitchell et al.; bài lưu ý thận trọng.",
+        "page": 0,
+        "quote": "153 µm 2 (−137, 443), p=0.30"
+      },
+      {
+        "id": "r13",
+        "outcome": "Thay đổi lượng protein ăn vào hàng ngày (g/day)",
+        "arms": [
+          {
+            "name": "Protein group",
+            "value": "23",
+            "sd": "41",
+            "n": 0
+          },
+          {
+            "name": "Control group",
+            "value": "1",
+            "sd": "14",
+            "n": 0
+          }
+        ],
+        "p": "protein p=0.004; control p=0.83; between p=0.01",
+        "d": "",
+        "ci": "protein range -25 to 158 g/day; control range -17 to 40 g/day",
+        "note": "Protein group tăng; control không đổi; khác biệt giữa nhóm có ý nghĩa.",
+        "page": 0,
+        "quote": "23±41 g/day; −25 g/day to 158 g/day; p=0.004"
+      },
+      {
+        "id": "r14",
+        "outcome": "Protein ăn vào tương đối hàng ngày (g/kg/day)",
+        "arms": [
+          {
+            "name": "Protein pre",
+            "value": "1.4",
+            "sd": "0.4",
+            "n": 0
+          },
+          {
+            "name": "Protein post",
+            "value": "1.8",
+            "sd": "0.7",
+            "n": 0
+          },
+          {
+            "name": "Protein Δ",
+            "value": "0.3",
+            "sd": "0.5",
+            "n": 0
+          },
+          {
+            "name": "Control pre",
+            "value": "1.4",
+            "sd": "0.3",
+            "n": 0
+          },
+          {
+            "name": "Control post",
+            "value": "1.3",
+            "sd": "0.3",
+            "n": 0
+          },
+          {
+            "name": "Control Δ",
+            "value": "-0.02",
+            "sd": "0.1",
+            "n": 0
+          }
+        ],
+        "p": "protein Δ p=0.002; control Δ p=0.48; between p<0.001",
+        "d": "",
+        "ci": "",
+        "note": "Đơn vị g/kg/day.",
+        "page": 0,
+        "quote": "pre: 1.4±0.4, post: 1.8±0.7, Δ: 0.3±0.5 g/kg/day, p=0.002"
+      },
+      {
+        "id": "r15",
+        "outcome": "Thay đổi năng lượng ăn vào hàng ngày (kcal/day)",
+        "arms": [
+          {
+            "name": "Protein group Δ",
+            "value": "50",
+            "sd": "293",
+            "n": 0
+          },
+          {
+            "name": "Control group Δ",
+            "value": "70",
+            "sd": "231",
+            "n": 0
+          }
+        ],
+        "p": "p=0.71",
+        "d": "",
+        "ci": "",
+        "note": "Không khác biệt giữa nhóm.",
+        "page": 0,
+        "quote": "Δ protein group: 50±293 kcal/day, Δ control group: 70±231 kcal/day, p=0.71"
+      },
+      {
+        "id": "r16",
+        "outcome": "Độ không đồng nhất (heterogeneity)",
+        "arms": [
+          {
+            "name": "1RM",
+            "value": "χ2=53.49; I2=33%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Fibre CSA",
+            "value": "χ2=30.97; I2=68%",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "1RM p=0.003; fibre CSA p=0.0006",
+        "d": "",
+        "ci": "",
+        "note": "",
+        "page": 0,
+        "quote": "1RM (χ 2 =53.49, I 2 =33%, p=0.003) and fibre CSA"
+      },
+      {
+        "id": "r17",
+        "outcome": "Meta-regression đa biến cho 1RM và FFM",
+        "arms": [
+          {
+            "name": "1RM (15 studies, 1216 subjects)",
+            "value": "p=0.77",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "FFM (15 studies, 642 participants)",
+            "value": "p=0.12",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.77 (1RM); p=0.12 (FFM)",
+        "d": "",
+        "ci": "",
+        "note": "Baseline protein intake, protein dose, age và training status cùng lúc không giải thích variance; fibre CSA không đủ quan sát (<10).",
+        "page": 0,
+        "quote": "1RM (15 studies, 1216 subjects, p=0.77) or FFM (15 studies, 642 participants, p=0.12)"
+      },
+      {
+        "id": "r18",
+        "outcome": "Meta-regression đơn biến 1RM: baseline protein intake",
+        "arms": [
+          {
+            "name": "Baseline protein intake",
+            "value": "coeff 2.85 (-8.15 to 13.84)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.59",
+        "d": "",
+        "ci": "95% CI -8.15 to 13.84",
+        "note": "21 studies, 814 participants.",
+        "page": 0,
+        "quote": "baseline protein intake (21 studies, 814 participants, p=0.59)"
+      },
+      {
+        "id": "r19",
+        "outcome": "Meta-regression đơn biến 1RM: age",
+        "arms": [
+          {
+            "name": "Age",
+            "value": "coeff 0.01 (-0.09 to 0.11)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.78",
+        "d": "",
+        "ci": "95% CI -0.09 to 0.11",
+        "note": "27 studies, 802 participants.",
+        "page": 0,
+        "quote": "age (27 studies, 802 participants, p=0.78)"
+      },
+      {
+        "id": "r20",
+        "outcome": "Meta-regression đơn biến 1RM: training status",
+        "arms": [
+          {
+            "name": "Training status",
+            "value": "coeff 5.77 (-2.96 to 7.13)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.40",
+        "d": "",
+        "ci": "95% CI -2.96 to 7.13",
+        "note": "28 studies, 858 participants.",
+        "page": 0,
+        "quote": "training status (28 studies, 858 participants, p=0.40)"
+      },
+      {
+        "id": "r21",
+        "outcome": "Meta-regression đơn biến 1RM: postexercise protein dose",
+        "arms": [
+          {
+            "name": "Postexercise protein dose",
+            "value": "coeff 0.13 (-0.04 to 0.31)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.13",
+        "d": "",
+        "ci": "95% CI -0.04 to 0.31",
+        "note": "23 studies, 589 participants.",
+        "page": 0,
+        "quote": "post-exercise protein dose (23 studies, 589 participants, p=0.13)"
+      },
+      {
+        "id": "r22",
+        "outcome": "Meta-regression đơn biến FFM: baseline protein intake",
+        "arms": [
+          {
+            "name": "Baseline protein intake",
+            "value": "coeff 0.64 (0.02 to 1.27)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.045",
+        "d": "",
+        "ci": "95% CI 0.02 to 1.27",
+        "note": "22 studies, 988 participants.",
+        "page": 0,
+        "quote": "baseline protein intake (22 studies, 988 participants, p=0.045)"
+      },
+      {
+        "id": "r23",
+        "outcome": "Meta-regression đơn biến FFM: postexercise protein dose",
+        "arms": [
+          {
+            "name": "Postexercise protein dose",
+            "value": "coeff 0.02 (-0.01 to 0.04)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.25",
+        "d": "",
+        "ci": "95% CI -0.01 to 0.04",
+        "note": "20 studies, 793 participants; không ảnh hưởng.",
+        "page": 0,
+        "quote": "postexercise protein dose was the only covariate that did not influence the efficacy"
+      },
+      {
+        "id": "r24",
+        "outcome": "Meta-regression đơn biến FFM: age",
+        "arms": [
+          {
+            "name": "Age",
+            "value": "coeff -0.01 (-0.02 to 0.00)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.02",
+        "d": "",
+        "ci": "95% CI -0.02 to 0.00",
+        "note": "25 studies, 1033 participants.",
+        "page": 0,
+        "quote": "age (25 studies, 1033 participants, p=0.02; figure 4)"
+      },
+      {
+        "id": "r25",
+        "outcome": "Meta-regression đơn biến FFM: training status",
+        "arms": [
+          {
+            "name": "Training status",
+            "value": "coeff 0.75 (0.09 to 1.40)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.03",
+        "d": "",
+        "ci": "95% CI 0.09 to 1.40",
+        "note": "26 studies, 1089 participants.",
+        "page": 0,
+        "quote": "training status (26 studies, 1089 participants, p=0.03)"
+      },
+      {
+        "id": "r26",
+        "outcome": "FFM theo nhóm tuổi (old vs young)",
+        "arms": [
+          {
+            "name": "Old >45 years (67±7 years)",
+            "value": "MD 0.06 kg",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Young <45 years (24±4 years)",
+            "value": "MD 0.55 kg",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.003",
+        "d": "",
+        "ci": "old 95% CI -0.14 to 0.26; young 95% CI 0.30 to 0.81",
+        "note": "Khác biệt giữa nhóm tuổi: χ2=8.71, I2=89%.",
+        "page": 0,
+        "quote": "old (>45; 67±7 years; MD: 0.06 (-0.14, 0.26)) and young"
+      },
+      {
+        "id": "r27",
+        "outcome": "Meta-regression fibre CSA",
+        "arms": [
+          {
+            "name": "Age (10 studies, 474 participants)",
+            "value": "I2=65%; Adj. R2=-3%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Baseline protein intake (8 studies, 384 participants)",
+            "value": "I2=43%; Adj. R2=-44%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Postexercise protein dose (10 studies, 270 participants)",
+            "value": "I2=77%; Adj. R2=-38%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Training status (11 studies, 586 participants)",
+            "value": "I2=71%; Adj. R2=-24%",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "age p=0.50; baseline p=0.84; dose p=0.92; training p=0.94",
+        "d": "",
+        "ci": "",
+        "note": "Không covariate nào giải thích variance.",
+        "page": 0,
+        "quote": "age (10 studies, 474 participants, I 2 =65%, Adj. R 2 =-3%, p=0.50)"
+      },
+      {
+        "id": "r28",
+        "outcome": "Meta-regression đơn biến bổ sung cho 1RM: whole-body và supervised RET",
+        "arms": [
+          {
+            "name": "Whole-body RET (27 studies; 4 not whole-body)",
+            "value": "I2=2%; Adj. R2=76%",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Supervised RET (28 studies)",
+            "value": "I2=5%; Adj. R2=58%",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "whole-body p=0.01; supervised p=0.047",
+        "d": "",
+        "ci": "",
+        "note": "Chỉ hai biến này giải thích một phần variance của hiệu quả protein lên 1RM.",
+        "page": 0,
+        "quote": "whether the RET was whole-body ... or supervised ... explained part of the variance"
+      },
+      {
+        "id": "r29",
+        "outcome": "Break point của protein intake cho FFM",
+        "arms": [
+          {
+            "name": "Biphasic regression (42 study arms, 723 participants)",
+            "value": "break point=1.62 g/kg/day",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.079",
+        "d": "",
+        "ci": "95% CI 1.03-2.20",
+        "note": "Slope=1.75, R2=0.19, df=36; biphasic giải thích nhiều hơn linear nhưng không có ý nghĩa thống kê.",
+        "page": 0,
+        "quote": "break point=1.62 (1.03, 2.20) g/kg/day, slope=1.75, R 2 =0.19"
+      },
+      {
+        "id": "r30",
+        "outcome": "FFM theo baseline protein intake: young vs old",
+        "arms": [
+          {
+            "name": "Young",
+            "value": "slope=-1.54 g/kg/day; R2=0.17",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Old",
+            "value": "slope=0.16 g/kg/day; R2=0.04",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.042",
+        "d": "",
+        "ci": "",
+        "note": "Linear regression giải thích nhiều hơn biphasic ở cả hai nhóm; df young=34, old=14.",
+        "page": 0,
+        "quote": "young (slope=−1.54 g/kg/day, R 2 =0.17, df=34) and old (slope=0.16 g/kg/day, R 2 =0.04, df=14)"
+      },
+      {
+        "id": "r31",
+        "outcome": "Mức tăng 1RM do RET và phần tăng thêm do protein supplementation",
+        "arms": [
+          {
+            "name": "RET-induced 1RM increase",
+            "value": "27±22 kg",
+            "sd": "22",
+            "n": 0
+          },
+          {
+            "name": "Protein supplementation thêm",
+            "value": "2.49 kg (9%)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Tăng 1RM do RET lớn hơn nhiều so với phần thêm do protein.",
+        "page": 0,
+        "quote": "average RET-induced increase ... was 27 kg (mean±SD; 27±22 kg)"
+      },
+      {
+        "id": "r32",
+        "outcome": "Mức tăng FFM do RET và phần tăng thêm do protein supplementation",
+        "arms": [
+          {
+            "name": "RET alone FFM increase",
+            "value": "1.1±1.2 kg",
+            "sd": "1.2",
+            "n": 0
+          },
+          {
+            "name": "Protein supplementation thêm",
+            "value": "0.30 kg (27%)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "",
+        "page": 0,
+        "quote": "RET alone ... resulted in an increase in FFM (1.1±1.2 kg)"
+      },
+      {
+        "id": "r33",
+        "outcome": "Phần tăng thêm do protein supplementation cho fibre CSA và mid-femur CSA",
+        "arms": [
+          {
+            "name": "Fibre CSA",
+            "value": "310 µm2 (38%)",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "Mid-femur CSA",
+            "value": "7.2 mm2 (14%)",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "",
+        "page": 0,
+        "quote": "fibre CSA by 310 µm 2 (38%; see online supplementary figure 2 : panel A) and mid-femur CSA by 7.2 mm 2 (14%"
+      }
+    ],
+    "authors": {
+      "conclusion": {
+        "value": "Dietary protein supplementation augments changes in muscle mass and strength during prolonged RET. Protein supplementation is more effective at improving FFM in young or resistance-trained individuals than in older or untrained individuals. Protein supplementation is sufficient at ~1.6 g/kg/day in healthy adults during RET. Based on limited data we observed no overtly apparent sex-based differences but acknowledge that far less work has been done in women than men. This analysis shows that dietary protein supplementation can be, if protein intake is less than 1.6 g protein/kg/day, both sufficient and necessary to optimise RET-induced changes in FFM and 1RM strength. However, performance of RET alone is the much more potent stimulus, accounting, at least according to this meta-analysis, for a substantially greater portion of the variance in RET-induced gains in muscle mass and strength.",
+        "page": 0,
+        "quote": "Dietary protein supplementation augments changes in muscle mass and strength during prolonged RET. Protein supplementation",
+        "source": "conclusion"
+      },
+      "interpretations": [],
+      "applications": [],
+      "limitations": [],
+      "benefitSignals": [
+        {
+          "value": "rol information, performance outcomes, body composition outcomes and any other notable information (eg, sources of bias/conflict of interest). Where data were not presented in table or text and authors could not be reached, data were extracted using WebPlotDigitizer (Web Plot Digitizer, V.3.11. Texas, USA: Ankit Rohatgi, 2017) or calculated from baseline values and/or percentage change. Where there were any discrepancies between the thr",
+          "page": 0,
+          "quote": "rol information, performance outcomes, body composition outcomes and any other notable information (eg, sources of",
+          "source": "quét toàn văn"
+        },
+        {
+          "value": "es were restricted to studies with less than three reported high or unclear risk domains (predominately due to reported conflicts of interest and lack of blinding investigators and/or participants; (see online supplementary appendix 2 )). Funnel plots were visually inspected to determine publication bias. Multiple sensitivity analyses were performed to determine if any of the results were influenced by the studies that were removed. 10.",
+          "page": 0,
+          "quote": "es were restricted to studies with less than three reported high or unclear risk domains",
+          "source": "quét toàn văn"
+        }
+      ]
+    },
+    "sections": {
+      "conclusion": true
+    },
+    "glossaryCandidates": [],
+    "confidence": {
+      "basedOn": "fulltext"
+    }
+  },
+  "usage": {
+    "input": 41947,
+    "output": 63028,
+    "cost": 0
+  },
+  "model": "deepseek-v4.1-flash",
+  "promptVersion": "v3"
+}

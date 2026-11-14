@@ -1,0 +1,1094 @@
+{
+  "content": {
+    "metadata": {
+      "title": "Influence of “In Series” Elastic Resistance on Muscular Performance During a Biceps-curl Set on the Cable Machine",
+      "authors": [
+        "David García-López",
+        "Azael J Herrero",
+        "Gustavo González-Calvo",
+        "Matthew R Rhea",
+        "Pedro J Marín"
+      ],
+      "year": 2010,
+      "journal": "Journal of Strength and Conditioning Research",
+      "volume": "24",
+      "issue": "9",
+      "pages": "2449-2455",
+      "doi": "10.1519/jsc.0b013e3181e3482f"
+    },
+    "tldr": "Bài thử nghiệm cross-over ngẫu nhiên trên 21 sinh viên: mắc thêm dây đàn hồi nối tiếp vào máy cáp khiến số lần lặp tối đa trong một set biceps curl ở 70% 1RM giảm có ý nghĩa thống kê, trong khi cảm nhận gắng sức không cho thấy khác biệt. Chuyển động của tấm tạ cũng khác: gia tốc trung bình giảm mượt hơn ở điều kiện có dây, còn gia tốc đỉnh chỉ là xu hướng giảm, không có ý nghĩa. Đây là nghiên cứu cấp tính một set, không nói gì về phì đại hay sức mạnh lâu dài.",
+    "researchQuestion": "Không nêu trong bài",
+    "studyType": "Thử nghiệm cross-over ngẫu nhiên, cấp tính (1 set/buổi), so sánh trong cùng một người",
+    "evidenceLevel": {
+      "level": 2,
+      "explanation": "Là thử nghiệm can thiệp có phân điều kiện ngẫu nhiên và so sánh trong cùng người (mỗi người tập cả hai cách mắc), mạnh hơn nghiên cứu quan sát hay báo cáo ca, nhưng dưới mức tổng quan hệ thống/ phân tích gộp vì cỡ mẫu nhỏ, chỉ một bài tập và chỉ đo một set."
+    },
+    "evidenceAxes": {
+      "design": {
+        "rating": "cao",
+        "reason": "Cross-over ngẫu nhiên trong cùng người, có thủ tục counterbalance để cân bằng thứ tự hai điều kiện — thiết kế phù hợp để so sánh hai cách mắc trên cùng một người, giảm ảnh hưởng khác biệt cá nhân."
+      },
+      "certainty": {
+        "rating": "vừa",
+        "reason": "Cỡ mẫu nhỏ, không nêu cách tính cỡ mẫu và không báo cáo mức dao động của chênh lệch giữa hai điều kiện; 1RM được ước tính từ 1–3RM nên mức tải 70% có thể lệch; không thể làm mù người tập với việc có dùng dây hay không; nhiều so sánh không kèm giá trị p."
+      },
+      "relevance": {
+        "rating": "cao",
+        "reason": "Trả lời trực tiếp câu hỏi của PT: mắc dây đàn hồi nối tiếp vào máy cáp thì set biceps curl thay đổi thế nào về số lần lặp, chuyển động của tải và cảm nhận gắng sức — đúng thứ PT quan sát được trong phòng tập."
+      }
+    },
+    "participants": {
+      "n": 21,
+      "description": "21 sinh viên đại học (17 nam, 4 nữ), tuổi 19.2±1.1, chiều cao 175.7±8.6 cm, khối lượng 70.1±12.7 kg, 1RM biceps curl 33.0±11.0 kg. Tác giả mô tả đây là người tập recreationally trained (tập thể hình/kháng lực ở mức giải trí, không phải vận động viên chuyên nghiệp)."
+    },
+    "design": "Cross-over ngẫu nhiên: mỗi người tập cả hai điều kiện (máy cáp truyền thống và máy cáp + dây đàn hồi nối tiếp), thứ tự điều kiện được quyết định bằng thủ tục counterbalance. Dữ liệu thu trong 4 tuần, mỗi tuần một buổi kiểm tra. Có tính độ tin cậy test–retest (ICC) của các chỉ số giữa các buổi.",
+    "intervention": "Một set biceps curl trên máy cáp đến kiệt sức (volitional exhaustion), tải của set là 70% 1RM của từng người. Tiêu chí dừng set: thanh tạ ngừng di chuyển; người tập nghỉ quá 1 giây khi tay ở vị trí duỗi; hoặc không thể gập hoàn toàn tay. Hai điều kiện so sánh: máy cáp truyền thống (PC) và PC có dây đàn hồi mắc nối tiếp (ER + PC).",
+    "outcomes": "Số lần lặp tối đa trong set; vận tốc và gia tốc trung bình/ tối đa của tấm tạ theo từng lần lặp và theo cả set; phần trăm thời gian tấm tạ được tăng tốc; cảm nhận gắng sức theo thang OMNI-RES.",
+    "measurementNote": "Chuyển động được đo bằng bộ mã hóa quay (rotary encoder) gắn vào tấm tạ trên cùng của chồng tạ — tức đo chuyển động của tải, không phải của tay hay thanh cầm — với độ chính xác vị trí 0.1 mm và thời gian 0.001 giây. 1RM không đo trực tiếp mà ước tính từ kết quả 1–3RM. Cảm nhận gắng sức được hỏi ngay sau lần lặp thứ 5.",
+    "resultsOverview": "Kết quả xoay quanh ba nhóm: số lần lặp tối đa, chuyển động của tấm tạ (vận tốc, gia tốc, phần trăm thời gian tăng tốc) và cảm nhận gắng sức. Các giá trị là trung bình nhóm ± SD; SD cho thấy mức dao động giữa từng người có thể lớn hơn chênh lệch giữa hai điều kiện, nên đọc kết quả nhóm không thay thế được việc theo dõi từng khách.",
+    "mainResults": [
+      {
+        "finding": "[Dữ kiện] Số lần lặp tối đa trong set ở 70% 1RM thấp hơn có ý nghĩa khi mắc dây đàn hồi nối tiếp so với máy cáp truyền thống.",
+        "numbers": "PC truyền thống: 12.4 ± 3.1 lần; ER + PC: 10.9 ± 2.3 lần; p<0.01; d=0.65; ER + PC giảm 12.3% số lần lặp.",
+        "plainMeaning": "[Nhận xét của AI] Nếu PT đang ghi số lần lặp để ước lượng khối lượng tập, hai cách mắc phải có mốc tham chiếu riêng; dùng chung một mốc sẽ khiến khách bị đánh giá là “yếu đi” trong khi thực chất bài tập đã khác đi. Cỡ ảnh hưởng ở mức vừa, nhưng SD cho thấy có người gần như không đổi và có người đổi nhiều.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "p<0.01, cỡ ảnh hưởng vừa, so sánh trong cùng người, và chỉ số này có độ tin cậy test–retest tốt (xem kết quả độ tin cậy bên dưới)."
+        },
+        "claimType": "data",
+        "page": 4,
+        "quote": "number of repetitions achieved was 12.463.1 and 10.962.3"
+      },
+      {
+        "finding": "[Dữ kiện] Cảm nhận gắng sức (OMNI-RES) tại thời điểm được hỏi không phát hiện khác biệt có ý nghĩa giữa hai điều kiện.",
+        "numbers": "PC truyền thống: 7.9 ± 0.9; ER + PC: 8.2 ± 1.3; p>0.05; d=0.23; chênh 3.8%.",
+        "plainMeaning": "[Nhận xét của AI] Bài không phát hiện khác biệt ở chỉ số cảm nhận, nên không thể dùng cảm giác của khách để biết dây có đang tạo thêm tải hay không — trong khi số lần lặp lại giảm rõ. Đây là kết quả “không phát hiện khác biệt”, không phải bằng chứng rằng hai cách mắc khó như nhau với mọi người.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Là kết quả âm (p>0.05) trên một thang cảm nhận chủ quan, không thể làm mù người tập với việc có dùng dây hay không, và chỉ hỏi ở một thời điểm trong set."
+        },
+        "claimType": "data",
+        "page": 4,
+        "quote": "7.960.9 and 8.261.3 in traditional and ER + PC conditions"
+      },
+      {
+        "finding": "[Dữ kiện] Các chỉ số đo lặp lại ổn định giữa các buổi kiểm tra.",
+        "numbers": "ICC >0.91 cho toàn bộ các biến phụ thuộc.",
+        "plainMeaning": "[Nhận xét của AI] Vì phép đo vận tốc/ gia tốc của tấm tạ lặp lại ổn định, chênh lệch quan sát giữa hai điều kiện có thể tin là do cách mắc, khó quy cho sai số đo.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "Độ tin cậy test–retest được báo cáo trực tiếp cho toàn bộ biến phụ thuộc."
+        },
+        "claimType": "data",
+        "page": 4,
+        "quote": "obtaining values always greater than 0.91"
+      },
+      {
+        "finding": "[Dữ kiện] Gia tốc trung bình của tấm tạ giảm dần trong set ở cả hai điều kiện, nhưng kiểu suy giảm khác nhau: điều kiện có dây giảm mượt hơn và mốc bắt đầu giảm có ý nghĩa xuất hiện muộn hơn; tại mốc 10% số lần lặp, gia tốc trung bình ở điều kiện có dây thấp hơn có ý nghĩa.",
+        "numbers": "Giảm có ý nghĩa ở cả hai điều kiện: p<0.05; hiệu ứng điều kiện lên kiểu suy giảm: p<0.01, d=0.24; mốc gia tốc trung bình bắt đầu giảm có ý nghĩa: PC truyền thống ở 50% số lần lặp, ER + PC ở 80% số lần lặp (bài không nêu p cho từng mốc); tại mốc 10% số lần lặp, ER + PC thấp hơn có ý nghĩa (bài không nêu giá trị hay p).",
+        "plainMeaning": "[Nhận xét của AI] Có dây thì tốc độ “tuột” của tải trong set diễn ra theo kiểu khác — không phải tải nhẹ đi, mà là đường cong lực cản khác. PT không nên đọc cùng một mẫu gia tốc cho hai cách mắc khi theo dõi chất lượng lần lặp.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "Hiệu ứng điều kiện có p<0.01 dù cỡ ảnh hưởng nhỏ; riêng các mốc phần trăm chỉ là mô tả vì bài không kèm p."
+        },
+        "claimType": "data",
+        "page": 5,
+        "quote": "significant condition effect concerning acceleration pattern was observed"
+      },
+      {
+        "finding": "[Dữ kiện] Phần trăm thời gian tấm tạ được tăng tốc ở lần lặp có phần tăng tốc lớn nhất là tương tự nhau giữa hai điều kiện; lần lặp đó là lần đầu tiên trong set ở cả hai điều kiện.",
+        "numbers": "PC truyền thống: 48.5%; ER + PC: 46.7% (bài không nêu p).",
+        "plainMeaning": "[Nhận xét của AI] Ngay cả ở lần lặp tốt nhất, tấm tạ cũng chỉ được tăng tốc chưa tới một nửa thời gian chuyển động — phần còn lại tải vẫn đang chạy theo quán tính hoặc bị hãm. Với PT, đây là gợi ý rằng “kỹ thuật đẩy nhanh” chỉ chiếm một phần nhỏ của mỗi lần lặp.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Bài không nêu p cho so sánh này và không báo cáo độ dao động (SD), nên chỉ đọc như mô tả."
+        },
+        "claimType": "data",
+        "page": 5,
+        "quote": "48.5 and 46.7% for traditional and ER + PC condition, respectively"
+      },
+      {
+        "finding": "[Dữ kiện] Gia tốc đỉnh của tải có xu hướng thấp hơn ở điều kiện có dây, nhưng đây chỉ là xu hướng, không có ý nghĩa thống kê.",
+        "numbers": "ER + PC so với PC truyền thống: −18.6% (xu hướng; bài không nêu p).",
+        "plainMeaning": "[Nhận xét của AI] Không được biến xu hướng này thành “dây làm giảm lực đỉnh”. Nếu PT quan tâm đến việc tải đỉnh cao (ví dụ hướng tới biểu hiện sức mạnh/ tốc độ), đây là điểm cần theo dõi thêm chứ chưa phải kết luận.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Tác giả tự gọi là xu hướng, không có ý nghĩa thống kê và không báo cáo p."
+        },
+        "claimType": "data",
+        "page": 5,
+        "quote": "ER trended to reduce (18.6%) the peak acceleration of the load"
+      },
+      {
+        "finding": "[Dữ kiện] Vận tốc trung bình của tấm tạ trong set giảm có ý nghĩa ở cả hai điều kiện và mốc bắt đầu giảm giống nhau; không phát hiện hiệu ứng của điều kiện lên kiểu suy giảm vận tốc, cũng không phát hiện khác biệt về chuyển động trong từng lần lặp.",
+        "numbers": "Vận tốc trung bình toàn set: PC truyền thống 0.157 ± 0.037 m/s; ER + PC 0.161 ± 0.041 m/s; giảm trong set ở cả hai điều kiện: p<0.05; mốc giảm có ý nghĩa: 50% số lần lặp ở cả hai điều kiện (bài không nêu p); không phát hiện khác biệt về chuyển động trong từng lần lặp.",
+        "plainMeaning": "[Nhận xét của AI] Khác với gia tốc, “hình dạng” đường vận tốc không đổi khi thêm dây — nghĩa là nếu PT dùng vận tốc để ước lượng mức gắng sức (ví dụ đo tốc độ lần lặp), chỉ số này có thể dùng tương tự ở hai cách mắc, trong khi gia tốc thì không.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Việc giảm vận tốc trong set có p<0.05, nhưng so sánh giữa hai điều kiện và các so sánh chuyển động từng lần lặp không kèm p, chỉ được mô tả là không có ý nghĩa."
+        },
+        "claimType": "data",
+        "page": 5,
+        "quote": "0.15760.037 and 0.16160.041 m"
+      }
+    ],
+    "secondaryResults": [
+      {
+        "finding": "[Nhận xét của AI] Nhiều so sánh trong bài được mô tả mà không kèm giá trị p (các mốc phần trăm số lần lặp, phần trăm thời gian tăng tốc, xu hướng gia tốc đỉnh, so sánh vận tốc giữa hai điều kiện), nên chỉ nên đọc như thông tin mô tả, không phải kết luận thống kê.",
+        "numbers": "Không nêu trong bài",
+        "plainMeaning": "Không nêu trong bài",
+        "certainty": {
+          "rating": "vừa",
+          "reason": ""
+        },
+        "claimType": "data",
+        "page": 0,
+        "quote": ""
+      }
+    ],
+    "figures": [
+      {
+        "label": "Figure 2",
+        "kind": "figure",
+        "title": "Không nêu tiêu đề hình trong bài",
+        "caption": "Elastic resistance device connected to the pulley cable and to the bar (patent pending)",
+        "explanation": "[Nhận xét của AI] Hình này cho thấy cách mắc thực tế: dây đàn hồi nằm giữa cáp của máy và thanh nối tay cầm, tức là lực phải đi qua dây trước khi tới chồng tạ.",
+        "whatToLookFor": "Nhìn vị trí dây so với cáp và thanh nối để hiểu vì sao tấm tạ chưa chuyển động ở đầu pha đồng tâm; chú ý thêm ghi chú “patent pending”.",
+        "page": 3
+      },
+      {
+        "label": "Figure 1",
+        "kind": "figure",
+        "title": "",
+        "caption": "Experimental setup.",
+        "explanation": "",
+        "whatToLookFor": "",
+        "page": 2
+      },
+      {
+        "label": "Figure 3",
+        "kind": "figure",
+        "title": "",
+        "caption": "Acceleration–time curve during the fastest repetition exerted by a representative subject for traditional and elastic resistance + pulley-cable modes, respectively.",
+        "explanation": "",
+        "whatToLookFor": "",
+        "page": 4
+      },
+      {
+        "label": "Figure 4",
+        "kind": "figure",
+        "title": "",
+        "caption": "Evolution of mean acceleration throughout the set in traditional and elastic resistance + pulley-cable conditions, respectively. Number of repetitions is expressed as a percentage of total number of repetitions completed. Values are means6SD. *Significantly different from first repetition (p,0.05).#Significantly different from traditional-mode value at the same percentage of total repetitions achieved (p,0.05).",
+        "explanation": "",
+        "whatToLookFor": "",
+        "page": 4
+      },
+      {
+        "label": "Figure 5",
+        "kind": "figure",
+        "title": "",
+        "caption": "Evolution of mean velocity throughout the set in traditional and elastic resistance + pulley-cable conditions, respectively. Number of repetitions is expressed as a percentage of total number of repetitions completed. Values are means6SD. *Significantly different from first repetition (p,0.05). During both experimental conditions, the repetition with the",
+        "explanation": "",
+        "whatToLookFor": "",
+        "page": 5
+      }
+    ],
+    "quickRead": {
+      "lines": [
+        "[Dữ kiện] Mắc dây đàn hồi nối tiếp vào máy cáp làm giảm số lần lặp tối đa trong một set biceps curl ở 70% 1RM so với máy cáp truyền thống.",
+        "[Dữ kiện] Gia tốc trung bình của tấm tạ suy giảm mượt và muộn hơn khi có dây, nhưng gia tốc đỉnh chỉ là xu hướng giảm, chưa có ý nghĩa thống kê.",
+        "[Dữ kiện] Cảm nhận gắng sức không phát hiện khác biệt, và đây là nghiên cứu cấp tính một set nên không nói gì về thích nghi dài hạn."
+      ],
+      "readyForPt": "Dùng được để thử và để đặt kỳ vọng đúng: có cơ sở nói rằng cùng mức tạ, thêm dây nối tiếp sẽ khiến khách dừng set sớm hơn và đường cong gia tốc khác đi; chưa đủ cơ sở để nói dây nối tiếp tăng phì đại, tăng sức mạnh, hay làm set “nặng hơn” theo cảm giác của khách."
+    },
+    "whyStudy": "[Tác giả diễn giải] Với tạ tự do, ở cuối tầm vận động người tập buộc phải giảm tốc để dừng tạ lại, nên đoạn cuối mỗi lần lặp cơ không cần gồng tối đa; lực cản biến đổi (variable resistance) được thiết kế để thay đổi tải bên ngoài theo góc khớp, với kỳ vọng phân bổ lực cản đều hơn trong cả biên độ. [Tác giả diễn giải] Nhóm tác giả đặt dây đàn hồi mắc nối tiếp (“in series”) giữa thanh nối và cáp của máy, để lực cản tăng dần khi dây giãn, và kỳ vọng cách này cho lực căng cơ trung bình lớn hơn trong toàn biên độ — điều này chưa được đo trực tiếp. [Dữ kiện] Nghiên cứu đo xem cách mắc đó thay đổi gì ở số lần lặp, chuyển động của tấm tạ và cảm nhận gắng sức trong một set đến kiệt sức.",
+    "mechanism": {
+      "summary": "[Dữ kiện] Dây đàn hồi được cài vào giữa tay kéo và cáp của máy, nên mọi lực phải đi qua dây trước khi tới chồng tạ; điều đó đổi cả độ lớn lực cản lẫn thời điểm tải bắt đầu dịch chuyển.",
+      "steps": [
+        "[Dữ kiện] Thiết bị gồm các dây thun khác nhau mắc nối tiếp giữa thanh nối với tay cầm và cáp của máy ròng rọc, kèm một cáp chặn (stop cable) và giới hạn giãn của mỗi dây là 5 kg; số dây được chọn theo mức tải của set (70% 1RM) của từng người.",
+        "[Dữ kiện] Khi người tập bắt đầu kéo, lực trước hết làm giãn dây đàn hồi; lực cản tăng dần theo độ giãn, tức là tải bên ngoài không còn phẳng như khi chỉ có chồng tạ.",
+        "[Tác giả diễn giải] Chỉ khi dây giãn hoàn toàn thì các tấm tạ mới bắt đầu di chuyển, nên đoạn đầu pha đồng tâm chủ yếu là lực cản đàn hồi, còn phần sau là lực cản của chồng tạ cộng thêm phần dây đang căng.",
+        "[Dữ kiện] Vì đầu đo gắn ở tấm tạ, những gì máy ghi được là chuyển động của tải sau khi đã trừ phần giãn dây — đây là lý do phải đọc kỹ “gia tốc” trong bài là gia tốc của tấm tạ, không phải của tay.",
+        "[Nhận xét của AI] Hệ quả cho PT: cùng một mức tạ 70% 1RM, hai cách mắc cho hai “bài tập” khác nhau về phân bố lực cản, nên không thể dùng chung một thang số lần lặp cho cả hai."
+      ],
+      "whyWeightStaysStill": "Vì dây đàn hồi nằm giữa tay kéo và cáp, lực kéo ban đầu chỉ làm giãn dây; chồng tạ chưa nhận đủ lực nên đứng yên cho tới khi dây giãn tới mức tương ứng. Đó là lý do đoạn đầu mỗi lần lặp chủ yếu là lực cản đàn hồi.",
+      "analogy": "Giống như kéo một xe nhỏ bằng sợi dây có đoạn cao su ở giữa: lúc đầu bạn chỉ kéo giãn đoạn cao su và xe chưa nhúc nhích; khi cao su hết giãn thì xe mới lăn, và càng về sau lực bạn phải bỏ ra càng khác so với kéo bằng dây không giãn."
+    },
+    "authorsConclusion": "Áp dụng dây đàn hồi “in series” với máy cáp làm giảm số lần lặp tối đa và làm mức suy giảm gia tốc trung bình trong set biceps curl đến kiệt sức đều và mượt hơn so với máy cáp truyền thống; dây đàn hồi có xu hướng giảm gia tốc đỉnh của tải, trong khi không phát hiện khác biệt về chuyển động trong từng lần lặp.",
+    "authorsView": {
+      "conclusion": "[Tác giả diễn giải] ER áp dụng “in series” với máy cáp làm giảm số lần lặp tối đa và làm mức suy giảm gia tốc trung bình trong set biceps curl đến kiệt sức đều và mượt hơn so với máy cáp truyền thống; ER có xu hướng giảm gia tốc đỉnh của tải dù không phát hiện khác biệt về chuyển động trong từng lần lặp.",
+      "interpretations": [
+        "[Tác giả diễn giải] Với lực cản ngoài phân bổ đều hơn, mô cơ có thể đạt lực căng trung bình lớn hơn trong toàn biên độ, dẫn đến mức gắng sức cao hơn và giải thích số lần lặp tối đa thấp hơn — lực căng cơ không được đo trực tiếp trong bài.",
+        "[Tác giả diễn giải] ER có xu hướng giảm gia tốc đỉnh, và do đó giảm lực đỉnh, có thể không tối ưu cho tập sức mạnh hướng tới thành tích thể thao.",
+        "[Tác giả diễn giải] Thiết bị ER nối tiếp tạo lực cản đàn hồi riêng ở giai đoạn đầu của pha đồng tâm; chỉ khi dây thun giãn hoàn toàn thì các tấm tạ mới bắt đầu di chuyển.",
+        "[Tác giả diễn giải] Cảm nhận gắng sức không thay đổi với ER + PC; khác biệt so với các nghiên cứu khác có thể do loại lực cản biến đổi, bài tập và công cụ đo cảm nhận.",
+        "[Tác giả diễn giải] Ứng dụng ER “in series” không làm thay đổi mẫu suy giảm vận tốc trung bình trong set.",
+        "[Tác giả diễn giải] Phần thời gian tăng tốc thấp hơn so với các nghiên cứu bench press trước đây có thể do tải sử dụng và đặc điểm cơ sinh học của bài tập/khớp."
+      ],
+      "applications": [
+        "[Tác giả diễn giải] ER nối tiếp với máy kháng lực cáp có thể làm tăng kích thích tổng thể lên cơ — chưa được đo.",
+        "[Tác giả diễn giải] Dùng lực mượt và đều trong mỗi lần lặp, tránh giảm tốc chủ động, được kỳ vọng làm tăng lợi ích của bài tập kháng lực — chưa được đo.",
+        "[Tác giả diễn giải] Người tìm kiếm tăng phì đại cơ có thể hưởng lợi nhiều nhất từ phương pháp này — chưa được đo.",
+        "[Tác giả diễn giải] Thiết bị là một bổ sung mới và ít tốn kém cho máy kháng lực cáp.",
+        "[Tác giả diễn giải] Vì mẫu chỉ là người tập recreationally trained, việc ngoại suy sang vận động viên có phần hạn chế.",
+        "[Tác giả diễn giải] Các phương pháp giảm giảm tốc chủ động có thể có giá trị cho vận động viên chuẩn bị cho môi trường thi đấu — chưa được đo."
+      ]
+    },
+    "limitations": [
+      "Mẫu chỉ gồm người tập recreationally trained nên ngoại suy sang vận động viên có phần hạn chế (tác giả nêu).",
+      "Chỉ đo một set, một bài tập nên không thể suy ra thích nghi dài hạn (nhận xét của người viết)."
+    ],
+    "limitationsStructured": {
+      "authors": [
+        "[Tác giả diễn giải] Đối tượng chỉ là người tập recreationally trained, nên ngoại suy kết quả cho vận động viên có phần hạn chế."
+      ],
+      "ai": [
+        "[Nhận xét của AI] Không thể làm mù người tập với điều kiện (họ biết mình có dùng dây hay không) — điều này có thể ảnh hưởng đến cảm nhận gắng sức và mức nỗ lực.",
+        "[Nhận xét của AI] Cỡ mẫu nhỏ và bài không nêu cách tính cỡ mẫu, nên độ chắc chắn của các so sánh còn giới hạn.",
+        "[Nhận xét của AI] 1RM được ước tính từ kết quả 1–3RM, không đo trực tiếp, nên mức tải 70% của từng người có thể lệch so với 1RM thật.",
+        "[Nhận xét của AI] Nhiều so sánh không kèm giá trị p (mốc phần trăm số lần lặp, phần trăm thời gian tăng tốc, xu hướng gia tốc đỉnh, so sánh vận tốc giữa hai điều kiện) nên không xác định được là có ý nghĩa hay không.",
+        "[Nhận xét của AI] Mẫu không cân bằng giới (17 nam, 4 nữ) và không phân tích riêng theo giới.",
+        "[Nhận xét của AI] Chỉ đo chuyển động của tấm tạ; lực căng cơ, mức hoạt hóa cơ chỉ là suy luận của tác giả, chưa được đo.",
+        "[Nhận xét của AI] Các mức chênh lệch phần trăm được báo cáo không kèm độ dao động riêng, nên khó đánh giá độ chính xác.",
+        "[Nhận xét của AI] Chỉ một bài tập, một khớp, một mức tải tương đối và một set — kết quả không đại diện cho các bài khác."
+      ]
+    },
+    "conflictOfInterest": "Bài không nêu mục xung đột lợi ích. Thiết bị đàn hồi dùng trong nghiên cứu được ghi “patent pending” ở chú thích hình, và tác giả giới thiệu thiết bị là mới, ít tốn kém — người đọc nên biết điều này khi đọc phần ứng dụng thực hành.",
+    "benefitSignals": {
+      "statement": "[Dữ kiện] Bài có tín hiệu lợi ích cần cân nhắc khi đọc phần ứng dụng: thiết bị đàn hồi dùng trong nghiên cứu được ghi “patent pending”, và tác giả nhiều lần giới thiệu thiết bị là mới, ít tốn kém, sẵn có.",
+      "flags": [
+        {
+          "text": "Thiết bị đàn hồi dùng trong nghiên cứu được ghi “patent pending”.",
+          "source": "Chú thích Figure 2",
+          "page": 3
+        },
+        {
+          "text": "Thiết bị được mô tả là bổ sung “mới và ít tốn kém” cho máy kháng lực cáp, trong phần Practical Applications.",
+          "source": "Practical Applications",
+          "page": 6
+        },
+        {
+          "text": "ER “in series” với chồng tạ được mô tả là kỹ thuật ít tốn kém và sẵn có.",
+          "source": "Phần Introduction",
+          "page": 2
+        }
+      ]
+    },
+    "practicalTakeaways": [
+      "Ghi số lần lặp riêng cho từng cách mắc (máy cáp truyền thống và có dây nối tiếp) — đừng so sánh hai điều kiện bằng cùng một mốc.",
+      "Đừng dựa vào cảm giác của khách để kết luận dây có tạo thêm tải hay không; ở chỉ số cảm nhận gắng sức, bài không phát hiện khác biệt.",
+      "Khi theo dõi chất lượng lần lặp bằng gia tốc/ vận tốc, nhớ rằng gia tốc và vận tốc cho hai câu chuyện khác nhau: kiểu suy giảm gia tốc khác giữa hai cách mắc, còn kiểu suy giảm vận tốc thì không.",
+      "Nếu mục tiêu của khách là sức mạnh/ power, hãy xem việc dùng dây nối tiếp là một thử nghiệm cần theo dõi, vì tác giả nêu khả năng gia tốc đỉnh giảm có thể không tối ưu — và điều này chưa được đo.",
+      "Coi đây là bằng chứng cấp tính trên một bài, một set, một nhóm sinh viên: đủ để thử và giải thích cho khách, không đủ để cam kết kết quả."
+    ],
+    "application": {
+      "supported": [
+        "[Dữ kiện] Có cơ sở để nói: cùng mức tải 70% 1RM của một người, mắc dây đàn hồi nối tiếp sẽ làm người đó dừng set sớm hơn so với máy cáp truyền thống (số lần lặp giảm có ý nghĩa, xem kết quả số lần lặp).",
+        "[Dữ kiện] Có cơ sở để nói: kiểu suy giảm gia tốc trung bình trong set khác nhau giữa hai cách mắc — có dây thì mức giảm đều hơn và mốc bắt đầu giảm muộn hơn.",
+        "[Dữ kiện] Có cơ sở để nói: tại thời điểm được hỏi trong set, cảm nhận gắng sức không cho thấy khác biệt giữa hai điều kiện (p>0.05).",
+        "[Dữ kiện] Có cơ sở để nói: không phát hiện khác biệt về chuyển động trong từng lần lặp và về kiểu suy giảm vận tốc trung bình giữa hai cách mắc.",
+        "[Dữ kiện] Có cơ sở để dùng cách mắc này như một biến thể có thể tái lập trong phòng tập: thiết bị rõ ràng, mỗi dây có giới hạn giãn 5 kg, có cáp chặn, số dây chọn theo mức tải của set."
+      ],
+      "hypothesis": [
+        "[Tác giả diễn giải] Lực căng cơ trung bình lớn hơn trong toàn biên độ dẫn đến mức gắng sức cao hơn và vì thế ít lần lặp hơn — chưa được đo (bài chỉ đo số lần lặp, chuyển động của tấm tạ và cảm nhận gắng sức).",
+        "[Tác giả diễn giải] ER nối tiếp có thể làm tăng kích thích tổng thể lên cơ — chưa được đo.",
+        "[Tác giả diễn giải] Dùng lực mượt, tránh giảm tốc chủ động được kỳ vọng làm tăng lợi ích của bài tập kháng lực — chưa được đo.",
+        "[Tác giả diễn giải] Người tìm kiếm tăng phì đại cơ có thể hưởng lợi nhiều nhất — chưa được đo.",
+        "[Tác giả diễn giải] Mặt hạn chế: gia tốc đỉnh có xu hướng giảm (kèm giảm lực đỉnh) có thể không tối ưu cho tập sức mạnh hướng thành tích thể thao — chưa được đo, và bản thân xu hướng này cũng chưa có ý nghĩa thống kê."
+      ],
+      "notYet": [
+        "[Nhận xét của AI] Chưa nên nói với khách rằng dây nối tiếp giúp tăng phì đại hay tăng sức mạnh — bài chỉ là một set cấp tính.",
+        "[Nhận xét của AI] Chưa nên lấy số lần lặp của điều kiện có dây làm mốc lập kế hoạch khối lượng tập cho người khác: mẫu nhỏ, là sinh viên tập giải trí, chỉ một bài và dao động giữa từng người lớn (xem SD trong kết quả số lần lặp).",
+        "[Nhận xét của AI] Chưa nên loại dây nối tiếp khỏi chương trình của vận động viên sức mạnh/ power chỉ dựa trên xu hướng giảm gia tốc đỉnh, vì xu hướng đó chưa có ý nghĩa thống kê.",
+        "[Nhận xét của AI] Chưa nên áp dụng cách tính số dây của bài như một công thức chuẩn cho mọi mức tải — bài trình bày thiết kế của mình, không so sánh các cách chọn số dây khác nhau."
+      ],
+      "unanswered": [
+        "[Dữ kiện] Tập với dây nối tiếp trong nhiều tuần thì phì đại, sức mạnh và công suất thay đổi thế nào — bài không trả lời.",
+        "[Dữ kiện] Cảm nhận gắng sức ở các lần lặp cuối set thì sao — bài chỉ hỏi ở một thời điểm.",
+        "[Dữ kiện] Các bài tập khác và khớp khác có cùng kiểu kết quả không — bài không trả lời.",
+        "[Dữ kiện] Nam và nữ có phản ứng khác nhau không — bài không trả lời.",
+        "[Dữ kiện] Độ dày/ độ giãn khác nhau của dây, số dây khác nhau, ảnh hưởng thế nào — bài không trả lời.",
+        "[Dữ kiện] Với người mới tập hoặc người có 1RM rất khác mẫu sinh viên này thì kết quả ra sao — bài không trả lời."
+      ],
+      "notApplicableTo": "Không dùng cho bài tập không phải biceps curl trên máy cáp, hoặc cho mức tải khác mức 70% 1RM đã dùng trong bài."
+    },
+    "whoItDoesNotApplyTo": "Vận động viên ưu tiên sức mạnh/ power (mẫu chỉ là người tập giải trí), người có 1RM rất khác nhóm sinh viên này, người mới chưa quen máy cáp, và các bài tập/ khớp khác ngoài biceps curl trên máy cáp.",
+    "selfCheck": [
+      {
+        "question": "Khách nói “mắc thêm dây hay không thấy khó hơn”. Câu đó có mâu thuẫn với kết quả bài không?",
+        "answer": "Không mâu thuẫn. Bài không phát hiện khác biệt về cảm nhận gắng sức (p>0.05) trong khi số lần lặp tối đa lại giảm có ý nghĩa. Nghĩa là cảm giác không phải thước đo đáng tin để biết dây có làm set nặng hơn; cũng không được nói “hai cách mắc khó như nhau” cho mọi người."
+      },
+      {
+        "question": "Vì sao tấm tạ chưa chuyển động ngay khi khách bắt đầu kéo?",
+        "answer": "Vì dây đàn hồi mắc nối tiếp phải giãn trước; lực kéo ban đầu chỉ làm giãn dây, tấm tạ chỉ dịch chuyển khi dây đã căng tới mức tương ứng. Đó cũng là lý do đoạn đầu pha đồng tâm chủ yếu là lực cản đàn hồi."
+      },
+      {
+        "question": "Có được kết luận dây nối tiếp giúp tăng phì đại không?",
+        "answer": "Không. Bài chỉ đo một set cấp tính (số lần lặp, chuyển động của tấm tạ, cảm nhận gắng sức). Phì đại chỉ là giả thuyết tác giả nêu và chưa được đo; muốn biết cần nghiên cứu dài hạn."
+      }
+    ],
+    "glossary": [
+      {
+        "en": "in series",
+        "vi": "mắc nối tiếp",
+        "explanation": "Cài thiết bị vào giữa hai phần của hệ truyền lực, nên toàn bộ lực phải đi qua nó trước khi tới tải.",
+        "example": "Trong bài: dây đàn hồi nằm giữa thanh nối tay cầm và cáp của máy, nên mọi lực kéo đều qua dây trước khi tới chồng tạ."
+      },
+      {
+        "en": "pulley-cable (PC) machine",
+        "vi": "máy cáp/ ròng rọc",
+        "explanation": "Máy kháng lực dùng dây cáp chạy qua ròng rọc để đổi hướng lực kéo, tải là chồng tạ.",
+        "example": "Máy cáp kéo tay cầm xuống cho biceps curl là ví dụ điển hình; cáp càng căng thì tấm tạ càng lên."
+      },
+      {
+        "en": "variable resistance",
+        "vi": "lực cản biến đổi",
+        "explanation": "Tải bên ngoài thay đổi trong quá trình chuyển động, thay vì giữ nguyên như tạ đĩa thông thường.",
+        "example": "Dây đàn hồi càng giãn càng “nặng”, nên lực cản ở cuối tầm khác với lúc bắt đầu."
+      },
+      {
+        "en": "acceleration / velocity",
+        "vi": "gia tốc / vận tốc",
+        "explanation": "Vận tốc là tải đi nhanh hay chậm; gia tốc là mức thay đổi của vận tốc (tăng tốc hay giảm tốc). Một tải có thể đi chậm nhưng vẫn đang tăng tốc mạnh.",
+        "example": "Khi khách ghì tay kéo đều đều, vận tốc gần như không đổi nên gia tốc nhỏ; lúc bật mạnh đầu lần lặp, vận tốc tăng nhanh nên gia tốc lớn."
+      },
+      {
+        "en": "peak acceleration / mean acceleration",
+        "vi": "gia tốc đỉnh / gia tốc trung bình",
+        "explanation": "Gia tốc đỉnh là giá trị cao nhất trong lần lặp (đại diện cho lực đỉnh); gia tốc trung bình là mức chung của cả lần lặp.",
+        "example": "Một lần lặp có thể bật rất mạnh ở đoạn đầu (gia tốc đỉnh cao) rồi chạy đều — gia tốc trung bình vẫn ở mức vừa."
+      },
+      {
+        "en": "accelerative portion",
+        "vi": "phần trăm thời gian tăng tốc",
+        "explanation": "Tỉ lệ thời gian trong một lần lặp mà tải thực sự đang được làm nhanh lên; phần còn lại tải chạy theo quán tính hoặc bị hãm.",
+        "example": "Nếu máy ghi khoảng một nửa thời gian là tăng tốc, nửa còn lại khách đang giữ hoặc ghì tải chứ không đẩy nhanh."
+      },
+      {
+        "en": "intrarepetition kinematics",
+        "vi": "chuyển động trong từng lần lặp",
+        "explanation": "Cách tải di chuyển bên trong một lần lặp: tăng tốc, giữ đều, giảm tốc ở đoạn nào.",
+        "example": "Hai khách cùng tốc độ trung bình nhưng một người bật mạnh đầu rồi hãm cuối, người kia kéo đều — đó là khác nhau về chuyển động trong lần lặp."
+      },
+      {
+        "en": "OMNI-RES",
+        "vi": "thang cảm nhận gắng sức cho kháng lực",
+        "explanation": "Thang người tập tự chấm mức gắng sức khi tập tạ, dùng để ước lượng nỗ lực chủ quan.",
+        "example": "Hỏi khách “set này gắng sức bao nhiêu trên thang OMNI-RES?” để biết họ cảm thấy nặng thế nào, khác với việc đếm số lần lặp."
+      },
+      {
+        "en": "stop cable",
+        "vi": "cáp chặn",
+        "explanation": "Dây phụ giới hạn mức giãn tối đa của thiết bị đàn hồi, để dây không bị kéo quá giới hạn.",
+        "example": "Khi dây thun giãn tới giới hạn, cáp chặn căng ra và giữ không cho dây giãn thêm."
+      },
+      {
+        "en": "counterbalance procedure",
+        "vi": "cân bằng thứ tự điều kiện",
+        "explanation": "Cách sắp xếp để mỗi điều kiện được thực hiện trước ở một nửa số người, tránh việc điều kiện làm sau bị lợi hoặc bất lợi do thứ tự.",
+        "example": "Nửa nhóm tập máy cáp thường trước rồi có dây sau; nửa còn lại làm ngược lại, để kết quả không bị lệch vì “lần đầu bao giờ cũng hăng”."
+      },
+      {
+        "en": "rotary encoder",
+        "vi": "bộ mã hóa quay",
+        "explanation": "Cảm biến ghi lại vị trí và thời gian chuyển động rất chính xác, từ đó tính ra vận tốc và gia tốc.",
+        "example": "Trong bài, cảm biến gắn vào tấm tạ trên cùng nên đo chuyển động của tải, không đo tay hay thanh cầm."
+      },
+      {
+        "en": "effect size d",
+        "vi": "cỡ ảnh hưởng (d)",
+        "explanation": "Con số cho biết mức chênh lệch giữa hai điều kiện lớn hay nhỏ so với độ dao động giữa người với người; khoảng 0.2 là nhỏ, 0.5 là vừa, 0.8 trở lên là lớn.",
+        "example": "Hai cách mắc chênh nhau nửa lần lặp trên người rất ổn định là cỡ ảnh hưởng lớn; chênh nửa lần lặp nhưng mỗi người dao động vài lần thì cỡ ảnh hưởng nhỏ."
+      },
+      {
+        "en": "cross-over",
+        "vi": "thiết kế đổi chéo",
+        "explanation": "Mỗi người thử cả hai điều kiện, thứ tự được cân bằng để giảm ảnh hưởng của thứ tự học.",
+        "example": "Cùng một khách tập thử cả hai cách móc dây, buổi sau đổi thứ tự."
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext",
+      "missingInfo": [
+        "Bài không báo cáo mức dao động của chênh lệch giữa hai điều kiện cho các so sánh chính.",
+        "Bài không nêu cách tính cỡ mẫu.",
+        "Bài không nêu mục xung đột lợi ích.",
+        "Bài không nêu giá trị p cho nhiều so sánh (các mốc phần trăm số lần lặp, phần trăm thời gian tăng tốc, xu hướng gia tốc đỉnh, so sánh vận tốc giữa hai điều kiện).",
+        "Bài không đo trực tiếp lực căng cơ hay hoạt động cơ, nên phần giải thích cơ chế chỉ là suy luận của tác giả."
+      ]
+    },
+    "verification": {
+      "passed": true,
+      "issues": [],
+      "rounds": 1
+    }
+  },
+  "facts": {
+    "metadata": {
+      "title": {
+        "value": "Influence of “In Series” Elastic Resistance on Muscular Performance During a Biceps-curl Set on the Cable Machine",
+        "page": 1,
+        "quote": ""
+      },
+      "authors": [
+        {
+          "value": "David García-López",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Azael J Herrero",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Gustavo González-Calvo",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Matthew R Rhea",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Pedro J Marín",
+          "page": 1,
+          "quote": ""
+        }
+      ],
+      "year": {
+        "value": "2010",
+        "page": 1,
+        "quote": ""
+      },
+      "journal": {
+        "value": "Journal of Strength and Conditioning Research",
+        "page": 1,
+        "quote": ""
+      },
+      "volume": {
+        "value": "24",
+        "page": 1,
+        "quote": ""
+      },
+      "issue": {
+        "value": "9",
+        "page": 1,
+        "quote": ""
+      },
+      "pages": {
+        "value": "2449-2455",
+        "page": 1,
+        "quote": ""
+      },
+      "doi": {
+        "value": "10.1519/jsc.0b013e3181e3482f",
+        "page": 1,
+        "quote": ""
+      }
+    },
+    "study": {
+      "design": {
+        "value": "Nghiên cứu cross-over ngẫu nhiên so sánh hiệu suất biceps curl với và không có ER nối tiếp vào máy PC",
+        "page": 2,
+        "quote": "A randomized cross-over study was designed to compare biceps-curl performance"
+      },
+      "participants": {
+        "n": 21,
+        "description": {
+          "value": "21 sinh viên đại học (17 nam, 4 nữ); tuổi 19.2±1.1, chiều cao 175.7±8.6 cm, khối lượng 70.1±12.7 kg, 1RM biceps curl 33.0±11.0 kg",
+          "page": 2,
+          "quote": "The subjects’ mean6SDage, height, body mass, and biceps-curl 1RM were 19.261.1"
+        }
+      },
+      "intervention": {
+        "value": "Một set biceps curl trên máy PC ở 70% 1RM đến kiệt sức; so sánh PC truyền thống với ER + PC",
+        "page": 3,
+        "quote": "One set to volitional exhaustion, with a load equivalent to the subject’s 70% of 1RM"
+      },
+      "device": {
+        "value": "Thiết bị ER gắn nối tiếp giữa thanh nối cáp và pulley cable (PC); gồm các dây thun khác nhau, giới hạn giãn mỗi dây = 5 kg, có stop cable; số dây tính theo 70% 1RM của từng người",
+        "page": 3,
+        "quote": "different elastic bands (stretch limit of each band = 5 kg) with a stop cable."
+      },
+      "comparator": {
+        "value": "PC truyền thống (không có ER)",
+        "page": 2,
+        "quote": "traditional condition and ER + CP condition"
+      },
+      "outcomes": [
+        {
+          "value": "Số lần lặp tối đa (number of repetitions)",
+          "page": 1,
+          "quote": "number of repetitions performed, kinematics parameters, and perceived exertion"
+        },
+        {
+          "value": "Kinematics: vận tốc và gia tốc trung bình/tối đa",
+          "page": 3,
+          "quote": "average and maximal velocity for each repetition, average and maximal acceleration"
+        },
+        {
+          "value": "Phần trăm thời gian tăng tốc (accelerative portion)",
+          "page": 3,
+          "quote": "percentage of time in which the load plate was accelerated"
+        },
+        {
+          "value": "Perceived exertion (OMNI-RES)",
+          "page": 3,
+          "quote": "OMNI-Resistance Exercise Scale (OMNI-RES) perceived exertion scale"
+        },
+        {
+          "value": "Peak acceleration của tải",
+          "page": 1,
+          "quote": "ER trended to reduce (18.6%) the peak acceleration of the load"
+        }
+      ],
+      "measurement": {
+        "value": "Rotary encoder gắn vào tấm tạ cao nhất, độ chính xác vị trí 0.1 mm và thời gian 0.001 giây; 1RM ước tính từ 1–3RM; OMNI-RES hỏi ngay sau lần lặp thứ 5",
+        "page": 3,
+        "quote": "rotary encoder recorded the position of the load plate within an accuracy of 0.1 mm"
+      },
+      "setting": {
+        "value": "Laboratory of Physiology, European University Miguel de Cervantes, Valladolid, Spain",
+        "page": 1,
+        "quote": "Laboratory of Physiology, European University Miguel de Cervantes"
+      },
+      "duration": {
+        "value": "4 tuần, 1 buổi kiểm tra mỗi tuần",
+        "page": 2,
+        "quote": "over a period of 4 weeks with 1 testing session each week"
+      },
+      "failureCriteria": {
+        "value": "Thanh tạ ngừng di chuyển; nghỉ >1 giây khi tay ở vị trí duỗi; không thể đạt tư thế gập hoàn toàn của tay",
+        "page": 3,
+        "quote": "barbell ceased to move, if the subject paused more than 1 second"
+      }
+    },
+    "results": [
+      {
+        "id": "r1",
+        "outcome": "Số lần lặp tối đa",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "12.4",
+            "sd": "3.1",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "10.9",
+            "sd": "2.3",
+            "n": 21
+          }
+        ],
+        "p": "<0.01",
+        "d": "0.65",
+        "ci": "",
+        "note": "ER + PC giảm 12.3% số lần lặp so với truyền thống.",
+        "page": 4,
+        "quote": "number of repetitions achieved was 12.463.1 and 10.962.3"
+      },
+      {
+        "id": "r2",
+        "outcome": "Perceived exertion (OMNI-RES) tại lần lặp thứ 5",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "7.9",
+            "sd": "0.9",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "8.2",
+            "sd": "1.3",
+            "n": 21
+          }
+        ],
+        "p": ">0.05",
+        "d": "0.23",
+        "ci": "",
+        "note": "ER + PC được báo khó hơn nhẹ (3.8%) nhưng không có hiệu ứng điều kiện có ý nghĩa.",
+        "page": 4,
+        "quote": "7.960.9 and 8.261.3 in traditional and ER + PC conditions"
+      },
+      {
+        "id": "r3",
+        "outcome": "Độ tin cậy test–retest (ICC)",
+        "arms": [
+          {
+            "name": "Tất cả biến phụ thuộc",
+            "value": ">0.91",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Giá trị ICC luôn >0.91.",
+        "page": 4,
+        "quote": "obtaining values always greater than 0.91"
+      },
+      {
+        "id": "r4",
+        "outcome": "Gia tốc trung bình trong set (mức giảm)",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "<0.05",
+        "d": "",
+        "ci": "",
+        "note": "Giảm có ý nghĩa ở cả hai điều kiện.",
+        "page": 5,
+        "quote": "decrease of mean acceleration throughout the set"
+      },
+      {
+        "id": "r5",
+        "outcome": "Mẫu suy giảm gia tốc trung bình giữa hai điều kiện",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "giảm nhiều hơn",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "giảm mượt hơn",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "<0.01",
+        "d": "0.24",
+        "ci": "",
+        "note": "Giảm lớn hơn ở truyền thống; mốc giảm ý nghĩa 50% so với 80% số lần lặp.",
+        "page": 5,
+        "quote": "significant condition effect concerning acceleration pattern was observed"
+      },
+      {
+        "id": "r6",
+        "outcome": "Mốc % số lần lặp khi gia tốc trung bình giảm có ý nghĩa",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "50",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "80",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Bài không nêu p cho từng mốc.",
+        "page": 5,
+        "quote": "50% of the total number of repetitions achieved in the traditional mode"
+      },
+      {
+        "id": "r7",
+        "outcome": "Gia tốc trung bình tại mốc 10% số lần lặp",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "cao hơn",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "thấp hơn có ý nghĩa",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Post hoc cho thấy ER + PC thấp hơn; bài không nêu giá trị hay p.",
+        "page": 5,
+        "quote": "significantly lower acceleration during the ER + PC for repetition corresponding to 10%"
+      },
+      {
+        "id": "r8",
+        "outcome": "Phần trăm thời gian tăng tốc của lần lặp nhanh nhất (%)",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "48.5",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "46.7",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Lần lặp có phần tăng tốc cao nhất là lần đầu ở cả hai điều kiện; không nêu p.",
+        "page": 5,
+        "quote": "48.5 and 46.7% for traditional and ER + PC condition, respectively"
+      },
+      {
+        "id": "r9",
+        "outcome": "Peak acceleration của tải (xu hướng)",
+        "arms": [
+          {
+            "name": "ER + PC so với truyền thống",
+            "value": "-18.6%",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Xu hướng giảm 18.6%; không có ý nghĩa, bài không nêu p.",
+        "page": 5,
+        "quote": "ER trended to reduce (18.6%) the peak acceleration of the load"
+      },
+      {
+        "id": "r10",
+        "outcome": "Kinematics trong từng lần lặp",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Không có khác biệt có ý nghĩa; bài không nêu p.",
+        "page": 5,
+        "quote": "no significant differences were found concerning intrarepetition kinematics"
+      },
+      {
+        "id": "r11",
+        "outcome": "Vận tốc trung bình toàn set (m/s)",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "0.157",
+            "sd": "0.037",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "0.161",
+            "sd": "0.041",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Không có hiệu ứng điều kiện có ý nghĩa về mẫu vận tốc; bài không nêu p.",
+        "page": 5,
+        "quote": "0.15760.037 and 0.16160.041 m"
+      },
+      {
+        "id": "r12",
+        "outcome": "Vận tốc trung bình trong set (mức giảm)",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "<0.05",
+        "d": "",
+        "ci": "",
+        "note": "Giảm có ý nghĩa ở cả hai điều kiện.",
+        "page": 5,
+        "quote": "decrease of mean velocity throughout the set"
+      },
+      {
+        "id": "r13",
+        "outcome": "Mẫu suy giảm vận tốc giữa hai điều kiện",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Không có hiệu ứng điều kiện; mẫu giảm tương tự ở hai điều kiện.",
+        "page": 5,
+        "quote": "No significant condition effect concerning velocity pattern was observed"
+      },
+      {
+        "id": "r14",
+        "outcome": "Mốc % số lần lặp khi vận tốc trung bình giảm có ý nghĩa",
+        "arms": [
+          {
+            "name": "PC truyền thống",
+            "value": "50",
+            "sd": "",
+            "n": 21
+          },
+          {
+            "name": "ER + PC",
+            "value": "50",
+            "sd": "",
+            "n": 21
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Giảm có ý nghĩa tại 50% ở cả hai điều kiện; bài không nêu p.",
+        "page": 5,
+        "quote": "corresponded to 50% of the total number of repetitions achieved in both"
+      }
+    ],
+    "authors": {
+      "conclusion": {
+        "value": "ER áp dụng “in series” với máy PC làm giảm số lần lặp tối đa và làm mức suy giảm gia tốc trung bình trong set biceps curl đến kiệt sức đều và mượt hơn so với PC truyền thống; ER có xu hướng giảm peak acceleration dù không có khác biệt về intrarepetition kinematics.",
+        "page": 6,
+        "quote": "ER applied ‘in series’ to a PC machine reduces the maximal number of repetitions",
+        "source": "In summary"
+      },
+      "interpretations": [
+        {
+          "value": "Với lực cản ngoài phân bố đều hơn, mô cơ có thể đạt lực căng trung bình lớn hơn trong toàn biên độ, dẫn đến mệt mỏi lớn hơn và giải thích số lần lặp tối đa thấp hơn.",
+          "page": 6,
+          "quote": "greater average muscle tension could have been achieved throughout the range of movement",
+          "source": ""
+        },
+        {
+          "value": "ER có xu hướng giảm peak acceleration, và do đó giảm lực đỉnh, có thể không tối ưu cho tập sức mạnh hướng tới thành tích thể thao.",
+          "page": 6,
+          "quote": "which may not optimize strength training oriented to athletic performance",
+          "source": ""
+        },
+        {
+          "value": "Thiết bị ER nối tiếp tạo lực cản đàn hồi riêng ở giai đoạn đầu của pha đồng tâm; chỉ khi dây thun giãn hoàn toàn thì các tấm tạ mới bắt đầu di chuyển.",
+          "page": 6,
+          "quote": "Only when elastic bands are totally stretched",
+          "source": ""
+        },
+        {
+          "value": "Cảm nhận gắng sức không thay đổi với ER + PC; khác biệt so với nghiên cứu khác có thể do loại lực cản biến đổi, bài tập và công cụ đo cảm nhận.",
+          "page": 6,
+          "quote": "The perception of effort did not change in the ER + PC approach",
+          "source": ""
+        },
+        {
+          "value": "Ứng dụng ER “in series” không làm thay đổi mẫu suy giảm vận tốc trung bình trong set.",
+          "page": 6,
+          "quote": "the application of ‘in series’ ER did not change the decay pattern",
+          "source": ""
+        },
+        {
+          "value": "Phần thời gian tăng tốc thấp hơn so với các nghiên cứu bench press trước đây có thể do tải sử dụng và đặc điểm cơ sinh học của bài tập/khớp.",
+          "page": 6,
+          "quote": "This difference could be explained through aspects related with the load used",
+          "source": ""
+        }
+      ],
+      "applications": [
+        {
+          "value": "ER nối tiếp với máy kháng lực cáp có thể làm tăng kích thích tổng thể lên cơ.",
+          "page": 6,
+          "quote": "may enhance the overall stimulus applied to the muscle",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Dùng lực mượt và đều trong mỗi lần lặp, tránh giảm tốc chủ động, được kỳ vọng làm tăng lợi ích của bài tập kháng lực.",
+          "page": 6,
+          "quote": "while avoiding active deceleration, is expected to enhance the benefits",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Người tìm kiếm tăng phì đại cơ có thể hưởng lợi nhiều nhất từ phương pháp này.",
+          "page": 6,
+          "quote": "those seeking greater increases in muscular hypertrophy may benefit the greatest",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Thiết bị là một bổ sung mới và ít tốn kém cho máy kháng lực cáp.",
+          "page": 6,
+          "quote": "represents a novel and inexpensive supplement to cable-based resistance machines",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Vì mẫu chỉ là người tập recreationally trained, việc ngoại suy sang vận động viên có phần hạn chế.",
+          "page": 6,
+          "quote": "subjects in this study were only recreationally trained",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Các phương pháp giảm giảm tốc chủ động có thể có giá trị cho vận động viên chuẩn bị cho môi trường thi đấu.",
+          "page": 6,
+          "quote": "may be of value to athletes in preparation for competitive environments",
+          "measured": false,
+          "source": ""
+        }
+      ],
+      "limitations": [
+        {
+          "value": "Đối tượng chỉ là người tập recreationally trained, nên ngoại suy kết quả cho vận động viên có phần hạn chế.",
+          "page": 6,
+          "quote": "extrapolating these findings to work with athletes is somewhat limited",
+          "source": ""
+        }
+      ],
+      "benefitSignals": [
+        {
+          "value": "Thiết bị ER được ghi “patent pending”.",
+          "page": 3,
+          "quote": "Elastic resistance device connected to the pulley cable and to the bar (patent pending)",
+          "source": "Figure 2 footnote"
+        },
+        {
+          "value": "Thiết bị được mô tả là “novel and inexpensive” supplement cho máy kháng lực cáp.",
+          "page": 6,
+          "quote": "represents a novel and inexpensive supplement to cable-based resistance machines",
+          "source": "Practical Applications"
+        },
+        {
+          "value": "ER “in series” với load plates được mô tả là kỹ thuật ít tốn kém và sẵn có.",
+          "page": 2,
+          "quote": "in an inexpensive and readily available tech-nique",
+          "source": "Introduction"
+        }
+      ]
+    },
+    "sections": {
+      "abstract": true,
+      "introduction": true,
+      "methods": true,
+      "results": true,
+      "discussion": true,
+      "inSummary": true,
+      "practicalApplications": true,
+      "patent": true
+    },
+    "glossaryCandidates": [
+      {
+        "value": "in series",
+        "page": 2,
+        "quote": "an application of ER ‘in series’ to load plates",
+        "source": ""
+      },
+      {
+        "value": "pulley-cable (PC) machine",
+        "page": 1,
+        "quote": "a pulley-cable (PC) machine",
+        "source": ""
+      },
+      {
+        "value": "variable resistance",
+        "page": 1,
+        "quote": "Variable resistance is designed to change the external resistance load",
+        "source": ""
+      },
+      {
+        "value": "accelerative portion",
+        "page": 3,
+        "quote": "percentage of time in which the load plate was accelerated",
+        "source": ""
+      },
+      {
+        "value": "peak acceleration",
+        "page": 1,
+        "quote": "ER trended to reduce (18.6%) the peak acceleration of the load",
+        "source": ""
+      },
+      {
+        "value": "mean acceleration",
+        "page": 4,
+        "quote": "decrease in mean acceleration throughout the set",
+        "source": ""
+      },
+      {
+        "value": "intrarepetition kinematics",
+        "page": 5,
+        "quote": "no significant differences were found concerning intrarepetition kinematics",
+        "source": ""
+      },
+      {
+        "value": "OMNI-RES",
+        "page": 3,
+        "quote": "OMNI-Resistance Exercise Scale (OMNI-RES) perceived exertion scale",
+        "source": ""
+      },
+      {
+        "value": "stop cable",
+        "page": 3,
+        "quote": "different elastic bands (stretch limit of each band = 5 kg) with a stop cable",
+        "source": ""
+      },
+      {
+        "value": "counterbalance procedure",
+        "page": 2,
+        "quote": "A counterbalance procedure was used to determine the condition",
+        "source": ""
+      },
+      {
+        "value": "rotary encoder",
+        "page": 3,
+        "quote": "rotary encoder recorded the position of the load plate within an accuracy of 0.1 mm",
+        "source": ""
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext"
+    }
+  }
+}

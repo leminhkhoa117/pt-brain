@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../components/ui.jsx';
+import { useDialog } from '../components/DialogProvider.jsx';
 import MarkdownText from '../components/MarkdownText.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import {
@@ -29,6 +30,7 @@ function ConfidenceBadge({ value }) {
 }
 
 export default function BodyAssessmentPage() {
+  const dialog = useDialog();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [goal, setGoal] = useState(user?.profile?.goal || 'maintain');
@@ -329,8 +331,18 @@ export default function BodyAssessmentPage() {
                   <button
                     type="button"
                     className="btn-ghost !px-2 !py-1 text-xs text-rose-500"
+                    title="Xóa đánh giá thể trạng"
+                    aria-label="Xóa đánh giá thể trạng"
                     onClick={() => {
-                      if (window.confirm('Xóa đánh giá này?')) remove.mutate(result.assessment._id);
+                      dialog
+                        .confirm({
+                          title: 'Xóa đánh giá thể trạng',
+                          message: 'Xóa đánh giá này và toàn bộ ảnh đi kèm?',
+                          confirmLabel: 'Xóa đánh giá',
+                        })
+                        .then((ok) => {
+                          if (ok) remove.mutate(result.assessment._id);
+                        });
                     }}
                   >
                     Xóa đánh giá

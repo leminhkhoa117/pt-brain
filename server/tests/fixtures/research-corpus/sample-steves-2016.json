@@ -1,0 +1,1456 @@
+{
+  "content": {
+    "metadata": {
+      "title": "Kicking Back Cognitive Ageing: Leg Power Predicts Cognitive Ageing after Ten Years in Older Female Twins",
+      "authors": [
+        "Claire J. Steves",
+        "Mitul M. Mehta",
+        "Stephen H.D. Jackson",
+        "Tim D. Spector"
+      ],
+      "year": 2016,
+      "journal": "Gerontology",
+      "volume": "62",
+      "issue": "2",
+      "pages": "138-149",
+      "doi": "10.1159/000441029"
+    },
+    "tldr": "[Dữ kiện] Ở phụ nữ trung niên và lớn tuổi, ai có công suất duỗi chân cao hơn lúc ban đầu thì suy giảm nhận thức sau một thập kỷ ít hơn. [Dữ kiện] Hiệu ứng này độc lập với hoạt động thể lực tự báo cáo và không xuất hiện với lực bóp tay, chức năng phổi hay khối cơ chân. [Nhận xét của AI] Đây là nghiên cứu quan sát, không phải thử nghiệm tập luyện, nên chưa thể nói tập chân làm chậm lão hóa não.",
+    "researchQuestion": "Không nêu trong bài",
+    "studyType": "Nghiên cứu đoàn hệ quan sát dọc (theo dõi 10 năm) trên nữ sinh đôi, kèm phân tích cặp sinh đôi bất tương hợp và một phân nhóm chụp MRI não",
+    "evidenceLevel": {
+      "level": 3,
+      "explanation": "Bằng chứng quan sát (đoàn hệ dọc), không phải thử nghiệm can thiệp: thấy được mối liên quan theo thời gian nhưng không chứng minh nhân quả, và nhóm tác giả cũng tự nêu điều này."
+    },
+    "evidenceAxes": {
+      "design": {
+        "rating": "vừa",
+        "reason": "Theo dõi dọc hai thời điểm và so sánh trong cùng cặp sinh đôi giúp loại bớt ảnh hưởng của di truyền và môi trường sống chung; nhưng không có nhóm can thiệp, không có phân bổ ngẫu nhiên."
+      },
+      "certainty": {
+        "rating": "vừa",
+        "reason": "Phép đo chính có độ tin cậy cao, phân tích hiệu chỉnh nhiều yếu tố và có hiệu chỉnh Bonferroni; nhưng chỉ đo hai thời điểm, thiếu dữ liệu phải bù bằng multiple imputation, còn phân nhóm sinh đôi bất tương hợp và phân nhóm MRI thì rất nhỏ."
+      },
+      "relevance": {
+        "rating": "thấp",
+        "reason": "Bài trả lời câu hỏi về lão hóa nhận thức ở người lớn tuổi, không đo tải tập, set, rep hay hiệu quả một chương trình tập — nên không chuyển trực tiếp thành kế hoạch trong phòng tập."
+      }
+    },
+    "participants": {
+      "n": 324,
+      "description": "Phụ nữ sinh đôi khỏe mạnh, tuổi trung bình lúc ban đầu 55 (43–73); 127 cặp cùng trứng (MZ), 197 cặp khác trứng (DZ). Phân nhóm MRI gồm 20 cặp cùng trứng. Đây là đoàn hệ tình nguyện viên TwinsUK tại London."
+    },
+    "design": "Đoàn hệ quan sát dọc: đo lường tại hai thời điểm cách nhau 10 năm (1999 và 2009), chụp MRI thêm vào 2011–2012. Phân tích dùng hồi quy tuyến tính có hiệu chỉnh tuổi và nhiều yếu tố, mô hình hiệu chỉnh quan hệ gia đình (generalised estimating equation — GEE), và so sánh cặp sinh đôi bất tương hợp (discordant twin) về công suất chân.",
+    "intervention": "Không có can thiệp tập luyện; đây là nghiên cứu đo lường. Mỗi người thực hiện đẩy bàn đạp trên Leg Extensor Power Rig 3 lần, nghỉ 30 giây giữa các lần, lấy kết quả tốt nhất của chân thuận; đại lượng đo là lực và vận tốc duỗi chân. Bài không nêu tiêu chí dừng set kiểu tập tới failure vì không có set tạ — người tham gia được hướng dẫn đẩy “nhanh và mạnh nhất như phanh khẩn cấp”.",
+    "outcomes": "Kết quả chính: thay đổi nhận thức liên quan tuổi (age-related cognitive change — ARC) tính từ 7 test CANTAB trên màn hình cảm ứng, đo hai lần. Kết quả phụ: công suất duỗi chân (LEP), hoạt động thể lực tự báo cáo theo thang 4 mức, và ở phân nhóm nhỏ là thể tích chất xám toàn bộ, thể tích não thất, vùng thùy thái dương giữa (MTL), middle frontal gyrus và hoạt động não BOLD khi làm nhiệm vụ reaction time.",
+    "measurementNote": "Công suất chân được đo gián tiếp qua lực và vận tốc của bàn đạp trên Leg Extensor Power Rig (Đại học Y Nottingham), không phải công suất của một thanh tạ hay của tay cầm: người ngồi trên ghế chỉnh sao cho chân gần duỗi hoàn toàn, tay khoanh, chân không đo không dùng làm đòn bẩy, bánh đà quay tay tới điểm đỏ rồi quay ngược để lấy độ rơ trước khi đạp.",
+    "resultsOverview": "[Dữ kiện] Kết quả chính cho thấy công suất chân lúc ban đầu gắn với mức suy giảm nhận thức ít hơn sau một thập kỷ, và mối liên quan này không giải thích được bằng hoạt động thể lực tự báo cáo hay các thước đo thể lực khác. [Dữ kiện] Phân tích trong cặp sinh đôi cùng hướng nhưng chỉ có ý nghĩa thống kê khi gộp cả hai loại sinh đôi và ở nhóm khác trứng; nhóm cùng trứng quá nhỏ. [Nhận xét của AI] Vì đây là dữ kiện quan sát, mọi suy luận về việc tập luyện cải thiện nhận thức vẫn nằm ở mức giả thuyết.",
+    "mainResults": [
+      {
+        "finding": "[Dữ kiện] Độ tin cậy của phép đo công suất duỗi chân được bài dẫn lại từ nghiên cứu trước trên người trưởng thành chưa quen, đo lặp trong cùng một tuần: hệ số tin cậy cao, sai số dao động giữa các lần đo ở mức một chữ số phần trăm.",
+        "numbers": "reliability coefficient 0.97; coefficient of variation 9.4%",
+        "plainMeaning": "[Nhận xét của AI] Sai số dưới khoảng 1/10 giá trị đo giúp tin rằng việc xếp ai khỏe chân hơn ai trong nghiên cứu không phải do nhiễu thiết bị — điều kiện cần để một chỉ số dùng được làm mốc theo dõi.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Con số này lấy từ nghiên cứu khác, không phải mẫu sinh đôi của bài; bài không nêu p kèm theo."
+        },
+        "claimType": "data",
+        "page": 2,
+        "quote": "reliability coefficient 0.97, coefficient of variation 9.4%, over 1-week period"
+      },
+      {
+        "finding": "[Dữ kiện] Trong mô hình đa biến hiệu chỉnh tuổi và các yếu tố lối sống/sức khỏe, cả công suất chân và hoạt động thể lực tự báo cáo đều gắn với ít suy giảm nhận thức hơn; công suất chân có hệ số lớn hơn và vẫn giữ ý nghĩa sau ngưỡng hiệu chỉnh đa so sánh Bonferroni.",
+        "numbers": "LEP Stdβ = 0.184, p<0.001; hoạt động thể lực tự báo cáo Stdβ = 0.129, p=0.028; ngưỡng Bonferroni 7.8 × 10⁻³",
+        "plainMeaning": "[Nhận xét của AI] Hai yếu tố đóng góp độc lập: người khỏe chân hơn vẫn giữ lợi thế kể cả khi xét mức vận động họ tự khai, nên công suất chân không chỉ là cái bóng của “chăm vận động”.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "Là phân tích chính trên toàn mẫu, hiệu chỉnh nhiều yếu tố, có hiệu chỉnh đa so sánh và vượt ngưỡng đó; mô hình hiệu chỉnh thêm bệnh tật cũng giữ nguyên hướng và ý nghĩa."
+        },
+        "claimType": "data",
+        "page": 5,
+        "quote": "Both PA [standardised β-coefficient (Stdβ) = 0.129, p = 0.028] and LEP"
+      },
+      {
+        "finding": "[Dữ kiện] Bài quy đổi độ lớn hiệu ứng sang đơn vị thực tế: tăng công suất chân hoặc tăng mức vận động đều tương ứng với cải thiện điểm nhận thức, tính theo độ lệch chuẩn; bài không nêu p cho phần quy đổi này.",
+        "numbers": "tăng LEP 40 W → cải thiện 18% SD của ARC; từ hoạt động nhẹ sang vừa 8 giờ/ngày → cải thiện 13% SD; 40 W tương đương 3.3 năm khác biệt tuổi",
+        "plainMeaning": "[Nhận xét của AI] Đây là chênh lệch giữa các nhóm người trong dân số, không phải kết quả của việc tập thêm — không được đọc thành “tập để tăng công suất thì não trẻ lại vài năm”.",
+        "certainty": {
+          "rating": "vừa",
+          "reason": "Là diễn giải độ lớn hiệu ứng từ mô hình quan sát; không có p riêng cho phép quy đổi."
+        },
+        "claimType": "author",
+        "page": 5,
+        "quote": "an increase in LEP of 40 W produced an 18% SD improvement"
+      },
+      {
+        "finding": "[Dữ kiện] Công suất chân giảm đáng kể theo tuổi trong khoảng thời gian theo dõi, mức giảm tính theo độ lệch chuẩn của mẫu.",
+        "numbers": "gần 0.5 SD trong 10 năm, p<0.001 (Stdβ = –0.0478)",
+        "plainMeaning": "[Nhận xét của AI] Đây là lý do thực tế để đo công suất chân ở người trên 50: nó tụt rõ rệt theo thời gian, nên đo lại sau vài năm có ý nghĩa hơn là chỉ đo một lần.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "Tính trực tiếp trên toàn mẫu theo dõi, p rất nhỏ."
+        },
+        "claimType": "data",
+        "page": 5,
+        "quote": "10 years leading to almost 0.5 SD decline in leg power"
+      },
+      {
+        "finding": "[Dữ kiện] Khi so trong cùng cặp sinh đôi lệch nhau về công suất chân, người khỏe chân hơn lúc ban đầu giữ nhận thức tốt hơn; kết quả có ý nghĩa khi gộp toàn bộ và ở nhóm sinh đôi khác trứng, KHÔNG đạt ý nghĩa ở nhóm cùng trứng do số cặp quá ít. So sánh tương tự với hoạt động thể lực tự báo cáo thì không nhóm nào có ý nghĩa.",
+        "numbers": "toàn bộ: khỏe hơn 0.169 vs yếu hơn –0.112, one-tailed p=0.022; DZ: 0.209 vs –0.125, p=0.040; MZ: hai chị em lệch nhau đối xứng ±0.089, p=0.174; dữ liệu hoàn chỉnh n=221 (118 cặp); cặp lệch về hoạt động thể lực: 0.15/0.02 (DZ 0.09/–0.04; MZ 0.26/0.10), không nhóm nào có ý nghĩa, bài không nêu p",
+        "plainMeaning": "[Nhận xét của AI] Phần này là chỗ chắc chắn nhất về mặt thiết kế (đã loại gen và môi trường chung) nhưng lại yếu nhất về cỡ mẫu; đừng đọc kết quả nhóm cùng trứng “không đạt ý nghĩa” thành “không có tác dụng”.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Cỡ mẫu rất nhỏ, kiểm định một phía, và nhóm cùng trứng chỉ vài cặp."
+        },
+        "claimType": "data",
+        "page": 6,
+        "quote": "twins who were stronger at baseline had significantly less deterioration in cognition"
+      },
+      {
+        "finding": "[Dữ kiện] Khi thay công suất chân bằng các thước đo thể lực khác, không thước đo nào dự báo thay đổi nhận thức; một số yếu tố sức khỏe thì có liên quan. Việc thêm biến “có địa chỉ email” (đại diện cho dùng máy tính) hầu như không đổi kết quả.",
+        "numbers": "lực bóp tay Stdβ = –0.031, p=0.588; chức năng phổi Stdβ = 0.060, p=0.226; khối nạc chân phải Stdβ = 0.034, p=0.546; đái tháo đường β = –1.81, p=0.002; ApoE ε4 đồng hợp tử β = –0.54, cùng mức p như đái tháo đường (n=10/155); thêm biến email F = 0.35, p=0.557",
+        "plainMeaning": "[Nhận xét của AI] Trong bài này, “khỏe chân” đo bằng công suất (lực × tốc độ) dự báo tốt hơn “to khỏe chân” đo bằng lực tĩnh hay khối cơ — gợi ý tốc độ/khả năng bung nhanh là phần thông tin, không phải khối lượng cơ.",
+        "certainty": {
+          "rating": "cao",
+          "reason": "Ba thước đo thay thế được chạy trên cùng mẫu và cùng mô hình, kết quả nhất quán là không có liên quan."
+        },
+        "claimType": "data",
+        "page": 6,
+        "quote": "Neither grip strength (Stdβ = –0.031, p = 0.588), lung function"
+      },
+      {
+        "finding": "[Dữ kiện] Ở phân nhóm nhỏ được chụp MRI, công suất chân lúc ban đầu gắn với thể tích chất xám toàn bộ lớn hơn sau 12 năm; trong các cặp cùng trứng lệch nhau nhiều về công suất chân, người yếu chân hơn có não thất lớn hơn. Không thấy liên quan với não thất hay các vùng quan tâm trong mô hình trên toàn mẫu.",
+        "numbers": "LEP – chất xám toàn bộ Stdβ = 0.362, p=0.005; sinh đôi yếu hơn có não thất lớn hơn 26%, one-sided p=0.025; mô hình trên toàn mẫu với não thất và các vùng quan tâm: không thấy liên quan, bài không nêu p",
+        "plainMeaning": "[Nhận xét của AI] Đây là mảnh ghép sinh học hấp dẫn nhưng mỏng: nhóm MRI chỉ vài cặp, và mô hình không hiệu chỉnh nhiều yếu tố như phân tích chính.",
+        "certainty": {
+          "rating": "thấp",
+          "reason": "Phân nhóm rất nhỏ, một số so sánh dùng kiểm định một phía, mô hình chất xám chỉ hiệu chỉnh tuổi."
+        },
+        "claimType": "data",
+        "page": 6,
+        "quote": "LEP had a positive association with total grey matter volume 12 years later"
+      }
+    ],
+    "secondaryResults": [
+      {
+        "finding": "[Dữ kiện] Trong mô hình rút gọn (Bảng 2), hệ số của công suất chân ổn định qua các bước hiệu chỉnh, còn hệ số của hoạt động thể lực tự báo cáo giảm nhẹ.",
+        "numbers": "Model 1: LEP Stdβ = 0.191 (p<0.001), PA Stdβ = 0.109 (p=0.043); model 2–4: LEP 0.186; 0.178; 0.180 và PA 0.107",
+        "plainMeaning": "Không nêu trong bài",
+        "certainty": {
+          "rating": "vừa",
+          "reason": ""
+        },
+        "claimType": "data",
+        "page": 5,
+        "quote": ""
+      },
+      {
+        "finding": "[Dữ kiện] Trong phân nhóm MRI, hướng liên quan giữa công suất chân và thay đổi nhận thức giống mẫu lớn nhưng không có ý nghĩa; liên quan giữa chất xám toàn bộ và thay đổi nhận thức giảm mạnh khi hiệu chỉnh thêm công suất chân.",
+        "numbers": "LEP–ARC Stdβ = 0.159, p=0.157 (n=41); chất xám–ARC Stdβ = 0.195, p=0.024, còn 0.067, p=0.621 khi thêm LEP",
+        "plainMeaning": "Không nêu trong bài",
+        "certainty": {
+          "rating": "vừa",
+          "reason": ""
+        },
+        "claimType": "data",
+        "page": 7,
+        "quote": ""
+      },
+      {
+        "finding": "[Dữ kiện] Điểm z khác biệt thể tích não (chuẩn hóa theo thể tích nội sọ) giữa các cặp cùng trứng lệch nhau về công suất chân: chỉ não thất và chất xám toàn bộ khác có ý nghĩa, các vùng khu trú thì không. Điểm âm nghĩa là sinh đôi yếu hơn có thể tích nhỏ hơn.",
+        "numbers": "não thất/ICV 0.540; chất xám toàn bộ/ICV –0.577 — đây là hai so sánh duy nhất đạt ý nghĩa, cùng mức p như kết quả não thất nêu trên; MTL trái 0.261 (p=0.890); MTL phải 0.329 (p=0.843); middle frontal gyrus trái –0.036 (p=0.444); phải 0.023 (p=0.550)",
+        "plainMeaning": "Không nêu trong bài",
+        "certainty": {
+          "rating": "vừa",
+          "reason": ""
+        },
+        "claimType": "data",
+        "page": 7,
+        "quote": ""
+      },
+      {
+        "finding": "[Dữ kiện] Ở các cặp cùng trứng lệch nhau hơn 25 W, hai chị em không phát hiện khác biệt về chiều cao hay thể tích nội sọ — tức khác biệt não không do đầu to/nhỏ hơn.",
+        "numbers": "chiều cao p=0.37; thể tích nội sọ p=0.77 (9 cặp)",
+        "plainMeaning": "Không nêu trong bài",
+        "certainty": {
+          "rating": "vừa",
+          "reason": ""
+        },
+        "claimType": "data",
+        "page": 6,
+        "quote": ""
+      },
+      {
+        "finding": "[Dữ kiện] Công suất chân và chức năng phổi tương quan thuận ở mức trung bình; bài ghi p theo cách bất thường (p>0.001) nên chỉ nên đọc như một tương quan mô tả.",
+        "numbers": "r = 0.38, p>0.001",
+        "plainMeaning": "Không nêu trong bài",
+        "certainty": {
+          "rating": "vừa",
+          "reason": ""
+        },
+        "claimType": "data",
+        "page": 9,
+        "quote": ""
+      },
+      {
+        "finding": "[Dữ kiện] Khi làm nhiệm vụ reaction time có gợi ý trong máy fMRI, sinh đôi khỏe chân hơn hoạt hóa mạnh hơn ở vỏ vận động chính hai bên và BA 5 trái; nhiệm vụ choice reaction time thì không phát hiện khác biệt có ý nghĩa. Bài không nêu p cụ thể trong câu.",
+        "numbers": "20 người (phân nhóm fMRI)",
+        "plainMeaning": "Không nêu trong bài",
+        "certainty": {
+          "rating": "vừa",
+          "reason": ""
+        },
+        "claimType": "data",
+        "page": 8,
+        "quote": ""
+      }
+    ],
+    "figures": [
+      {
+        "label": "Table 1",
+        "kind": "table",
+        "title": "",
+        "caption": "Multiple linear regression of factors predicting 10-year age-related change in cognition IDs Age (per year) Birthweight",
+        "explanation": "",
+        "whatToLookFor": "",
+        "page": 4
+      },
+      {
+        "label": "Figure 1",
+        "kind": "figure",
+        "title": "",
+        "caption": "Age-related change in twins discordant for LEP. LEP discordance was defined as a difference of >1 SD. There were 28 DZ and 14 MZ twins.",
+        "explanation": "",
+        "whatToLookFor": "",
+        "page": 6
+      },
+      {
+        "label": "Figure 2",
+        "kind": "figure",
+        "title": "",
+        "caption": "Brain activation in 2011 during a cued reaction time task in stronger compared to weaker twins in 1999. Upper panel: Signifi- cantly increased brain activity in stronger twins (1999) during cued reaction times compared to the control condition. Coronal",
+        "explanation": "",
+        "whatToLookFor": "",
+        "page": 9
+      }
+    ],
+    "quickRead": {
+      "lines": [
+        "[Dữ kiện] Công suất duỗi chân đo lúc ban đầu dự báo mức suy giảm nhận thức sau một thập kỷ ở phụ nữ lớn tuổi.",
+        "[Dữ kiện] Hiệu ứng mạnh hơn hoạt động thể lực tự báo cáo và không thấy với lực bóp tay, chức năng phổi, khối nạc chân.",
+        "[Nhận xét của AI] Đây là liên quan quan sát: chưa chứng minh rằng tập nâng công suất chân sẽ cải thiện nhận thức."
+      ],
+      "readyForPt": "Chưa dùng để lập kế hoạch set/rep. Dùng được như kiến thức nền: khi làm việc với người lớn tuổi, công suất chi dưới là biến số đáng theo dõi và đáng đo lại theo thời gian."
+    },
+    "whyStudy": "[Tác giả diễn giải] Nhóm tác giả đặt vấn đề là tìm yếu tố thể lực nào gắn với lão hóa nhận thức, và cho rằng thể lực cơ bắp — đặc biệt công suất chi dưới — có thể là dấu hiệu nhạy hơn các thước đo thể lực khác. [Tác giả diễn giải] Họ chọn thiết kế sinh đôi vì cặp cùng trứng chia sẻ gần như toàn bộ gen và lớn lên trong cùng môi trường, nên nếu người khỏe chân hơn trong cùng một cặp cũng giữ nhận thức tốt hơn thì khó quy cho gen hay hoàn cảnh gia đình. [Dữ kiện] Giả thuyết được kiểm tra bằng cách đo công suất duỗi chân một lần rồi đo nhận thức hai lần cách nhau 10 năm, đồng thời so sánh trong cặp sinh đôi lệch nhau về công suất chân.",
+    "mechanism": {
+      "summary": "[Tác giả diễn giải] Nhóm tác giả không đo cơ chế nào; họ liệt kê bốn con đường giả thuyết nối thể lực cơ với não: tim mạch, miễn dịch, nội tiết thần kinh và tín hiệu thần kinh dưỡng (neurotrophic). [Tác giả diễn giải] Chính bài nêu rằng dữ liệu này không ủng hộ con đường tim mạch làm trung gian, và cho rằng tính đặc hiệu của thể lực chi dưới là bằng chứng chống lại một nguyên nhân chung lưu hành trong máu.",
+      "steps": [
+        "[Tác giả diễn giải] Bước giả thuyết 1 — vận động làm tăng tưới máu và các yếu tố tuần hoàn; nhưng bài nói dữ liệu của mình không ủng hộ nhánh tim mạch làm trung gian.",
+        "[Tác giả diễn giải] Bước giả thuyết 2 — các yếu tố thần kinh dưỡng như VEGF, BDNF, IGF-1, FGF-2 có thể thúc đẩy tạo mạch, tạo synapse và tạo neuron.",
+        "[Tác giả diễn giải] Bước giả thuyết 3 — một cơ chế chung, không do di truyền, tác động lên cả não và đơn vị thần kinh–cơ, đặc hiệu cho chi dưới và/hoặc cho tốc độ phối hợp chức năng cơ."
+      ],
+      "whyWeightStaysStill": "Không áp dụng cho bài này: không có tạ, dây đàn hồi hay máy cáp, nên không có tình huống tạ đứng yên lúc đầu. Thiết bị duy nhất là Leg Extensor Power Rig với bánh đà quay tay tới điểm đỏ rồi quay ngược để tạo độ rơ; bàn đạp đặt ở vị trí “up” và người tập đạp xuống một lần mỗi lần thử.",
+      "analogy": "Dễ hình dung như đề-pa xe máy: bạn đạp một cú thật nhanh và dứt khoát để bánh đà quay, chứ không phải đẩy từ từ — máy đo lấy cả lực lẫn tốc độ của cú đạp đó. Công suất chân ở đây là “khả năng bung nhanh”, khác với “nâng được nặng bao nhiêu”."
+    },
+    "authorsConclusion": "[Tác giả diễn giải] Nhóm tác giả kết luận rằng thể lực cơ bắp — đo bằng công suất chân — gắn với lão hóa nhận thức tốt hơn trong 10 năm ở phụ nữ sống trong cộng đồng và không suy giảm nhận thức; hiệu ứng mạnh hơn và độc lập với các yếu tố lối sống/sức khỏe khác, và không bị giải thích bởi yếu tố di truyền hay môi trường sớm dùng chung ở sinh đôi.",
+    "authorsView": {
+      "conclusion": "[Tác giả diễn giải] Kết luận đo được: công suất chân cao hơn lúc ban đầu đi kèm ít suy giảm nhận thức hơn sau 10 năm, độc lập với hoạt động thể lực tự báo cáo, và hiệu ứng không do kiểu gen hay môi trường dùng chung.",
+      "interpretations": [
+        "[Tác giả diễn giải] Việc hiệu chỉnh thêm công suất chân làm giảm liên quan giữa chất xám toàn bộ và thay đổi nhận thức được hiểu là công suất chân và chất xám có thể nằm trên cùng một con đường nhân quả (dùng từ “may” — chưa được đo).",
+        "[Tác giả diễn giải] Hiệu ứng quan sát được nhiều khả năng là hệ quả của việc đo chức năng chi dưới nói chung hơn là sức mạnh cơ nói riêng.",
+        "[Tác giả diễn giải] Bốn cơ chế tiềm năng được nêu: tim mạch, miễn dịch, nội tiết thần kinh và tín hiệu thần kinh dưỡng; bài nói dữ liệu của mình không ủng hộ nhánh tim mạch.",
+        "[Tác giả diễn giải] Các yếu tố như VEGF, BDNF, IGF-1, FGF-2 “có thể” thúc đẩy tạo mạch, tạo synapse, tạo neuron — đây là suy đoán, chưa được đo trong bài.",
+        "[Tác giả diễn giải] Giả thuyết thay thế: công suất chân là dấu hiệu nhạy của kiểu hoạt động thể chất có thể ảnh hưởng lão hóa nhận thức.",
+        "[Tác giả diễn giải] Tính đặc hiệu của thể lực chi dưới được xem là bằng chứng chống lại một “nguyên nhân chung lưu hành trong tuần hoàn”."
+      ],
+      "applications": [
+        "[Tác giả diễn giải] Can thiệp nhằm cải thiện công suất chân về dài hạn “có thể” giúp đạt mục tiêu lão hóa nhận thức khỏe mạnh — chưa được đo.",
+        "[Tác giả diễn giải] Nhóm tác giả dự định làm tiếp một can thiệp tập luyện ở các cặp sinh đôi lệch nhau về thể lực để xem nhận thức có hội tụ không — chưa được đo.",
+        "[Tác giả diễn giải] Công suất chân “có thể” đặc biệt phù hợp làm thước đo thể lực ở phụ nữ lớn tuổi ít vận động — chưa được đo.",
+        "[Tác giả diễn giải] Bài dẫn một nghiên cứu khác cho thấy bài tập nhẹ như đi bộ tăng dần làm tăng công suất cơ trong 12 tuần trong khi VO2max và diện tích cắt ngang cơ tứ đầu không đổi — đây là dẫn chứng ngoài, chưa được kiểm chứng trong bài này.",
+        "[Tác giả diễn giải] Cần nghiên cứu dọc xác nhận lại và lặp lại ở đoàn hệ sinh đôi khác."
+      ]
+    },
+    "limitations": [
+      "[Tác giả nêu] Đoàn hệ gồm phụ nữ sinh đôi học vấn tương đối cao, nghề nghiệp trung bình, sức khỏe tốt hơn dân số chung một chút.",
+      "[Tác giả nêu] Tuổi 43–73 khi đo lần đầu, theo dõi từ trung niên tới đầu tuổi già, nên không nói được gì về thay đổi ở tuổi già hơn.",
+      "[Tác giả nêu] Cần nghiên cứu thêm để biết có khái quát được cho nam giới không.",
+      "[Tác giả nêu] Bài không đo các thước đo thể lực aerobic (ví dụ VO2max) để so sánh với công suất chân.",
+      "[Tác giả nêu] Vì hạn chế hậu cần và kinh phí, các đo lường theo dõi đã không được thực hiện.",
+      "[Tác giả nêu] Bộ test nhận thức chỉ nhắm tốc độ xử lý và trí nhớ thị giác, không bắt được thay đổi ngôn ngữ hay trí nhớ lời nói.",
+      "[Tác giả nêu] Chỉ test hai thời điểm nên chỉ phân tích được thay đổi tuyến tính.",
+      "[Tác giả nêu] Cỡ mẫu nhỏ cho phân tích sinh đôi bất tương hợp và phân nhóm MRI; hướng liên quan bị hạn chế vì không có đo MRI từ đầu.",
+      "[Tác giả nêu] Thiết kế không chứng minh được nhân quả dù có tính dọc; có thể khác biệt chức năng não dẫn tới công suất chân cao hơn (nhân quả ngược)."
+    ],
+    "limitationsStructured": {
+      "authors": [
+        "[Tác giả diễn giải] Mẫu là nữ sinh đôi học vấn khá, sức khỏe tốt hơn dân số chung; không khái quát cho nam giới.",
+        "[Tác giả diễn giải] Khoảng tuổi 43–73, không phản ánh tuổi già hơn.",
+        "[Tác giả diễn giải] Không đo thước đo aerobic để so sánh.",
+        "[Tác giả diễn giải] Thiếu đo lường theo dõi vì hạn chế hậu cần và kinh phí.",
+        "[Tác giả diễn giải] Bộ test nhận thức bỏ sót ngôn ngữ và trí nhớ lời nói.",
+        "[Tác giả diễn giải] Chỉ hai thời điểm nên chỉ phân tích thay đổi tuyến tính.",
+        "[Tác giả diễn giải] Cỡ mẫu nhỏ cho phân tích cặp sinh đôi bất tương hợp và phân nhóm MRI.",
+        "[Tác giả diễn giải] Không chứng minh được nhân quả; có thể có nhân quả ngược."
+      ],
+      "ai": [
+        "[Nhận xét của AI] Không thấy báo cáo tính cỡ mẫu trước khi làm, nên khó đánh giá nghiên cứu có đủ lực thống kê cho các phân tích phụ hay không.",
+        "[Nhận xét của AI] Các so sánh then chốt ở nhóm sinh đôi dùng kiểm định một phía, vốn dễ cho kết quả “có ý nghĩa” hơn kiểm định hai phía; với nhóm cùng trứng thì không đạt ý nghĩa.",
+        "[Nhận xét của AI] Dữ liệu thiếu được bù bằng multiple imputation, nghĩa là một phần kết quả dựa trên giá trị ước lượng chứ không phải đo trực tiếp.",
+        "[Nhận xét của AI] Hoạt động thể lực là tự báo cáo theo thang 4 mức, không có thiết bị đeo — sai lệch nhớ lại và mong muốn xã hội có thể làm yếu biến so sánh.",
+        "[Nhận xét của AI] Công suất chân chỉ đo một lần ở đầu nghiên cứu; không biết nó thay đổi thế nào ở từng người trong 10 năm, nên không thể nói chiều nhân quả.",
+        "[Nhận xét của AI] Bài không nêu tuyên bố xung đột lợi ích, chỉ nêu nguồn tài trợ.",
+        "[Nhận xét của AI] Phân nhóm MRI chỉ hiệu chỉnh tuổi ở mô hình chất xám, và chỉ vài cặp cùng trứng — mọi kết luận về não nên xem là khám phá, không phải xác nhận.",
+        "[Nhận xét của AI] Có rất nhiều phép so sánh được chạy; dù có hiệu chỉnh Bonferroni cho phân tích chính, các phân tích phụ không được hiệu chỉnh tương tự."
+      ]
+    },
+    "conflictOfInterest": "Không nêu trong bài: phần dữ kiện chỉ có mục tài trợ/ghi nhận (Wellcome Trust, FP7, NIHR), không thấy tuyên bố xung đột lợi ích hay bằng sáng chế.",
+    "benefitSignals": {
+      "statement": "[Dữ kiện] Bài ghi rõ nguồn tài trợ học thuật (Wellcome Trust qua Clinical Training Research Fellowship cho tác giả thứ nhất, chương trình FP7 của Cộng đồng châu Âu, và các đơn vị do NIHR tài trợ); không thấy tuyên bố xung đột lợi ích hay bằng sáng chế trong phần dữ kiện của bài.",
+      "flags": [
+        {
+          "text": "Bài nêu hạn chế về kinh phí khiến không thực hiện được đo lường theo dõi — dấu hiệu giới hạn nguồn lực của nghiên cứu.",
+          "source": "Strengths and Limitations",
+          "page": 10
+        },
+        {
+          "text": "Kết quả phân nhóm MRI được mô tả là “novel” — tín hiệu nhấn mạnh tính mới của sản phẩm nghiên cứu của nhóm tác giả.",
+          "source": "Discussion",
+          "page": 9
+        },
+        {
+          "text": "Bài công bố theo giấy phép CC BY của S. Karger AG, có ghi bản quyền nhà xuất bản ở chân trang 1.",
+          "source": "chú thích chân trang 1",
+          "page": 1
+        },
+        {
+          "text": "Tài trợ: Wellcome Trust qua Clinical Training Research Fellowship cấp cho Claire J. Steves (086904/Z/08/Z).",
+          "source": "Acknowledgment",
+          "page": 11
+        },
+        {
+          "text": "Tài trợ: Chương trình Khung lần thứ bảy của Cộng đồng châu Âu (FP7/2007–2013).",
+          "source": "Acknowledgment",
+          "page": 11
+        },
+        {
+          "text": "Hỗ trợ từ BioResource, Clinical Research Facility và Biomedical Research Centre do NIHR tài trợ, tại Guy’s and St Thomas’ NHS Foundation Trust hợp tác với King’s College London.",
+          "source": "Acknowledgment",
+          "page": 11
+        }
+      ]
+    },
+    "practicalTakeaways": [
+      "[Nhận xét của AI] Khi làm việc với khách trên 50 tuổi, thêm một chỉ số có yếu tố tốc độ cho chi dưới (ví dụ đo thời gian đứng lên ngồi xuống nhanh vài lần, hoặc một bài đạp/nhảy tại chỗ có kiểm soát) và ghi lại theo thời gian — thay vì chỉ ghi số kg.",
+      "[Nhận xét của AI] Đừng suy từ bài này ra giáo án: không có dữ liệu về set, rep, tải, tần suất. Dùng nó để giải thích vì sao theo dõi công suất chi dưới ở người lớn tuổi là hợp lý.",
+      "[Nhận xét của AI] Nếu khách hỏi “tập chân có tốt cho trí nhớ không?”, câu trả lời trung thực là: dữ liệu quan sát cho thấy người khỏe chân hơn giữ nhận thức tốt hơn, nhưng chưa có bằng chứng từ thử nghiệm tập luyện rằng tập sẽ tạo ra khác biệt đó.",
+      "[Nhận xét của AI] Bài nhấn mạnh công suất chân đặc hiệu hơn các chỉ số khác — một lý do để không bỏ pha bung nhanh, dứt khoát trong chương trình của người lớn tuổi khỏe mạnh."
+    ],
+    "application": {
+      "supported": [
+        "[Nhận xét của AI] Ở phụ nữ lớn tuổi khỏe mạnh, công suất duỗi chân đo bằng lực × vận tốc là chỉ số dự báo tốt hơn lực bóp tay, chức năng phổi và khối nạc chân về mặt nhận thức dài hạn — nên nếu chỉ chọn một chỉ số chi dưới để theo dõi, chọn chỉ số có yếu tố tốc độ.",
+        "[Nhận xét của AI] Công suất chân giảm rõ theo tuổi, nên đo lại định kỳ (ví dụ mỗi 1–2 năm) hợp lý hơn là đo một lần rồi bỏ.",
+        "[Nhận xét của AI] Việc hỏi thêm về mức vận động tự khai vẫn có giá trị vì nó đóng góp độc lập, nhưng không thay thế được đo công suất."
+      ],
+      "hypothesis": [
+        "[Tác giả diễn giải] Can thiệp dài hạn nhằm tăng công suất chân có thể cải thiện lão hóa nhận thức — chưa được đo.",
+        "[Tác giả diễn giải] Công suất chân và chất xám toàn bộ có thể nằm trên cùng một con đường nhân quả tới lão hóa nhận thức — chưa được đo.",
+        "[Tác giả diễn giải] Các yếu tố thần kinh dưỡng (VEGF, BDNF, IGF-1, FGF-2) có thể là mắt xích trung gian — chưa được đo.",
+        "[Tác giả diễn giải] Hiệu ứng có thể phản ánh chức năng chi dưới nói chung chứ không riêng công suất cơ — tức phần “tích cực” của công suất có thể không phải là thứ duy nhất có lợi, và ngược lại, kết quả không cho phép khẳng định riêng việc nâng công suất là đủ — chưa được đo.",
+        "[Nhận xét của AI] Nếu hiệu ứng thật sự đến từ hoạt động thể chất kiểu tạo công suất, thì các chương trình chỉ tập chậm, nặng, không có pha bung nhanh “có thể” không tạo ra lợi ích tương tự — chưa được đo trong bài."
+      ],
+      "notYet": [
+        "[Nhận xét của AI] Chưa nên hứa với khách rằng tập chân sẽ giúp “nhớ tốt hơn” hay “chống sa sút trí tuệ”: đây là liên quan quan sát, chưa có thử nghiệm can thiệp trong bài.",
+        "[Nhận xét của AI] Chưa nên lấy các con số quy đổi của bài (kiểu tăng công suất bao nhiêu watt thì tương đương bao nhiêu năm tuổi) làm mục tiêu tập cho từng người.",
+        "[Nhận xét của AI] Chưa nên áp dụng máy Leg Extensor Power Rig hay quy trình đo của bài cho khách phổ thông ngoài mục đích nghiên cứu — thiết bị chuyên dụng, không phải máy trong phòng gym thương mại."
+      ],
+      "unanswered": [
+        "[Nhận xét của AI] Tập luyện làm tăng công suất chân có làm chậm suy giảm nhận thức không — bài không trả lời, đây là câu hỏi cho thử nghiệm can thiệp tiếp theo.",
+        "[Nhận xét của AI] Cần bao nhiêu set, bao nhiêu lần/tuần, tải bao nhiêu % 1RM để tăng công suất chân có ý nghĩa — bài không trả lời (không có can thiệp tập).",
+        "[Nhận xét của AI] Ngưỡng công suất chân nào thì được coi là “đủ” cho sức khỏe não — bài không trả lời.",
+        "[Nhận xét của AI] Nam giới có cùng mối liên quan không — bài không trả lời.",
+        "[Nhận xét của AI] Cơ chế sinh học thật sự là gì — bài chỉ nêu giả thuyết.",
+        "[Nhận xét của AI] Chênh lệch giữa các cá nhân (dao động quanh giá trị trung bình, SD) lớn đến mức nào trong từng người theo thời gian — bài không trả lời."
+      ],
+      "notApplicableTo": "Nam giới (chưa có dữ liệu), người đã suy giảm nhận thức hoặc có bệnh thần kinh (bài chọn người không suy giảm nhận thức), người rất già (ngoài khoảng tuổi 43–73 lúc ban đầu), và người trẻ đang tập tăng cơ — nghiên cứu không nói gì về nhóm này."
+    },
+    "whoItDoesNotApplyTo": "Phụ nữ trưởng thành khỏe mạnh là đối tượng của bài; không áp dụng cho nam giới, người đã có suy giảm nhận thức, người có bệnh thần kinh–cơ ảnh hưởng chi dưới, và không dùng để suy ra kế hoạch tập cho vận động viên trẻ.",
+    "selfCheck": [
+      {
+        "question": "Nếu một khách nói “chị tập chân khỏe lên là não chị trẻ lại phải không?”, dựa vào bài này bạn trả lời thế nào cho đúng?",
+        "answer": "Phải nói rõ đây là nghiên cứu quan sát: người có công suất chân cao hơn lúc ban đầu thì suy giảm nhận thức ít hơn sau 10 năm, nhưng bài không thử can thiệp tập luyện nên chưa chứng minh được tập chân làm chậm lão hóa não. Cũng không được hứa hẹn cụ thể về trí nhớ."
+      },
+      {
+        "question": "Vì sao kết quả ở nhóm sinh đôi cùng trứng không đạt ý nghĩa thống kê lại KHÔNG được đọc là “không có tác dụng”?",
+        "answer": "Vì nhóm đó chỉ có vài cặp, thiếu lực thống kê; hướng của số liệu vẫn giống nhóm còn lại. Đúng phải viết là “không phát hiện khác biệt” ở nhóm nhỏ này, chứ không được kết luận rằng hai chị em trong cặp giống nhau về nhận thức."
+      },
+      {
+        "question": "Vì sao kết quả với lực bóp tay và khối nạc chân lại quan trọng dù chúng không dự báo gì?",
+        "answer": "Vì chúng cho thấy không phải cứ “khỏe hơn” hay “nhiều cơ hơn” là dự báo được nhận thức; thông tin nằm ở chỉ số có yếu tố tốc độ của chi dưới. Đây là so sánh trực tiếp trên cùng mẫu, cùng mô hình, nên đáng tin hơn suy đoán."
+      }
+    ],
+    "glossary": [
+      {
+        "en": "leg extensor power (LEP)",
+        "vi": "công suất duỗi chân",
+        "explanation": "Khả năng sinh lực nhanh của chân, tính bằng lực × vận tốc; khác với sức mạnh tối đa (nâng được nặng nhất).",
+        "example": "Một người squat 100 kg nhưng đứng lên khỏi ghế chậm có thể có sức mạnh tốt mà công suất thấp."
+      },
+      {
+        "en": "Leg Extensor Power Rig / Nottingham power rig",
+        "vi": "máy đo công suất duỗi chân kiểu Nottingham",
+        "explanation": "Thiết bị chuyên dụng có ghế, bàn đạp và bánh đà; đo cả lực lẫn tốc độ của một cú đạp chân.",
+        "example": "Giống cảm giác đạp mạnh xuống một bàn đạp xe đứng yên, được ghi lại bằng cảm biến."
+      },
+      {
+        "en": "discordant twin design",
+        "vi": "thiết kế cặp sinh đôi bất tương hợp",
+        "explanation": "So sánh hai chị em trong cùng một cặp sinh đôi nhưng khác nhau rõ rệt về một đặc điểm, để loại ảnh hưởng của gen và môi trường gia đình.",
+        "example": "Hai chị em cùng nhà, cùng tuổi, một người khỏe chân hơn hẳn — so hai người với nhau thay vì so với người ngoài."
+      },
+      {
+        "en": "age-related cognitive change (ARC)",
+        "vi": "thay đổi nhận thức liên quan tuổi",
+        "explanation": "Điểm tổng hợp từ nhiều bài test máy tính, đo mức thay đổi trí nhớ và tốc độ xử lý qua thời gian.",
+        "example": "Như chấm điểm một bài kiểm tra phản xạ và ghi nhớ hình, rồi so điểm cách đây 10 năm."
+      },
+      {
+        "en": "standardised β-coefficient (Stdβ)",
+        "vi": "hệ số hồi quy đã chuẩn hóa",
+        "explanation": "Hệ số cho biết hai biến liên quan mạnh hay yếu sau khi đưa về cùng đơn vị đo, nên so sánh được các biến khác đơn vị.",
+        "example": "Như quy cả “kg nâng” và “giây chạy” về cùng thang điểm để biết yếu tố nào ảnh hưởng mạnh hơn."
+      },
+      {
+        "en": "Bonferroni correction",
+        "vi": "hiệu chỉnh Bonferroni",
+        "explanation": "Cách hạ ngưỡng p khi làm nhiều phép so sánh, để giảm khả năng “tình cờ thấy có ý nghĩa”.",
+        "example": "Như kiểm tra 10 bài test thì phải đúng gần như tuyệt đối mới được coi là giỏi, thay vì 6/10."
+      },
+      {
+        "en": "generalised estimating equation (GEE)",
+        "vi": "phương trình ước lượng tổng quát",
+        "explanation": "Cách phân tích có tính đến việc các quan sát không độc lập, ví dụ hai chị em sinh đôi trong cùng một cặp.",
+        "example": "Như khi tính điểm trung bình lớp phải nhớ có nhiều cặp anh chị em trong lớp, không được đếm thành hai học sinh độc lập."
+      },
+      {
+        "en": "multiple imputation",
+        "vi": "bù dữ liệu thiếu bằng nhiều lần ước lượng",
+        "explanation": "Kỹ thuật tạo nhiều bộ dữ liệu ước lượng cho các ô trống rồi gộp kết quả, thay vì xóa người thiếu dữ liệu.",
+        "example": "Như khi thiếu vài chỉ số trong bảng theo dõi, bạn điền bằng cách suy từ các chỉ số khác và ghi rõ đó là giá trị ước lượng."
+      },
+      {
+        "en": "total grey matter volume",
+        "vi": "thể tích chất xám toàn bộ",
+        "explanation": "Phần mô não chứa thân tế bào thần kinh, đo trên ảnh MRI; giảm dần theo tuổi ở nhiều người.",
+        "example": "Giống đo “độ dày” của lớp vỏ não trên ảnh chụp, không phải đo chức năng đang hoạt động."
+      },
+      {
+        "en": "BOLD contrast / fMRI",
+        "vi": "tín hiệu BOLD trên ảnh cộng hưởng từ chức năng",
+        "explanation": "Tín hiệu phản ánh mức oxy trong máu ở từng vùng não khi làm một nhiệm vụ, dùng để suy ra vùng nào hoạt động mạnh hơn.",
+        "example": "Như xem vùng nào trong não “bật đèn sáng hơn” khi khách đang bấm nút theo tín hiệu trên màn hình."
+      },
+      {
+        "en": "neurotrophic factors (VEGF, BDNF, IGF-1, FGF-2)",
+        "vi": "các yếu tố thần kinh dưỡng",
+        "explanation": "Các protein được cho là hỗ trợ tạo mạch, tạo synapse và tạo neuron mới; bài chỉ nêu như giả thuyết, không đo.",
+        "example": "Giống như “phân bón” cho dây thần kinh — có thể có lợi, nhưng nghiên cứu này không đo mức phân bón đó."
+      },
+      {
+        "en": "circulating common cause",
+        "vi": "nguyên nhân chung lưu hành trong máu",
+        "explanation": "Giả thuyết rằng một chất nào đó trong máu tác động lên cả cơ và não, tạo ra mối liên quan giả.",
+        "example": "Như cùng một loại hormone ảnh hưởng cả việc đi lại nhanh và trí nhớ, khiến hai thứ “đi cùng nhau” mà không nhân quả với nhau."
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext",
+      "missingInfo": [
+        "Bài không báo cáo độ bất định kèm các hệ số ước lượng chính.",
+        "Không có tuyên bố xung đột lợi ích.",
+        "Không có mô tả chi tiết nội dung các hình/bảng được trích dẫn trong phần dữ kiện (chỉ có số liệu dạng chữ).",
+        "Không nêu tiêu chí dừng cho lần đạp/3 lần thử ngoài hướng dẫn “nhanh và mạnh nhất”.",
+        "Không có thông tin về độ dao động giữa các cá nhân cho từng kết quả (chỉ có SD chung của mẫu ở một vài chỗ)."
+      ]
+    },
+    "verification": {
+      "passed": true,
+      "issues": [],
+      "rounds": 1
+    }
+  },
+  "facts": {
+    "metadata": {
+      "title": {
+        "value": "Kicking Back Cognitive Ageing: Leg Power Predicts Cognitive Ageing after Ten Years in Older Female Twins",
+        "page": 1,
+        "quote": ""
+      },
+      "authors": [
+        {
+          "value": "Claire J. Steves",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Mitul M. Mehta",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Stephen H.D. Jackson",
+          "page": 1,
+          "quote": ""
+        },
+        {
+          "value": "Tim D. Spector",
+          "page": 1,
+          "quote": ""
+        }
+      ],
+      "year": {
+        "value": "2016",
+        "page": 1,
+        "quote": ""
+      },
+      "journal": {
+        "value": "Gerontology",
+        "page": 1,
+        "quote": ""
+      },
+      "volume": {
+        "value": "62",
+        "page": 1,
+        "quote": ""
+      },
+      "issue": {
+        "value": "2",
+        "page": 1,
+        "quote": ""
+      },
+      "pages": {
+        "value": "138-149",
+        "page": 1,
+        "quote": ""
+      },
+      "doi": {
+        "value": "10.1159/000441029",
+        "page": 1,
+        "quote": ""
+      }
+    },
+    "study": {
+      "design": {
+        "value": "Nghiên cứu đoàn hệ quan sát dọc (longitudinal observational cohort) trên nữ sinh đôi; phân tích cặp sinh đôi bất tương hợp (discordant twin) và phân nhóm MRI",
+        "page": 3,
+        "quote": "This study used a longitudinal observational cohort design in a sample of 324"
+      },
+      "participants": {
+        "n": 324,
+        "description": {
+          "value": "324 nữ sinh đôi khỏe mạnh, tuổi trung bình lúc ban đầu 55 (43–73); 127 sinh đôi cùng trứng (MZ), 197 sinh đôi khác trứng (DZ). Phân nhóm MRI: 20 cặp sinh đôi cùng trứng",
+          "page": 1,
+          "quote": "A total of 324 healthy female twins (average age at baseline 55, range 43–73)"
+        }
+      },
+      "intervention": {
+        "value": "Không có can thiệp; đo lường quan sát tại 2 thời điểm (1999 và 2009), MRI 2011–2012",
+        "page": 3,
+        "quote": "This study used a longitudinal observational cohort design"
+      },
+      "device": {
+        "value": "Leg Extensor Power Rig (Đại học Y Nottingham): ghế chỉnh sao cho chân gần duỗi hoàn toàn, tay khoanh, chân không hoạt động không dùng làm đòn bẩy, bàn đạp ở vị trí 'up', bánh đà quay tay tới điểm đỏ rồi quay ngược lấy độ rơ; đẩy bàn đạp xuống nhanh và mạnh nhất 'như phanh khẩn cấp'; 3 lần thử, nghỉ 30 giây, lấy kết quả tốt nhất chân thuận; đo lực và vận tốc duỗi chân",
+        "page": 3,
+        "quote": "using the Leg Extensor Power Rig (designed by Nottingham University Medical School)"
+      },
+      "comparator": {
+        "value": "Trong cặp sinh đôi: sinh đôi khỏe hơn (LEP cao hơn) so với yếu hơn; bất tương hợp định nghĩa >1 SD khác biệt về LEP (phân tích chung) và >25 watt (phân nhóm MRI)",
+        "page": 3,
+        "quote": "defined as more than 1 SD different on LEP"
+      },
+      "outcomes": [
+        {
+          "value": "Thay đổi nhận thức liên quan tuổi (ARC) từ 7 test CANTAB trên màn hình cảm ứng, đo 1999 và 2009",
+          "page": 3,
+          "quote": "Subjects underwent the same seven computerised CANTAB tests"
+        },
+        {
+          "value": "Công suất duỗi chân (leg extensor power, LEP) đo 1999",
+          "page": 3,
+          "quote": "Leg extension muscle power was measured in 1999 by a trained research nurse"
+        },
+        {
+          "value": "Hoạt động thể lực tự báo cáo (thang Likert 4 mức: inactive, light, moderate, heavy) tại nhà, nơi làm việc, lúc nhàn rỗi",
+          "page": 3,
+          "quote": "how would you describe the kind of PA you performed"
+        },
+        {
+          "value": "Thể tích chất xám toàn bộ, thể tích não thất, vùng MTL và middle frontal gyrus; hoạt động BOLD khi nhiệm vụ reaction time",
+          "page": 4,
+          "quote": "global measures of ventricular volume (sum of 3rd, 4th left and right lateral"
+        }
+      ],
+      "measurement": {
+        "value": "CANTAB (PRM, DMS, Paired Associates Learning, Spatial Span, Spatial Working Memory, Simple Reaction Time, Five-Choice Reaction Time); Leg Extensor Power Rig; bảng hỏi PA; MRI 1.5-tesla Signa HDx với SPM8/DARTEL, Freesurfer; mô hình hồi quy tuyến tính, GEE, paired t test; multiple imputation",
+        "page": 4,
+        "quote": "same day and same 1.5-tesla Signa HDx MR scanner"
+      },
+      "setting": {
+        "value": "Đoàn hệ tình nguyện TwinsUK, London; cùng một cơ sở cho cả hai lần khám, trừ 14 người được test tại nhà năm 2009",
+        "page": 5,
+        "quote": "with the exception of 14 subjects tested at home in 2009"
+      },
+      "duration": {
+        "value": "Theo dõi nhận thức 10 năm (1999–2009); MRI sau 12 năm (2011–2012)",
+        "page": 1,
+        "quote": "at two time points 10 years apart"
+      },
+      "failureCriteria": {
+        "value": "",
+        "page": 0,
+        "quote": ""
+      }
+    },
+    "results": [
+      {
+        "id": "r1",
+        "outcome": "Độ tin cậy của LEP (hệ số tin cậy, hệ số biến thiên)",
+        "arms": [
+          {
+            "name": "Người trưởng thành chưa quen, đo trong 1 tuần",
+            "value": "reliability coefficient 0.97",
+            "sd": "coefficient of variation 9.4%",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Giá trị độ tin cậy lấy từ nghiên cứu trước, không nêu p",
+        "page": 2,
+        "quote": "reliability coefficient 0.97, coefficient of variation 9.4%, over 1-week period"
+      },
+      {
+        "id": "r2",
+        "outcome": "ARC 10 năm theo LEP và hoạt động thể lực tự báo cáo (mô hình đa biến, hiệu chỉnh tuổi và các yếu tố)",
+        "arms": [
+          {
+            "name": "LEP",
+            "value": "Stdβ = 0.184",
+            "sd": "",
+            "n": 324
+          },
+          {
+            "name": "Self-reported PA",
+            "value": "Stdβ = 0.129",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "LEP p<0.001; PA p=0.028",
+        "d": "",
+        "ci": "",
+        "note": "Hai yếu tố có hiệu ứng bảo vệ độc lập",
+        "page": 5,
+        "quote": "Both PA [standardised β-coefficient (Stdβ) = 0.129, p = 0.028] and LEP"
+      },
+      {
+        "id": "r3",
+        "outcome": "ARC 10 năm theo LEP (mô hình level 5, hiệu chỉnh bệnh tật)",
+        "arms": [
+          {
+            "name": "LEP",
+            "value": "Stdβ = 0.174",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "p=0.002",
+        "d": "",
+        "ci": "",
+        "note": "Vẫn có ý nghĩa sau hiệu chỉnh ngưỡng Bonferroni 7.8 × 10⁻³",
+        "page": 5,
+        "quote": "Stdβ = 0.174, p = 0.002, level 5 model"
+      },
+      {
+        "id": "r4",
+        "outcome": "Suy giảm công suất chân theo tuổi trong 10 năm",
+        "arms": [
+          {
+            "name": "10 năm",
+            "value": "almost 0.5 SD decline",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "<0.001",
+        "d": "Stdβ = –0.0478",
+        "ci": "",
+        "note": "",
+        "page": 5,
+        "quote": "10 years leading to almost 0.5 SD decline in leg power"
+      },
+      {
+        "id": "r5",
+        "outcome": "Độ lớn hiệu ứng tuyệt đối của LEP và PA lên ARC",
+        "arms": [
+          {
+            "name": "Tăng LEP 40 W",
+            "value": "18% SD improvement in ARC",
+            "sd": "",
+            "n": 324
+          },
+          {
+            "name": "Từ hoạt động nhẹ sang vừa 8 giờ/ngày",
+            "value": "13% SD improvement in ARC",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Tăng 40 W tương đương 3.3 năm khác biệt tuổi; không nêu p cho so sánh này",
+        "page": 5,
+        "quote": "an increase in LEP of 40 W produced an 18% SD improvement"
+      },
+      {
+        "id": "r6",
+        "outcome": "ARC theo các yếu tố trong mô hình rút gọn (Bảng 2)",
+        "arms": [
+          {
+            "name": "LEP (Model 1)",
+            "value": "Stdβ = 0.191",
+            "sd": "",
+            "n": 324
+          },
+          {
+            "name": "PA (Model 1)",
+            "value": "Stdβ = 0.109",
+            "sd": "",
+            "n": 324
+          },
+          {
+            "name": "Diabetes status (Model 1)",
+            "value": "β = –1.81",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "LEP p<0.001; PA p=0.043; diabetes p=0.002",
+        "d": "",
+        "ci": "",
+        "note": "LEP giữ nguyên độ lớn ở các model 2–4 (0.186; 0.178; 0.180); PA 0.109; 0.107; 0.107",
+        "page": 5,
+        "quote": "0.191 <0.001"
+      },
+      {
+        "id": "r7",
+        "outcome": "ARC và tình trạng đồng hợp tử ApoE ε4",
+        "arms": [
+          {
+            "name": "ApoE ε4 homozygous (n=10/155)",
+            "value": "β –0.54",
+            "sd": "",
+            "n": 155
+          }
+        ],
+        "p": "p=0.002",
+        "d": "",
+        "ci": "",
+        "note": "Loại các cá thể này không làm thay đổi điểm ước lượng hay ý nghĩa",
+        "page": 6,
+        "quote": "ApoE ε4 homozygous status was itself strongly associated with ARC"
+      },
+      {
+        "id": "r8",
+        "outcome": "Kiểm tra ảnh hưởng của việc dùng máy tính (có địa chỉ email) – so sánh mô hình",
+        "arms": [
+          {
+            "name": "Model có/không điều chỉnh email status",
+            "value": "F = 0.35",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "p=0.557",
+        "d": "",
+        "ci": "",
+        "note": "Kết quả LEP ít thay đổi",
+        "page": 6,
+        "quote": "possessing an email address), with little change in results"
+      },
+      {
+        "id": "r9",
+        "outcome": "ARC theo các chỉ số thể lực khác khi thay thế LEP",
+        "arms": [
+          {
+            "name": "Grip strength",
+            "value": "Stdβ = –0.031",
+            "sd": "",
+            "n": 324
+          },
+          {
+            "name": "Lung function",
+            "value": "Stdβ = 0.060",
+            "sd": "",
+            "n": 324
+          },
+          {
+            "name": "Right leg lean mass",
+            "value": "Stdβ = 0.034",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "grip p=0.588; lung p=0.226; lean mass p=0.546",
+        "d": "",
+        "ci": "",
+        "note": "Không chỉ số nào dự báo ARC",
+        "page": 6,
+        "quote": "Neither grip strength (Stdβ = –0.031, p = 0.588), lung function"
+      },
+      {
+        "id": "r10",
+        "outcome": "ARC ở các cặp sinh đôi bất tương hợp LEP (paired t test, Bảng 3)",
+        "arms": [
+          {
+            "name": "All twins (n=42) – stronger twin",
+            "value": "0.169",
+            "sd": "",
+            "n": 42
+          },
+          {
+            "name": "All twins – weaker twin",
+            "value": "–0.112",
+            "sd": "",
+            "n": 42
+          },
+          {
+            "name": "DZ (n=28) – stronger twin",
+            "value": "0.209",
+            "sd": "",
+            "n": 28
+          },
+          {
+            "name": "DZ – weaker twin",
+            "value": "–0.125",
+            "sd": "",
+            "n": 28
+          },
+          {
+            "name": "MZ (n=14) – stronger twin",
+            "value": "0.089",
+            "sd": "",
+            "n": 14
+          },
+          {
+            "name": "MZ – weaker twin",
+            "value": "–0.089",
+            "sd": "",
+            "n": 14
+          }
+        ],
+        "p": "all twins one-tailed p=0.022; DZ p=0.040; MZ p=0.174",
+        "d": "",
+        "ci": "",
+        "note": "Không đạt ý nghĩa ở nhóm MZ do số lượng nhỏ; hoàn thành dữ liệu n=221 (118 cặp)",
+        "page": 6,
+        "quote": "twins who were stronger at baseline had significantly less deterioration in cognition"
+      },
+      {
+        "id": "r11",
+        "outcome": "ARC ở các cặp sinh đôi bất tương hợp hoạt động thể lực",
+        "arms": [
+          {
+            "name": "All twins (more active/less active)",
+            "value": "0.15/0.02",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "DZ",
+            "value": "0.09/–0.04",
+            "sd": "",
+            "n": 0
+          },
+          {
+            "name": "MZ",
+            "value": "0.26/0.10",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Bài chỉ nói không có ý nghĩa ở bất kỳ nhóm nào, không nêu p",
+        "page": 6,
+        "quote": "but the effects were not significant in any group"
+      },
+      {
+        "id": "r12",
+        "outcome": "Chất xám toàn bộ (12 năm sau) theo LEP",
+        "arms": [
+          {
+            "name": "LEP – total grey matter",
+            "value": "Stdβ = 0.362",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "p=0.005",
+        "d": "",
+        "ci": "",
+        "note": "Mô hình chỉ hiệu chỉnh tuổi; vẫn thấy khi hiệu chỉnh chiều cao và cân nặng sơ sinh",
+        "page": 6,
+        "quote": "LEP had a positive association with total grey matter volume 12 years later"
+      },
+      {
+        "id": "r13",
+        "outcome": "Não thất, MTL và middle frontal gyrus theo LEP",
+        "arms": [
+          {
+            "name": "LEP – ventricles và các ROI",
+            "value": "",
+            "sd": "",
+            "n": 0
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Không tìm thấy liên quan; bài không nêu p",
+        "page": 6,
+        "quote": "No association was found between LEP and ventricle size or the regions of interest"
+      },
+      {
+        "id": "r14",
+        "outcome": "So sánh chiều cao và thể tích nội sọ ở 9 cặp sinh đôi cùng trứng bất tương hợp >25 W",
+        "arms": [
+          {
+            "name": "Height (stronger vs weaker)",
+            "value": "",
+            "sd": "",
+            "n": 9
+          },
+          {
+            "name": "Intracranial volume",
+            "value": "",
+            "sd": "",
+            "n": 9
+          }
+        ],
+        "p": "height p=0.37; intracranial volume p=0.77",
+        "d": "",
+        "ci": "",
+        "note": "Không khác biệt có ý nghĩa giữa hai nhóm sinh đôi",
+        "page": 6,
+        "quote": "were not significantly different with regard to height (p = 0.37) or intracranial volume"
+      },
+      {
+        "id": "r15",
+        "outcome": "Thể tích não thất ở cặp sinh đôi cùng trứng bất tương hợp LEP",
+        "arms": [
+          {
+            "name": "Weaker twins so với stronger twins",
+            "value": "26% larger ventricles",
+            "sd": "",
+            "n": 9
+          }
+        ],
+        "p": "one-sided p=0.025",
+        "d": "",
+        "ci": "",
+        "note": "Không có khác biệt vùng chất xám khu trú",
+        "page": 7,
+        "quote": "weaker twins having 26% larger ventricles than their stronger sisters"
+      },
+      {
+        "id": "r16",
+        "outcome": "Hiệu ứng LEP lên ARC trong mẫu MRI nhỏ",
+        "arms": [
+          {
+            "name": "LEP – ARC (n=41)",
+            "value": "Stdβ = 0.159",
+            "sd": "",
+            "n": 41
+          }
+        ],
+        "p": "p=0.157",
+        "d": "",
+        "ci": "",
+        "note": "Cùng hướng với mẫu lớn nhưng không có ý nghĩa",
+        "page": 7,
+        "quote": "The direction of effect of LEP on ARC within this smaller sample"
+      },
+      {
+        "id": "r17",
+        "outcome": "Chất xám toàn bộ và ARC (có/không hiệu chỉnh LEP)",
+        "arms": [
+          {
+            "name": "Grey matter – ARC (chỉ hiệu chỉnh tuổi)",
+            "value": "Stdβ = 0.195",
+            "sd": "",
+            "n": 41
+          },
+          {
+            "name": "Grey matter – ARC (thêm hiệu chỉnh LEP)",
+            "value": "Stdβ = 0.067",
+            "sd": "",
+            "n": 41
+          }
+        ],
+        "p": "p=0.024; p=0.621",
+        "d": "",
+        "ci": "",
+        "note": "Hiệu ứng bị giảm đáng kể khi hiệu chỉnh LEP",
+        "page": 7,
+        "quote": "This effect was significantly attenuated when adjusting additionally for LEP"
+      },
+      {
+        "id": "r18",
+        "outcome": "Khác biệt thể tích não chuẩn hóa (điểm z) giữa cặp sinh đôi cùng trứng bất tương hợp LEP (Bảng 6)",
+        "arms": [
+          {
+            "name": "Ventricles/ICV",
+            "value": "0.540",
+            "sd": "",
+            "n": 9
+          },
+          {
+            "name": "Total grey matter/ICV",
+            "value": "–0.577",
+            "sd": "",
+            "n": 9
+          },
+          {
+            "name": "Left MTL",
+            "value": "0.261",
+            "sd": "",
+            "n": 9
+          },
+          {
+            "name": "Right MTL",
+            "value": "0.329",
+            "sd": "",
+            "n": 9
+          },
+          {
+            "name": "Left middle frontal gyrus",
+            "value": "–0.036",
+            "sd": "",
+            "n": 9
+          },
+          {
+            "name": "Right middle frontal gyrus",
+            "value": "0.023",
+            "sd": "",
+            "n": 9
+          }
+        ],
+        "p": "ventricles p=0.025; total grey p=0.025; left MTL p=0.890; right MTL p=0.843; left MFG p=0.444; right MFG p=0.550",
+        "d": "",
+        "ci": "",
+        "note": "paired t test một phía; điểm âm nghĩa là sinh đôi yếu hơn có thể tích nhỏ hơn",
+        "page": 7,
+        "quote": "A negative difference score indicates the weaker twins have on average smaller volumes"
+      },
+      {
+        "id": "r19",
+        "outcome": "Tương quan giữa LEP và chức năng phổi (FEV1)",
+        "arms": [
+          {
+            "name": "LEP – FEV1",
+            "value": "r = 0.38",
+            "sd": "",
+            "n": 324
+          }
+        ],
+        "p": "p>0.001",
+        "d": "",
+        "ci": "",
+        "note": "",
+        "page": 9,
+        "quote": "lung function (FEV 1 ) were correlated (r = 0.38, p > 0.001)"
+      },
+      {
+        "id": "r20",
+        "outcome": "Hoạt động não (fMRI) khi nhiệm vụ cued reaction time: sinh đôi khỏe hơn so với yếu hơn",
+        "arms": [
+          {
+            "name": "Stronger twins",
+            "value": "more activation in primary motor cortex bilaterally, BA 5 left",
+            "sd": "",
+            "n": 20
+          }
+        ],
+        "p": "",
+        "d": "",
+        "ci": "",
+        "note": "Bền vững khi hiệu chỉnh thành tích trong scanner; không nêu p cụ thể trong câu; nhiệm vụ choice reaction time không khác biệt có ý nghĩa",
+        "page": 8,
+        "quote": "stronger twins showed significantly more activation in the primary motor cortex bilaterally"
+      }
+    ],
+    "authors": {
+      "conclusion": {
+        "value": "Thể lực cơ bắp (đo bằng công suất chân) liên quan đến quá trình lão hóa nhận thức tốt hơn trong 10 năm ở phụ nữ sống trong cộng đồng không suy giảm nhận thức; hiệu ứng mạnh hơn và độc lập với các yếu tố lối sống/sức khỏe khác; không bị gây nhiễu bởi yếu tố di truyền và môi trường sớm dùng chung ở sinh đôi",
+        "page": 10,
+        "quote": "greater muscular fitness – as measured by leg power – is associated with improved cognitive ageing",
+        "source": "Conclusion"
+      },
+      "interpretations": [
+        {
+          "value": "Điều chỉnh theo công suất chân làm giảm liên quan giữa chất xám và thay đổi nhận thức, gợi ý công suất chân và thể tích chất xám toàn bộ có thể nằm trên cùng một con đường nhân quả tác động lên lão hóa nhận thức",
+          "page": 8,
+          "quote": "suggesting that prior physical power and global grey matter volume may be on the same causal pathway",
+          "source": ""
+        },
+        {
+          "value": "Mô hình sinh đôi cho thấy hiệu ứng không do gây nhiễu bởi kiểu gen hay môi trường dùng chung",
+          "page": 8,
+          "quote": "these effects were not explained by confounding through genotype or shared environment",
+          "source": ""
+        },
+        {
+          "value": "Hiệu ứng quan sát được nhiều khả năng là hệ quả của việc đo chức năng chi dưới nói chung, hơn là sức mạnh cơ nói riêng",
+          "page": 9,
+          "quote": "more likely that the observed effect is a consequence of measuring lower limb function, rather than muscle power specifically",
+          "source": ""
+        },
+        {
+          "value": "Khác biệt giữa các cá nhân trong nghiên cứu này hình thành trong 'đời sống thực' thay vì can thiệp thử nghiệm nên có thể ít liên quan đến tiềm năng dài hạn",
+          "page": 9,
+          "quote": "generated in ‘real life’ as opposed to trial interventions, which may have limited bearing",
+          "source": ""
+        },
+        {
+          "value": "Đây là nghiên cứu đầu tiên cho thấy hiệu ứng của công suất chi dưới lên thay đổi nhận thức ở dân số bình thường",
+          "page": 9,
+          "quote": "this is the first study to show an apparent effect of lower limb power on cognitive change",
+          "source": ""
+        },
+        {
+          "value": "Bốn cơ chế tiềm năng đã được xác định: tim mạch, miễn dịch, nội tiết thần kinh và tín hiệu thần kinh dưỡng; nghiên cứu này không ủng hộ yếu tố tim mạch làm trung gian",
+          "page": 10,
+          "quote": "This study lends no support for cardiovascular factors mediating the relationship",
+          "source": ""
+        },
+        {
+          "value": "Các yếu tố thần kinh dưỡng như VEGF, BDNF, IGF-1, FGF-2 có thể thúc đẩy tạo mạch, tạo synapse và tạo neuron",
+          "page": 10,
+          "quote": "may play a role in promoting angiogenesis, synaptogenesis and neurogenesis",
+          "source": ""
+        },
+        {
+          "value": "Chất xám toàn bộ liên quan đến ARC trong phân nhóm MRI, nhưng phân nhóm nhỏ nên hạn chế diễn giải",
+          "page": 8,
+          "quote": "Within the MRI sub-study, global grey volume was significantly related to ARC",
+          "source": ""
+        },
+        {
+          "value": "LEP và lão hóa nhận thức có thể liên quan do một cơ chế chung độc lập với yếu tố di truyền và nhiều yếu tố phát triển, đặc hiệu cho chi dưới và/hoặc tốc độ – phối hợp chức năng cơ, và tác động lên công suất chi dưới trước khi ảnh hưởng nhận thức.",
+          "page": 11,
+          "quote": "a shared mechanism which is independent of genetic and many developmental factors and specific to lower limb",
+          "source": ""
+        },
+        {
+          "value": "Nếu đúng vậy, việc tìm kiếm các yếu tố chung nền tảng cho lão hóa não và lão hóa thần kinh – cơ nên bắt đầu từ các cơ chế phi di truyền, ví dụ thay đổi tế bào đáp ứng với môi trường ở cả não và đơn vị thần kinh – cơ.",
+          "page": 11,
+          "quote": "a search for common factors underpinning brain and neuromuscular ageing should begin with non-genetic mechanisms",
+          "source": ""
+        },
+        {
+          "value": "Giả thuyết thay thế: sức mạnh chi dưới là dấu hiệu nhạy của loại hoạt động thể chất (PA) có thể ảnh hưởng tới lão hóa nhận thức.",
+          "page": 11,
+          "quote": "leg power is a sensitive marker of the kind of PA that can influence cognitive",
+          "source": ""
+        },
+        {
+          "value": "Tính đặc hiệu của thể lực chi dưới là bằng chứng chống lại một nguyên nhân chung lưu hành trong tuần hoàn.",
+          "page": 11,
+          "quote": "the specificity of leg fitness is evidence against a circulating common cause",
+          "source": ""
+        }
+      ],
+      "applications": [
+        {
+          "value": "Can thiệp nhằm cải thiện công suất chân về dài hạn có thể giúp đạt mục tiêu chung là lão hóa nhận thức khỏe mạnh",
+          "page": 1,
+          "quote": "Interventions targeted to improve leg power in the long term may help",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Nhóm tác giả dự định tiếp tục bằng can thiệp tập luyện ở các cặp sinh đôi bất tương hợp thể lực để xem chức năng nhận thức có hội tụ hay không",
+          "page": 10,
+          "quote": "We aim to follow up this study with a physical exercise intervention in twins discordant for physical fitness",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "LEP có thể đặc biệt phù hợp làm thước đo thể lực ở phụ nữ lớn tuổi ít vận động hoặc ít tham gia hoạt động thể lực lúc nhàn rỗi",
+          "page": 10,
+          "quote": "LEP may have particular relevance as a fitness measure in older women who are relatively less active",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Bài tập nhẹ như đi bộ tăng dần đã tăng công suất cơ có ý nghĩa chỉ trong 12 tuần trong khi VO2max và diện tích cắt ngang cơ tứ đầu không đổi (dẫn từ nghiên cứu khác)",
+          "page": 10,
+          "quote": "Low-intensity general exercise, such as progressive walking, was seen to increase muscle power significantly",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Cần các nghiên cứu dọc xác nhận lại kết quả và cần nghiên cứu lặp lại ở đoàn hệ sinh đôi khác",
+          "page": 10,
+          "quote": "Given its importance, confirmatory longitudinal studies are needed",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Cần nghiên cứu thêm để xác định liệu các thước đo aerobic, công suất chân hay thước đo thể lực khác liên quan độc lập với thay đổi não",
+          "page": 9,
+          "quote": "whether aerobic measures, leg power measures or other measures of fitness are independently related",
+          "measured": false,
+          "source": ""
+        },
+        {
+          "value": "Thử nghiệm can thiệp nhằm cải thiện sức mạnh chi dưới trong dài hạn có thể hiệu quả trong việc tìm chiến lược cải thiện lão hóa nhận thức ở quần thể khỏe mạnh.",
+          "page": 11,
+          "quote": "interventional trials aimed at improving leg power over the long term may be fruitful",
+          "measured": false,
+          "source": ""
+        }
+      ],
+      "limitations": [
+        {
+          "value": "Đoàn hệ gồm phụ nữ sinh đôi học vấn tương đối cao, nghề nghiệp trung bình, sức khỏe tốt hơn dân số chung một chút",
+          "page": 10,
+          "quote": "this cohort represents relatively educated women of middling occupational status",
+          "source": ""
+        },
+        {
+          "value": "Độ tuổi 43–73 khi test lần đầu, theo dõi từ trung niên đến đầu tuổi già nên không phản ánh thay đổi ở tuổi già hơn",
+          "page": 10,
+          "quote": "does not inform on changes occurring in older ages",
+          "source": ""
+        },
+        {
+          "value": "Cần nghiên cứu thêm để biết có thể khái quát hóa cho nam giới hay không",
+          "page": 10,
+          "quote": "Furthest studies are required to ascertain whether the findings can be generalised to men",
+          "source": ""
+        },
+        {
+          "value": "Nghiên cứu không đo các thước đo thể lực aerobic (ví dụ VO2max) để so sánh với LEP",
+          "page": 10,
+          "quote": "the study did not assess aerobic measures of physical fitness (e.g. VO 2 max )",
+          "source": ""
+        },
+        {
+          "value": "Do hạn chế hậu cần và kinh phí, các đo lường theo dõi đã không được thực hiện",
+          "page": 10,
+          "quote": "due to logistic and funding constraints, follow-up measures were not performed",
+          "source": ""
+        },
+        {
+          "value": "Bộ test nhận thức chỉ tập trung vào tốc độ xử lý và trí nhớ thị giác, không bắt được thay đổi ngôn ngữ hay trí nhớ lời nói",
+          "page": 10,
+          "quote": "did not capture change in language performance or verbal memory",
+          "source": ""
+        },
+        {
+          "value": "Chỉ test tại hai thời điểm nên chỉ phân tích được thay đổi tuyến tính",
+          "page": 10,
+          "quote": "Testing was only performed at two time points, limiting the analysis to linear change",
+          "source": ""
+        },
+        {
+          "value": "Cỡ mẫu nhỏ cho phân tích sinh đôi bất tương hợp và phân nhóm MRI; hướng liên quan bị hạn chế vì các đo lường MRI không có từ đầu nghiên cứu",
+          "page": 10,
+          "quote": "For the discordant twins analysis and the MRI sub-study, the size of the study was a limitation",
+          "source": ""
+        },
+        {
+          "value": "Thiết kế phân nhóm MRI không thể chứng minh nhân quả dù có tính dọc; có thể khác biệt chức năng não dẫn đến LEP cao hơn",
+          "page": 10,
+          "quote": "it cannot prove causality despite the longitudinal nature of the study",
+          "source": ""
+        }
+      ],
+      "benefitSignals": [
+        {
+          "value": "Bài nêu hạn chế về kinh phí khiến không thực hiện được đo lường theo dõi",
+          "page": 10,
+          "quote": "due to logistic and funding constraints, follow-up measures were not performed",
+          "source": "Strengths and Limitations"
+        },
+        {
+          "value": "Hình ảnh và kết quả phân nhóm MRI được mô tả là 'novel' – dấu hiệu nhấn mạnh tính mới của sản phẩm/quy trình nghiên cứu của nhóm tác giả",
+          "page": 9,
+          "quote": "while limited by study numbers, are novel because of the control garnered",
+          "source": "Discussion"
+        },
+        {
+          "value": "Bài công bố theo giấy phép CC BY của S. Karger AG, có tuyên bố bản quyền của nhà xuất bản",
+          "page": 1,
+          "quote": "Published by S. Karger AG, Basel",
+          "source": "Page 1 footnote"
+        },
+        {
+          "value": "Nghiên cứu được tài trợ bởi Wellcome Trust qua Clinical Training Research Fellowship cấp cho Claire J. Steves (086904/Z/08/Z).",
+          "page": 11,
+          "quote": "This research was supported by the Wellcome Trust through a Clinical Training Research Fellowship",
+          "source": "Acknowledgment"
+        },
+        {
+          "value": "Nghiên cứu nhận hỗ trợ từ Chương trình Khung lần thứ bảy của Cộng đồng châu Âu (FP7/2007–2013).",
+          "page": 11,
+          "quote": "The study also received support from the European Community’s Seventh Framework Programme (FP7/2007–2013)",
+          "source": "Acknowledgment"
+        },
+        {
+          "value": "Hỗ trợ từ BioResource, Clinical Research Facility và Biomedical Research Centre do NIHR tài trợ, đặt tại Guy’s and St Thomas’ NHS Foundation Trust hợp tác với King’s College London.",
+          "page": 11,
+          "quote": "National Institute for Health Research (NIHR)-funded BioRe-source, Clinical Research Facility and Biomedical Research Centre",
+          "source": "Acknowledgment"
+        }
+      ]
+    },
+    "sections": {
+      "abstract": true,
+      "introduction": true,
+      "methods": true,
+      "results": true,
+      "discussion": true,
+      "conclusion": true,
+      "limitations": true,
+      "acknowledgments": true,
+      "funding": true
+    },
+    "glossaryCandidates": [
+      {
+        "value": "leg extensor power (LEP)",
+        "page": 2,
+        "quote": "explosive power (LEP), which is sensitive to low-intensity PA, performing better than maximal oxygen consumption",
+        "source": ""
+      },
+      {
+        "value": "Nottingham power rig / Leg Extensor Power Rig",
+        "page": 2,
+        "quote": "It is measured using the Nottingham power rig, which assesses the force and velocity",
+        "source": ""
+      },
+      {
+        "value": "discordant twin approach",
+        "page": 1,
+        "quote": "A discordant twin approach was used to adjust for factors shared by twins",
+        "source": ""
+      },
+      {
+        "value": "age-related cognitive change (ARC)",
+        "page": 3,
+        "quote": "This central dependent variable was denoted the age-related cognitive change (ARC)",
+        "source": ""
+      },
+      {
+        "value": "standardised β-coefficient (Stdβ)",
+        "page": 5,
+        "quote": "Independent variables were standardised to allow comparison between the effects of the variables",
+        "source": ""
+      },
+      {
+        "value": "Bonferroni correction",
+        "page": 5,
+        "quote": "The statistically strong evidence for the effect of LEP (Bonferroni adjusted p value threshold = 7.8 × 10⁻³",
+        "source": ""
+      },
+      {
+        "value": "generalised estimating equation (GEE)",
+        "page": 3,
+        "quote": "The generalised estimating equation approach was used to adjust for family relatedness",
+        "source": ""
+      },
+      {
+        "value": "multiple imputation",
+        "page": 3,
+        "quote": "Missing values of predictors and covariates were imputed using multiple imputation in Stata 11",
+        "source": ""
+      },
+      {
+        "value": "DARTEL",
+        "page": 4,
+        "quote": "Diffeomorphic Anatomical Registration through Exponentiated Lie Algebra (DARTEL) technique",
+        "source": ""
+      },
+      {
+        "value": "family-wise error (FWE)",
+        "page": 5,
+        "quote": "corrected for multiple comparisons based on both voxel intensity (family-wise error) and cluster extent",
+        "source": ""
+      },
+      {
+        "value": "BOLD contrast",
+        "page": 9,
+        "quote": "showing the BOLD contrast values per twin pair in the CuedRT relative to the control condition",
+        "source": ""
+      },
+      {
+        "value": "frailty index (Rockwood)",
+        "page": 3,
+        "quote": "adjusted for leucocyte telomere length, frailty (Rockwood Frailty index) and other physical fitness measures",
+        "source": ""
+      },
+      {
+        "value": "principle of parsimony",
+        "page": 11,
+        "quote": "The principle of parsimony would favour this lat-ter explanation",
+        "source": ""
+      },
+      {
+        "value": "premorbid intelligence",
+        "page": 11,
+        "quote": "shared environmental factors, premorbid intelligence, ageing",
+        "source": ""
+      },
+      {
+        "value": "telomeres",
+        "page": 11,
+        "quote": "frailty or cell ageing (via telo-meres)",
+        "source": ""
+      },
+      {
+        "value": "circulating common cause",
+        "page": 11,
+        "quote": "the specificity of leg fitness is evidence against a circulating common cause",
+        "source": ""
+      },
+      {
+        "value": "neuromuscular unit",
+        "page": 11,
+        "quote": "found in both the brain and the neuromuscular unit",
+        "source": ""
+      },
+      {
+        "value": "LEP (leg extensor power)",
+        "page": 11,
+        "quote": "LEP and cognitive ageing may be as-sociated due to a shared mechanism",
+        "source": ""
+      }
+    ],
+    "confidence": {
+      "basedOn": "fulltext"
+    }
+  },
+  "usage": {
+    "input": 71691,
+    "output": 76209,
+    "cost": 0
+  },
+  "model": "deepseek-v4.1-flash",
+  "promptVersion": "v3"
+}

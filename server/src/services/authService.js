@@ -41,7 +41,11 @@ export async function registerUser({ email, password, name }) {
   const exists = await User.exists({ email: normalizedEmail });
   if (exists) throw ApiError.conflict('Email đã được đăng ký');
 
-  const user = new User({ email: normalizedEmail, name: name.trim() });
+  const user = new User({
+    email: normalizedEmail,
+    name: name.trim(),
+    onboardingRequired: true,
+  });
   await user.setPassword(password);
   await user.save();
   const tokens = await issueTokens(user);
@@ -91,6 +95,17 @@ export async function logoutUser(userId) {
 
 export async function getUser(userId) {
   const user = await User.findById(userId);
+  if (!user) throw ApiError.unauthorized('Tài khoản không tồn tại');
+  return user;
+}
+
+/** Đánh dấu đã xem trang giới thiệu; các lần đăng nhập sau vào thẳng dashboard. */
+export async function markIntroSeen(userId) {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { $set: { onboardingRequired: false } },
+    { new: true },
+  );
   if (!user) throw ApiError.unauthorized('Tài khoản không tồn tại');
   return user;
 }

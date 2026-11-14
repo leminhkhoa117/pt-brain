@@ -1,16 +1,58 @@
 import { evidenceLevelFromPublicationTypes } from './evidence.js';
+import { assessFullText } from './fullText.js';
 
 const EVIDENCE_WEIGHT = { 1: 100, 2: 80, 3: 50, 4: 20, 5: 0 };
 
+const TITLE_STOPWORDS = new Set([
+  'the',
+  'and',
+  'for',
+  'with',
+  'from',
+  'into',
+  'during',
+  'after',
+  'before',
+  'between',
+  'among',
+  'using',
+  'effect',
+  'effects',
+  'study',
+  'trial',
+  'review',
+]);
+
 const normalizeTitleKey = (title = '') =>
-  title
+  String(title || '')
     .toLowerCase()
-    .replace(/[^a-z0-9à-ỹ]+/gi, ' ')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
     .trim()
-    .slice(0, 120);
+    .slice(0, 200);
+
+const titleTokens = (title = '') =>
+  normalizeTitleKey(title)
+    .split(' ')
+    .filter((token) => token.length >= 3 && !TITLE_STOPWORDS.has(token));
+
+function titleSimilarity(a = '', b = '') {
+  const left = new Set(titleTokens(a));
+  const right = new Set(titleTokens(b));
+  if (!left.size || !right.size) return 0;
+  let overlap = 0;
+  for (const token of left) if (right.has(token)) overlap += 1;
+  return (2 * overlap) / (left.size + right.size);
+}
+
+const yearsCompatible = (a, b) => !a || !b || Math.abs(Number(a) - Number(b)) <= 1;
 
 function mergeResults(a, b) {
   const types = Array.from(new Set([...(a.publicationTypes || []), ...(b.publicationTypes || [])]));
+  const providers = Array.from(
+    new Set([...(a.providers || []), ...(b.providers || []), a.source, b.source].filter(Boolean)),
+  );
   return {
     ...a,
     title: (b.title || '').length > (a.title || '').length ? b.title : a.title,
@@ -32,13 +74,38 @@ function mergeResults(a, b) {
     fullTextUrl: a.fullTextUrl || b.fullTextUrl || '',
     journal: a.journal || b.journal || '',
     year: a.year || b.year || undefined,
+    journalHIndex: Math.max(a.journalHIndex || 0, b.journalHIndex || 0) || undefined,
+    journalImpact2yr:
+      Math.max(a.journalImpact2yr || 0, b.journalImpact2yr || 0) || undefined,
+    oaStatus: a.oaStatus || b.oaStatus || '',
+    isRetracted: Boolean(a.isRetracted || b.isRetracted),
+    providers,
     source: a.source || b.source,
   };
 }
 
-/** Gộp kết quả từ nhiều nguồn, loại trùng theo DOI -> PMID -> tiêu đề. */
+function findFuzzyCluster(item, clusters) {
+  let best = null;
+  let bestScore = 0;
+  for (const cluster of clusters) {
+    // Hai DOI khác nhau là hai bài khác nhau, dù tiêu đề giống.
+    if (item.doi && cluster.doi && item.doi !== cluster.doi) continue;
+    if (!yearsCompatible(item.year, cluster.item.year)) continue;
+    const score = titleSimilarity(item.title, cluster.item.title);
+    if (score > bestScore) {
+      bestScore = score;
+      best = cluster;
+    }
+  }
+  return bestScore >= 0.9 ? best : null;
+}
+
+/** Gộp kết quả từ nhiều nguồn: DOI -> PMID -> fuzzy title + năm. */
 export function dedupeResults(results = []) {
-  const map = new Map();
+  const clusters = [];
+  const doiIndex = new Map();
+  const pmidIndex = new Map();
+
   for (const raw of results) {
     if (!raw?.title) continue;
     const item = {
@@ -46,16 +113,33 @@ export function dedupeResults(results = []) {
       evidenceLevel:
         raw.evidenceLevel || evidenceLevelFromPublicationTypes(raw.publicationTypes).level,
       citationCount: raw.citationCount || 0,
+      providers:
+        Array.isArray(raw.providers) && raw.providers.length
+          ? raw.providers
+          : [raw.source].filter(Boolean),
     };
-    const key = item.doi
-      ? `doi:${String(item.doi).toLowerCase()}`
-      : item.pmid
-        ? `pmid:${item.pmid}`
-        : `title:${normalizeTitleKey(item.title)}`;
-    const existing = map.get(key);
-    map.set(key, existing ? mergeResults(existing, item) : item);
+    const doi = item.doi ? String(item.doi).toLowerCase() : '';
+    const pmid = item.pmid ? String(item.pmid) : '';
+
+    let cluster = doi ? doiIndex.get(doi) : pmid ? pmidIndex.get(pmid) : null;
+    if (!cluster) cluster = findFuzzyCluster(item, clusters);
+
+    if (!cluster) {
+      cluster = { item, doi, pmid };
+      clusters.push(cluster);
+    } else {
+      cluster.item = mergeResults(cluster.item, item);
+      cluster.doi = cluster.doi || doi;
+      cluster.pmid = cluster.pmid || pmid;
+    }
+
+    if (cluster.doi) doiIndex.set(cluster.doi, cluster);
+    if (doi) doiIndex.set(doi, cluster);
+    if (cluster.pmid) pmidIndex.set(cluster.pmid, cluster);
+    if (pmid) pmidIndex.set(pmid, cluster);
   }
-  return [...map.values()];
+
+  return clusters.map((cluster) => cluster.item);
 }
 
 export function scoreResult(item, currentYear = new Date().getFullYear()) {
@@ -69,10 +153,11 @@ export function scoreResult(item, currentYear = new Date().getFullYear()) {
 }
 
 /** Lọc và xếp hạng hoàn toàn bằng code, không để AI quyết định thứ tự. */
-export function rankResults(results = [], { maxLevel, openAccessOnly } = {}) {
+export function rankResults(results = [], { maxLevel, openAccessOnly, fullTextOnly } = {}) {
   return results
     .filter((item) => (maxLevel ? (item.evidenceLevel || 5) <= maxLevel : true))
     .filter((item) => (openAccessOnly ? item.isOpenAccess : true))
-    .map((item) => ({ ...item, score: scoreResult(item) }))
+    .map((item) => ({ ...item, ...assessFullText(item), score: scoreResult(item) }))
+    .filter((item) => (fullTextOnly ? item.hasFullText : true))
     .sort((a, b) => b.score - a.score);
 }

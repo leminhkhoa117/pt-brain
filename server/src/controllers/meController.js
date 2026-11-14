@@ -16,6 +16,11 @@ export async function getMyAiUsage(req, res) {
   res.json({ data: await getAiUsage(req.userId) });
 }
 
+export async function markIntroSeen(req, res) {
+  const user = await authService.markIntroSeen(req.userId);
+  res.json({ data: { user: user.toSafeJSON(), age: user.age() } });
+}
+
 export async function deleteMe(req, res) {
   await authService.deleteAccount(req.userId);
   clearAuthCookies(res);

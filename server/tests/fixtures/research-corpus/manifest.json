@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "description": "Bộ bài kiểm thử đa loại cho pipeline tóm tắt nghiên cứu. Không kèm PDF gốc vì bản quyền; runner lấy metadata/nội dung qua DOI hoặc PDF do người dùng cung cấp.",
+  "papers": [
+    {
+      "id": "garcia-2010",
+      "doi": "10.1519/JSC.0b013e3181e3482f",
+      "label": "Acute randomized crossover",
+      "expected": {
+        "titleIncludes": ["Influence", "In Series", "Elastic Resistance", "Biceps-curl"],
+        "conclusionExpected": true,
+        "numbers": ["12.4", "10.9", "12.3", "0.01", "0.65", "7.9", "8.2", "0.157", "0.161", "18.6", "10", "50", "80", "0.91"],
+        "benefitFlags": ["patent", "mới|ít tốn kém"],
+        "mustHaveSections": ["whyStudy", "mechanism", "application", "selfCheck"]
+      }
+    },
+    {
+      "id": "steves-2016",
+      "doi": "10.1159/000441029",
+      "label": "Prospective observational (twin cohort)",
+      "expected": {
+        "titleIncludes": ["Kicking Back Cognitive Ageing", "Leg Power"],
+        "conclusionExpected": true,
+        "numbers": ["0.174", "0.002", "0.362", "0.005"],
+        "benefitFlags": [],
+        "mustHaveSections": ["whyStudy", "limitations", "application"]
+      }
+    },
+    {
+      "id": "schoenfeld-2019",
+      "doi": "10.1249/MSS.0000000000001764",
+      "label": "Randomized controlled trial",
+      "expected": {
+        "titleIncludes": ["Resistance Training Volume", "Hypertrophy", "Strength"],
+        "conclusionExpected": true,
+        "numbers": [],
+        "benefitFlags": [],
+        "mustHaveSections": ["whyStudy", "application", "limitations"]
+      }
+    },
+    {
+      "id": "schoenfeld-2017",
+      "doi": "10.1519/JSC.0000000000002200",
+      "label": "Systematic review + meta-analysis",
+      "expected": {
+        "titleIncludes": ["Strength and Hypertrophy Adaptations", "Low- vs. High-Load"],
+        "conclusionExpected": true,
+        "numbers": [],
+        "benefitFlags": [],
+        "mustHaveSections": ["whyStudy", "evidenceAxes", "application"]
+      }
+    },
+    {
+      "id": "ralston-2017",
+      "doi": "10.1007/s40279-017-0762-7",
+      "label": "Meta-analysis",
+      "expected": {
+        "titleIncludes": ["Weekly Set Volume", "Strength Gain"],
+        "conclusionExpected": true,
+        "numbers": [],
+        "benefitFlags": [],
+        "mustHaveSections": ["whyStudy", "evidenceAxes", "application"]
+      }
+    },
+    {
+      "id": "morton-2018",
+      "doi": "10.1136/bjsports-2017-097608",
+      "label": "Systematic review + meta-analysis + meta-regression",
+      "expected": {
+        "titleIncludes": ["protein supplementation", "resistance training"],
+        "conclusionExpected": true,
+        "numbers": [],
+        "benefitFlags": [],
+        "mustHaveSections": ["whyStudy", "application", "limitations"]
+      }
+    },
+    {
+      "id": "suchomel-2018",
+      "doi": "10.1007/s40279-018-0862-z",
+      "label": "Narrative review",
+      "expected": {
+        "titleIncludes": ["Importance of Muscular Strength", "Training Considerations"],
+        "conclusionExpected": true,
+        "numbers": [],
+        "benefitFlags": [],
+        "mustHaveSections": ["whyStudy", "application", "glossary"]
+      }
+    }
+  ]
+}

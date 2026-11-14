@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Badge, EmptyState, Icon, InfoTip, Panel, Spinner } from '../../components/ui.jsx';
+import { useDialog } from '../../components/DialogProvider.jsx';
 import { activateMealPlan, deleteMealPlan, listMealPlans } from '../../api/mealPlans.js';
 import { getErrorMessage } from '../../api/client.js';
 import { formatDateKey, todayKey } from '../../lib/date.js';
@@ -36,6 +37,7 @@ function PhaseBadge({ phase }) {
 }
 
 export default function MealPlanCard() {
+  const dialog = useDialog();
   const queryClient = useQueryClient();
   const [aiOpen, setAiOpen] = useState(false);
   const [editor, setEditor] = useState(null);
@@ -219,8 +221,13 @@ export default function MealPlanCard() {
               type="button"
               className="btn-ghost btn-sm ml-auto text-vermilion-600 dark:text-vermilion-300"
               disabled={remove.isPending}
-              onClick={() => {
-                if (window.confirm(`Xóa kế hoạch “${active.name}”?`)) remove.mutate(active._id);
+              onClick={async () => {
+                const ok = await dialog.confirm({
+                  title: 'Xóa kế hoạch ăn uống',
+                  message: `Xóa kế hoạch “${active.name}”?`,
+                  confirmLabel: 'Xóa kế hoạch',
+                });
+                if (ok) remove.mutate(active._id);
               }}
             >
               <Icon name="trash" className="h-3.5 w-3.5" />
@@ -304,8 +311,13 @@ export default function MealPlanCard() {
           today={today}
           onClose={() => setDetail(null)}
           onActivate={(plan) => activate.mutate(plan._id)}
-          onDelete={(plan) => {
-            if (window.confirm(`Xóa kế hoạch “${plan.name}”?`)) remove.mutate(plan._id);
+          onDelete={async (plan) => {
+            const ok = await dialog.confirm({
+              title: 'Xóa kế hoạch ăn uống',
+              message: `Xóa kế hoạch “${plan.name}”?`,
+              confirmLabel: 'Xóa kế hoạch',
+            });
+            if (ok) remove.mutate(plan._id);
           }}
           onEdit={(plan) => {
             setDetail(null);

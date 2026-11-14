@@ -1,9 +1,10 @@
 import crypto from 'node:crypto';
 import { Summary } from '../../models/Summary.js';
 import { Paper } from '../../models/Paper.js';
-import { summarizePaper } from '../ai/paperSummarizer.js';
+import { summarizePaper, PROMPT_VERSION } from '../ai/paperSummarizer.js';
 import { assertAiQuota, recordAiCall } from '../ai/quota.js';
 import {
+  enrichPaperMetadata,
   parseIdentifier,
   resolveWorkByDoi,
   resolveWorkByUrl,
@@ -31,19 +32,24 @@ function inferTitleFromText(text) {
 async function resolveInput(input, file) {
   if (file) {
     const parsed = await parsePdfBuffer(file.buffer, { filename: file.originalname });
-    return {
-      paper: {
+    const paper = await enrichPaperMetadata(
+      {
         title: input.title || parsed.title,
         authors: [],
         url: '',
         publicationTypes: [],
         evidenceLevel: 5,
         source: 'manual',
+        doi: parsed.doiFromFilename || '',
       },
+      { text: parsed.text, filename: file.originalname, keepTitle: Boolean(input.title) },
+    );
+    return {
+      paper,
       text: parsed.text,
       basedOn: 'fulltext',
       sourceKind: 'user_pdf',
-      sourceUrl: '',
+      sourceUrl: paper.url || '',
       pdfHash: parsed.hash,
       pdfPages: parsed.pages || 0,
       figureHints: parsed.figureHints || [],
@@ -64,8 +70,8 @@ async function resolveInput(input, file) {
   }
 
   const text = normalizeText(input.text);
-  return {
-    paper: {
+  const paper = await enrichPaperMetadata(
+    {
       title: input.title || inferTitleFromText(text),
       authors: [],
       url: '',
@@ -73,6 +79,10 @@ async function resolveInput(input, file) {
       evidenceLevel: 5,
       source: 'manual',
     },
+    { text, keepTitle: Boolean(input.title) },
+  );
+  return {
+    paper,
     text,
     basedOn: text.length >= 5000 ? 'fulltext' : 'abstract_only',
     sourceKind: 'user_text',
@@ -81,13 +91,14 @@ async function resolveInput(input, file) {
   };
 }
 
-export function buildCacheKey(resolved) {
-  if (resolved.paper?.doi) return `doi:${resolved.paper.doi.toLowerCase()}`;
-  if (resolved.pdfHash) return `pdf:${resolved.pdfHash}`;
+export function buildCacheKey(resolved, version = PROMPT_VERSION) {
+  const suffix = `:${version}`;
+  if (resolved.paper?.doi) return `doi:${resolved.paper.doi.toLowerCase()}${suffix}`;
+  if (resolved.pdfHash) return `pdf:${resolved.pdfHash}${suffix}`;
   if (resolved.sourceUrl) {
-    return `url:${crypto.createHash('sha256').update(resolved.sourceUrl).digest('hex').slice(0, 40)}`;
+    return `url:${crypto.createHash('sha256').update(resolved.sourceUrl).digest('hex').slice(0, 40)}${suffix}`;
   }
-  return `text:${crypto.createHash('sha256').update(resolved.text).digest('hex').slice(0, 40)}`;
+  return `text:${crypto.createHash('sha256').update(resolved.text).digest('hex').slice(0, 40)}${suffix}`;
 }
 
 // Job tóm tắt chạy trong RAM. Nếu server restart hoặc AI treo, document có thể
@@ -113,6 +124,9 @@ const PAPER_FIELDS = [
   'authors',
   'year',
   'journal',
+  'volume',
+  'issue',
+  'pages',
   'doi',
   'pmid',
   'pmcid',
@@ -122,6 +136,10 @@ const PAPER_FIELDS = [
   'evidenceLevel',
   'citationCount',
   'isOpenAccess',
+  'oaStatus',
+  'isRetracted',
+  'journalHIndex',
+  'journalImpact2yr',
   'fullTextUrl',
   'pdfUrl',
   'source',
@@ -174,11 +192,12 @@ async function responseForSummary(summary, { cached, processing }) {
  */
 async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey }) {
   try {
-    const { content, usage, model, promptVersion } = await summarizePaper({
+    const { content, facts, usage, model, promptVersion } = await summarizePaper({
       paper: resolved.paper,
       text: resolved.text,
       basedOn: resolved.basedOn,
       figureHints: resolved.figureHints || [],
+      facts: resolved.facts || null,
       onProgress: (progress) => {
         Summary.updateOne({ _id: summaryId }, { $set: { progress } }).catch(() => {});
       },
@@ -195,6 +214,9 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey })
       }
       if (!resolved.paper.journal && content.metadata.journal) update.journal = content.metadata.journal;
       if (!resolved.paper.year && content.metadata.year) update.year = content.metadata.year;
+      if (!resolved.paper.volume && content.metadata.volume) update.volume = content.metadata.volume;
+      if (!resolved.paper.issue && content.metadata.issue) update.issue = content.metadata.issue;
+      if (!resolved.paper.pages && content.metadata.pages) update.pages = content.metadata.pages;
       if (!resolved.paper.doi && content.metadata.doi) update.doi = content.metadata.doi;
       if (Object.keys(update).length) {
         await Paper.findByIdAndUpdate(paperId, { $set: update }).catch(() => {});
@@ -206,8 +228,11 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey })
       {
         $set: {
           content,
+          facts,
           model,
           promptVersion,
+          needsReview: content.verification?.passed === false,
+          reviewedAt: null,
           status: 'ready',
           progress: '',
           error: '',
@@ -293,6 +318,8 @@ export async function createSummaryForUser(user, input, file) {
         existing.status = 'processing';
         existing.progress = 'Đang chuẩn bị tài liệu...';
         existing.error = '';
+        existing.needsReview = false;
+        existing.reviewedAt = null;
         await existing.save();
         jobStarted = true;
         runSummaryJob({
@@ -307,6 +334,10 @@ export async function createSummaryForUser(user, input, file) {
             figureHints: existing.figureHints?.length
               ? existing.figureHints
               : extractFigureHints(existing.sourceText),
+            facts:
+              existing.facts && existing.promptVersion === PROMPT_VERSION
+                ? existing.facts
+                : null,
           },
           cacheKey,
         });
@@ -337,6 +368,9 @@ export async function createSummaryForUser(user, input, file) {
           authors: resolved.paper.authors || [],
           year: resolved.paper.year || 0,
           journal: resolved.paper.journal || '',
+          volume: resolved.paper.volume || '',
+          issue: resolved.paper.issue || '',
+          pages: resolved.paper.pages || '',
           doi: resolved.paper.doi || '',
         },
         tldr: 'Đang xử lý...',
@@ -350,6 +384,7 @@ export async function createSummaryForUser(user, input, file) {
       pdfPages: resolved.pdfPages || 0,
       figureHints: resolved.figureHints || [],
       cacheKey,
+      promptVersion: PROMPT_VERSION,
       status: 'processing',
       progress: 'Đang chuẩn bị tài liệu...',
     });
@@ -418,6 +453,8 @@ export async function retrySummaryForUser(userId, id) {
     summary.status = 'processing';
     summary.progress = 'Đang chuẩn bị tài liệu...';
     summary.error = '';
+    summary.needsReview = false;
+    summary.reviewedAt = null;
     await summary.save();
 
     jobStarted = true;
@@ -433,6 +470,8 @@ export async function retrySummaryForUser(userId, id) {
         figureHints: summary.figureHints?.length
           ? summary.figureHints
           : extractFigureHints(summary.sourceText),
+        facts:
+          summary.facts && summary.promptVersion === PROMPT_VERSION ? summary.facts : null,
       },
       cacheKey: summary.cacheKey,
     });
@@ -497,7 +536,7 @@ export async function resumeInterruptedSummaries({ limit = 5 } = {}) {
 
     await Summary.updateOne(
       { _id: summary._id, status: 'processing' },
-      { $set: { progress: 'Đang khôi phục sau khởi động lại...' } },
+      { $set: { progress: 'Đang khôi phục sau khởi động lại...', needsReview: false, reviewedAt: null } },
     );
     runSummaryJob({
       summaryId: summary._id,
@@ -511,6 +550,8 @@ export async function resumeInterruptedSummaries({ limit = 5 } = {}) {
         figureHints: summary.figureHints?.length
           ? summary.figureHints
           : extractFigureHints(summary.sourceText),
+        facts:
+          summary.facts && summary.promptVersion === PROMPT_VERSION ? summary.facts : null,
       },
       cacheKey: summary.cacheKey,
     });
