@@ -18,7 +18,7 @@ import {
 } from './atlasMuscleMap.js';
 import { registerAtlasTools } from './atlasAgentTools.js';
 import { MUSCLE_GROUPS, MUSCLES } from '@shared/muscles/index.js';
-import { Spinner } from '../../components/ui.jsx';
+import { Icon, Spinner } from '../../components/ui.jsx';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import './atlas.css';
 
@@ -642,6 +642,7 @@ function DetailPanel({
   onIsolate,
   onClear,
   isolated,
+  onAsk,
 }) {
   const group = muscle ? MUSCLE_GROUPS[muscle.group] : null;
   const description = muscle ? muscle.fn : chosen ? explanation(chosen.name, system?.id) : '';
@@ -773,6 +774,16 @@ function DetailPanel({
       </div>
 
       <div className="shrink-0 space-y-1 border-t border-slate-200/70 p-2.5 dark:border-white/10">
+        {muscle && onAsk ? (
+          <button
+            type="button"
+            onClick={onAsk}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-pine-200 bg-pine-50 px-3 py-2 text-[11px] font-semibold text-pine-800 transition hover:bg-pine-100 dark:border-pine-900 dark:bg-pine-950/50 dark:text-pine-200 dark:hover:bg-pine-950"
+          >
+            <Icon name="chat" className="h-3.5 w-3.5" />
+            Hỏi AI về cơ này
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onIsolate}
@@ -881,7 +892,7 @@ function AboutDialog({ atlas, onClose }) {
   );
 }
 
-export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '' }) {
+export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', onAsk }) {
   const { isDark } = useTheme();
   const [atlas, setAtlas] = useState(null);
   const [state, setState] = useState(INITIAL_STATE);
@@ -1244,6 +1255,18 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '' })
         </div>
 
         <div className="absolute right-3 top-3 z-30 flex items-center gap-1.5">
+          {onAsk ? (
+            <button
+              type="button"
+              onClick={onAsk}
+              className="inline-flex h-9 items-center gap-2 rounded-xl bg-pine-700 px-3 text-[11px] font-semibold text-white shadow-sm transition hover:bg-pine-600 dark:bg-pine-400 dark:text-pine-950 dark:hover:bg-pine-300"
+              aria-label="Hỏi AI về cơ đang chọn"
+              title="Hỏi AI về cơ đang chọn"
+            >
+              <Icon name="chat" className="h-3.5 w-3.5" />
+              <span className="max-md:hidden">Hỏi AI</span>
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => {
@@ -1378,6 +1401,7 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '' })
             onIsolate={toggleIsolate}
             onClear={closeDetails}
             isolated={state.isolate}
+            onAsk={onAsk}
           />
         )}
 

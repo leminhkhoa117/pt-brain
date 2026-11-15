@@ -16,7 +16,7 @@ const SUGGESTIONS = [
 const chatKey = (slug) => `ptbrain:muscle-chat:${slug}`;
 const MAX_SAVED = 40;
 
-export default function MuscleChat({ muscle }) {
+export default function MuscleChat({ muscle, onClose }) {
   const slug = muscle?.slug || '';
   const [messages, setMessages] = useState(() => (slug ? readStored(chatKey(slug), []) : []));
   const [loadedSlug, setLoadedSlug] = useState(slug);
@@ -26,6 +26,8 @@ export default function MuscleChat({ muscle }) {
   const scrollRef = useRef(null);
   const abortRef = useRef(null);
   const slugRef = useRef(slug);
+  const inputRef = useRef(null);
+
 
   // Đổi cơ: nạp lại lịch sử riêng của cơ đó thay vì xóa trắng.
   if (slug !== loadedSlug) {
@@ -143,9 +145,9 @@ export default function MuscleChat({ muscle }) {
   const visibleMessages = loadedSlug === slug ? messages : [];
 
   return (
-    <Card className="flex flex-col">
+    <Card id="muscle-chat" className="flex h-full min-h-0 flex-col">
       <div className="flex items-start justify-between gap-2">
-        <div>
+        <div className="min-w-0">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold text-slate-900 dark:text-white">
             <Icon name="target" className="h-4 w-4 text-brand-500" />
             Hỏi HLV AI về cơ này
@@ -156,16 +158,28 @@ export default function MuscleChat({ muscle }) {
               : 'Chọn một cơ trên mô hình để bắt đầu hỏi.'}
           </p>
         </div>
-        {visibleMessages.length > 0 && (
-          <button
-            type="button"
-            className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-500"
-            onClick={clearChat}
-            disabled={streaming}
-          >
-            Xoá chat
-          </button>
-        )}
+        <div className="flex shrink-0 items-center gap-0.5">
+          {visibleMessages.length > 0 && (
+            <button
+              type="button"
+              className="rounded-md px-1.5 py-1 text-[11px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-rose-500 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-white/10"
+              onClick={clearChat}
+              disabled={streaming}
+            >
+              Xoá chat
+            </button>
+          )}
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Đóng khung chat"
+              className="grid h-7 w-7 place-items-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
+            >
+              <Icon name="close" className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -176,7 +190,7 @@ export default function MuscleChat({ muscle }) {
 
       <div
         ref={scrollRef}
-        className="mt-3 max-h-[360px] min-h-[160px] space-y-2 overflow-y-auto rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.03]"
+        className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.03]"
       >
         {!visibleMessages.length && !streaming && (
           <div className="py-2">
@@ -248,6 +262,7 @@ export default function MuscleChat({ muscle }) {
         }}
       >
         <textarea
+          ref={inputRef}
           className="input min-h-[44px] flex-1 resize-none !py-2 text-sm"
           rows={2}
           maxLength={1500}
