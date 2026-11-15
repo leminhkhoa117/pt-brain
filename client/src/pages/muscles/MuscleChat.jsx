@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { Alert, Card, Icon, Spinner } from '../../components/ui.jsx';
 import MarkdownText from '../../components/MarkdownText.jsx';
-import { askMuscleCoach } from '../../api/muscles.js';
+import { askMuscleCoachStream } from '../../api/muscles.js';
 import { getErrorMessage } from '../../api/client.js';
+import { readStored, removeStored, writeStored } from '../../lib/persist.js';
 
 const SUGGESTIONS = [
   'Cơ này có chức năng gì khi tập?',
@@ -13,58 +13,134 @@ const SUGGESTIONS = [
   'Đau khi tập cơ này thì nên làm gì?',
 ];
 
+const chatKey = (slug) => `ptbrain:muscle-chat:${slug}`;
+const MAX_SAVED = 40;
+
 export default function MuscleChat({ muscle }) {
-  const [messages, setMessages] = useState([]);
+  const slug = muscle?.slug || '';
+  const [messages, setMessages] = useState(() => (slug ? readStored(chatKey(slug), []) : []));
+  const [loadedSlug, setLoadedSlug] = useState(slug);
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
+  const [streaming, setStreaming] = useState(false);
   const scrollRef = useRef(null);
-  const muscleSlugRef = useRef(muscle?.slug);
+  const abortRef = useRef(null);
+  const slugRef = useRef(slug);
 
-  const ask = useMutation({
-    mutationFn: (payload) => askMuscleCoach(payload),
-    onSuccess: (data, variables) => {
-      // Bỏ qua câu trả lời của cơ cũ nếu người dùng đã chọn cơ khác trong lúc chờ.
-      if (variables?.slug !== muscleSlugRef.current) return;
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
-      setError(null);
-    },
-    onError: (err) => setError(getErrorMessage(err)),
-  });
+  // Đổi cơ: nạp lại lịch sử riêng của cơ đó thay vì xóa trắng.
+  if (slug !== loadedSlug) {
+    setLoadedSlug(slug);
+    setMessages(slug ? readStored(chatKey(slug), []) : []);
+  }
 
   useEffect(() => {
-    muscleSlugRef.current = muscle?.slug;
-    setMessages([]);
-    setInput('');
+    slugRef.current = slug;
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setStreaming(false);
     setError(null);
-    ask.reset();
-  }, [muscle?.slug]); // eslint-disable-line react-hooks/exhaustive-deps
+    setInput('');
+  }, [slug]);
+
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  // Lưu lịch sử theo từng cơ để bấm sang cơ khác rồi quay lại vẫn còn hội thoại.
+  useEffect(() => {
+    if (!slug || loadedSlug !== slug) return;
+    writeStored(chatKey(slug), messages.slice(-MAX_SAVED));
+  }, [messages, slug, loadedSlug]);
 
   useEffect(() => {
     const node = scrollRef.current;
     if (node) node.scrollTop = node.scrollHeight;
-  }, [messages, ask.isPending]);
+  }, [messages, streaming]);
 
   const history = useMemo(
     () =>
       messages
         .filter((item) => item.role === 'user' || item.role === 'assistant')
+        .filter((item) => item.content)
         .map((item) => ({ role: item.role, content: item.content.slice(0, 3000) }))
         .slice(-8),
     [messages],
   );
 
-  const send = (text) => {
+  const clearChat = () => {
+    abortRef.current?.abort();
+    setMessages([]);
+    setError(null);
+    setStreaming(false);
+    if (slug) removeStored(chatKey(slug));
+  };
+
+  const send = async (text) => {
     const message = String(text || '').trim();
-    if (!message || !muscle || ask.isPending) return;
-    setMessages((prev) => [...prev, { role: 'user', content: message }]);
+    if (!message || !muscle || streaming) return;
+    const past = history;
+    setMessages((prev) => [
+      ...prev,
+      { role: 'user', content: message },
+      { role: 'assistant', content: '', streaming: true },
+    ]);
     setInput('');
     setError(null);
-    ask.mutate({
-      slug: muscle.slug,
-      message,
-      history,
-    });
+    setStreaming(true);
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const result = await askMuscleCoachStream({
+        slug: muscle.slug,
+        message,
+        history: past,
+        signal: controller.signal,
+        onDelta: (delta) => {
+          if (slugRef.current !== muscle.slug) return;
+          setMessages((prev) => {
+            const next = [...prev];
+            const last = next.length - 1;
+            if (last >= 0 && next[last].role === 'assistant') {
+              next[last] = { ...next[last], content: next[last].content + delta };
+            }
+            return next;
+          });
+        },
+      });
+      setMessages((prev) => {
+        const next = [...prev];
+        const last = next.length - 1;
+        if (last >= 0 && next[last].role === 'assistant') {
+          next[last] = {
+            role: 'assistant',
+            content: result.answer || next[last].content,
+          };
+        }
+        return next;
+      });
+    } catch (err) {
+      if (err?.name === 'AbortError' || slugRef.current !== muscle.slug) return;
+      setError(
+        err?.response
+          ? getErrorMessage(err)
+          : err?.message || 'Không trả lời được câu hỏi này. Vui lòng thử lại.',
+      );
+      setMessages((prev) => {
+        const next = [...prev];
+        const last = next.length - 1;
+        if (last >= 0 && next[last].role === 'assistant' && !next[last].content) {
+          next.pop();
+        } else if (last >= 0 && next[last].role === 'assistant') {
+          next[last] = { ...next[last], streaming: false };
+        }
+        return next;
+      });
+    } finally {
+      if (slugRef.current === muscle.slug) setStreaming(false);
+      if (abortRef.current === controller) abortRef.current = null;
+    }
   };
+
+  const visibleMessages = loadedSlug === slug ? messages : [];
 
   return (
     <Card className="flex flex-col">
@@ -76,18 +152,16 @@ export default function MuscleChat({ muscle }) {
           </h3>
           <p className="mt-1 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
             {muscle
-              ? `Đang hỏi về ${muscle.vi} (${muscle.en}).`
+              ? `Đang hỏi về ${muscle.vi} (${muscle.en}). Hội thoại được lưu riêng cho cơ này.`
               : 'Chọn một cơ trên mô hình để bắt đầu hỏi.'}
           </p>
         </div>
-        {messages.length > 0 && (
+        {visibleMessages.length > 0 && (
           <button
             type="button"
             className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-rose-500"
-            onClick={() => {
-              setMessages([]);
-              setError(null);
-            }}
+            onClick={clearChat}
+            disabled={streaming}
           >
             Xoá chat
           </button>
@@ -104,7 +178,7 @@ export default function MuscleChat({ muscle }) {
         ref={scrollRef}
         className="mt-3 max-h-[360px] min-h-[160px] space-y-2 overflow-y-auto rounded-xl bg-slate-50/80 p-3 dark:bg-white/[0.03]"
       >
-        {!messages.length && !ask.isPending && (
+        {!visibleMessages.length && !streaming && (
           <div className="py-2">
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {muscle
@@ -128,7 +202,7 @@ export default function MuscleChat({ muscle }) {
           </div>
         )}
 
-        {messages.map((item, index) => (
+        {visibleMessages.map((item, index) => (
           <div
             key={`${item.role}-${index}`}
             className={item.role === 'user' ? 'flex justify-end' : 'flex justify-start'}
@@ -136,20 +210,29 @@ export default function MuscleChat({ muscle }) {
             <div
               className={
                 item.role === 'user'
-                  ? 'max-w-[88%] rounded-lg rounded-br-md bg-brand-600 px-3 py-2 text-xs text-white'
+                  ? 'max-w-[88%] whitespace-pre-wrap rounded-lg rounded-br-md bg-brand-600 px-3 py-2 text-xs text-white'
                   : 'max-w-[92%] rounded-lg rounded-bl-md bg-white px-3 py-2 text-xs text-slate-700 shadow-sm dark:bg-slate-900 dark:text-slate-200'
               }
             >
               {item.role === 'user' ? (
                 <p className="whitespace-pre-wrap">{item.content}</p>
+              ) : item.content ? (
+                <>
+                  <MarkdownText>{item.content}</MarkdownText>
+                  {item.streaming && (
+                    <span className="ml-0.5 inline-block h-3 w-1.5 animate-pulse rounded-sm bg-brand-500 align-middle dark:bg-brand-300" />
+                  )}
+                </>
               ) : (
-                <MarkdownText>{item.content}</MarkdownText>
+                <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                  <Spinner className="h-3.5 w-3.5" /> AI đang soạn câu trả lời...
+                </span>
               )}
             </div>
           </div>
         ))}
 
-        {ask.isPending && (
+        {streaming && visibleMessages[visibleMessages.length - 1]?.role === 'user' && (
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <Spinner className="h-4 w-4" />
             AI đang soạn câu trả lời...
@@ -170,7 +253,7 @@ export default function MuscleChat({ muscle }) {
           maxLength={1500}
           placeholder={muscle ? 'Hỏi về cơ này...' : 'Chọn một cơ trước'}
           value={input}
-          disabled={!muscle || ask.isPending}
+          disabled={!muscle || streaming}
           onChange={(event) => setInput(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -182,10 +265,10 @@ export default function MuscleChat({ muscle }) {
         <button
           type="submit"
           className="btn-primary !px-3 !py-2.5"
-          disabled={!muscle || !input.trim() || ask.isPending}
+          disabled={!muscle || !input.trim() || streaming}
           aria-label="Gửi câu hỏi"
         >
-          {ask.isPending ? (
+          {streaming ? (
             <Spinner className="h-4 w-4 text-white" />
           ) : (
             <Icon name="send" className="h-4 w-4" />

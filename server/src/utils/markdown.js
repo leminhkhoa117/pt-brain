@@ -49,6 +49,13 @@ export function summaryToMarkdown(summary, paper) {
     lines.push('');
   }
 
+  if (c.conclusion?.summary || c.conclusion?.points?.length) {
+    lines.push('## Kết luận dễ hiểu');
+    if (c.conclusion.summary) lines.push(c.conclusion.summary);
+    (c.conclusion.points || []).forEach((point) => lines.push(`- ${point}`));
+    lines.push('');
+  }
+
   if (c.whyStudy) {
     lines.push('## Vì sao làm nghiên cứu');
     lines.push(c.whyStudy);
@@ -160,7 +167,9 @@ export function summaryToMarkdown(summary, paper) {
   if (c.benefitSignals?.flags?.length) {
     lines.push('**Dấu hiệu cần lưu ý:**');
     c.benefitSignals.flags.forEach((flag) =>
-      lines.push(`- ${flag.text}${flag.source ? ` (${flag.source}${flag.page ? `, tr. ${flag.page}` : ''})` : ''}`),
+      lines.push(
+        `- ${flag.text}${flag.source ? ` (${flag.source}${flag.page ? `, tr. ${flag.page}` : ''})` : ''}`,
+      ),
     );
   }
   lines.push('');
@@ -200,8 +209,7 @@ export function summaryToMarkdown(summary, paper) {
 
   if (summary.facts) {
     const audit = buildFactsAudit(summary.facts);
-    const cell = (value = '') =>
-      String(value).replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
+    const cell = (value = '') => String(value).replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
     lines.push('## Phụ lục — Dữ kiện kiểm chứng (audit)');
     lines.push(
       'Phần này giữ nguyên dữ kiện bước 1 để đối chiếu với bản viết. Không dùng để thay thế bài gốc.',

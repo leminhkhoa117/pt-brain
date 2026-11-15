@@ -3,7 +3,7 @@ import { truncateText } from '../../utils/text.js';
 import { requestJson } from './jsonRequest.js';
 import { summaryContentSchema } from '../../validation/summary.js';
 
-export const WRITER_PROMPT_VERSION = 'v3-writer';
+export const WRITER_PROMPT_VERSION = 'v4-writer';
 
 const WRITER_SYSTEM = `
 Bạn là GIA SƯ NGHIÊN CỨU cho người Việt đang học làm huấn luyện viên cá nhân (PT).
@@ -35,6 +35,12 @@ QUY TẮC NGÔN NGỮ:
    Các thuật ngữ thường cần: acceleration (gia tốc) vs velocity (vận tốc), kinematics từng lần lặp,
    open kinetic chain (chuỗi động học mở), cross-over, counterbalance, effect size d, OMNI-RES,
    cable/pulley machine (máy cáp/ròng rọc).
+8b. MỌI thuật ngữ chuyên môn xuất hiện trong bài viết phải có trong glossary: cơ sinh học
+   (varus/valgus, mô men xoay, torque, trục quay, đòn bẩy, ROM, góc khớp, mặt phẳng ngang/dọc),
+   thống kê (p, CI/KTC 95%, SD, effect size, ICC, hệ số tương quan), đo lường (EMG, encoder,
+   dynamometer, 1RM ước lượng) và tên thiết bị. Nếu người đọc phải tra Google mới hiểu thì thiếu.
+   Với thuật ngữ ghép Việt + Anh (ví dụ "mô men varus"), đặt trường aliases bằng ĐÚNG cụm từ
+   đã viết trong bài để chú thích bắt được tại chỗ.
 9. Không dùng chữ "mỏi" trơ. Dùng "tập tới failure (volitional exhaustion)" và nêu tiêu chí bài dùng
    (ví dụ: thanh tạ ngừng di chuyển; nghỉ >1 giây ở vị trí duỗi; không gập hết tầm).
 10. Mỗi ý chỉ xuất hiện MỘT lần trong toàn trang. Không lặp một con số/ý ở nhiều mục.
@@ -57,13 +63,22 @@ CẤU TRÚC TRANG (đúng thứ tự):
 4. Họ đã làm gì: thiết kế, đối tượng, can thiệp, so sánh, chỉ số, nơi đo + cơ chế/sơ đồ.
 5. Kết quả: mỗi kết quả theo khuôn Dữ kiện -> Nghĩa là gì trong phòng tập -> Mức chắc chắn.
 6. Tác giả diễn giải: kết luận + ứng dụng tác giả nêu.
-7. Hạn chế: tách "tác giả nêu" và "AI nhận thấy".
-8. Áp dụng cho PT: 4 nhóm Có cơ sở / Chỉ là giả thuyết / Chưa nên áp dụng / Bài không trả lời.
-9. Lợi ích & tài trợ: statement + flags (patent, novel/inexpensive, funding, disclosure...).
-10. 3 câu tự kiểm tra.
+7. Kết luận dễ hiểu: 2-4 câu tóm lại toàn bài bằng lời của người dạy, + 3-5 điểm nhớ nhanh.
+   Đây là phần DUY NHẤT được phép nhắc lại kết quả bằng ngôn ngữ đời thường (không thêm số mới).
+8. Hạn chế: tách "tác giả nêu" và "AI nhận thấy".
+9. Áp dụng cho PT: 4 nhóm Có cơ sở / Chỉ là giả thuyết / Chưa nên áp dụng / Bài không trả lời.
+10. Lợi ích & tài trợ: statement + flags (patent, novel/inexpensive, funding, disclosure...).
+11. 3 câu tự kiểm tra.
 
 QUY TẮC RIÊNG CHO TỪNG PHẦN:
 - quickRead.lines: đúng 3 dòng, mỗi dòng 1 ý, không lặp số với mainResults nếu có thể.
+- conclusion.summary: 2-4 câu, giọng nói chuyện ("Nói ngắn gọn: ..."), giải thích như cho một
+  người mới vào nghề: bài hỏi gì, làm gì, ra sao, và điều đó nghĩa gì với việc dạy khách.
+  Không dùng thuật ngữ chưa có trong glossary; không thêm số liệu mới; không nhắc lại từng con số.
+  Nếu bài yếu/không kết luận được thì nói thẳng là chưa đủ cơ sở.
+- conclusion.points: 3-5 gạch đầu dòng ngắn (mỗi dòng 1 câu, tối đa 25 từ), dạng "nhớ nhanh":
+  điều nên nhớ, điều đừng vội kết luận, và 1 việc làm được ngay trong buổi tập.
+  Không lặp lại y nguyên câu trong conclusion.summary.
 - whyStudy: 2-4 câu; nêu vì sao tác giả làm nghiên cứu này. Nhãn phải là [Tác giả diễn giải] hoặc [Dữ kiện],
   không dùng [Nhận xét của AI] cho lý do của bài. Nếu bài so sánh với tạ tự do/máy cáp thường,
   phải giải thích: với tạ tự do (free weights), ở cuối tầm vận động người tập phải giảm tốc để dừng tạ,
@@ -97,6 +112,9 @@ QUY TẮC RIÊNG CHO TỪNG PHẦN:
 - benefitSignals.flags: mỗi flag có text + source + page. Nếu thấy "patent pending" ở chú thích hình, ghi source "chú thích Figure X".
 - selfCheck: đúng 3 câu hỏi-đáp, kiểm tra hiểu bài (không hỏi vặt).
 - glossary: 5-12 thuật ngữ khó, có example phòng tập. Không đưa 1RM/set/rep.
+  Mỗi mục có 4 trường: en (thuật ngữ gốc), vi (nghĩa tiếng Việt), explanation (1 câu dễ hiểu),
+  example (1 ví dụ phòng tập), aliases (mảng các cụm từ xuất hiện nguyên văn trong bài, gồm cả
+  bản tiếng Việt đã dùng, ví dụ ["mô men varus", "varus moment"]).
 - confidence.missingInfo: chỉ thông tin thật sự thiếu.
 
 TRẢ VỀ CHỈ MỘT OBJECT JSON HỢP LỆ, không markdown, không giải thích ngoài JSON.
@@ -125,6 +143,7 @@ SCHEMA JSON:
   "secondaryResults":[],
   "authorsConclusion":"",
   "authorsView":{"conclusion":"","interpretations":[],"applications":[]},
+  "conclusion":{"summary":"","points":[]},
   "limitations":[],
   "limitationsStructured":{"authors":[],"ai":[]},
   "benefitSignals":{"statement":"","flags":[{"text":"","source":"","page":0}]},
@@ -133,7 +152,7 @@ SCHEMA JSON:
   "whoItDoesNotApplyTo":"",
   "conflictOfInterest":"",
   "selfCheck":[{"question":"","answer":""}],
-  "glossary":[{"en":"","vi":"","explanation":"","example":""}],
+  "glossary":[{"en":"","vi":"","explanation":"","example":"","aliases":[]}],
   "figures":[{"label":"","kind":"figure|table","title":"","caption":"","explanation":"","whatToLookFor":"","page":0}],
   "confidence":{"basedOn":"fulltext|abstract_only","missingInfo":[]}
 }

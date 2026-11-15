@@ -19,9 +19,11 @@ export default function Research() {
     const next = new URLSearchParams(params);
     if (value === 'reader') {
       next.delete('tab');
+      // Giữ ?summary để quay lại đúng bài đang đọc thay vì rơi về thư viện.
       next.delete('doi');
       next.delete('url');
-      next.delete('summary');
+      next.delete('auto');
+      next.delete('from');
     } else {
       next.set('tab', value);
     }
@@ -33,13 +35,7 @@ export default function Research() {
       <div className="mb-4 overflow-x-auto">
         <Segmented options={TABS} value={tab} onChange={changeTab} />
       </div>
-      {tab === 'finder' ? (
-        <FinderPage />
-      ) : tab === 'library' ? (
-        <LibraryPage />
-      ) : (
-        <ReaderPage />
-      )}
+      {tab === 'finder' ? <FinderPage /> : tab === 'library' ? <LibraryPage /> : <ReaderPage />}
     </div>
   );
 }

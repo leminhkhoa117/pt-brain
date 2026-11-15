@@ -7,7 +7,7 @@ import { extractPaperFacts } from './paperFacts.js';
 import { writeSummaryForPt } from './paperWriter.js';
 import { verifySummary, verifyFactsQuotes } from './summaryVerifier.js';
 
-export const PROMPT_VERSION = 'v3';
+export const PROMPT_VERSION = 'v4';
 
 function mergeMetadata(paper, aiMetadata = {}) {
   const paperTitle = String(paper.title || '').trim();
@@ -82,7 +82,16 @@ function mergeRepair(previous = {}, repaired = {}) {
 
   merged.metadata = { ...(previous.metadata || {}), ...(repaired.metadata || {}) };
 
-  for (const key of ['quickRead', 'mechanism', 'authorsView', 'limitationsStructured', 'benefitSignals', 'application', 'evidenceAxes']) {
+  for (const key of [
+    'quickRead',
+    'mechanism',
+    'authorsView',
+    'conclusion',
+    'limitationsStructured',
+    'benefitSignals',
+    'application',
+    'evidenceAxes',
+  ]) {
     merged[key] = { ...(previous[key] || {}), ...(repaired[key] || {}) };
   }
   if (!isFilled(repaired.benefitSignals?.flags)) {
@@ -96,8 +105,7 @@ function mergeRepair(previous = {}, repaired = {}) {
       repaired.quickRead?.lines?.length === 3
         ? repaired.quickRead.lines
         : previous.quickRead?.lines || [],
-    readyForPt:
-      repaired.quickRead?.readyForPt || previous.quickRead?.readyForPt || '',
+    readyForPt: repaired.quickRead?.readyForPt || previous.quickRead?.readyForPt || '',
   };
   for (const key of ['supported', 'hypothesis', 'notYet', 'unanswered']) {
     if (!isFilled(repaired.application?.[key])) {
@@ -106,12 +114,25 @@ function mergeRepair(previous = {}, repaired = {}) {
     }
   }
 
-  for (const key of ['mainResults', 'secondaryResults', 'figures', 'limitations', 'practicalTakeaways']) {
+  for (const key of [
+    'mainResults',
+    'secondaryResults',
+    'figures',
+    'limitations',
+    'practicalTakeaways',
+  ]) {
     if (!isFilled(repaired[key])) merged[key] = previous[key] || [];
   }
   if (!isFilled(repaired.selfCheck) || repaired.selfCheck?.length !== 3) {
     merged.selfCheck = previous.selfCheck || [];
   }
+  merged.conclusion = {
+    summary: repaired.conclusion?.summary || previous.conclusion?.summary || '',
+    points:
+      repaired.conclusion?.points?.length > 0
+        ? repaired.conclusion.points
+        : previous.conclusion?.points || [],
+  };
   if (!isFilled(repaired.glossary) || repaired.glossary?.length < 4) {
     merged.glossary = previous.glossary || [];
   }
@@ -141,11 +162,14 @@ function mergeRepair(previous = {}, repaired = {}) {
 
 function ensureCoreGlossary(content) {
   const glossary = Array.isArray(content.glossary) ? [...content.glossary] : [];
-  const has = (pattern) => glossary.some((term) => pattern.test(`${term.en} ${term.vi}`));
+  const has = (pattern) =>
+    glossary.some((term) =>
+      pattern.test(`${term.en} ${term.vi} ${(term.aliases || []).join(' ')}`),
+    );
   const text = JSON.stringify(content);
   const add = (term) => {
     if (!has(new RegExp(term.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'))) {
-      glossary.push(term);
+      glossary.push({ aliases: [], ...term });
     }
   };
 
@@ -156,6 +180,7 @@ function ensureCoreGlossary(content) {
       explanation:
         'Mỗi người thử cả hai điều kiện, thứ tự được cân bằng để giảm ảnh hưởng của thứ tự học.',
       example: 'Cùng một khách tập thử cả hai cách móc dây, buổi sau đổi thứ tự.',
+      aliases: ['cross-over', 'crossover', 'đổi chéo'],
     });
   }
   if (/open kinetic chain|chuỗi động học mở/i.test(text)) {
@@ -164,6 +189,7 @@ function ensureCoreGlossary(content) {
       vi: 'chuỗi động học mở',
       explanation: 'Đầu xa của chi chuyển động tự do, không bị cố định vào sàn hay giá.',
       example: 'Biceps curl tay tự do: bàn tay di chuyển, không bị giữ cố định.',
+      aliases: ['open kinetic chain', 'chuỗi động học mở'],
     });
   }
   if (/effect size|(^|\W)d\s*=/i.test(text)) {
@@ -172,6 +198,7 @@ function ensureCoreGlossary(content) {
       vi: 'độ lớn ảnh hưởng (d)',
       explanation: 'Độ lớn khác biệt đã chuẩn hóa; khoảng 0.2 nhỏ, 0.5 vừa, 0.8 lớn.',
       example: 'd = 0.65 là mức vừa, không phải khác biệt khổng lồ.',
+      aliases: ['effect size', 'độ lớn ảnh hưởng'],
     });
   }
   if (/OMNI-RES/i.test(text)) {
@@ -180,6 +207,65 @@ function ensureCoreGlossary(content) {
       vi: 'thang cảm nhận gắng sức cho kháng lực',
       explanation: 'Thang 1-10 để người tập tự báo mức gắng sức khi tập tạ.',
       example: 'Sau lần lặp thứ 5, hỏi khách: “Thang 1-10, bạn thấy nặng cỡ mấy?”',
+      aliases: ['OMNI-RES'],
+    });
+  }
+  // Cơ sinh học: các từ người đọc hay hỏi nhất ("mô men varus là gì?").
+  if (/varus/i.test(text)) {
+    add({
+      en: 'varus',
+      vi: 'khuynh vào trong',
+      explanation:
+        'Trục chi bị lệch vào trong so với đường giữa; với gối là đầu gối có xu hướng đổ vào trong.',
+      example: 'Khi chùng gối, gối đổ vào trong quá nhiều là dấu hiệu kiểm soát hông yếu.',
+      aliases: ['varus moment', 'mô men varus', 'mô-men varus', 'varus'],
+    });
+  }
+  if (/valgus/i.test(text)) {
+    add({
+      en: 'valgus',
+      vi: 'khuynh ra ngoài',
+      explanation: 'Trục chi bị lệch ra ngoài so với đường giữa; với gối là đầu gối đổ ra ngoài.',
+      example: 'Nhìn từ trước, gối đổ ra ngoài khi squat là dạng valgus.',
+      aliases: ['valgus moment', 'mô men valgus', 'mô-men valgus', 'valgus'],
+    });
+  }
+  if (/mô[ -]?men|moment\b|torque/i.test(text)) {
+    add({
+      en: 'moment (torque)',
+      vi: 'mô men xoay',
+      explanation:
+        'Lực gây xoay quanh một khớp/trục, tính bằng lực nhân cánh tay đòn; mô men càng lớn thì khớp càng bị xoay mạnh.',
+      example: 'Giữ tạ xa cơ thể làm mô men lên vai lớn hơn, nên vai mỏi nhanh hơn.',
+      aliases: ['mô men', 'mô-men', 'mô men xoay', 'moment', 'torque'],
+    });
+  }
+  if (/EMG|điện cơ/i.test(text)) {
+    add({
+      en: 'EMG',
+      vi: 'điện cơ',
+      explanation: 'Đo tín hiệu điện của cơ khi co; chỉ cho biết cơ có hoạt động, không đo lực.',
+      example: 'EMG cao ở cơ mông không có nghĩa là mông khỏe hơn.',
+      aliases: ['EMG', 'điện cơ'],
+    });
+  }
+  if (/\bICC\b/i.test(text)) {
+    add({
+      en: 'ICC',
+      vi: 'hệ số tin cậy giữa các lần đo',
+      explanation:
+        'Cho biết hai lần đo cùng một người có cho kết quả giống nhau không; càng gần 1 càng ổn định.',
+      example: 'ICC = 0.90 nghĩa là đo lại hôm sau vẫn ra gần như cũ.',
+      aliases: ['ICC'],
+    });
+  }
+  if (/\bROM\b|tầm vận động/i.test(text)) {
+    add({
+      en: 'ROM',
+      vi: 'tầm vận động',
+      explanation: 'Biên độ khớp đi được từ vị trí gập tối đa đến duỗi tối đa.',
+      example: 'Squat sâu hơn là tăng ROM của hông và gối.',
+      aliases: ['ROM', 'tầm vận động'],
     });
   }
 
@@ -218,7 +304,10 @@ function finalizeContent({ content, paper, basedOn, figureHints, facts = null, m
           flags: factsFlags,
         };
       }
-      if (!merged.benefitSignals?.statement || /^không nêu trong bài$/i.test(merged.benefitSignals.statement)) {
+      if (
+        !merged.benefitSignals?.statement ||
+        /^không nêu trong bài$/i.test(merged.benefitSignals.statement)
+      ) {
         merged.benefitSignals = {
           ...(merged.benefitSignals || {}),
           statement: '[Dữ kiện] Bài có dấu hiệu lợi ích/tài trợ; xem các cờ bên dưới.',
@@ -235,6 +324,14 @@ function finalizeContent({ content, paper, basedOn, figureHints, facts = null, m
   }
   merged.figures = mergeFigureHints(merged.figures, figureHints);
   ensureCoreGlossary(merged);
+  // Bản cũ/thiếu field: vẫn có mục "Kết luận" đọc được thay vì để trống.
+  if (!merged.conclusion || typeof merged.conclusion !== 'object') {
+    merged.conclusion = { summary: '', points: [] };
+  }
+  if (!merged.conclusion.summary) merged.conclusion.summary = merged.tldr || '';
+  if (!(merged.conclusion.points || []).length) {
+    merged.conclusion.points = (merged.quickRead?.lines || []).slice(0, 3);
+  }
   merged.confidence = {
     basedOn,
     missingInfo: Array.isArray(merged.confidence?.missingInfo)

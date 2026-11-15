@@ -32,8 +32,12 @@ import {
   updateSummaryMeta,
 } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
+import { createFlashcard } from '../api/learning.js';
+import { readStored, removeStored, writeStored } from '../lib/persist.js';
 import { formatDateKey } from '../lib/date.js';
 import { formatNumber } from '../lib/format.js';
+
+const SUMMARY_STORAGE_KEY = 'ptbrain:research:last-summary';
 
 const MODES = [
   { value: 'link', label: 'Link / DOI' },
@@ -97,7 +101,7 @@ export default function ReaderPage() {
   const dialog = useDialog();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const fromFinder = searchParams.get('from') === 'finder';
   const [mode, setMode] = useState('link');
   const [link, setLink] = useState('');
@@ -106,13 +110,38 @@ export default function ReaderPage() {
   const [file, setFile] = useState(null);
   const [active, setActive] = useState(null);
   const [error, setError] = useState(null);
+  const [notice, setNotice] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [loadingId, setLoadingId] = useState(null);
   const [applyOpen, setApplyOpen] = useState(false);
   const [chatFocusSignal, setChatFocusSignal] = useState(0);
+  const activeIdRef = useRef(null);
 
   const listQuery = useQuery({ queryKey: ['summaries'], queryFn: () => listSummaries() });
   const termsQuery = useQuery({ queryKey: ['terms'], queryFn: listTerms });
+
+  useEffect(() => {
+    activeIdRef.current = active?.summary?._id || null;
+  }, [active]);
+
+  /** Đưa bài đang đọc vào URL + localStorage để rời trang rồi quay lại vẫn còn. */
+  const rememberSummary = (id) => {
+    writeStored(SUMMARY_STORAGE_KEY, { id, at: Date.now() });
+    if (!id) return;
+    const next = new URLSearchParams(searchParams);
+    ['doi', 'url', 'auto', 'from'].forEach((key) => next.delete(key));
+    next.delete('tab');
+    if (next.get('summary') === id) return;
+    next.set('summary', id);
+    setSearchParams(next, { replace: true });
+  };
+
+  const forgetSummary = () => {
+    removeStored(SUMMARY_STORAGE_KEY);
+    const next = new URLSearchParams(searchParams);
+    next.delete('summary');
+    setSearchParams(next, { replace: true });
+  };
 
   useEffect(() => {
     const doi = searchParams.get('doi');
@@ -131,16 +160,23 @@ export default function ReaderPage() {
   useEffect(() => {
     const id = searchParams.get('summary');
     if (!id) return undefined;
+    // Đã hiển thị đúng bài này rồi (ví dụ vừa bấm từ thư viện) thì không tải lại.
+    if (activeIdRef.current === id) return undefined;
     let cancelled = false;
     setLoadingId(id);
     getSummary(id)
       .then((data) => {
         if (!cancelled) {
           setActive(data);
+          writeStored(SUMMARY_STORAGE_KEY, { id, at: Date.now() });
         }
       })
       .catch((err) => {
-        if (!cancelled) setError(getErrorMessage(err));
+        if (!cancelled) {
+          setError(getErrorMessage(err));
+          // Bài đã bị xóa hoặc không còn quyền: bỏ khỏi URL để không lặp lỗi.
+          if ([403, 404].includes(err?.response?.status)) forgetSummary();
+        }
       })
       .finally(() => {
         if (!cancelled) setLoadingId(null);
@@ -148,7 +184,18 @@ export default function ReaderPage() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams]);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Khôi phục bài đang đọc khi quay lại /research (không có ?summary trên URL).
+  useEffect(() => {
+    if (searchParams.get('summary')) return;
+    if (searchParams.get('doi') || searchParams.get('url')) return;
+    const stored = readStored(SUMMARY_STORAGE_KEY);
+    if (!stored?.id) return;
+    const next = new URLSearchParams(searchParams);
+    next.set('summary', stored.id);
+    setSearchParams(next, { replace: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const savedTerms = new Set((termsQuery.data?.terms || []).map((t) => t.en));
 
@@ -157,10 +204,12 @@ export default function ReaderPage() {
     onSuccess: (data) => {
       setActive(data);
       setError(null);
+      setNotice(null);
       setLink('');
       setText('');
       setTitle('');
       setFile(null);
+      rememberSummary(data.summary?._id);
       queryClient.invalidateQueries({ queryKey: ['summaries'] });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
@@ -184,9 +233,27 @@ export default function ReaderPage() {
         en: term.en,
         vi: term.vi,
         explanation: term.explanation,
+        example: term.example || '',
         sourcePaperId: active?.paper?._id,
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['terms'] }),
+    onSuccess: () => {
+      setNotice('Đã lưu thuật ngữ vào Từ điển. Sang mục Học tập để ôn hoặc tạo flashcard.');
+      queryClient.invalidateQueries({ queryKey: ['terms'] });
+    },
+    onError: (err) => setError(getErrorMessage(err)),
+  });
+
+  /** Tạo flashcard từ thuật ngữ đã lưu (dùng cho nút trong popover/giải thích). */
+  const flashcardMutation = useMutation({
+    mutationFn: async (term) => {
+      const saved = (termsQuery.data?.terms || []).find((item) => item.en === term.en);
+      if (!saved) throw new Error('Thuật ngữ chưa có trong từ điển — bấm lưu trước đã.');
+      return createFlashcard({ termId: saved._id });
+    },
+    onSuccess: () => {
+      setNotice('Đã tạo flashcard cho thuật ngữ này. Vào Học tập → Flashcard để ôn.');
+      queryClient.invalidateQueries({ queryKey: ['flashcards'] });
+    },
     onError: (err) => setError(getErrorMessage(err)),
   });
 
@@ -194,6 +261,7 @@ export default function ReaderPage() {
     mutationFn: (id) => deleteSummary(id),
     onSuccess: () => {
       setActive(null);
+      forgetSummary();
       queryClient.invalidateQueries({ queryKey: ['summaries'] });
     },
     onError: (err) => setError(getErrorMessage(err)),
@@ -286,15 +354,24 @@ export default function ReaderPage() {
   const loadSaved = async (id) => {
     setLoadingId(id);
     setError(null);
+    setNotice(null);
     try {
       const data = await getSummary(id);
       setActive(data);
+      rememberSummary(id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
       setLoadingId(null);
     }
+  };
+
+  /** Thoát khỏi bài đang đọc: xóa URL + bộ nhớ để lần sau mở lại là thư viện. */
+  const closeSummary = () => {
+    setActive(null);
+    setNotice(null);
+    forgetSummary();
   };
 
   const stage = STAGES[Math.min(STAGES.length - 1, Math.floor(elapsed / 6))];
@@ -362,6 +439,12 @@ export default function ReaderPage() {
         </Alert>
       )}
 
+      {notice && (
+        <Alert tone="success" className="mb-4">
+          {notice}
+        </Alert>
+      )}
+
       {active ? (
         <>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -378,7 +461,7 @@ export default function ReaderPage() {
               <button
                 type="button"
                 className="btn-ghost"
-                onClick={() => setActive(null)}
+                onClick={closeSummary}
               >
                 ← Thư viện
               </button>
@@ -401,7 +484,7 @@ export default function ReaderPage() {
               <button
                 type="button"
                 className="btn-secondary mt-5"
-                onClick={() => setActive(null)}
+                onClick={closeSummary}
               >
                 Về thư viện
               </button>
@@ -418,7 +501,7 @@ export default function ReaderPage() {
                 >
                   {retryMutation.isPending ? 'Đang thử lại...' : 'Thử lại'}
                 </button>
-                <button type="button" className="btn-secondary !px-3 !py-1.5 text-xs" onClick={() => setActive(null)}>
+                <button type="button" className="btn-secondary !px-3 !py-1.5 text-xs" onClick={closeSummary}>
                   Quay lại thư viện
                 </button>
               </div>
@@ -432,7 +515,16 @@ export default function ReaderPage() {
                 paper={active.paper}
                 savedTerms={savedTerms}
                 savingTerm={saveTermMutation.isPending ? saveTermMutation.variables?.en : null}
-                onSaveTerm={(term) => saveTermMutation.mutate(term)}
+                onSaveTerm={(term) => {
+                  setError(null);
+                  setNotice(null);
+                  saveTermMutation.mutate(term);
+                }}
+                onMakeFlashcard={(term) => {
+                  setError(null);
+                  setNotice(null);
+                  flashcardMutation.mutate(term);
+                }}
                 deleting={deleteMutation.isPending}
                 onDelete={async () => {
                   const ok = await dialog.confirm({

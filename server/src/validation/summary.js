@@ -86,6 +86,19 @@ const resultItemSchema = z.preprocess((value) => {
   return value;
 }, resultItemBase);
 
+// `aliases` giữ đúng cụm từ xuất hiện trong bài (ví dụ "mô men varus") để phần
+// chú thích tại chỗ bắt được cả biến thể tiếng Việt lẫn tiếng Anh.
+const glossaryAliases = z.preprocess((value) => {
+  if (typeof value === 'string') {
+    return value
+      .split(/[;,]\s*/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => String(item || '').trim()).filter(Boolean);
+}, z.array(z.string()).default([]));
+
 const glossaryItemSchema = z.preprocess(
   (value) =>
     value && typeof value === 'object'
@@ -94,6 +107,7 @@ const glossaryItemSchema = z.preprocess(
           vi: value.vi || value.termVi || '',
           explanation: value.explanation || value.meaning || '',
           example: value.example || value.gymExample || '',
+          aliases: value.aliases || value.matches || value.variants || [],
         }
       : value,
   z.object({
@@ -101,6 +115,7 @@ const glossaryItemSchema = z.preprocess(
     vi: z.string().min(1),
     explanation: z.string().min(1),
     example: z.string().default(''),
+    aliases: glossaryAliases,
   }),
 );
 
@@ -113,9 +128,29 @@ const glossarySchema = z.preprocess((value) => {
       vi: item.vi || item.termVi || '',
       explanation: item.explanation || item.meaning || '',
       example: item.example || item.gymExample || '',
+      aliases: item.aliases || item.matches || item.variants || [],
     }))
     .filter((item) => item.en && item.vi && item.explanation);
 }, z.array(glossaryItemSchema).default([]));
+
+const conclusionSchema = z.preprocess(
+  (value) => {
+    if (typeof value === 'string') {
+      return { summary: value, points: [] };
+    }
+    if (value && typeof value === 'object') {
+      return {
+        summary: value.summary || value.text || value.plain || '',
+        points: value.points || value.bullets || value.takeaways || [],
+      };
+    }
+    return {};
+  },
+  z.object({
+    summary: z.string().default(''),
+    points: flexibleStringArray,
+  }),
+);
 
 const figureItemSchema = z.preprocess(
   (value) => {
@@ -460,6 +495,8 @@ export const summaryContentSchema = z.object({
   mechanism: mechanismSchema,
   authorsConclusion: z.string().default('Không nêu trong bài'),
   authorsView: authorsViewSchema,
+  // Kết luận dễ hiểu cho người học: 2-4 câu + 3-5 điểm nhớ nhanh.
+  conclusion: conclusionSchema.default({}),
   limitations: stringArray(/\n+/),
   limitationsStructured: limitationsStructuredSchema,
   conflictOfInterest: z.string().default('Không nêu trong bài'),

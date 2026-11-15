@@ -1,4 +1,4 @@
-import { chatCompletion } from './client.js';
+import { chatCompletion, chatCompletionStream } from './client.js';
 import { evidenceReferences, formatEvidence, getEvidence } from '../../research/evidenceBase.js';
 
 const EVIDENCE_IDS = ['E1', 'E2', 'E3', 'E4', 'E5', 'E6'];
@@ -21,17 +21,21 @@ QUY TẮC:
 ${formatEvidence(getEvidence(EVIDENCE_IDS))}`;
 }
 
-export async function answerMuscleQuestion({ muscle, message, history = [], profile = {} }) {
+export function buildMuscleMessages({ muscle, message, history = [], profile = {} }) {
   const past = history
     .slice(-8)
     .filter((item) => item.role === 'user' || item.role === 'assistant')
     .map((item) => ({ role: item.role, content: item.content }));
 
-  const messages = [
+  return [
     { role: 'system', content: systemPrompt({ muscle, profile }) },
     ...past,
     { role: 'user', content: message },
   ];
+}
+
+export async function answerMuscleQuestion({ muscle, message, history = [], profile = {} }) {
+  const messages = buildMuscleMessages({ muscle, message, history, profile });
 
   // Model reasoning có thể dùng hết max_tokens và trả content rỗng.
   // Tăng trần và thử lại một lần không bật reasoning nếu lần đầu bị cắt vì độ dài.
@@ -59,6 +63,30 @@ export async function answerMuscleQuestion({ muscle, message, history = [], prof
       temperature: 0.35,
     });
   }
+
+  return {
+    answer: response.text.trim(),
+    model: response.model,
+    usage: response.usage,
+    evidence: evidenceReferences(EVIDENCE_IDS),
+  };
+}
+
+/** Bản streaming cho SSE: trả từng đoạn để UI hiện chữ dần như bên nghiên cứu. */
+export async function answerMuscleQuestionStream({
+  muscle,
+  message,
+  history = [],
+  profile = {},
+  onDelta,
+}) {
+  const response = await chatCompletionStream({
+    messages: buildMuscleMessages({ muscle, message, history, profile }),
+    maxTokens: 4000,
+    temperature: 0.35,
+    reasoningEffort: 'low',
+    onDelta,
+  });
 
   return {
     answer: response.text.trim(),

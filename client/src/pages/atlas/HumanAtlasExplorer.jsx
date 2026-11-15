@@ -881,7 +881,7 @@ function AboutDialog({ atlas, onClose }) {
   );
 }
 
-export default function HumanAtlasExplorer({ onMuscleChange }) {
+export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '' }) {
   const { isDark } = useTheme();
   const [atlas, setAtlas] = useState(null);
   const [state, setState] = useState(INITIAL_STATE);
@@ -1136,7 +1136,26 @@ export default function HumanAtlasExplorer({ onMuscleChange }) {
     void sceneRef.current?.ensureParts(concept.elements);
   };
 
+  // Quay lại trang Cơ bắp 3D: chọn lại đúng cơ lần trước để khung chat còn ngữ cảnh.
+  const restoredSlugRef = useRef('');
+  useEffect(() => {
+    if (!atlas || !initialSlug) return;
+    if (restoredSlugRef.current === initialSlug) return;
+    const meta = MUSCLES[initialSlug];
+    const keywordRow = ATLAS_MUSCLE_KEYWORDS.find((row) => row.slug === initialSlug);
+    if (!meta || !keywordRow) return;
+    const elements = atlas.parts
+      .filter((part) =>
+        (keywordRow.keywords ?? []).some((keyword) => part.name.toLowerCase().includes(keyword)),
+      )
+      .map((part) => part.id);
+    if (!elements.length) return;
+    restoredSlugRef.current = initialSlug;
+    chooseConcept({ id: `pt:muscle:${initialSlug}`, name: meta.en, elements });
+  }, [atlas, initialSlug, partsById]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const reset = () => {
+    restoredSlugRef.current = '';
     setState((current) => ({ ...INITIAL_STATE, reset: current.reset + 1 }));
     setChosen(null);
     setDetails(false);

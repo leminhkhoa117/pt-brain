@@ -1,11 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import {
-  createSummaryInputSchema,
-  summaryContentSchema,
-} from '../src/validation/summary.js';
+import { createSummaryInputSchema, summaryContentSchema } from '../src/validation/summary.js';
 import { parseJsonLoose } from '../src/services/ai/client.js';
 import { summaryToMarkdown } from '../src/utils/markdown.js';
 import { buildCacheKey } from '../src/services/research/reader.js';
+import { PROMPT_VERSION } from '../src/services/ai/paperSummarizer.js';
 
 const validSummary = {
   metadata: {
@@ -45,6 +43,35 @@ describe('summaryContentSchema', () => {
     const parsed = summaryContentSchema.parse(validSummary);
     expect(parsed.mainResults).toHaveLength(1);
     expect(parsed.confidence.basedOn).toBe('fulltext');
+  });
+
+  it('mặc định mục kết luận rỗng khi bản cũ chưa có', () => {
+    const parsed = summaryContentSchema.parse(validSummary);
+    expect(parsed.conclusion).toEqual({ summary: '', points: [] });
+  });
+
+  it('nhận kết luận dạng chuỗi hoặc object và giữ alias thuật ngữ', () => {
+    const parsed = summaryContentSchema.parse({
+      ...validSummary,
+      authorsConclusion: 'x',
+      conclusion: 'Nói ngắn gọn: bài này chỉ là bước đầu.',
+      glossary: [
+        {
+          en: 'varus',
+          vi: 'khuynh vào trong',
+          explanation: 'Trục chi lệch vào trong.',
+          aliases: ['mô men varus', 'varus moment'],
+        },
+      ],
+    });
+    expect(parsed.conclusion.summary).toContain('bước đầu');
+    expect(parsed.glossary[0].aliases).toEqual(['mô men varus', 'varus moment']);
+
+    const withPoints = summaryContentSchema.parse({
+      ...validSummary,
+      conclusion: { summary: 'Tóm lại', points: ['Nhớ ý 1', 'Nhớ ý 2'] },
+    });
+    expect(withPoints.conclusion.points).toEqual(['Nhớ ý 1', 'Nhớ ý 2']);
   });
 
   it('điền default cho field phụ bị thiếu', () => {
@@ -89,9 +116,7 @@ describe('createSummaryInputSchema', () => {
 
   it('từ chối text quá ngắn và field lạ', () => {
     expect(() => createSummaryInputSchema.parse({ text: 'quá ngắn' })).toThrow();
-    expect(() =>
-      createSummaryInputSchema.parse({ doi: '10.1000/xyz', hack: true }),
-    ).toThrow();
+    expect(() => createSummaryInputSchema.parse({ doi: '10.1000/xyz', hack: true })).toThrow();
   });
 });
 
@@ -137,6 +162,18 @@ describe('summaryToMarkdown', () => {
     });
     expect(md).toContain('chỉ abstract');
     expect(md).toContain('Thiếu bảng số liệu');
+  });
+
+  it('xuất mục kết luận dễ hiểu khi có', () => {
+    const md = summaryToMarkdown({
+      content: {
+        ...validSummary,
+        conclusion: { summary: 'Bài này chỉ là bước đầu.', points: ['Nhớ ý A', 'Nhớ ý B'] },
+      },
+    });
+    expect(md).toContain('## Kết luận dễ hiểu');
+    expect(md).toContain('Bài này chỉ là bước đầu.');
+    expect(md).toContain('- Nhớ ý A');
   });
 
   it('xuất phần đọc nhanh và hình/bảng', () => {
@@ -190,17 +227,19 @@ describe('summaryToMarkdown', () => {
 describe('buildCacheKey', () => {
   it('ưu tiên DOI và chuẩn hóa lowercase, kèm version', () => {
     expect(buildCacheKey({ paper: { doi: '10.1000/ABC' }, text: 'x' })).toBe(
-      'doi:10.1000/abc:v3',
+      `doi:10.1000/abc:${PROMPT_VERSION}`,
     );
   });
 
   it('dùng hash PDF khi không có DOI', () => {
-    expect(buildCacheKey({ paper: {}, pdfHash: 'abc123', text: 'x' })).toBe('pdf:abc123:v3');
+    expect(buildCacheKey({ paper: {}, pdfHash: 'abc123', text: 'x' })).toBe(
+      `pdf:abc123:${PROMPT_VERSION}`,
+    );
   });
 
   it('dùng hash text khi không có DOI/PDF/URL', () => {
     const key = buildCacheKey({ paper: {}, text: 'nội dung' });
-    expect(key).toMatch(/^text:[a-f0-9]{40}:v3$/);
+    expect(key).toMatch(new RegExp(`^text:[a-f0-9]{40}:${PROMPT_VERSION}$`));
     expect(buildCacheKey({ paper: {}, text: 'nội dung' })).toBe(key);
   });
 

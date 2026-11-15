@@ -9,7 +9,7 @@ import {
 } from '../../api/summaries.js';
 import { formatNumber, formatDoi } from '../../lib/format.js';
 import FigureViewer from './FigureViewer.jsx';
-import GlossaryText from './GlossaryText.jsx';
+import GlossaryText, { GlossaryActionsContext } from './GlossaryText.jsx';
 
 const LABEL_STYLES = {
   data: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
@@ -302,6 +302,7 @@ export default function SummaryView({
   onSaveTerm,
   savedTerms,
   savingTerm,
+  onMakeFlashcard,
   onApply,
   onAsk,
   onRefresh,
@@ -359,6 +360,9 @@ export default function SummaryView({
   };
 
   return (
+    <GlossaryActionsContext.Provider
+      value={{ onSaveTerm, savedTerms, savingTerm, onMakeFlashcard }}
+    >
     <Card className="flex flex-col">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -689,8 +693,36 @@ export default function SummaryView({
         ) : null}
       </Section>
 
+      {c.conclusion?.summary || c.conclusion?.points?.length ? (
+        <Section
+          title="Kết luận dễ hiểu"
+          step="7"
+          hint="Nếu chỉ đọc một mục, đọc mục này: bài nói gì và bạn nên nhớ gì."
+        >
+          <div className="rounded-md border border-pine-200 bg-pine-50/60 p-3.5 dark:border-pine-900/70 dark:bg-pine-950/30">
+            <p className="text-[13.5px] leading-relaxed text-pine-950 dark:text-pine-100">
+              <GlossaryText text={c.conclusion?.summary || c.tldr} glossary={glossary} />
+            </p>
+          </div>
+          {c.conclusion?.points?.length ? (
+            <ul className="mt-3 space-y-1.5">
+              {c.conclusion.points.map((point, index) => (
+                <li key={`${point}-${index}`} className="flex gap-2">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded bg-pine-100 font-mono text-[10px] font-semibold text-pine-700 dark:bg-pine-950 dark:text-pine-300">
+                    ✓
+                  </span>
+                  <span className="text-[13px] leading-relaxed">
+                    <GlossaryText text={point} glossary={glossary} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </Section>
+      ) : null}
+
       {c.limitationsStructured?.authors?.length || c.limitationsStructured?.ai?.length || c.limitations?.length ? (
-        <Section title="Hạn chế" step="7">
+        <Section title="Hạn chế" step="8">
           <div className="grid gap-2.5 sm:grid-cols-2">
             <div className="rounded-md border border-amber-200 bg-amber-50/50 p-3.5 dark:border-amber-900/60 dark:bg-amber-950/20">
               <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-amber-800 dark:text-amber-300">
@@ -728,7 +760,7 @@ export default function SummaryView({
 
       <Section
         title="Áp dụng cho PT"
-        step="8"
+        step="9"
         hint="Bốn nhóm tách bạch: dữ kiện, giả thuyết chưa đo, điều chưa nên áp dụng, và câu hỏi bài không trả lời."
       >
         {hasApplications ? (
@@ -775,7 +807,7 @@ export default function SummaryView({
         ) : null}
       </Section>
 
-      <Section title="Lợi ích & tài trợ" step="9">
+      <Section title="Lợi ích & tài trợ" step="10">
         <div
           className={clsx(
             'rounded-md border p-3.5',
@@ -810,7 +842,7 @@ export default function SummaryView({
       </Section>
 
       {c.selfCheck?.length ? (
-        <Section title="3 câu tự kiểm tra" step="10">
+        <Section title="3 câu tự kiểm tra" step="11">
           <div className="space-y-2">
             {c.selfCheck.map((item, index) => (
               <details
@@ -914,19 +946,30 @@ export default function SummaryView({
                       ) : null}
                     </div>
                     {onSaveTerm ? (
-                      <button
-                        type="button"
-                        disabled={saved || savingTerm === term.en}
-                        onClick={() => onSaveTerm(term)}
-                        className={clsx(
-                          'badge shrink-0',
-                          saved
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                            : 'bg-surface text-slate-600 border-line hover:border-pine-600 hover:text-brand-700 dark:bg-slate-900 dark:text-slate-300 dark:border-white/15',
-                        )}
-                      >
-                        {saved ? 'Đã lưu' : savingTerm === term.en ? 'Đang lưu...' : '+ Từ điển'}
-                      </button>
+                      <div className="flex shrink-0 flex-wrap items-center gap-1">
+                        <button
+                          type="button"
+                          disabled={saved || savingTerm === term.en}
+                          onClick={() => onSaveTerm(term)}
+                          className={clsx(
+                            'badge',
+                            saved
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-surface text-slate-600 border-line hover:border-pine-600 hover:text-brand-700 dark:bg-slate-900 dark:text-slate-300 dark:border-white/15',
+                          )}
+                        >
+                          {saved ? 'Đã lưu' : savingTerm === term.en ? 'Đang lưu...' : '+ Từ điển'}
+                        </button>
+                        {saved && onMakeFlashcard ? (
+                          <button
+                            type="button"
+                            onClick={() => onMakeFlashcard(term)}
+                            className="badge border border-line bg-surface text-slate-600 hover:border-pine-600 hover:text-brand-700 dark:border-white/15 dark:bg-slate-900 dark:text-slate-300"
+                          >
+                            Flashcard
+                          </button>
+                        ) : null}
+                      </div>
                     ) : null}
                   </div>
                 );
@@ -985,5 +1028,6 @@ export default function SummaryView({
         />
       ) : null}
     </Card>
+    </GlossaryActionsContext.Provider>
   );
 }

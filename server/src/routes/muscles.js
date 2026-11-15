@@ -7,6 +7,7 @@ import * as muscles from '../controllers/muscleController.js';
 const router = Router();
 router.use(requireAuth);
 
+router.post('/chat/stream', aiLimiter, asyncHandler(muscles.chatStream));
 router.post('/chat', aiLimiter, asyncHandler(muscles.chat));
 
 export default router;
