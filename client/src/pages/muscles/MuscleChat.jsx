@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import clsx from 'clsx';
 import { Alert, Card, Icon, Spinner } from '../../components/ui.jsx';
 import MarkdownText from '../../components/MarkdownText.jsx';
 import { askMuscleCoachStream } from '../../api/muscles.js';
@@ -16,7 +17,7 @@ const SUGGESTIONS = [
 const chatKey = (slug) => `ptbrain:muscle-chat:${slug}`;
 const MAX_SAVED = 40;
 
-export default function MuscleChat({ muscle, onClose }) {
+export default function MuscleChat({ muscle, onClose, onHeaderPointerDown, active = true }) {
   const slug = muscle?.slug || '';
   const [messages, setMessages] = useState(() => (slug ? readStored(chatKey(slug), []) : []));
   const [loadedSlug, setLoadedSlug] = useState(slug);
@@ -56,6 +57,13 @@ export default function MuscleChat({ muscle, onClose }) {
     const node = scrollRef.current;
     if (node) node.scrollTop = node.scrollHeight;
   }, [messages, streaming]);
+
+  // Mở lại khung chat: nhảy xuống tin nhắn mới nhất thay vì giữ vị trí cuộn cũ.
+  useEffect(() => {
+    if (!active) return;
+    const node = scrollRef.current;
+    if (node) node.scrollTop = node.scrollHeight;
+  }, [active]);
 
   const history = useMemo(
     () =>
@@ -145,11 +153,29 @@ export default function MuscleChat({ muscle, onClose }) {
   const visibleMessages = loadedSlug === slug ? messages : [];
 
   return (
-    <Card id="muscle-chat" className="flex h-full min-h-0 flex-col">
-      <div className="flex items-start justify-between gap-2">
+    <Card id="muscle-chat" className="flex min-h-0 flex-1 flex-col !p-3">
+      <div
+        onPointerDown={onHeaderPointerDown}
+        className={clsx(
+          'flex select-none items-start justify-between gap-2 rounded-lg px-1 pb-1',
+          onHeaderPointerDown && 'cursor-grab touch-none active:cursor-grabbing',
+        )}
+        title={onHeaderPointerDown ? 'Giữ và kéo để di chuyển khung chat' : undefined}
+      >
         <div className="min-w-0">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold text-slate-900 dark:text-white">
-            <Icon name="target" className="h-4 w-4 text-brand-500" />
+            <span
+              aria-hidden="true"
+              className="mr-0.5 grid h-6 w-3.5 shrink-0 grid-cols-2 content-center justify-items-center gap-[2px] text-slate-300 dark:text-slate-600"
+            >
+              <span className="h-[3px] w-[3px] rounded-full bg-current" />
+              <span className="h-[3px] w-[3px] rounded-full bg-current" />
+              <span className="h-[3px] w-[3px] rounded-full bg-current" />
+              <span className="h-[3px] w-[3px] rounded-full bg-current" />
+              <span className="h-[3px] w-[3px] rounded-full bg-current" />
+              <span className="h-[3px] w-[3px] rounded-full bg-current" />
+            </span>
+            <Icon name="chat" className="h-4 w-4 text-brand-500" />
             Hỏi HLV AI về cơ này
           </h3>
           <p className="mt-1 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
@@ -173,10 +199,11 @@ export default function MuscleChat({ muscle, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              aria-label="Đóng khung chat"
+              aria-label="Thu gọn khung chat"
+              title="Thu gọn khung chat"
               className="grid h-7 w-7 place-items-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
             >
-              <Icon name="close" className="h-4 w-4" />
+              <Icon name="chevronDown" className="h-4 w-4" />
             </button>
           )}
         </div>
