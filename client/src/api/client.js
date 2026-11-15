@@ -34,9 +34,19 @@ api.interceptors.response.use(
       return api(original);
     } catch (refreshError) {
       refreshPromise = null;
-      // Cho AuthProvider biết phiên đã hết hạn để điều hướng về /login thay vì
-      // để người dùng mắc kẹt trên trang với mọi query đều lỗi 401.
-      window.dispatchEvent(new Event('pt-auth-expired'));
+      const refreshStatus = refreshError?.response?.status;
+      if (refreshStatus === 401 || refreshStatus === 403) {
+        // Tab/PWA khác có thể vừa xoay token khiến cookie của mình thành token cũ.
+        // Thử lại request gốc một lần (cookie dùng chung) trước khi kết luận mất phiên.
+        try {
+          return await api(original);
+        } catch {
+          window.dispatchEvent(new Event('pt-auth-expired'));
+          return Promise.reject(refreshError);
+        }
+      }
+      // Lỗi mạng/5xx (Render đang thức dậy, mất wifi thoáng qua) không được đá
+      // người dùng về trang đăng nhập.
       return Promise.reject(refreshError);
     }
   },

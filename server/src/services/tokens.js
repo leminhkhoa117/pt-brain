@@ -5,16 +5,25 @@ import { env } from '../config/env.js';
 export const ACCESS_COOKIE = 'pt_access';
 export const REFRESH_COOKIE = 'pt_refresh';
 
-export function signAccessToken(userId) {
-  return jwt.sign({ sub: String(userId), type: 'access' }, env.JWT_ACCESS_SECRET, {
-    expiresIn: env.ACCESS_TOKEN_TTL,
-  });
+export function signAccessToken(userId, sessionId) {
+  return jwt.sign(
+    { sub: String(userId), type: 'access', ...(sessionId ? { sid: String(sessionId) } : {}) },
+    env.JWT_ACCESS_SECRET,
+    { expiresIn: env.ACCESS_TOKEN_TTL },
+  );
 }
 
-export function signRefreshToken(userId) {
-  return jwt.sign({ sub: String(userId), type: 'refresh' }, env.JWT_REFRESH_SECRET, {
-    expiresIn: `${env.REFRESH_TOKEN_TTL_DAYS}d`,
-  });
+export function signRefreshToken(userId, sessionId) {
+  return jwt.sign(
+    {
+      sub: String(userId),
+      type: 'refresh',
+      ...(sessionId ? { sid: String(sessionId) } : {}),
+      jti: crypto.randomUUID(),
+    },
+    env.JWT_REFRESH_SECRET,
+    { expiresIn: `${env.REFRESH_TOKEN_TTL_DAYS}d` },
+  );
 }
 
 export function verifyAccessToken(token) {

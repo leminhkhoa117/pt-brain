@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { BodyAssessment } from '../models/BodyAssessment.js';
 import { BodyLog } from '../models/BodyLog.js';
 import { CalcHistory } from '../models/CalcHistory.js';
@@ -12,6 +13,7 @@ import { Program } from '../models/Program.js';
 import { Summary } from '../models/Summary.js';
 import { Term } from '../models/Term.js';
 import { User } from '../models/User.js';
+import { Session } from '../models/Session.js';
 import { WorkoutSession } from '../models/WorkoutSession.js';
 import { AiUsage } from '../models/AiUsage.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -26,17 +28,41 @@ import {
 } from './userFiles.js';
 
 const REFRESH_TTL_MS = env.REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
+// Cửa sổ ân hạn cho token vừa bị xoay (2 phút) để 2 tab/PWA cùng refresh không đá nhau.
+const REFRESH_ROTATE_GRACE_MS = 2 * 60 * 1000;
 
-async function issueTokens(user) {
-  const accessToken = signAccessToken(user._id);
-  const refreshToken = signRefreshToken(user._id);
-  user.refreshTokenHash = hashToken(refreshToken);
-  user.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TTL_MS);
-  await user.save();
-  return { accessToken, refreshToken };
+function clientMeta({ userAgent = '', ip = '' } = {}) {
+  return { userAgent: String(userAgent || '').slice(0, 300), ip: String(ip || '').slice(0, 80) };
 }
 
-export async function registerUser({ email, password, name }) {
+/** Tạo phiên mới cho một thiết bị và trả cặp token gắn với session đó. */
+async function createSessionTokens(user, meta = {}) {
+  const session = await Session.create({
+    userId: user._id,
+    // Giá trị tạm để thoả unique index trước khi ký token cần session._id.
+    tokenHash: `pending:${crypto.randomUUID()}`,
+    expiresAt: new Date(Date.now() + REFRESH_TTL_MS),
+    ...clientMeta(meta),
+  });
+  const refreshToken = signRefreshToken(user._id, session._id);
+  session.tokenHash = hashToken(refreshToken);
+  await session.save();
+  return { accessToken: signAccessToken(user._id, session._id), refreshToken, session };
+}
+
+/** Xoay token trong cùng một phiên, giữ nguyên session id của thiết bị. */
+async function rotateSessionTokens(session, user) {
+  const refreshToken = signRefreshToken(user._id, session._id);
+  session.prevTokenHash = session.tokenHash;
+  session.prevTokenExpiresAt = new Date(Date.now() + REFRESH_ROTATE_GRACE_MS);
+  session.tokenHash = hashToken(refreshToken);
+  session.expiresAt = new Date(Date.now() + REFRESH_TTL_MS);
+  session.lastUsedAt = new Date();
+  await session.save();
+  return { accessToken: signAccessToken(user._id, session._id), refreshToken };
+}
+
+export async function registerUser({ email, password, name }, meta = {}) {
   const normalizedEmail = email.toLowerCase().trim();
   const exists = await User.exists({ email: normalizedEmail });
   if (exists) throw ApiError.conflict('Email đã được đăng ký');
@@ -48,22 +74,24 @@ export async function registerUser({ email, password, name }) {
   });
   await user.setPassword(password);
   await user.save();
-  const tokens = await issueTokens(user);
+  const tokens = await createSessionTokens(user, meta);
   return { user, ...tokens };
 }
 
-export async function loginUser({ email, password }) {
+export async function loginUser({ email, password }, meta = {}) {
   const user = await User.findOne({ email: email.toLowerCase().trim() }).select(
-    '+passwordHash +refreshTokenHash +refreshTokenExpiresAt',
+    '+passwordHash +refreshTokenHash +refreshTokenExpiresAt +prevRefreshTokenHash +prevRefreshTokenExpiresAt',
   );
   if (!user) throw ApiError.unauthorized('Email hoặc mật khẩu không đúng');
   const ok = await user.checkPassword(password);
   if (!ok) throw ApiError.unauthorized('Email hoặc mật khẩu không đúng');
-  const tokens = await issueTokens(user);
+  const tokens = await createSessionTokens(user, meta);
+  // Dọn phiên hết hạn của tài khoản cho gọn DB.
+  await Session.deleteMany({ userId: user._id, expiresAt: { $lt: new Date() } });
   return { user, ...tokens };
 }
 
-export async function rotateSession(refreshToken) {
+export async function rotateSession(refreshToken, meta = {}) {
   if (!refreshToken) throw ApiError.unauthorized('Không có refresh token');
   let payload;
   try {
@@ -71,25 +99,80 @@ export async function rotateSession(refreshToken) {
   } catch {
     throw ApiError.unauthorized('Refresh token không hợp lệ hoặc đã hết hạn');
   }
-  const user = await User.findById(payload.sub).select('+refreshTokenHash +refreshTokenExpiresAt');
+
+  const now = new Date();
+  const tokenHash = hashToken(refreshToken);
+
+  // Token mới: gắn với session của đúng thiết bị.
+  if (payload.sid) {
+    const session = await Session.findOne({ _id: payload.sid, userId: payload.sub });
+    if (!session) throw ApiError.unauthorized('Phiên đăng nhập không tồn tại');
+    if (session.expiresAt <= now) {
+      await session.deleteOne();
+      throw ApiError.unauthorized('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại');
+    }
+    const matchesCurrent = session.tokenHash === tokenHash;
+    const inGraceWindow =
+      session.prevTokenHash === tokenHash &&
+      session.prevTokenExpiresAt &&
+      session.prevTokenExpiresAt > now;
+    if (!matchesCurrent && !inGraceWindow) {
+      // Token cũ bị dùng lại sau cửa sổ ân hạn: chỉ thu hồi phiên này,
+      // các thiết bị khác vẫn đăng nhập bình thường.
+      await session.deleteOne();
+      throw ApiError.unauthorized('Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại');
+    }
+    const user = await User.findById(payload.sub);
+    if (!user) throw ApiError.unauthorized('Tài khoản không tồn tại');
+    const tokens = await rotateSessionTokens(session, user);
+    return { user, ...tokens };
+  }
+
+  // Token kiểu cũ (phát hành trước khi có session): xác thực theo User rồi
+  // nâng cấp sang session mới để các thiết bị không đá nhau nữa.
+  const user = await User.findById(payload.sub).select(
+    '+refreshTokenHash +refreshTokenExpiresAt +prevRefreshTokenHash +prevRefreshTokenExpiresAt',
+  );
   if (!user) throw ApiError.unauthorized('Tài khoản không tồn tại');
-  const matches = user.refreshTokenHash === hashToken(refreshToken);
-  const notExpired = user.refreshTokenExpiresAt && user.refreshTokenExpiresAt > new Date();
-  if (!matches || !notExpired) {
-    // Token cũ bị dùng lại -> hủy phiên hiện tại
-    user.refreshTokenHash = undefined;
-    user.refreshTokenExpiresAt = undefined;
-    await user.save();
+  const matchesCurrent = user.refreshTokenHash === tokenHash;
+  const inGraceWindow =
+    user.prevRefreshTokenHash === tokenHash &&
+    user.prevRefreshTokenExpiresAt &&
+    user.prevRefreshTokenExpiresAt > now;
+  const notExpired = user.refreshTokenExpiresAt && user.refreshTokenExpiresAt > now;
+  if ((!matchesCurrent && !inGraceWindow) || !notExpired) {
     throw ApiError.unauthorized('Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại');
   }
-  const tokens = await issueTokens(user);
+  const tokens = await createSessionTokens(user, meta);
+  await User.updateOne(
+    { _id: user._id },
+    {
+      $unset: {
+        refreshTokenHash: 1,
+        refreshTokenExpiresAt: 1,
+        prevRefreshTokenHash: 1,
+        prevRefreshTokenExpiresAt: 1,
+      },
+    },
+  );
   return { user, ...tokens };
 }
 
-export async function logoutUser(userId) {
+export async function logoutUser(sessionId, userId) {
+  if (sessionId) {
+    await Session.deleteOne({ _id: sessionId, userId });
+    return;
+  }
+  // Access token phát hành trước khi có session id: thu hồi toàn bộ phiên cũ.
   if (!userId) return;
+  await Session.deleteMany({ userId });
   await User.findByIdAndUpdate(userId, {
-    $unset: { refreshTokenHash: 1, refreshTokenExpiresAt: 1 },
+    $unset: {
+      refreshTokenHash: 1,
+      refreshTokenExpiresAt: 1,
+      prevRefreshTokenHash: 1,
+      prevRefreshTokenExpiresAt: 1,
+    },
   });
 }
 
@@ -171,6 +254,7 @@ export async function deleteAccount(userId) {
     MealPlanReview.deleteMany(filter),
     PlanEvaluation.deleteMany(filter),
     AiUsage.deleteMany(filter),
+    Session.deleteMany(filter),
   ]);
 
   await Promise.all([

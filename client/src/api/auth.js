@@ -3,6 +3,7 @@ import { api, unwrap } from './client.js';
 export const loginRequest = (body) => api.post('/auth/login', body).then(unwrap);
 export const registerRequest = (body) => api.post('/auth/register', body).then(unwrap);
 export const logoutRequest = () => api.post('/auth/logout').then(unwrap);
+export const refreshRequest = () => api.post('/auth/refresh').then(unwrap);
 export const fetchMe = () => api.get('/me').then(unwrap);
 export const updateMe = (body) => api.patch('/me', body).then(unwrap);
 export const fetchAiUsage = () => api.get('/me/ai-usage').then(unwrap);

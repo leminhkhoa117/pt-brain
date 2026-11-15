@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema(
     onboardingRequired: { type: Boolean, default: false },
     refreshTokenHash: { type: String, select: false },
     refreshTokenExpiresAt: { type: Date, select: false },
+    // Token vừa bị xoay vẫn được chấp nhận thêm ít phút: PWA và tab trình duyệt
+    // có thể refresh cùng lúc, không nên đá nhau gây đăng xuất oan.
+    prevRefreshTokenHash: { type: String, select: false },
+    prevRefreshTokenExpiresAt: { type: Date, select: false },
   },
   { timestamps: true },
 );
@@ -68,6 +72,8 @@ userSchema.methods.toSafeJSON = function toSafeJSON() {
   delete obj.passwordHash;
   delete obj.refreshTokenHash;
   delete obj.refreshTokenExpiresAt;
+  delete obj.prevRefreshTokenHash;
+  delete obj.prevRefreshTokenExpiresAt;
   delete obj.__v;
   return obj;
 };

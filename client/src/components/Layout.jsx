@@ -222,6 +222,7 @@ function SidebarContent({ onNavigate, rail = false, onCollapse, onExpand }) {
 
 export default function Layout({ children }) {
   const { isDark, toggle } = useTheme();
+  const { offline } = useAuth();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [navCollapsed, setNavCollapsed] = useState(() => {
@@ -280,8 +281,7 @@ export default function Layout({ children }) {
           navCollapsed ? 'lg:pl-16' : 'lg:pl-[248px]',
         )}
       >
-        <header className="sticky top-0 z-30 border-b border-line bg-paper/90 backdrop-blur-md dark:border-white/[0.08] dark:bg-[#0e1211]/90">
-          <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 border-b border-line bg-paper/90 backdrop-blur-md dark:border-white/[0.08] dark:bg-[#0e1211]/90">          <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 sm:px-6 lg:px-8">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
@@ -340,6 +340,15 @@ export default function Layout({ children }) {
             </div>
           </div>
         </header>
+
+        {offline ? (
+          <div
+            role="status"
+            className="border-b border-amber-200 bg-amber-50 px-4 py-1.5 text-center text-[11px] font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
+          >
+            Đang dùng phiên đã lưu trên máy · chưa kết nối lại được máy chủ. Thử tải lại khi có mạng.
+          </div>
+        ) : null}
 
         <main className="mx-auto w-full max-w-[1320px] px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-14 lg:pt-8">
           <div key={location.pathname} className="animate-fade-up">

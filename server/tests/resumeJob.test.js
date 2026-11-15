@@ -35,6 +35,17 @@ async function waitForStatus(summaryId, expected, timeoutMs = 3000) {
   return models.Summary.findById(summaryId).lean();
 }
 
+/** Khóa job có thể được nhả ngay sau khi status đổi; chờ thay vì kiểm tra tức thì. */
+async function waitForLockReleased(cacheKey, timeoutMs = 3000) {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    const count = await models.SummaryJobLock.countDocuments({ userId, cacheKey });
+    if (count === 0) return 0;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return models.SummaryJobLock.countDocuments({ userId, cacheKey });
+}
+
 beforeAll(async () => {
   const { connectDb } = await import('../src/config/db.js');
   await connectDb(DB_URI);
@@ -84,9 +95,7 @@ describe('resumeInterruptedSummaries', () => {
     const finished = await waitForStatus(summary._id, 'ready');
     expect(finished.status).toBe('ready');
     expect(finished.content.tldr).toBe('Job resumed successfully');
-    expect(
-      await models.SummaryJobLock.countDocuments({ userId, cacheKey: 'resume-job-1' }),
-    ).toBe(0);
+    expect(await waitForLockReleased('resume-job-1')).toBe(0);
   });
 
   it('hai request cùng nội dung chỉ tạo một job và một Summary', async () => {
@@ -130,9 +139,7 @@ describe('resumeInterruptedSummaries', () => {
     const current = await waitForStatus(summary._id, 'failed');
     expect(current.status).toBe('failed');
     expect(current.error).toContain('AI boom');
-    expect(
-      await models.SummaryJobLock.countDocuments({ userId, cacheKey: 'resume-job-fail' }),
-    ).toBe(0);
+    expect(await waitForLockReleased('resume-job-fail')).toBe(0);
   });
 
   it('job thiếu nguồn bị đánh dấu failed thay vì treo processing', async () => {

@@ -10,6 +10,7 @@ export function requireAuth(req, res, next) {
   try {
     const payload = verifyAccessToken(token);
     req.userId = payload.sub;
+    req.sessionId = payload.sid || null;
     return next();
   } catch {
     return next(ApiError.unauthorized('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại'));
