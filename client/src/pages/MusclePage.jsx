@@ -50,7 +50,8 @@ export default function MusclePage() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const isNarrow = viewport.w < 640;  const panelWidth = isNarrow ? Math.max(280, viewport.w - EDGE * 2) : PANEL_WIDTH;
+  const isNarrow = viewport.w < 640;
+  const panelWidth = isNarrow ? Math.max(280, viewport.w - EDGE * 2) : PANEL_WIDTH;
   const panelHeight = isNarrow
     ? Math.min(Math.round(viewport.h * 0.68), 560)
     : Math.min(PANEL_HEIGHT, viewport.h - 140);
@@ -145,19 +146,23 @@ export default function MusclePage() {
       writeStored(PANEL_POS_KEY, drag.latest);
     };
     const onKey = (event) => {
-      if (event.key === 'Escape') stop();
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      stop();
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', stop);
     window.addEventListener('pointercancel', stop);
-    window.addEventListener('keydown', onKey);
+    window.addEventListener('blur', stop);
+    window.addEventListener('keydown', onKey, true);
     const previousSelect = document.body.style.userSelect;
     document.body.style.userSelect = 'none';
     return () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', stop);
       window.removeEventListener('pointercancel', stop);
-      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('blur', stop);
+      window.removeEventListener('keydown', onKey, true);
       document.body.style.userSelect = previousSelect;
     };
   }, [bounds, dragging]);
@@ -173,9 +178,11 @@ export default function MusclePage() {
         onClick={openChat}
         aria-expanded={chatOpen}
         className={clsx(
-          'fixed z-[69] flex max-w-[70vw] items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-1.5 pr-3 text-[12px] font-semibold text-slate-700 shadow-overlay transition-all duration-200 ease-out dark:border-white/10 dark:bg-[#171f1b] dark:text-slate-100',
-          'hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0',
-          chatOpen ? 'pointer-events-none translate-y-2 scale-90 opacity-0' : 'opacity-100',
+          'fixed z-[69] flex max-w-[70vw] items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-1.5 pr-3 text-[12px] font-semibold text-slate-700 shadow-overlay transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none dark:border-white/10 dark:bg-[#171f1b] dark:text-slate-100',
+          'hover:shadow-lg',
+          chatOpen
+            ? 'pointer-events-none translate-y-1 scale-90 opacity-0'
+            : 'translate-y-0 scale-100 opacity-100',
         )}
         style={{ right: pillRight, bottom: pillBottom }}
       >
@@ -190,32 +197,49 @@ export default function MusclePage() {
         ) : null}
       </button>
 
-      {/* Khung chat nổi: kéo tiêu đề để di chuyển, nút chevron để thu gọn.
-          Luôn mounted để câu trả lời đang stream không bị mất khi thu gọn/mở lại. */}
-      <section
+      {/* Lớp ngoài: giữ vị trí + nhận transform khi kéo, KHÔNG có transition.
+          Nhờ tách khỏi lớp animation bên trong nên lúc thả chuột không bị "giật"
+          do transition transform chạy ngược. */}
+      <div
         ref={panelRef}
-        role="dialog"
-        aria-label="Hỏi HLV AI về cơ đang chọn"
         aria-hidden={chatOpen ? undefined : true}
         inert={chatOpen ? undefined : ''}
         style={{ left: position.x, top: position.y, width: panelWidth, height: panelHeight }}
-        className={clsx(
-          'fixed z-[70] flex flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-overlay transition-[opacity,transform] duration-200 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none dark:border-white/10 dark:bg-[#0e1211]',
-          'origin-bottom-right will-change-transform',
-          chatOpen
-            ? 'translate-y-0 scale-100 opacity-100'
-            : 'pointer-events-none translate-y-2 scale-90 opacity-0',
-          dragging && 'shadow-[0_30px_80px_-20px_rgba(15,23,42,0.55)]',
-        )}
+        className={clsx('fixed z-[70]', !chatOpen && 'pointer-events-none')}
       >
-        <div className="h-0.5 shrink-0 bg-gradient-to-r from-pine-600 via-brand-500 to-teal-400" />
-        <MuscleChat
-          muscle={selectedMuscle}
-          onClose={closeChat}
-          onHeaderPointerDown={startDrag}
-          active={chatOpen}
-        />
-      </section>
+        {/* Lớp animation mở/đóng: chỉ opacity + trượt nhẹ, không scale để chữ không bị mờ. */}
+        <div
+          className={clsx(
+            'h-full w-full origin-bottom-right transition-[opacity,transform] motion-reduce:transition-none',
+            chatOpen ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0',
+          )}
+          style={{
+            transitionDuration: chatOpen ? '240ms' : '170ms',
+            transitionTimingFunction: chatOpen
+              ? 'cubic-bezier(0.16, 1, 0.3, 1)'
+              : 'cubic-bezier(0.4, 0, 1, 1)',
+          }}
+        >
+          <section
+            role="dialog"
+            aria-label="Hỏi HLV AI về cơ đang chọn"
+            className={clsx(
+              'flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper transition-shadow duration-200 ease-out dark:border-white/10 dark:bg-[#0e1211]',
+              dragging
+                ? 'shadow-[0_32px_80px_-24px_rgba(15,23,42,0.6)] ring-1 ring-brand-500/20'
+                : 'shadow-overlay',
+            )}
+          >
+            <div className="h-0.5 shrink-0 bg-gradient-to-r from-pine-600 via-brand-500 to-teal-400" />
+            <MuscleChat
+              muscle={selectedMuscle}
+              onClose={closeChat}
+              onHeaderPointerDown={startDrag}
+              active={chatOpen}
+            />
+          </section>
+        </div>
+      </div>
     </>
   );
 
