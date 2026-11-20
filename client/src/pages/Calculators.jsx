@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, EmptyState, Field, Icon, InfoTip, PageHeader, Segmented, Spinner } from '../components/ui.jsx';
 import { useDialog } from '../components/DialogProvider.jsx';
@@ -102,11 +103,16 @@ function NumberField({ label, value, onChange, hint, error, ...props }) {
 }
 
 export default function Calculators() {
+  // Deep-link từ bài học: /calculators?tab=hr mở sẵn đúng nhóm máy tính.
+  const [searchParams] = useSearchParams();
+  const urlTab = searchParams.get('tab');
+  const [tab, setTab] = useState(
+    TABS.some((t) => t.value === urlTab) ? urlTab : '1rm',
+  );
   const dialog = useDialog();
   const { user, age: authAge } = useAuth();
   const queryClient = useQueryClient();
   const profile = user?.profile || {};
-  const [tab, setTab] = useState('1rm');
   const [notice, setNotice] = useState(null);
 
   const { data: summary } = useQuery({

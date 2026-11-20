@@ -18,6 +18,7 @@ import bodyAssessmentRoutes from './bodyAssessments.js';
 import mealRoutes from './meals.js';
 import mealPlanRoutes from './mealPlans.js';
 import muscleRoutes from './muscles.js';
+import curriculumRoutes from './curriculum.js';
 
 const router = Router();
 
@@ -67,5 +68,6 @@ router.use('/body-assessments', bodyAssessmentRoutes);
 router.use('/meals', mealRoutes);
 router.use('/meal-plans', mealPlanRoutes);
 router.use('/muscles', muscleRoutes);
+router.use('/curriculum', curriculumRoutes);
 
 export default router;

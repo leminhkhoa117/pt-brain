@@ -5,6 +5,7 @@ import { Alert, Badge, Field, Icon, LoadingBlock, Panel, PageHeader, Stat } from
 import WeightChart from '../components/WeightChart.jsx';
 import Heatmap from '../components/Heatmap.jsx';
 import { fetchSummary, saveMetric } from '../api/metrics.js';
+import { getCurriculum } from '../api/curriculum.js';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { calorieTarget } from '@shared/calculators/index.js';
@@ -21,6 +22,21 @@ export default function Dashboard() {
     queryKey: ['summary', 90],
     queryFn: () => fetchSummary(90),
   });
+
+  // Tiếp tục học: bài gần nhất đang đọc trong giáo trình PT (nếu có).
+  const curriculumQuery = useQuery({
+    queryKey: ['curriculum'],
+    queryFn: getCurriculum,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const curriculum = curriculumQuery.data;
+  const continueLesson = curriculum?.continueLesson
+    ? (curriculum.modules || [])
+        .flatMap((mod) => mod.chapters)
+        .flatMap((chapter) => chapter.lessons)
+        .find((lesson) => lesson.slug === curriculum.continueLesson)
+    : null;
 
   const quickSave = useMutation({
     mutationFn: (body) => saveMetric(todayKey(), body),
@@ -263,6 +279,15 @@ export default function Dashboard() {
         <Panel title="Việc nên làm tiếp" note="Theo thứ tự ưu tiên cho tuần này." flush>
           <ol className="divide-y divide-line dark:divide-white/[0.07]">
             {[
+              ...(continueLesson
+                ? [
+                    {
+                      text: `Tiếp tục học giáo trình PT: ${continueLesson.title} (${continueLesson.minutes} phút).`,
+                      to: `/learn?lesson=${continueLesson.slug}`,
+                      action: 'Mở bài học',
+                    },
+                  ]
+                : []),
               {
                 text: 'Cân mỗi sáng sau khi thức dậy, cùng điều kiện để giảm nhiễu.',
                 to: '/body-log',

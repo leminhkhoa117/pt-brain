@@ -16,3 +16,4 @@ export { Meal } from './Meal.js';
 export { MealPlan } from './MealPlan.js';
 export { MealPlanReview } from './MealPlanReview.js';
 export { PlanEvaluation } from './PlanEvaluation.js';
+export { CurriculumProgress } from './CurriculumProgress.js';

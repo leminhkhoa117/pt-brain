@@ -1,6 +1,6 @@
 # PT Brain
 
-Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm tắt bài báo sang tiếng Việt, tính chỉ số, theo dõi cơ thể, lên giáo án và ôn tập kiến thức — trong một nơi.
+Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm tắt bài báo sang tiếng Việt, tính chỉ số, theo dõi cơ thể, lên giáo án và **học theo giáo trình PT Academy** — trong một nơi.
 
 > **Trạng thái: hoàn thành Giai đoạn 0 → 6.**
 
@@ -13,7 +13,7 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 | Database | MongoDB 7 (local hoặc Atlas) |
 | AI | OpenCode Go – API OpenAI-compatible, model `deepseek-v4.1-flash` (key chỉ ở backend) |
 | Nguồn nghiên cứu | PubMed E-utilities, Europe PMC, OpenAlex, Unpaywall, Crossref, DOI resolver |
-| Test | Vitest – 185 test (unit + API integration) |
+| Test | Vitest – 303 test (unit + API integration; cần MongoDB cho phần integration) |
 | Tooling | ESLint 9 (flat config), Prettier, Docker Compose |
 
 ## Giao diện & logo
@@ -45,7 +45,7 @@ Mở http://localhost:5173 → **Đăng ký** → vào **Cài đặt** nhập gi
 
 - **Giáo án** → wizard tạo giáo án → **Log buổi tập**.
 - **Nghiên cứu** → dán DOI/PDF hoặc hỏi bằng tiếng Việt.
-- **Học tập** → từ điển, flashcard, sổ tay.
+- **Học tập** → **giáo trình PT Academy** (5 module, quiz, tiến độ), từ điển, flashcard, sổ tay.
 
 ### Cấu hình AI (OpenCode Go)
 
@@ -77,8 +77,8 @@ Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`doc
 ## Lệnh
 
 ```bash
-npm run test        # 225 test (unit + API integration; cần MongoDB)
-npm run test:unit   # 208 unit test, không cần MongoDB
+npm run test        # 303 test (unit + API integration; cần MongoDB)
+npm run test:unit   # 275 unit test, không cần MongoDB
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
 npm run format      # Prettier
@@ -94,26 +94,31 @@ pt-brain/
 │  ├─ analytics/warnings.js      # Cảnh báo theo quy tắc
 │  ├─ training/planner.js        # Split, prescription, progressive overload, deload
 │  ├─ learning/sm2.js            # SM-2 flashcard
+│  ├─ curriculum/                # Giáo trình PT Academy: schema zod + 14 bài flagship
+│  │                             # (validate khi import, quiz, nguồn kiểm chứng)
 │  ├─ muscles/index.js           # 59 cơ: tên Việt – Anh, nhóm, chức năng, bài tập
 │  └─ config/nutrition.js        # Hệ số/ngưỡng chỉnh được
 ├─ server/
 │  ├─ src/models/                # User, BodyLog, CalcHistory, Exercise, Program, WorkoutSession,
-│  │                             # Paper, Summary, Term, Flashcard, Note, AiUsage, Meal, MealPlan, MealPlanReview
+│  │                             # Paper, Summary, Term, Flashcard, Note, AiUsage, Meal, MealPlan, MealPlanReview,
+│  │                             # CurriculumProgress
 │  ├─ src/services/
 │  │  ├─ research/               # metadata, pdf, reader, pubmed, europepmc, openalex, ranker, finder
 │  │  ├─ ai/                     # client, quota, summarizer, finderSummarizer, planAdvisor,
-│  │  │                          # mealPlanner, mealPlanReview, muscleCoach
+│  │  │                          # mealPlanner, mealPlanReview, muscleCoach, lessonCoach
 │  │  └─ training/               # exerciseService, programService, workoutService
 │  ├─ src/routes/                # auth, me, metrics, calc, summaries, papers, research, meals, meal-plans,
-│  │                             # muscles, exercises, programs, workouts, terms, notes, flashcards
-│  └─ tests/                     # 20 file test (unit + API integration)
+│  │                             # muscles, exercises, programs, workouts, terms, notes, flashcards,
+│  │                             # quizzes, curriculum
+│  └─ tests/                     # 22 file test (unit + API integration)
 ├─ client/src/
 │  ├─ pages/                     # Dashboard, BodyLog, Calculators, Research(+Reader/Finder),
-│  │                             # Training(+Planner/Workout), Learn(+Glossary/Flashcards/Notes),
+│  │                             # Training(+Planner/Workout), Learn(+Curriculum/Lesson/Glossary/Flashcards/Notes),
 │  │                             # Nutrition, MusclePage (+atlas/*, muscles/MuscleChat), Settings
 │  ├─ components/                # Layout, UI, charts, research components
 │  └─ lib/                       # format, date, zod schemas
 ├─ client/public/models/human-atlas/  # atlas.json + 15 chunk .bin.gz (BodyParts3D)
+├─ client/public/curriculum/          # ảnh minh hoạ giáo trình (PD/CC BY) + ATTRIBUTION.md
 ├─ docker-compose.yml
 └─ .env.example
 ```
@@ -194,6 +199,15 @@ pt-brain/
 - **Meal plan 7 ngày, tối đa 3 tháng**: AI gợi ý theo hồ sơ/sở thích, hoặc người dùng **tự xây thực đơn** trong editor (7 ngày × tới 6 bữa × 12 món, chép ngày, chọn 7–90 ngày). Plan tự tạo lấy mục tiêu ngày = trung bình chính thực đơn đó và sửa lại được.
 - **Đánh giá tuần thực tế vs plan**: mỗi tuần so kcal/protein theo ngày và theo bữa với thực đơn mẫu, tính điểm bám plan 0–100 bằng code (40% số ngày có log + 35% calo + 25% protein); AI viết nhận xét điều làm tốt/chỗ lệch/gợi ý, lưu lại từng tuần.
 - **Chú thích chỉ số**: nút ⓘ cạnh 1RM, Epley/Brzycki, %1RM, RIR, BMR, TDEE, BMI, Navy, LBM, FFMI, MA7, tonnage, P/C/F... giải thích định nghĩa và công thức ngay trên giao diện; dưới cụm Epley/Brzycki có thêm đoạn giải thích vì sao hai công thức cho kết quả khác nhau. Phần **Nhịp tim** có nút **?** mở hướng dẫn sử dụng, công thức Tanaka/Karvonen và cách chọn 5 vùng nhịp tim.
+
+### Giai đoạn 7 — PT Academy: giáo trình học tập cho PT
+
+- **Giáo trình 6 module** (`/learn` → tab Giáo trình): Giải phẫu cơ xương khớp · Sinh lý vận động & tập luyện · Dinh dưỡng · Yếu tố thể chất · Phục hồi chức năng & an toàn · **Ứng dụng cá nhân hoá** — **64 bài hoàn chỉnh toàn bộ outline** (15+12+13+8+9+7; module Ứng dụng gồm quy trình 6 bước + 6 ca khách cụ thể: giảm mỡ văn phòng, nữ săn chắc, tăng huyết áp, lớn tuổi loãng xương, hardgainer, đau lưng đang physio — mỗi ca có số liệu TDEE/protein, giáo án tuần và thực đơn cụ thể), mỗi bài có mục tiêu, nội dung tiếng Việt (kèm thuật ngữ Anh), box "Áp dụng vào phòng tập", thuật ngữ, quiz chấm bằng code và **nguồn tham khảo kèm license** (đã kiểm chứng: Morton 2018, ISSN creatine, PEACE & LOVE, IASP 2020, Brinjikji 2015, Crossley 2016, Kongsgaard 2009, Gabbett 2016, WHO 2020...).
+- **Nội dung là code có version** tại `shared/curriculum/lessons/*.js` (thuần dữ liệu, không dependency); schema zod + tham chiếu chéo validate ngay khi server nạp routes (slug duy nhất, ảnh khai báo đủ, `related.muscles/conditions` trỏ tới dữ liệu có thật) — 20 test chuyên trách.- **Tiến độ per-user**: model `CurriculumProgress` (đang đọc/hoàn thành, điểm quiz tốt nhất); thanh tiến độ từng module, gợi ý **"Tiếp tục học"** trong trang giáo trình và trên Dashboard.
+- **Quiz kết hợp**: bank câu hỏi cố định chấm bằng **code** (miễn phí, có giải thích, lưu điểm tốt nhất) + nút **"AI tạo thêm câu hỏi"** từ nội dung bài (tốn quota `quiz` như quiz nghiên cứu).
+- **Chat AI theo bài** (SSE streaming, cùng cơ chế chat cơ bắp): AI chỉ trả lời trong phạm vi nội dung bài + bằng chứng liên quan; quota riêng `curriculum`.
+- **Tích hợp chéo**: thuật ngữ bài → **1-click tạo flashcard** SM-2 hoặc lưu vào từ điển cá nhân; cơ nhắc trong bài → deep-link `/muscles?muscle=` mở đúng cơ trong mô hình 3D; máy tính liên quan → deep-link `/calculators?tab=`; bệnh nền liên quan → tooltip quy tắc an toàn; nghiên cứu E1–E10 → chip DOI mở bài gốc.
+- **Ảnh minh hoạ public domain/CC BY/CC BY-SA** (14 tệp) tải sẵn về `client/public/curriculum/images/` (bản khắc Gray's Anatomy 1918, bản đồ Vesalius 1543, sơ đồ Sarcomere CC BY-SA, minh hoạ y khoa PD-USGov) — attribution từng ảnh trong UI và trong `client/public/curriculum/ATTRIBUTION.md`; không dùng ảnh thương mại hoặc license NC/ND.
 
 ### Evidence base dùng cho AI
 
@@ -277,15 +291,27 @@ GET    /api/workouts/progression/:exercise
 # POST cardio: { kind:"cardio", activity, durationMin, distanceKm?, intensity?, caloriesBurned? }
 
 POST   /api/muscles/chat                     # hỏi AI về cơ đang chọn
+
+GET    /api/curriculum                        # cây giáo trình + tiến độ user
+GET    /api/curriculum/lessons/:slug         # nội dung đầy đủ một bài
+PUT    /api/curriculum/progress/:slug         # đánh dấu đang đọc / hoàn thành
+POST   /api/curriculum/lessons/:slug/quiz     # nộp quiz, chấm bằng code
+POST   /api/curriculum/lessons/:slug/quiz-ai  # AI tạo thêm câu hỏi (quota quiz)
+POST   /api/curriculum/lessons/:slug/ask            # chat hỏi đáp theo bài
+POST   /api/curriculum/lessons/:slug/ask/stream     # SSE: delta / done / error
 ```
 
 Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } }`.
 
 ## Kiểm chứng
 
-- `npm run test`: **225/225 pass** - công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, trích hình/bảng, ranker, progression, SM-2, PDF, quiz, retrieval, plan metrics/evidence, apply changes, cửa sổ tuần và điểm bám meal plan, validate chat cơ bắp, validate ước tính calo, API integration (auth, metrics, program, library, xóa tài khoản), pipeline research 3 bước + golden sample (crossover, quan sát, RCT, SR/MA, meta-analysis).
+- `npm run test`: **303/303 pass** - công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, trích hình/bảng, ranker, progression, SM-2, PDF, quiz, retrieval, plan metrics/evidence, apply changes, cửa sổ tuần và điểm bám meal plan, validate chat cơ bắp, validate ước tính calo, API integration (auth, metrics, program, library, xóa tài khoản), pipeline research 3 bước + golden sample (crossover, quan sát, RCT, SR/MA, meta-analysis), **giáo trình PT Academy (schema 14 bài, chấm quiz, tiến độ, xóa dữ liệu theo user)**.
 - `npm run lint`: 0 lỗi.
 - `npm run build`: thành công; tách chunk react/charts/query.
+- **E2E smoke giáo trình trên server dev + MongoDB thật**: register → GET cây (5 module/14 bài) →
+  GET bài (5 sections + ảnh `/curriculum/images/...`) → nộp quiz đúng hết (100/100, lưu best) →
+  mark completed → "Tiếp tục học" nhảy đúng bài kế tiếp → evidence/deep-link resolve đủ; smoke
+  user xóa sạch sau test (kèm CurriculumProgress cleanup).
 - E2E với MongoDB + AI thật:
   - Reader DOI meta-analysis: 201 trong ~65s, nhãn abstract-only, số liệu `P = 0.002`, `ES 0.023`, cache lần 2 trong **2s** cùng ID.
   - Reader fulltext OA: `sourceKind=open_access_fulltext`, 7.7k ký tự, mức 4, 4 kết quả chính.
@@ -331,6 +357,8 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 - AI plan có thể trả về fallback theo quy tắc nếu model không trả JSON hợp lệ; UI hiển thị rõ nguồn.
 - Ảnh thể trạng/bữa ăn dùng chung cơ chế lưu trữ với ảnh tiến độ (đĩa hoặc GridFS); production Render dùng GridFS.
 - Chưa có xác thực ảnh y tế/chuyên gia; không dùng cho người có bệnh lý hoặc rối loạn ăn uống.
+- **Giáo trình PT Academy hoàn tất 64 bài / 6 module** (outline gốc 57 bài ở 5 module + module mới "Ứng dụng cá nhân hoá" 7 bài theo yêu cầu riêng — quy trình 6 bước + 6 ca archetype khách cụ thể với số liệu đầy đủ).
+- Nội dung giáo trình biên soạn từ nguồn uy tín (mỗi bài ≥ 1 nguồn kèm license, liệt kê cuối bài); giáo dục cho PT, không thay thế chứng chỉ hành nghề — disclaimer hiển thị ngay trong trang giáo trình.
 
 ## Bảo mật & bản quyền
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { Icon, PageHeader } from '../components/ui.jsx';
@@ -21,8 +22,17 @@ function clamp(value, min, max) {
 }
 
 export default function MusclePage() {
+  // Deep-link từ bài học: /muscles?muscle=<slug> chọn sẵn đúng cơ.
+  const [searchParams] = useSearchParams();
+  const urlMuscle = searchParams.get('muscle');
   const [initial] = useState(() => readStored(STORAGE_KEY, {}));
-  const [slug, setSlug] = useState(() => (initial?.slug && MUSCLES[initial.slug] ? initial.slug : ''));
+  const [slug, setSlug] = useState(() => {
+    if (urlMuscle && MUSCLES[urlMuscle]) {
+      writeStored(STORAGE_KEY, { slug: urlMuscle });
+      return urlMuscle;
+    }
+    return initial?.slug && MUSCLES[initial.slug] ? initial.slug : '';
+  });
   const [chatOpen, setChatOpen] = useState(false);
   const [storedPos, setStoredPos] = useState(() => readStored(PANEL_POS_KEY, null));
   const [dragging, setDragging] = useState(false);

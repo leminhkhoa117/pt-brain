@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { BodyAssessment } from '../models/BodyAssessment.js';
 import { BodyLog } from '../models/BodyLog.js';
 import { CalcHistory } from '../models/CalcHistory.js';
+import { CurriculumProgress } from '../models/CurriculumProgress.js';
 import { Flashcard } from '../models/Flashcard.js';
 import { Meal } from '../models/Meal.js';
 import { MealPlan } from '../models/MealPlan.js';
@@ -253,6 +254,7 @@ export async function deleteAccount(userId) {
     MealPlan.deleteMany(filter),
     MealPlanReview.deleteMany(filter),
     PlanEvaluation.deleteMany(filter),
+    CurriculumProgress.deleteMany(filter),
     AiUsage.deleteMany(filter),
     Session.deleteMany(filter),
   ]);

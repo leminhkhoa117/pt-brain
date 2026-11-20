@@ -14,6 +14,7 @@ const aiUsageSchema = new mongoose.Schema(
     vision: { type: Number, default: 0, min: 0 },
     mealplan: { type: Number, default: 0, min: 0 },
     muscle: { type: Number, default: 0, min: 0 },
+    curriculum: { type: Number, default: 0, min: 0 },
     tokensIn: { type: Number, default: 0, min: 0 },
     tokensOut: { type: Number, default: 0, min: 0 },
     costUsd: { type: Number, default: 0, min: 0 },

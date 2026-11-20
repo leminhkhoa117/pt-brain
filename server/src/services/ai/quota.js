@@ -13,6 +13,7 @@ const KIND_LABELS = {
   vision: 'phân tích ảnh',
   mealplan: 'plan ăn uống',
   muscle: 'hỏi về cơ bắp',
+  curriculum: 'hỏi bài học',
 };
 
 /**
@@ -63,6 +64,7 @@ export async function getAiUsage(userId) {
     vision: usage?.vision || 0,
     mealplan: usage?.mealplan || 0,
     muscle: usage?.muscle || 0,
+    curriculum: usage?.curriculum || 0,
     limit: env.AI_DAILY_LIMIT_PER_USER,
     tokensIn: usage?.tokensIn || 0,
     tokensOut: usage?.tokensOut || 0,
