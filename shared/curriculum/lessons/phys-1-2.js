@@ -31,6 +31,7 @@ export default {
 5. Hết xung, bơm đưa Ca²⁺ về kho — cầu bám đóng lại, cơ giãn.
 
 Toàn chuỗi diễn ra trong **mili-giây**. Đây là lý do "khởi động thần kinh" có thật: vài rep nhẹ trước bài nặng chạy thử trọn đường ống tín hiệu–calcium, các lần sau trơn hơn.`,
+      image: 'phys-1-2-sliding.jpg',
     },
     {
       heading: 'Twitch đơn: một xung, một nhịp co',
@@ -91,7 +92,15 @@ Mọi lần bạn "gồng giữ" plank, siết bám tạ, giữ hàng phục v�
       def: 'Tetanus ngoài ý muốn do xung tự phát dồn dập khi mệt/mất cân bằng điện giải — nghỉ và bù nước/electrolyte.',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'phys-1-2-sliding.jpg',
+      caption: 'Mô hình trượt sợi: đầu myosin bám vào actin và kéo, làm sarcomere ngắn lại.',
+      source: 'OpenStax / Wikimedia Commons',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:1006_Sliding_Filament_Model_of_Muscle_Contraction.jpg',
+      license: 'CC BY 4.0',
+    },
+  ],
   quiz: [
     {
       q: 'Calcium đóng vai trò gì trong co cơ?',

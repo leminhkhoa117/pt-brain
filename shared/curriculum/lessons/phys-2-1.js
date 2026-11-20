@@ -26,6 +26,7 @@ export default {
       body: `Mọi chuyển động — từ nhấc ly cà phê tới cú snatch tối đa — cơ đều phải **nạp năng lượng bằng ATP (adenosine triphosphate)**. Cắt đứt một nhóm phosphate của ATP giải phóng năng lượng cho đầu cơ (myosin) kéo sợi actin; ATP còn cần để **thả** đầu cơ ra nữa.
 
 Vấn đề: lượng ATP trong cơ tại một thời điểm chỉ đủ cho **vài giây** công suất tối đa. Cơ thể không thể tích trữ nhiều ATP, nên nó phải **tái tạo ATP liên tục** từ 3 đường, mỗi đường có tốc độ và "dung tích bình xăng" khác nhau. Sức mạnh = tốc độ tái tạo ATP; sức bền = khả năng duy trì tốc độ đó.`,
+      image: 'phys-2-1-atp.svg',
     },
     {
       heading: 'Hệ 1 — Phosphagen (ATP–PCr): cú nổ 10 giây',
@@ -103,7 +104,15 @@ Ba hệ **không bật/tắt rời rạc** — cả ba luôn chạy đồng th�
       def: 'Đường ATP–PCr: công suất cao nhất, dung tích nhỏ nhất (~10 giây hết sức).',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'phys-2-1-atp.svg',
+      caption: 'Cấu trúc hóa học của ATP — adenosin gắn 3 nhóm phosphate; cắt một phosphate giải phóng năng lượng cho cơ co.',
+      source: 'Mysid / Wikimedia Commons',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:ATP_structure.svg',
+      license: 'Public domain',
+    },
+  ],
   quiz: [
     {
       q: 'Vì sao cơ thể không thể "tích trữ sẵn" một cục ATP lớn?',

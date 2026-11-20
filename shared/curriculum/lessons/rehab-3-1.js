@@ -39,6 +39,7 @@ Hệ quả: điều trị không phải "cấm vĩnh viễn động tác nâng t
 | 4 | **Overhead tiến dần**: landmine → dumbbell neutral grip → tầm đầy đủ | Mỗi nấc 2 buổi ổn |
 
 Cửa 4 chính là nơi khách muốn nhảy tới ngay — giữ nhịp: mỗi nấc tăng tầm 10–15° hoặc đổi 1 biến số (bài Tiến trình phục hồi: một biến mỗi lần).`,
+      image: 'rehab-3-1-cuff.svg',
     },
     {
       heading: 'Ba núm vặn điều chỉnh bài cho vùng vai',
@@ -94,7 +95,15 @@ Trong lúc phối hợp, phần còn lại của khách vẫn tập bình thư�
       def: 'Đau vai đêm kéo dài không liên quan nằm đè — một trong các tín hiệu cần đánh giá y tế, không phải "tập tiếp xem sao".',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'rehab-3-1-cuff.svg',
+      caption: 'Rotator cuff: 4 cơ SITS nhìn từ trước và sau — supraspinatus, infraspinatus, teres minor, subscapularis.',
+      source: 'Wikimedia Commons',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Rotator_cuff_muscles.svg',
+      license: 'CC BY-SA 4.0',
+    },
+  ],
   quiz: [
     {
       q: '"Impingement" nên được hiểu đúng là gì?',

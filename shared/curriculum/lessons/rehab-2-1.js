@@ -28,6 +28,7 @@ export default {
 Hệ quả thực hành: một khách cầm phim "thoát vị L4-L5" với nỗi sợ tương đương bản án là một **vấn đề giáo dục trước khi là vấn đề mô**. Câu chuyện "đĩa đệm hỏng rồi, không được cúi nữa" từng khiến hàng triệu người tránh vận động — và tránh vận động làm mọi thứ tệ hơn (bài Khoa học về đau).
 
 Việc của PT không phải đọc phim: là **đặt câu đúng** — "phim nói gì bác sĩ của bạn diễn giải thế nào, và bạn đang đau ra sao khi làm gì?" Rồi cùng bác sĩ/physio giữ khách vận động trong khung an toàn.`,
+      image: 'rehab-2-1-lumbar.png',
     },
     {
       heading: 'Giữ active với thoát vị: quy tắc của app đã có sẵn',
@@ -99,7 +100,16 @@ Fear-avoidance (tránh vận động vì sợ) là chất tăng âm lượng c�
       def: 'Chuỗi brace → gậy gỗ → RDL nhẹ → máy/trap bar: rèn lại sức chịu tải lưng theo tiêu chí 24 giờ.',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'rehab-2-1-lumbar.png',
+      caption:
+        'Mặt cắt dọc 2 đốt sống thắt lưng và dây chằng: đĩa đệm nằm giữa 2 thân đốt (bản khắc Gray\u2019s Anatomy, Plate 301).',
+      source: "Gray's Anatomy / Wikimedia Commons",
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Gray301.png',
+      license: 'Public domain',
+    },
+  ],
   quiz: [
     {
       q: 'Tổng quan Brinjikji 2015 cho thấy điều gì về MRI người KHÔNG đau?',

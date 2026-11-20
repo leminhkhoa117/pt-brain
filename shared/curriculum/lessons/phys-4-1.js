@@ -41,6 +41,7 @@ Mỗi lần tập tạo "cửa sổ nhạy cảm" ~24–48 giờ mà MPS đượ
 3. **Tổn thương cơ (muscle damage)** — DOMS. Bằng chứng gần đây hạ thấp vai trò của nó: cơ **không cần đau mới lớn**; tập mỏi dai dẳng còn cản trở volume tuần sau.
 
 Kết luận thực hành: tối ưu **chất lượng mỗi rep** (tải + biên độ + kiểm soát) trước, sau đó mới tới chi tiết kiểu "ép căng". "Tôi đau 4 ngày sau buổi nên chắc hiệu quả" là dấu hiệu bạn phá khách, không phải bạn giúp khách.`,
+      image: 'phys-4-1-fibers.png',
     },
     {
       heading: 'Bốn biến số giáo án có bằng chứng',
@@ -113,7 +114,15 @@ Giáo án bền = tải tăng **chậm** theo thang khách chịu được, 4 bi
       def: 'Khả năng "mở công tắc" các motor unit; thích ứng thần kinh giải thích tăng lực nhanh ở người mới tập.',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'phys-4-1-fibers.png',
+      caption: 'Mặt cắt ngang sợi cơ vân người: các sợi tròn xếp bó, mỗi sợi là một tế bào dài (bản khắc Gray\u2019s Anatomy).',
+      source: "Gray's Anatomy / Wikimedia Commons",
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Gray373.png',
+      license: 'Public domain',
+    },
+  ],
   quiz: [
     {
       q: 'Cơ chế nào hiện được coi là chủ đạo của tăng cơ?',

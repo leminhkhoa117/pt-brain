@@ -26,6 +26,7 @@ export default {
       body: `Nhìn từ bên, cột sống không thẳng tắp — nó có **ba đường cong sinh lý**: cong ra trước ở cổ (lordosis), cong ra sau ở ngực (kyphosis), cong ra trước ở thắt lưng. Cộng lại, cột sống như một **lò xo chữ S** — mỗi bước chạy, chặng chấn được chia nhỏ thay vì dồn một điểm.
 
 Đường cong có "độ nhạy hoàn cảnh": tuổi tác, ngồi nhiều, mang vác lệch sẽ nghiêng chúng nhiều hơn — nhưng nghiêng nhẹ so với khuôn "bình thường dân số" không tự động là bệnh. Điều đáng đọc hơn là **cột sống của chính khách đó** hôm nay so với khi họ thoải mái.`,
+      image: 'anat-5-1-spine.png',
     },
     {
       heading: 'Trung tính là "khuôn so sánh", không phải đích thi',
@@ -100,7 +101,16 @@ Các điều kiện "Thoát vị đĩa đệm" và "Đau lưng dưới" trong ap
       def: 'Đĩa đệm mất nước nhẹ trong ngày và bù lại khi nằm — lý do khởi động buổi sáng cần dài hơn.',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'anat-5-1-spine.png',
+      caption:
+        'Cột sống nhìn từ bên: 3 đường cong sinh lý — cổ, ngực, thắt lưng (bản khắc Gray\u2019s Anatomy, bản tô màu).',
+      source: "Gray's Anatomy (H.V. Carter) / Wikimedia Commons",
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Gray_111_-_Vertebral_column-coloured.png',
+      license: 'Public domain',
+    },
+  ],
   quiz: [
     {
       q: 'Chức năng chính của ba đường cong sinh lý cột sống là gì?',

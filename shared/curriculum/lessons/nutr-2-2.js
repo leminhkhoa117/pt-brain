@@ -48,6 +48,7 @@ Con số đầu chỉ là **điểm bắt đầu**: carb là biến số "đàn 
 - **Quanh buổi tập** (1–2 giờ trước, trong, ngay sau với buổi dài): carb **nhanh, dễ tiêu** — chuối, cơm gạo trắng, bánh mì, nước trái cây pha loãng. Mục tiêu: đầy bình mà không nặng bụng.
 - **Ngày thường**: carb **toàn phần + chất xơ** — cơm gạo lứt, khoai, yến mạch, đậu, trái cây nguyên vỏ. Chất xơ làm no lâu, tốt đường ruột và đường máu.
 - **Đo độ "đúng nguồn"**: nhìn đĩa của khách — 1/2 rau-trái cây, 1/4 protein, 1/4 carb toàn phần là khung mặc định lành mạnh cho bữa ngày thường.`,
+      image: 'nutr-2-2-myplate.jpg',
     },
     {
       heading: 'Hai myth đáng bỏ ngay',
@@ -89,7 +90,16 @@ Con số đầu chỉ là **điểm bắt đầu**: carb là biến số "đàn 
       def: 'Bình xăng rỗng làm chất lượng set/cữ tụt — thường bị đọc nhầm thành "khách lười".',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'nutr-2-2-myplate.jpg',
+      caption:
+        'Một bữa tối mẫu theo mô hình MyPlate: 5 nhóm thực phẩm — ngũ cốc, protein, sữa, rau, trái cây.',
+      source: 'USDA Food and Nutrition Service',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Dinner_meal_-_MyPlate_20210810-FNS-UNC-0017.jpg',
+      license: 'Public domain (US Gov)',
+    },
+  ],
   quiz: [
     {
       q: 'Carbohydrate mang bao nhiêu năng lượng và dự trữ chủ yếu ở đâu?',

@@ -41,6 +41,7 @@ Hệ quả thực hành:
 - Set nhiều rep: unit nhỏ mệt dần, unit lớn được gọi vào **theo tiến trình** — một phần lý do set 10–20 rep vẫn hiệu quả cho sức mạnh lẫn phì đại.
 - Ngày "đi bộ 10.000 bước" chỉ dùng sợi chậm — không cướp việc phục hồi của sợi nhanh dùng cho tạ nặng; cardio nhẹ và tạ có thể xếp cạnh nhau.
 - Khởi động "ramp" (nhẹ → nặng) đúng bản chất sinh học của tuyển chọn — không phải nghi lễ.`,
+      image: 'phys-1-1-neurojunction.svg',
     },
     {
       heading: 'All-or-none: sợi co hết hay không co',
@@ -103,7 +104,15 @@ Hai điểm đáng nhớ với PT:
       def: 'Protein dự trữ oxy trong sợi chậm, cho màu đỏ và độ bền của sợi loại I.',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'phys-1-1-neurojunction.svg',
+      caption: 'Điểm nối thần kinh–cơ: xung thần kinh chuyển thành tín hiệu hóa học kích hoạt sợi cơ.',
+      source: 'Paul Hege / Wikimedia Commons',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Neuromuscular_junction.svg',
+      license: 'CC BY-SA 4.0',
+    },
+  ],
   quiz: [
     {
       q: 'Một motor unit gồm những gì?',

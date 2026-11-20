@@ -56,6 +56,7 @@ Mỗi nấc mở theo tiêu chí quen thuộc: đau ≤ 3, không dồn sáng h�
 Với **Achilles** (phổ biến với khách chạy bộ): đứng calf raise (gối thẳng — gastrocnemius) + ngồi calf raise (gối gập — soleus) đều vào chương trình HSR tempo chậm; Nordic curl cho hamstring proximal — cùng một triết lý.
 
 Một lưu ý về "sưng cục đau buổi sáng": tendinopathy hay đau cứng sáng sau ngày tải — đây là **phản ứng trễ**, không phải "đang hỏng": theo dõi xu hướng theo tuần thay vì hoảng mỗi sáng.`,
+      image: 'rehab-5-1-achilles.png',
     },
     {
       heading: 'Điều chỉnh "tổng tải lối sống" song song bài rèn',
@@ -103,7 +104,16 @@ Khung thời gian thực tế: cải thiện rõ thường cần **8–12+ tuầ
       def: 'Chạy/nhảy/bậc thang/nghề đứng là "tổng tải" thật — điều chỉnh song song bài rèn, không chỉ trong gym.',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'rehab-5-1-achilles.png',
+      caption:
+        'Nhóm cơ mặt sau cẳng chân và gân Achilles (trong ô đánh dấu) — nơi tendinopathy phổ biến nhất với khách chạy bộ.',
+      source: 'OpenStax / Wikimedia Commons',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:1123_Muscles_of_the_Leg_that_Move_the_Foot_and_Toes_b.png',
+      license: 'CC BY 4.0',
+    },
+  ],
   quiz: [
     {
       q: 'Hai kịch bản kinh điển sinh tendinopathy là gì?',

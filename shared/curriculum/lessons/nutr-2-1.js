@@ -52,6 +52,7 @@ Ví dụ nhanh: khách 70 kg, cân nặng ổn định, tập 4 buổi/tuần �
 | Cá hồi | ~25 g | Kèm omega-3 |
 | Đậu hũ | ~8–15 g | Đầy đủ, kèm chất xơ |
 | Gạo + đậu | ~7 g (kết hợp) | Kết hợp tạo profile đầy đủ |`,
+      image: 'nutr-2-1-aminoacid.svg',
     },
     {
       heading: 'Phân bổ trong ngày và "cửa sổ giao thoa"',
@@ -113,7 +114,15 @@ Với khách giảm mỡ thông thường: giữ protein ở **nửa trên của
       def: 'Năng lượng tiêu tốn để tiêu hoá chất dinh dưỡng; protein cao nhất (~20–30% calo của nó).',
     },
   ],
-  images: [],
+  images: [
+    {
+      file: 'nutr-2-1-aminoacid.svg',
+      caption: 'Cấu trúc chung của một amino acid: nhóm amine (−NH₂), nhóm carboxyl (−COOH) và nhóm R quyết định loại amino acid.',
+      source: 'YassineMrabet / Wikimedia Commons',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:AminoAcidball.svg',
+      license: 'Public domain',
+    },
+  ],
   quiz: [
     {
       q: 'Meta-analysis của Morton 2018 tìm thấy lợi ích của protein lên khối cơ đạt điểm gãy khoảng bao nhiêu?',
