@@ -59,15 +59,22 @@ import case23 from './case-2-3.js';
 import case24 from './case-2-4.js';
 import case25 from './case-2-5.js';
 import case26 from './case-2-6.js';
+import case27 from './case-2-7.js';
+import case28 from './case-2-8.js';
+import case29 from './case-2-9.js';
+import case210 from './case-2-10.js';
 import rehab11 from './rehab-1-1.js';
 import rehab12 from './rehab-1-2.js';
 import rehab21 from './rehab-2-1.js';
+import rehab22 from './rehab-2-2.js';
 import rehab31 from './rehab-3-1.js';
 import rehab41 from './rehab-4-1.js';
+import rehab42 from './rehab-4-2.js';
 import rehab51 from './rehab-5-1.js';
 import rehab61 from './rehab-6-1.js';
 import rehab71 from './rehab-7-1.js';
 import rehab72 from './rehab-7-2.js';
+import rehab81 from './rehab-8-1.js';
 
 export const LESSONS = [
   anat11,
@@ -125,13 +132,20 @@ export const LESSONS = [
   case24,
   case25,
   case26,
+  case27,
+  case28,
+  case29,
+  case210,
   rehab11,
   rehab12,
   rehab21,
+  rehab22,
   rehab31,
   rehab41,
+  rehab42,
   rehab51,
   rehab61,
   rehab71,
   rehab72,
+  rehab81,
 ];

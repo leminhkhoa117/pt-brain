@@ -8,7 +8,7 @@ export default {
   slug: 'rehab-2-1',
   module: 'rehab',
   chapter: 2,
-  chapterTitle: 'Vùng lưng',
+  chapterTitle: 'Cột sống — lưng & cổ',
   order: 1,
   title: 'Đau lưng dưới và thoát vị đĩa đệm: MRI không phải bản án',
   subtitle:

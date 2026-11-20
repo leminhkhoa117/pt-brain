@@ -8,7 +8,7 @@ export default {
   slug: 'rehab-4-1',
   module: 'rehab',
   chapter: 4,
-  chapterTitle: 'Vùng gối',
+  chapterTitle: 'Vùng gối & thoái hoá khớp',
   order: 1,
   title: 'Đau quanh xương bánh chè: chữa từ hông xuống, không phạt cái gối',
   subtitle:
