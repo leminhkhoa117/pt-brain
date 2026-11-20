@@ -93,43 +93,95 @@ function ReadingProgress() {
 }
 
 function LessonImage({ image }) {
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (!expanded) return undefined;
+    const onKey = (event) => {
+      if (event.key === 'Escape') setExpanded(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [expanded]);
+
   if (!image?.url) return null;
+
   return (
-    <figure className="my-3">
-      <img
-        src={image.url}
-        alt={image.caption || 'Minh hoạ bài học'}
-        loading="lazy"
-        className="w-full rounded-xl border border-line dark:border-white/10"
-      />
-      <figcaption className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[11px] leading-relaxed text-slate-400 dark:text-slate-500">
-        <span className="font-medium text-slate-500 dark:text-slate-400">{image.caption}</span>
-        {image.source && (
-          <>
-            <span aria-hidden="true">·</span>
-            <span>
-              Nguồn: {image.source}
-              {image.sourceUrl && (
-                <>
-                  {' '}
-                  (
-                  <a
-                    href={image.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline underline-offset-2"
-                  >
-                    xem
-                  </a>
-                  )
-                </>
-              )}{' '}
-              — {image.license}
-            </span>
-          </>
-        )}
-      </figcaption>
-    </figure>
+    <>
+      <figure className="my-4">
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="group block mx-auto w-full max-w-full sm:max-w-[480px] rounded-lg border border-line bg-paper-2/50 p-2 transition-colors hover:border-line-strong dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
+          title="Bấm để phóng to"
+        >
+          <img
+            src={image.url}
+            alt={image.caption || 'Minh hoạ bài học'}
+            loading="lazy"
+            className="mx-auto max-h-[300px] sm:max-h-[380px] lg:max-h-[420px] w-auto max-w-full rounded-md object-contain"
+          />
+          <span className="mt-1.5 flex items-center justify-center gap-1 text-[10px] font-medium uppercase tracking-wide text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500">
+            <Icon name="search" className="h-3 w-3" />
+            Bấm để phóng to
+          </span>
+        </button>
+        <figcaption className="mx-auto mt-1.5 max-w-[480px] text-center text-[11px] leading-relaxed text-slate-400 dark:text-slate-500">
+          <span className="font-medium text-slate-500 dark:text-slate-400">{image.caption}</span>
+          {image.source && (
+            <>
+              {' · '}
+              <span>
+                Nguồn: {image.source}
+                {image.sourceUrl && (
+                  <>
+                    {' '}
+                    (
+                    <a
+                      href={image.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline underline-offset-2"
+                    >
+                      xem
+                    </a>
+                    )
+                  </>
+                )}{' '}
+                — {image.license}
+              </span>
+            </>
+          )}
+        </figcaption>
+      </figure>
+
+      {/* Lightbox: bấm để phóng to xem chi tiết */}
+      {expanded && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-8"
+          role="dialog"
+          aria-modal="true"
+          aria-label={image.caption || 'Ảnh minh hoạ phóng to'}
+          onClick={() => setExpanded(false)}
+        >
+          <div className="max-h-full max-w-full overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={image.url}
+              alt={image.caption || 'Minh hoạ bài học'}
+              className="mx-auto max-h-[85vh] max-w-full rounded-lg"
+            />
+            <p className="mt-2 text-center text-[11px] text-white/60">{image.caption}</p>
+            <button
+              type="button"
+              className="mt-3 mx-auto block rounded-md border border-white/20 px-3 py-1 text-xs text-white/80 transition hover:bg-white/10"
+              onClick={() => setExpanded(false)}
+            >
+              Đóng (Esc)
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
