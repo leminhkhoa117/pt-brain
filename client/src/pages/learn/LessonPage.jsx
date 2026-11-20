@@ -94,17 +94,74 @@ function ReadingProgress() {
 
 function LessonImage({ image }) {
   const [expanded, setExpanded] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const dragRef = useRef(null);
+
+  const resetZoom = () => {
+    setScale(1);
+    setOffset({ x: 0, y: 0 });
+  };
+
+  const close = () => {
+    setExpanded(false);
+    resetZoom();
+  };
 
   useEffect(() => {
     if (!expanded) return undefined;
     const onKey = (event) => {
-      if (event.key === 'Escape') setExpanded(false);
+      if (event.key === 'Escape') close();
+      if (event.key === '+' || event.key === '=') setScale((s) => Math.min(6, s * 1.25));
+      if (event.key === '-') setScale((s) => Math.max(0.3, s / 1.25));
+      if (event.key === '0') resetZoom();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanded]);
+
+  useEffect(() => {
+    if (!expanded) {
+      resetZoom();
+    }
   }, [expanded]);
 
   if (!image?.url) return null;
+
+  const onWheel = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const factor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
+    setScale((s) => Math.min(6, Math.max(0.3, s * factor)));
+  };
+
+  const onPointerDown = (event) => {
+    if (scale <= 1) return;
+    dragRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      startOffsetX: offset.x,
+      startOffsetY: offset.y,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onPointerMove = (event) => {
+    if (!dragRef.current) return;
+    const dx = event.clientX - dragRef.current.startX;
+    const dy = event.clientY - dragRef.current.startY;
+    setOffset({
+      x: dragRef.current.startOffsetX + dx,
+      y: dragRef.current.startOffsetY + dy,
+    });
+  };
+
+  const onPointerUp = () => {
+    dragRef.current = null;
+  };
+
+  const zoomPercent = Math.round(scale * 100);
 
   return (
     <>
@@ -155,29 +212,94 @@ function LessonImage({ image }) {
         </figcaption>
       </figure>
 
-      {/* Lightbox: bấm để phóng to xem chi tiết */}
+      {/* Lightbox zoomable: cuộn để zoom, kéo để pan, Esc để đóng */}
       {expanded && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
           role="dialog"
           aria-modal="true"
           aria-label={image.caption || 'Ảnh minh hoạ phóng to'}
-          onClick={() => setExpanded(false)}
+          onClick={close}
+          onWheel={onWheel}
         >
-          <div className="max-h-full max-w-full overflow-auto" onClick={(e) => e.stopPropagation()}>
+          {/* Thanh công cụ zoom */}
+          <div
+            className="absolute top-4 right-4 z-10 flex items-center gap-1 rounded-lg border border-white/15 bg-black/60 px-2 py-1 backdrop-blur-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="grid h-7 w-7 place-items-center rounded text-white/70 transition hover:bg-white/15 hover:text-white"
+              onClick={() => setScale((s) => Math.max(0.3, s / 1.25))}
+              title="Thu nhỏ (−)"
+            >
+              −
+            </button>
+            <span className="min-w-[48px] text-center font-mono text-xs font-semibold tabular-nums text-white/80">
+              {zoomPercent}%
+            </span>
+            <button
+              type="button"
+              className="grid h-7 w-7 place-items-center rounded text-white/70 transition hover:bg-white/15 hover:text-white"
+              onClick={() => setScale((s) => Math.min(6, s * 1.25))}
+              title="Phóng to (+)"
+            >
+              +
+            </button>
+            <span className="mx-1 h-4 w-px bg-white/15" />
+            <button
+              type="button"
+              className="grid h-7 w-7 place-items-center rounded text-[10px] font-bold text-white/70 transition hover:bg-white/15 hover:text-white"
+              onClick={resetZoom}
+              title="Vừa màn hình (0)"
+            >
+              FIT
+            </button>
+            <span className="mx-1 h-4 w-px bg-white/15" />
+            <button
+              type="button"
+              className="grid h-7 w-7 place-items-center rounded text-white/70 transition hover:bg-white/15 hover:text-white"
+              onClick={close}
+              title="Đóng (Esc)"
+            >
+              <Icon name="lock" className="h-3.5 w-3.5 rotate-45" />
+            </button>
+          </div>
+
+          {/* Vùng ảnh: kéo để pan khi zoom > 1 */}
+          <div
+            className="flex max-h-full max-w-full items-center justify-center overflow-hidden"
+            style={{ cursor: scale > 1 ? 'grab' : 'default' }}
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerLeave={onPointerUp}
+          >
             <img
               src={image.url}
               alt={image.caption || 'Minh hoạ bài học'}
-              className="mx-auto max-h-[85vh] max-w-full rounded-lg"
+              draggable={false}
+              className="max-h-[85vh] max-w-full select-none rounded-lg transition-transform duration-150 ease-out"
+              style={{
+                transform: `scale(${scale}) translate(${offset.x / scale}px, ${offset.y / scale}px)`,
+                cursor: scale > 1 ? (dragRef.current ? 'grabbing' : 'grab') : 'default',
+              }}
             />
-            <p className="mt-2 text-center text-[11px] text-white/60">{image.caption}</p>
-            <button
-              type="button"
-              className="mt-3 mx-auto block rounded-md border border-white/20 px-3 py-1 text-xs text-white/80 transition hover:bg-white/10"
-              onClick={() => setExpanded(false)}
-            >
-              Đóng (Esc)
-            </button>
+          </div>
+
+          {/* Hint + caption */}
+          <div
+            className="pointer-events-none absolute bottom-4 left-1/2 w-full max-w-[480px] -translate-x-1/2 px-4 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-[11px] leading-relaxed text-white/50">
+              {image.caption}
+              <br />
+              <span className="text-[10px] text-white/30">
+                Cuộn chuột để zoom · Kéo để di chuyển · Esc để đóng
+              </span>
+            </p>
           </div>
         </div>
       )}
