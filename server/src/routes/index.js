@@ -19,6 +19,7 @@ import mealRoutes from './meals.js';
 import mealPlanRoutes from './mealPlans.js';
 import muscleRoutes from './muscles.js';
 import curriculumRoutes from './curriculum.js';
+import learningRoutes from './learning.js';
 
 const router = Router();
 
@@ -69,5 +70,6 @@ router.use('/meals', mealRoutes);
 router.use('/meal-plans', mealPlanRoutes);
 router.use('/muscles', muscleRoutes);
 router.use('/curriculum', curriculumRoutes);
+router.use('/learning', learningRoutes);
 
 export default router;

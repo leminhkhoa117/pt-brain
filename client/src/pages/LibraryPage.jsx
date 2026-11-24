@@ -12,7 +12,12 @@ import {
   updateSummaryMeta,
 } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
+import { useAuth } from '../hooks/useAuth.jsx';
+import { usePersistentState } from '../hooks/usePersistentState.js';
 import { formatDateKey } from '../lib/date.js';
+
+const UI_STATE_PREFIX = 'ptbrain.library.ui.v1.';
+const DEFAULT_UI_STATE = { search: '', onlyFavorite: false };
 
 const LEVEL_STYLES = {
   1: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
@@ -26,8 +31,20 @@ export default function LibraryPage() {
   const dialog = useDialog();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
-  const [onlyFavorite, setOnlyFavorite] = useState(false);
+  const { user } = useAuth();
+  const userId = user?._id || 'anon';
+  const [ui, setUi] = usePersistentState(
+    `${UI_STATE_PREFIX}${userId}`,
+    DEFAULT_UI_STATE,
+    { delay: 200 },
+  );
+  const uiState = ui && typeof ui === 'object' ? ui : DEFAULT_UI_STATE;
+  const search = typeof uiState.search === 'string' ? uiState.search : '';
+  const onlyFavorite = Boolean(uiState.onlyFavorite);
+  const setSearch = (value) =>
+    setUi((prev) => ({ ...(prev && typeof prev === 'object' ? prev : {}), search: value }));
+  const setOnlyFavorite = (value) =>
+    setUi((prev) => ({ ...(prev && typeof prev === 'object' ? prev : {}), onlyFavorite: value }));
   const [error, setError] = useState(null);
 
   const deferredSearch = useDeferredValue(search);

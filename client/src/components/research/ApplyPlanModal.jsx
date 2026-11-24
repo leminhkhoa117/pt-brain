@@ -76,7 +76,7 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="max-h-[92vh] w-full overflow-auto rounded-t-2xl bg-white p-5 shadow-overlay dark:bg-slate-900 sm:max-w-2xl sm:rounded-lg">
+      <div className="max-h-[92vh] w-full overflow-auto rounded-t-2xl bg-surface p-5 shadow-overlay sm:max-w-2xl sm:rounded-lg">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="font-display text-[20px] font-semibold text-slate-900 dark:text-white">Áp dụng vào giáo án</h2>
@@ -142,7 +142,7 @@ export default function ApplyPlanModal({ summaryId, onClose, onApplied }) {
             )}
 
             {proposal.changes?.length ? (
-              <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
                 <table className="min-w-full text-sm">
                   <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 dark:bg-slate-800">
                     <tr>

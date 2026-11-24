@@ -55,6 +55,10 @@ Repo đã có `render.yaml` (Blueprint).
 | `STORAGE_DRIVER` | `mongo` (Render free) hoặc `disk` (VPS/Docker có ổ đĩa) |
 | `MONGO_URI` | connection string Atlas |
 | `CLIENT_ORIGIN` | domain HTTPS của Render |
+| `APP_PUBLIC_URL` | domain HTTPS (dùng cho link reset mật khẩu) |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | OAuth Web client; redirect URI `https://<domain>/api/auth/google/callback` |
+| `RESEND_API_KEY` / `MAIL_FROM` | gửi email đặt lại mật khẩu (tùy chọn nhưng nên có ở production) |
+| `SESSION_REFRESH_TTL_HOURS` | `24` (phiên không “ghi nhớ đăng nhập”) |
 | `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Render tự sinh trong `render.yaml` |
 | `AI_API_KEY` | key OpenCode Go (chỉ ở backend) |
 | `CONTACT_EMAIL` | email liên hệ Crossref/Unpaywall |
@@ -62,8 +66,8 @@ Repo đã có `render.yaml` (Blueprint).
 
 ## Lưu ý production
 
-- `COOKIE_SECURE=true` bắt buộc khi chạy HTTPS.
-- Nếu tách domain client/API, đặt `CLIENT_ORIGIN` đúng domain và cấu hình cookie `SameSite=None` (code hiện dùng `lax` cho mô hình cùng domain).
+- `COOKIE_SECURE=true` bắt buộc khi chạy HTTPS; code tự bật `Secure` khi `NODE_ENV=production`.
+- Nếu tách domain client/API, đặt `CLIENT_ORIGIN` đúng domain và cấu hình cookie `SameSite=None` (code hiện dùng `lax` cho mô hình cùng domain). Khi đó OAuth callback phải nằm cùng domain với client để cookie được set đúng.
 - **Ảnh/PDF**: `STORAGE_DRIVER=mongo` dùng GridFS bucket `uploads`, mỗi file nằm trong namespace `images/` hoặc `papers/`. `STORAGE_DRIVER=disk` lưu ở `server/uploads` và cần ổ đĩa persistent nếu deploy cloud.
 - **PDF** dùng font Noto Sans đóng gói trong `server/assets/fonts`, không phụ thuộc font hệ điều hành.
 - PWA cần HTTPS (localhost cũng được). Manifest + service worker nằm trong `client/public`.

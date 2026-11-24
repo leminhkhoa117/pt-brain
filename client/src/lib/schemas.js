@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  PASSWORD_MIN_LENGTH,
+  passwordProblems,
+} from '@shared/security/password.js';
 
 const optNumber = (min, max, message) =>
   z.preprocess(
@@ -62,12 +66,55 @@ export const profileSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
+  email: z.string().trim().email('Email không hợp lệ'),
   password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
+  remember: z.boolean().optional().default(true),
 });
 
-export const registerSchema = z.object({
-  name: z.string().trim().min(2, 'Tên tối thiểu 2 ký tự').max(80),
-  email: z.string().email('Email không hợp lệ'),
-  password: z.string().min(8, 'Mật khẩu tối thiểu 8 ký tự').max(100),
+export const registerSchema = z
+  .object({
+    name: z.string().trim().min(2, 'Tên tối thiểu 2 ký tự').max(80),
+    email: z.string().trim().email('Email không hợp lệ'),
+    password: z.string().min(PASSWORD_MIN_LENGTH, `Mật khẩu tối thiểu ${PASSWORD_MIN_LENGTH} ký tự`).max(100),
+    remember: z.boolean().optional().default(true),
+  })
+  .superRefine((data, ctx) => {
+    for (const message of passwordProblems(data.password, { email: data.email, name: data.name })) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message });
+    }
+  });
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().max(100).optional(),
+    newPassword: z.string().min(PASSWORD_MIN_LENGTH, `Mật khẩu tối thiểu ${PASSWORD_MIN_LENGTH} ký tự`).max(100),
+    confirmPassword: z.string().min(1, 'Nhập lại mật khẩu mới'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Mật khẩu nhập lại không khớp',
+    path: ['confirmPassword'],
+  })
+  .superRefine((data, ctx) => {
+    for (const message of passwordProblems(data.newPassword)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+    }
+  });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email('Email không hợp lệ'),
 });
+
+export const resetPasswordSchema = z
+  .object({
+    newPassword: z.string().min(PASSWORD_MIN_LENGTH, `Mật khẩu tối thiểu ${PASSWORD_MIN_LENGTH} ký tự`).max(100),
+    confirmPassword: z.string().min(1, 'Nhập lại mật khẩu mới'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Mật khẩu nhập lại không khớp',
+    path: ['confirmPassword'],
+  })
+  .superRefine((data, ctx) => {
+    for (const message of passwordProblems(data.newPassword)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+    }
+  });

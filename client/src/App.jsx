@@ -9,6 +9,8 @@ import { useAuth } from './hooks/useAuth.jsx';
 // trang Cơ bắp 3D hay các trang nặng khác ngay từ lần đầu.
 const Login = lazy(() => import('./pages/Login.jsx'));
 const Register = lazy(() => import('./pages/Register.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const BodyLog = lazy(() => import('./pages/BodyLog.jsx'));
 const Calculators = lazy(() => import('./pages/Calculators.jsx'));
@@ -20,6 +22,8 @@ const BodyAssessmentPage = lazy(() => import('./pages/BodyAssessmentPage.jsx'));
 const MusclePage = lazy(() => import('./pages/MusclePage.jsx'));
 const Settings = lazy(() => import('./pages/Settings.jsx'));
 const Welcome = lazy(() => import('./pages/Welcome.jsx'));
+const UiLab = lazy(() => import('./pages/UiLab.jsx'));
+const Studio = lazy(() => import('./pages/Studio.jsx'));
 
 function PageFallback() {
   return (
@@ -31,7 +35,7 @@ function PageFallback() {
 
 function Splash() {
   return (
-    <div className="grid min-h-screen place-items-center bg-paper dark:bg-[#0e1211]">
+    <div className="grid min-h-screen place-items-center">
       <div className="flex flex-col items-center gap-4">
         <span className="grid h-12 w-12 place-items-center rounded-md bg-pine-700 font-display text-lg font-semibold text-white dark:bg-pine-500 dark:text-pine-950">
           PT
@@ -47,9 +51,9 @@ function ProtectedLayout() {
   const location = useLocation();
   if (loading) return <Splash />;
   if (!user) return <Navigate to="/login" replace />;
-  // Tài khoản mới luôn xem giới thiệu trước; tài khoản cũ không có cờ này.
-  if (user.onboardingRequired === true && location.pathname !== '/welcome') {
-    return <Navigate to="/welcome" replace />;
+  // Tài khoản mới luôn xem trang giới thiệu công khai trước.
+  if (user.onboardingRequired === true) {
+    return <Navigate to="/" replace />;
   }
   return (
     <Layout>
@@ -81,9 +85,34 @@ export default function App() {
           </Suspense>
         }
       />
+      <Route
+        path="/forgot-password"
+        element={
+          <Suspense fallback={<Splash />}>
+            <ForgotPassword />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <Suspense fallback={<Splash />}>
+            <ResetPassword />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <Suspense fallback={<Splash />}>
+            <Welcome />
+          </Suspense>
+        }
+      />
+      <Route path="/welcome" element={<Navigate to="/" replace />} />
 
       <Route element={<ProtectedLayout />}>
-        <Route index element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/body-log" element={<BodyLog />} />
         <Route path="/body-assessment" element={<BodyAssessmentPage />} />
         <Route path="/muscles" element={<MusclePage />} />
@@ -93,7 +122,8 @@ export default function App() {
         <Route path="/learn" element={<Learn />} />
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/studio" element={<Studio />} />
+        <Route path="/ui-lab" element={<UiLab />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,22 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../components/ui.jsx';
 import { useDialog } from '../components/DialogProvider.jsx';
-import { createPaper, searchResearch } from '../api/summaries.js';
+import { createPaper } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
 import MarkdownText from '../components/MarkdownText.jsx';
+import ResearchJobProgress from '../components/research/ResearchJobProgress.jsx';
 import { formatNumber, formatDoi } from '../lib/format.js';
 import { useAuth } from '../hooks/useAuth.jsx';
+import { useFlushOnPageHide } from '../hooks/useFlushOnPageHide.js';
 import {
-  addSearchHistory,
+  clearPendingSearch,
   clearSearchHistory,
+  loadFinderDraft,
   loadLastSearch,
+  loadPendingSearch,
   loadSearchHistory,
   removeSearchHistory,
+  saveFinderDraft,
   saveLastSearch,
 } from '../lib/finderHistory.js';
+import {
+  getFinderSnapshot,
+  startFinderSearch,
+  subscribeFinderStore,
+} from '../lib/finderStore.js';
 
 const LEVEL_STYLES = {
   1: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
@@ -177,43 +187,107 @@ export default function FinderPage() {
   const [saved, setSaved] = useState({});
   const [expanded, setExpanded] = useState({});
   const [history, setHistory] = useState([]);
+  const [recovery, setRecovery] = useState(null);
+  const draftReady = useRef(false);
+  const draftDirty = useRef(false);
+  const draftValues = useRef({ question, filters });
+  const draftUserId = useRef(userId);
+  draftValues.current = { question, filters };
+
+  // Nếu user đổi mà component còn mounted, không mang nháp của user cũ ghi
+  // sang key mới. Trường hợp logout bình thường thì unmount flush đã chạy.
+  if (draftUserId.current !== userId) {
+    draftUserId.current = userId;
+    draftDirty.current = false;
+  }
+
+  // Request nằm ở store module-level nên vẫn chạy khi FinderPage unmount.
+  const search = useSyncExternalStore(subscribeFinderStore, getFinderSnapshot);
+  const searchIsMine = !search.userId || search.userId === userId;
+  const searchPending = search.status === 'pending' && searchIsMine;
+  const lastStoreVersion = useRef(search.version);
 
   useEffect(() => {
+    draftReady.current = false;
+    const pending = loadPendingSearch(userId);
+    const draft = loadFinderDraft(userId);
     const last = loadLastSearch(userId);
-    if (last?.data) {
-      setQuestion(last.question || '');
-      setFilters(toFormFilters(last.filters));
-      setDraftQueries(last.queries || last.data.queries || []);
-      setData(last.data);
-      setSaved(last.saved || {});
+    const storeIsOurs = !search.userId || search.userId === userId;
+
+    if (search.status === 'pending' && storeIsOurs) {
+      // Rời trang rồi quay lại khi request vẫn đang chạy.
+      setQuestion(search.payload?.question || draft?.question || '');
+      setFilters(toFormFilters(search.payload?.filters || draft?.filters));
+      setData(last?.data || null);
+      setDraftQueries(last?.queries || last?.data?.queries || []);
+      setSaved(last?.saved || {});
+      setRecovery(null);
+    } else if (pending) {
+      // Trình duyệt đã reload giữa lúc tìm: request cũ không thể tiếp tục.
+      setQuestion(pending.question || draft?.question || '');
+      setFilters(toFormFilters(pending.filters || draft?.filters));
+      setData(last?.data || null);
+      setDraftQueries(pending.queries || last?.queries || []);
+      setSaved(last?.saved || {});
+      setRecovery(pending);
+    } else {
+      setQuestion(draft?.question || last?.question || '');
+      setFilters(toFormFilters(draft?.filters || last?.filters));
+      setData(last?.data || null);
+      setDraftQueries(last?.queries || last?.data?.queries || []);
+      setSaved(last?.saved || {});
+      setRecovery(null);
     }
     setHistory(loadSearchHistory(userId));
-  }, [userId]);
+  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const search = useMutation({
-    mutationFn: (payload) => searchResearch(payload),
-    onSuccess: (result, variables) => {
-      setData(result);
-      setDraftQueries(result.queries || []);
+  useEffect(() => {
+    if (search.version <= lastStoreVersion.current) return;
+    lastStoreVersion.current = search.version;
+    if (search.userId && search.userId !== userId) {
+      setHistory(loadSearchHistory(userId));
+      return;
+    }
+    if (search.status === 'success' && search.data) {
+      setData(search.data);
+      setDraftQueries(search.data.queries || []);
       setSaved({});
-      setElapsed(0);
       setError(null);
-      const entry = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        question: variables?.question || question.trim(),
-        filters: variables?.filters || buildFilters(filters),
-        queries: result.queries || [],
-        data: result,
-        saved: {},
-        resultCount: result.results?.length || 0,
-        savedAt: new Date().toISOString(),
-      };
-      saveLastSearch(userId, entry);
-      setHistory(addSearchHistory(userId, entry));
+      setRecovery(null);
+      setHistory(loadSearchHistory(userId));
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    onError: (err) => setError(getErrorMessage(err)),
-  });
+    } else if (search.status === 'error') {
+      setError(search.error);
+      setRecovery(null);
+    } else if (search.status === 'pending') {
+      setError(null);
+      setRecovery(null);
+    }
+  }, [search, userId]);
+
+  // Lưu nháp câu hỏi + bộ lọc khi người dùng gõ/chỉnh, kể cả chưa bấm tìm.
+  useEffect(() => {
+    if (!draftReady.current) {
+      draftReady.current = true;
+      return undefined;
+    }
+    draftDirty.current = true;
+    const timer = setTimeout(() => {
+      draftDirty.current = false;
+      saveFinderDraft(userId, { ...draftValues.current, updatedAt: Date.now() });
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [question, filters, userId]);
+
+  // Chuyển route hoặc reload/đóng tab ngay sau khi gõ: flush phần debounce
+  // còn nợ. pagehide + visibilitychange xử lý cả trường hợp hard reload.
+  const flushDraft = () => {
+    if (!draftDirty.current) return;
+    draftDirty.current = false;
+    saveFinderDraft(draftUserId.current, { ...draftValues.current, updatedAt: Date.now() });
+  };
+  useFlushOnPageHide(flushDraft);
+  useEffect(() => () => flushDraft(), []);
 
   const savePaper = useMutation({
     mutationFn: (paper) => createPaper(paper),
@@ -224,33 +298,57 @@ export default function FinderPage() {
   });
 
   useEffect(() => {
-    if (!search.isPending) {
+    if (!searchPending) {
       setElapsed(0);
       return undefined;
     }
-    setElapsed(0);
-    const timer = setInterval(() => setElapsed((v) => v + 1), 1000);
+    const startedAt = search.startedAt || Date.now();
+    const tick = () => setElapsed(Math.max(0, Math.floor((Date.now() - startedAt) / 1000)));
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [search.isPending]);
+  }, [searchPending, search.startedAt]);
 
   const submit = (e) => {
     e.preventDefault();
     setError(null);
+    if (searchPending) return;
     if (question.trim().length < 5) {
       setError('Nhập câu hỏi cụ thể hơn (tối thiểu 5 ký tự).');
       return;
     }
-    search.mutate({ question: question.trim(), filters: buildFilters(filters) });
+    startFinderSearch({ question: question.trim(), filters: buildFilters(filters) }, userId);
   };
 
   const rerun = () => {
-    if (!draftQueries.length) return;
+    if (!draftQueries.length || searchPending) return;
     setError(null);
-    search.mutate({
-      question: question.trim(),
-      queries: draftQueries.filter(Boolean).slice(0, 4),
-      filters: buildFilters(filters),
-    });
+    startFinderSearch(
+      {
+        question: question.trim(),
+        queries: draftQueries.filter(Boolean).slice(0, 4),
+        filters: buildFilters(filters),
+      },
+      userId,
+    );
+  };
+
+  const resumeSearch = () => {
+    if (!recovery || searchPending) return;
+    setError(null);
+    startFinderSearch(
+      {
+        question: recovery.question || question.trim(),
+        queries: (recovery.queries || []).filter(Boolean).slice(0, 4),
+        filters: recovery.filters || buildFilters(filters),
+      },
+      userId,
+    );
+  };
+
+  const dismissRecovery = () => {
+    clearPendingSearch(userId);
+    setRecovery(null);
   };
 
   const openReader = (paper) => {
@@ -264,7 +362,7 @@ export default function FinderPage() {
   };
 
   const restoreSearch = (entry) => {
-    if (!entry || search.isPending) return;
+    if (!entry || searchPending) return;
     setError(null);
     setQuestion(entry.question || '');
     setFilters(toFormFilters(entry.filters));
@@ -276,11 +374,14 @@ export default function FinderPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    search.mutate({
-      question: entry.question,
-      queries: (entry.queries || []).slice(0, 4),
-      filters: entry.filters || {},
-    });
+    startFinderSearch(
+      {
+        question: entry.question,
+        queries: (entry.queries || []).slice(0, 4),
+        filters: entry.filters || {},
+      },
+      userId,
+    );
   };
 
   const stage = STAGES[Math.min(STAGES.length - 1, Math.floor(elapsed / 8))];
@@ -306,6 +407,32 @@ export default function FinderPage() {
         </Alert>
       )}
 
+      {recovery && !searchPending && (
+        <Alert tone="warning" title="Lần tìm trước bị gián đoạn" className="mb-4">
+          <p>
+            Trình duyệt đã tải lại khi đang tìm nên kết quả dở dang không còn. Câu hỏi và bộ lọc
+            đã được khôi phục sẵn. Bấm “Tiếp tục tìm” để chạy lại — thao tác này tốn 1 lượt tìm AI.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="btn-primary !px-3 !py-1.5 text-xs"
+              onClick={resumeSearch}
+            >
+              <Icon name="search" className="h-3.5 w-3.5" />
+              Tiếp tục tìm
+            </button>
+            <button
+              type="button"
+              className="btn-ghost !px-3 !py-1.5 text-xs"
+              onClick={dismissRecovery}
+            >
+              Bỏ qua
+            </button>
+          </div>
+        </Alert>
+      )}
+
       <Card>
         <form onSubmit={submit} className="space-y-4" noValidate>
           <Field
@@ -318,7 +445,7 @@ export default function FinderPage() {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               maxLength={1000}
-              disabled={search.isPending}
+              disabled={searchPending}
             />
           </Field>
 
@@ -332,7 +459,7 @@ export default function FinderPage() {
                 placeholder="2015"
                 value={filters.yearFrom}
                 onChange={(e) => setFilters((f) => ({ ...f, yearFrom: e.target.value }))}
-                disabled={search.isPending}
+                disabled={searchPending}
               />
             </Field>
             <Field label="Đến năm">
@@ -344,7 +471,7 @@ export default function FinderPage() {
                 placeholder="2026"
                 value={filters.yearTo}
                 onChange={(e) => setFilters((f) => ({ ...f, yearTo: e.target.value }))}
-                disabled={search.isPending}
+                disabled={searchPending}
               />
             </Field>
             <Field label="Mức bằng chứng">
@@ -352,7 +479,7 @@ export default function FinderPage() {
                 className="select"
                 value={filters.maxLevel}
                 onChange={(e) => setFilters((f) => ({ ...f, maxLevel: e.target.value }))}
-                disabled={search.isPending}
+                disabled={searchPending}
               >
                 <option value="">Tất cả mức</option>
                 <option value="1">Chỉ mức 1 (mạnh nhất)</option>
@@ -368,7 +495,7 @@ export default function FinderPage() {
                   className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
                   checked={filters.openAccessOnly}
                   onChange={(e) => setFilters((f) => ({ ...f, openAccessOnly: e.target.checked }))}
-                  disabled={search.isPending}
+                  disabled={searchPending}
                 />
                 Chỉ open access
               </label>
@@ -378,7 +505,7 @@ export default function FinderPage() {
                   className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
                   checked={filters.fullTextOnly}
                   onChange={(e) => setFilters((f) => ({ ...f, fullTextOnly: e.target.checked }))}
-                  disabled={search.isPending}
+                  disabled={searchPending}
                 />
                 Chỉ bài có toàn văn/PDF
               </label>
@@ -390,33 +517,21 @@ export default function FinderPage() {
               Kết quả luôn có link DOI/PubMed thật. Không có bài báo do AI tự sinh. Badge
               “Toàn văn PMC” hoặc “Có PDF” nghĩa là hệ thống có nguồn đọc trực tiếp, không chỉ abstract.
             </p>
-            <button type="submit" className="btn-primary" disabled={search.isPending}>
-              {search.isPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="search" className="h-4 w-4" />}
-              {search.isPending ? 'Đang tìm...' : 'Tìm nghiên cứu'}
+            <button type="submit" className="btn-primary" disabled={searchPending}>
+              {searchPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="search" className="h-4 w-4" />}
+              {searchPending ? 'Đang tìm...' : 'Tìm nghiên cứu'}
             </button>
           </div>
         </form>
 
-        {search.isPending && (
-          <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-900 dark:bg-brand-950/40">
-            <div className="flex items-center gap-3">
-              <Spinner className="h-5 w-5" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-brand-800 dark:text-brand-200">
-                  {stage}... ({elapsed}s)
-                </p>
-                <p className="text-xs text-brand-700/70 dark:text-brand-300/70">
-                  Thường 20-60 giây tùy số truy vấn và nguồn.
-                </p>
-              </div>
-            </div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-brand-200/70 dark:bg-brand-900">
-              <div
-                className="h-full rounded-full bg-brand-600 transition-all duration-700 dark:bg-brand-400"
-                style={{ width: `${Math.min(95, 10 + elapsed * 4)}%` }}
-              />
-            </div>
-          </div>
+        {searchPending && (
+          <ResearchJobProgress
+            stage={stage}
+            elapsed={elapsed}
+            note="Thường 20–60 giây tùy số truy vấn và nguồn. Bạn có thể rời tab, job vẫn chạy nền."
+            progressBase={10}
+            progressRate={4}
+          />
         )}
       </Card>
 
@@ -459,7 +574,7 @@ export default function FinderPage() {
                 <button
                   type="button"
                   onClick={() => restoreSearch(entry)}
-                  disabled={search.isPending}
+                  disabled={searchPending}
                   className="min-w-0 flex-1 text-left disabled:opacity-60"
                 >
                   <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">
@@ -505,7 +620,7 @@ export default function FinderPage() {
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                   Truy vấn tiếng Anh đã dùng
                 </h3>
-                <button type="button" className="btn-ghost !px-2.5 !py-1.5 text-xs" onClick={rerun} disabled={search.isPending}>
+                <button type="button" className="btn-ghost !px-2.5 !py-1.5 text-xs" onClick={rerun} disabled={searchPending}>
                   Tìm lại với truy vấn này
                 </button>
               </div>

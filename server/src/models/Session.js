@@ -12,6 +12,11 @@ const sessionSchema = new mongoose.Schema(
     prevTokenHash: { type: String },
     prevTokenExpiresAt: { type: Date },
     expiresAt: { type: Date, required: true },
+    // false = cookie phiên (mất khi đóng trình duyệt); true = "ghi nhớ đăng nhập".
+    remember: { type: Boolean, default: true },
+    // Tăng khi đổi mật khẩu/đăng xuất khẩn cấp để access token cũ mất hiệu lực
+    // ngay thay vì phải chờ hết TTL 15 phút.
+    authVersion: { type: Number, default: 0, min: 0 },
     userAgent: { type: String, default: '', maxlength: 300 },
     ip: { type: String, default: '' },
     lastUsedAt: { type: Date, default: Date.now },

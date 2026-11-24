@@ -11,7 +11,7 @@ const HIGHLIGHTS = [
 
 export default function AuthShell({ title, subtitle, children, footer }) {
   return (
-    <div className="grid min-h-screen bg-paper dark:bg-[#0e1211] lg:grid-cols-[minmax(0,1fr)_520px]">
+    <div className="grid min-h-screen lg:grid-cols-[minmax(0,1fr)_520px]">
       <div className="flex min-h-screen flex-col px-5 py-8 sm:px-8 lg:px-14">
         <div className="mx-auto flex w-full max-w-[380px] flex-1 flex-col lg:mx-0">
           <Link to="/" className="flex w-fit items-center gap-2.5">

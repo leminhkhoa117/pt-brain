@@ -221,7 +221,7 @@ export default function AskPanel({ summaryId, initialQa = [], sourceChars = 0, f
               className={
                 message.role === 'user'
                   ? 'ml-auto max-w-[85%] whitespace-pre-wrap rounded-md rounded-br-sm bg-pine-700 px-3.5 py-2.5 text-sm text-white dark:bg-pine-600'
-                  : 'mr-auto max-w-[92%] rounded-md rounded-bl-sm border border-line bg-surface px-3.5 py-2.5 text-sm text-slate-700 dark:border-white/[0.08] dark:bg-[#19211e] dark:text-slate-200'
+                  : 'mr-auto max-w-[92%] rounded-md rounded-bl-sm border border-line bg-surface px-3.5 py-2.5 text-sm text-slate-700 dark:border-white/[0.08] dark:text-slate-200'
               }
             >
               {message.role === 'assistant' ? (

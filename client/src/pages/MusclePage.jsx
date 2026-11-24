@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { Icon, PageHeader } from '../components/ui.jsx';
 import { MUSCLES } from '@shared/muscles/index.js';
+import { findAnatomyByName, getAnatomyStructure } from '@shared/anatomy/index.js';
 import { readStored, writeStored } from '../lib/persist.js';
 import HumanAtlasExplorer from './atlas/HumanAtlasExplorer.jsx';
 import MuscleChat from './muscles/MuscleChat.jsx';
@@ -21,17 +22,32 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), Math.max(min, max));
 }
 
+function structureForSlug(slug) {
+  if (!slug || !MUSCLES[slug]) return null;
+  return { kind: 'muscle', slug, ...MUSCLES[slug] };
+}
+
+function restoreStructure(stored) {
+  if (!stored) return null;
+  if (stored.slug && MUSCLES[stored.slug]) return structureForSlug(stored.slug);
+  if (stored.id || stored.name) {
+    const anatomy = (stored.id && getAnatomyStructure(stored.id)) || findAnatomyByName(stored.name);
+    if (anatomy) return { ...anatomy, id: anatomy.id || stored.id || '' };
+  }
+  return null;
+}
+
 export default function MusclePage() {
   // Deep-link từ bài học: /muscles?muscle=<slug> chọn sẵn đúng cơ.
   const [searchParams] = useSearchParams();
   const urlMuscle = searchParams.get('muscle');
   const [initial] = useState(() => readStored(STORAGE_KEY, {}));
-  const [slug, setSlug] = useState(() => {
+  const [structure, setStructure] = useState(() => {
     if (urlMuscle && MUSCLES[urlMuscle]) {
-      writeStored(STORAGE_KEY, { slug: urlMuscle });
-      return urlMuscle;
+      writeStored(STORAGE_KEY, { kind: 'muscle', slug: urlMuscle });
+      return structureForSlug(urlMuscle);
     }
-    return initial?.slug && MUSCLES[initial.slug] ? initial.slug : '';
+    return restoreStructure(initial);
   });
   const [chatOpen, setChatOpen] = useState(false);
   const [storedPos, setStoredPos] = useState(() => readStored(PANEL_POS_KEY, null));
@@ -42,16 +58,23 @@ export default function MusclePage() {
   }));
   const panelRef = useRef(null);
   const dragRef = useRef(null);
-  const lastSlugRef = useRef(slug);
+  const lastStructureRef = useRef(structure);
 
-  const selectedMuscle = slug && MUSCLES[slug] ? { slug, ...MUSCLES[slug] } : null;
-
-  const handleMuscleChange = useCallback((muscle) => {
-    // Explorer báo null lúc mount hoặc khi đóng panel: giữ cơ gần nhất để chat không nhảy.
-    if (!muscle?.slug) return;
-    lastSlugRef.current = muscle.slug;
-    setSlug(muscle.slug);
-    writeStored(STORAGE_KEY, { slug: muscle.slug });
+  const handleMuscleChange = useCallback((next) => {
+    // Explorer báo null lúc mount hoặc khi đóng panel: giữ cấu trúc gần nhất để chat không nhảy.
+    if (!next?.vi) return;
+    const key = next.kind === 'muscle' ? next.slug : next.id || next.en;
+    const previous = lastStructureRef.current;
+    const previousKey = previous?.kind === 'muscle' ? previous.slug : previous?.id || previous?.en;
+    if (next.kind === previous?.kind && key && key === previousKey) return;
+    lastStructureRef.current = next;
+    setStructure(next);
+    writeStored(STORAGE_KEY, {
+      kind: next.kind,
+      slug: next.slug,
+      id: next.id,
+      name: next.en,
+    });
   }, []);
 
   useEffect(() => {
@@ -188,7 +211,7 @@ export default function MusclePage() {
         onClick={openChat}
         aria-expanded={chatOpen}
         className={clsx(
-          'fixed z-[69] flex max-w-[70vw] items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-1.5 pr-3 text-[12px] font-semibold text-slate-700 shadow-overlay transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none dark:border-white/10 dark:bg-[#171f1b] dark:text-slate-100',
+          'fixed z-[69] flex max-w-[70vw] items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-1.5 pr-3 text-[12px] font-semibold text-slate-700 shadow-overlay transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none dark:border-white/10 dark:text-slate-100',
           'hover:shadow-lg',
           chatOpen
             ? 'pointer-events-none translate-y-1 scale-90 opacity-0'
@@ -200,9 +223,9 @@ export default function MusclePage() {
           <Icon name="chat" className="h-3.5 w-3.5" />
         </span>
         <span>Hỏi AI</span>
-        {selectedMuscle ? (
+        {structure ? (
           <span className="max-w-[120px] truncate font-normal text-slate-500 dark:text-slate-400">
-            · {selectedMuscle.vi}
+            · {structure.vi}
           </span>
         ) : null}
       </button>
@@ -234,7 +257,7 @@ export default function MusclePage() {
             role="dialog"
             aria-label="Hỏi HLV AI về cơ đang chọn"
             className={clsx(
-              'flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper transition-shadow duration-200 ease-out dark:border-white/10 dark:bg-[#0e1211]',
+              'flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper transition-shadow duration-200 ease-out dark:border-white/10',
               dragging
                 ? 'shadow-[0_32px_80px_-24px_rgba(15,23,42,0.6)] ring-1 ring-brand-500/20'
                 : 'shadow-overlay',
@@ -242,7 +265,7 @@ export default function MusclePage() {
           >
             <div className="h-0.5 shrink-0 bg-gradient-to-r from-pine-600 via-brand-500 to-teal-400" />
             <MuscleChat
-              muscle={selectedMuscle}
+              structure={structure}
               onClose={closeChat}
               onHeaderPointerDown={startDrag}
               active={chatOpen}
@@ -257,7 +280,7 @@ export default function MusclePage() {
     <div>
       <PageHeader
         title="Cơ bắp 3D"
-        subtitle="Human Atlas: 2.234 mảnh giải phẫu, 15 hệ cơ quan và 3.432 cấu trúc được đặt tên. Bấm vào cơ để xem metadata, tách lớp, phóng to hoặc bấm “Hỏi AI” để hỏi ngay về cơ đó."
+        subtitle="Human Atlas: 2.234 mảnh giải phẫu, 15 hệ cơ quan và 3.432 cấu trúc được đặt tên. Bấm vào cơ, xương hoặc mô liên kết để xem metadata, tách lớp, phóng to hoặc bấm “Hỏi AI” để hỏi ngay về cấu trúc đó."
         actions={
           <span className="badge badge-pine">
             BodyParts3D 4.0 · CC BY 4.0
@@ -267,7 +290,7 @@ export default function MusclePage() {
 
       <HumanAtlasExplorer
         onMuscleChange={handleMuscleChange}
-        initialSlug={lastSlugRef.current}
+        initialSlug={structure?.kind === 'muscle' ? structure.slug : ''}
         onAsk={openChat}
       />
 

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Roboto+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@400;600&family=Roboto+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,10 +7,95 @@
 @layer base {
   :root {
     color-scheme: light;
+
+    /* Ink — giữ nguyên ở cả 2 chế độ; các lớp dark: dùng bậc sáng hơn. */
+    --ts-ink-50: 241 243 238;
+    --ts-ink-100: 231 234 227;
+    --ts-ink-200: 216 221 212;
+    --ts-ink-300: 195 201 191;
+    --ts-ink-400: 154 163 155;
+    --ts-ink-500: 95 106 97;
+    --ts-ink-600: 74 85 76;
+    --ts-ink-700: 61 71 65;
+    --ts-ink-800: 41 51 45;
+    --ts-ink-900: 26 33 29;
+    --ts-ink-950: 13 18 16;
+
+    /* Accent — pine gốc. */
+    --ts-accent-50: 234 243 238;
+    --ts-accent-100: 211 231 220;
+    --ts-accent-200: 169 207 190;
+    --ts-accent-300: 119 178 155;
+    --ts-accent-400: 95 191 158;
+    --ts-accent-500: 46 138 107;
+    --ts-accent-600: 14 107 82;
+    --ts-accent-700: 11 86 66;
+    --ts-accent-800: 10 69 53;
+    --ts-accent-900: 9 56 44;
+    --ts-accent-950: 5 32 25;
+
+    /* Signal — vermilion + ochre. */
+    --ts-danger-50: 249 236 232;
+    --ts-danger-100: 242 216 209;
+    --ts-danger-200: 229 179 166;
+    --ts-danger-300: 214 141 122;
+    --ts-danger-400: 201 106 83;
+    --ts-danger-500: 184 67 44;
+    --ts-danger-600: 158 55 35;
+    --ts-danger-700: 127 44 28;
+    --ts-danger-800: 97 33 23;
+    --ts-danger-900: 69 24 18;
+    --ts-danger-950: 43 15 11;
+
+    --ts-warn-50: 248 241 223;
+    --ts-warn-100: 240 227 195;
+    --ts-warn-200: 227 203 146;
+    --ts-warn-300: 211 176 99;
+    --ts-warn-400: 193 146 52;
+    --ts-warn-500: 169 118 27;
+    --ts-warn-600: 141 97 22;
+    --ts-warn-700: 113 77 19;
+    --ts-warn-800: 87 59 16;
+    --ts-warn-900: 62 42 12;
+    --ts-warn-950: 38 26 7;
+
+    /* Bề mặt sáng. */
+    --ts-paper: 245 246 242;
+    --ts-paper-2: 237 239 233;
+    --ts-surface: 254 255 252;
+    --ts-surface-2: 238 240 234;
+    --ts-surface-deep: 21 27 24;
+    --ts-page-deep: 14 18 17;
+    --ts-line: 216 221 212;
+    --ts-line-strong: 195 201 191;
+
+    /* Shell luôn tối. */
+    --ts-shell: 14 23 19;
+    --ts-shell-2: 22 35 30;
+    --ts-shell-3: 10 17 14;
+    --ts-shell-ink: 232 229 219;
+
+    --ts-accent-live: rgb(var(--ts-accent-600));
+
+    /* Typography & shape. */
+    --ts-font-display: 'Source Serif 4', Georgia, Cambria, serif;
+    --ts-font-sans: 'Be Vietnam Pro', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --ts-font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --ts-radius: 1;
   }
 
   .dark {
     color-scheme: dark;
+
+    --ts-paper: 14 18 17;
+    --ts-paper-2: 17 22 20;
+    --ts-surface: 21 27 24;
+    --ts-surface-2: 27 35 32;
+    --ts-surface-deep: 21 27 24;
+    --ts-page-deep: 11 15 13;
+    --ts-line: 42 48 45;
+    --ts-line-strong: 58 66 62;
+    --ts-accent-live: rgb(var(--ts-accent-400));
   }
 
   html {
@@ -19,19 +104,23 @@
   }
 
   body {
-    @apply bg-paper font-sans text-[14px] leading-relaxed text-slate-900 antialiased dark:bg-[#0e1211] dark:text-slate-100;
-    background-image: radial-gradient(ellipse 95% 50% at 50% -18%, rgba(14, 107, 82, 0.055), transparent 72%);
-    background-attachment: fixed;
-    caret-color: #0e6b52;
+    @apply bg-paper font-sans text-[14px] leading-relaxed text-slate-900 antialiased dark:text-slate-100;
+    background-image: none;
+    caret-color: rgb(var(--ts-accent-600));
   }
 
   .dark body {
-    background-image: radial-gradient(ellipse 95% 50% at 50% -18%, rgba(95, 191, 158, 0.07), transparent 72%);
+    caret-color: rgb(var(--ts-accent-400));
   }
 
   input[type='checkbox'],
   input[type='radio'] {
-    accent-color: #0e6b52;
+    accent-color: rgb(var(--ts-accent-600));
+  }
+
+  .dark input[type='checkbox'],
+  .dark input[type='radio'] {
+    accent-color: rgb(var(--ts-accent-400));
   }
 
   h1,
@@ -41,7 +130,7 @@
   }
 
   h2 {
-    font-family: 'Source Serif 4', Georgia, Cambria, serif;
+    font-family: var(--ts-font-display);
   }
 
   p {
@@ -53,7 +142,7 @@
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-pine-600/60 ring-offset-2 ring-offset-paper dark:ring-pine-300/60 dark:ring-offset-[#0e1211];
+    @apply outline-none ring-2 ring-pine-600/60 ring-offset-2 ring-offset-paper dark:ring-pine-300/60 dark:ring-offset-paper;
   }
 
   input[type='number']::-webkit-outer-spin-button,
@@ -87,7 +176,7 @@
 @layer components {
   /* ---------- Surfaces ---------- */
   .panel {
-    @apply relative rounded-lg border border-line bg-surface transition-[border-color,box-shadow] duration-200 dark:border-white/[0.08] dark:bg-[#151b18];
+    @apply relative rounded-lg border border-line bg-surface transition-[border-color,box-shadow] duration-200 dark:border-white/[0.08];
     box-shadow:
       0 1px 2px rgba(16, 24, 20, 0.045),
       0 10px 28px -18px rgba(16, 24, 20, 0.08),
@@ -103,6 +192,16 @@
 
   .panel-header {
     @apply flex flex-wrap items-start justify-between gap-3 rounded-t-lg border-b border-line bg-paper-2/35 px-4 py-3.5 dark:border-white/[0.07] dark:bg-white/[0.015] sm:px-5;
+    /* Theo đúng bo góc của panel: variant Editorial/Brutal thu nhỏ card radius
+       nên header không được giữ 8px × --ts-radius (sẽ lòi/khuyết góc). */
+    border-top-left-radius: max(
+      0px,
+      calc(var(--ts-card-radius, calc(8px * var(--ts-radius, 1))) - 1px)
+    );
+    border-top-right-radius: max(
+      0px,
+      calc(var(--ts-card-radius, calc(8px * var(--ts-radius, 1))) - 1px)
+    );
   }
 
   .panel-body {
@@ -314,6 +413,62 @@
     @apply border-b-0;
   }
 
+  /* Khung cuộn cho bảng: lớp ngoài giữ viền + bo góc và cắt mọi thứ bên
+     trong, nên sticky header/scrollbar không thể đè lên góc bo khi tăng
+     --ts-radius. */
+  .table-scroll {
+    overflow: hidden;
+    border: 1px solid rgb(var(--ts-line));
+    border-radius: var(--ts-card-radius, calc(8px * var(--ts-radius, 1)));
+    background-color: rgb(var(--ts-surface));
+    isolation: isolate;
+  }
+
+  .dark .table-scroll {
+    border-color: rgb(255 255 255 / 0.08);
+  }
+
+  .table-scroll-inner {
+    max-height: 420px;
+    overflow: auto;
+    border-radius: inherit;
+    scrollbar-gutter: stable;
+  }
+
+  .table-scroll-inner::-webkit-scrollbar-track {
+    border-radius: 999px;
+  }
+
+  .table-scroll-inner::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Khung bảng markdown: lớp ngoài giữ viền/bo góc, lớp trong cuộn ngang. */
+  .table-frame {
+    overflow: hidden;
+    border: 1px solid rgb(var(--ts-line));
+    border-radius: calc(8px * var(--ts-radius, 1));
+    background-color: rgb(var(--ts-surface));
+    isolation: isolate;
+  }
+
+  .dark .table-frame {
+    border-color: rgb(255 255 255 / 0.08);
+  }
+
+  .table-frame-inner {
+    overflow-x: auto;
+    border-radius: inherit;
+  }
+
+  .table-frame-inner::-webkit-scrollbar-track {
+    border-radius: 999px;
+  }
+
+  .table-frame-inner::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   .num {
     @apply font-mono tabular-nums;
   }
@@ -367,15 +522,15 @@
   /* ---------- Welcome hero ---------- */
   .hero-surface {
     background:
-      radial-gradient(120% 160% at 6% -20%, rgba(14, 107, 82, 0.58) 0%, transparent 55%),
-      radial-gradient(90% 90% at 88% 18%, rgba(46, 138, 107, 0.22) 0%, transparent 60%),
-      linear-gradient(135deg, #11261e 0%, #0e1713 48%, #09100d 100%);
+      radial-gradient(120% 160% at 6% -20%, rgb(var(--ts-accent-600) / 0.58) 0%, transparent 55%),
+      radial-gradient(90% 90% at 88% 18%, rgb(var(--ts-accent-500) / 0.22) 0%, transparent 60%),
+      linear-gradient(135deg, rgb(var(--ts-shell-2)) 0%, rgb(var(--ts-shell)) 48%, rgb(var(--ts-shell-3)) 100%);
   }
 
   .hero-atmosphere {
     background:
-      radial-gradient(ellipse 60% 80% at 72% 42%, rgba(95, 191, 158, 0.14) 0%, transparent 70%),
-      radial-gradient(ellipse 45% 55% at 24% 85%, rgba(193, 146, 52, 0.08) 0%, transparent 65%);
+      radial-gradient(ellipse 60% 80% at 72% 42%, rgb(var(--ts-accent-400) / 0.14) 0%, transparent 70%),
+      radial-gradient(ellipse 45% 55% at 24% 85%, rgb(var(--ts-warn-400) / 0.08) 0%, transparent 65%);
   }
 
   .hero-noise {
@@ -392,8 +547,8 @@
     will-change: transform;
     background: radial-gradient(
       circle at center,
-      rgba(95, 191, 158, 0.4) 0%,
-      rgba(95, 191, 158, 0.08) 45%,
+      rgb(var(--ts-accent-400) / 0.4) 0%,
+      rgb(var(--ts-accent-400) / 0.08) 45%,
       transparent 70%
     );
     animation: heroDrift 24s ease-in-out infinite alternate;
@@ -403,8 +558,8 @@
     opacity: 0.45;
     background: radial-gradient(
       circle at center,
-      rgba(193, 146, 52, 0.3) 0%,
-      rgba(193, 146, 52, 0.06) 48%,
+      rgb(var(--ts-warn-400) / 0.3) 0%,
+      rgb(var(--ts-warn-400) / 0.06) 48%,
       transparent 72%
     );
     animation-duration: 31s;
@@ -413,7 +568,7 @@
 
   .hero-aurora-c {
     opacity: 0.4;
-    background: radial-gradient(circle at center, rgba(46, 138, 107, 0.32) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgb(var(--ts-accent-500) / 0.32) 0%, transparent 70%);
     animation-duration: 27s;
     animation-delay: -14s;
   }
@@ -437,6 +592,52 @@
   .hero-pulse-line-slow {
     stroke-dasharray: 2 12;
     animation: heroDash 12s linear infinite reverse;
+  }
+
+  /* Theme Studio — button/card variants nằm trong components layer để
+     utility màu/bo góc trên từng trang vẫn thắng (vd. CTA hero dùng pine-500,
+     card "Xóa tài khoản" giữ viền đỏ, callout giữ nền semantic). */
+  .btn-primary:where(:not(:disabled)) {
+    background-color: var(--ts-btn-bg);
+    background-image: var(--ts-btn-bg-image, none);
+    color: var(--ts-btn-fg);
+    border-color: var(--ts-btn-border);
+    border-width: var(--ts-btn-border-width, 1px);
+    border-radius: var(--ts-btn-radius);
+    box-shadow: var(--ts-btn-shadow);
+    transform: var(--ts-btn-transform, none);
+  }
+
+  .btn-primary:where(:not(:disabled)):hover {
+    background-color: var(--ts-btn-hover-bg);
+    border-color: var(--ts-btn-hover-border, var(--ts-btn-border));
+    box-shadow: var(--ts-btn-hover-shadow, var(--ts-btn-shadow));
+  }
+
+  .panel,
+  .card {
+    background-color: var(--ts-card-bg);
+    background-image: var(--ts-card-overlay, none);
+    border-color: var(--ts-card-border);
+    border-width: var(--ts-card-border-width, 1px);
+    border-top-width: var(--ts-card-top-width, 1px);
+    border-top-color: var(--ts-card-top-color, var(--ts-card-border));
+    border-radius: var(--ts-card-radius, calc(8px * var(--ts-radius, 1)));
+    box-shadow: var(--ts-card-shadow);
+    backdrop-filter: var(--ts-card-blur, none);
+    transition:
+      border-color var(--ts-dur, 160ms) var(--ts-ease, ease),
+      box-shadow var(--ts-dur, 160ms) var(--ts-ease, ease),
+      transform var(--ts-dur, 160ms) var(--ts-ease, ease),
+      background-color var(--ts-dur, 160ms) var(--ts-ease, ease);
+  }
+
+  .panel:hover,
+  .card:hover {
+    border-color: var(--ts-hover-border, var(--ts-card-border));
+    box-shadow: var(--ts-hover-shadow, var(--ts-card-shadow));
+    transform: var(--ts-hover-transform, none);
+    background-image: var(--ts-hover-overlay, var(--ts-card-overlay, none));
   }
 
   .hero-reveal {
@@ -500,6 +701,21 @@
   }
 }
 
+/* Thanh tiến trình không xác định cho job AI chạy nền. */
+@keyframes researchScan {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(330%);
+  }
+}
+
+.research-scan {
+  animation: researchScan 1.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -512,5 +728,12 @@
 
   .hero-reveal {
     animation-delay: 0ms !important;
+  }
+
+  .research-scan {
+    animation: none !important;
+    transform: none !important;
+    width: 33.333%;
+    opacity: 0.6;
   }
 }

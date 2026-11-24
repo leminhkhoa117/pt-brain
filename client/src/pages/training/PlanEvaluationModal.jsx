@@ -18,9 +18,9 @@ const PRIORITY = {
 };
 
 function scoreColor(score) {
-  if (score >= 80) return '#10b981';
-  if (score >= 60) return '#f59e0b';
-  return '#f43f5e';
+  if (score >= 80) return 'rgb(var(--ts-accent-500))';
+  if (score >= 60) return 'rgb(var(--ts-warn-500))';
+  return 'rgb(var(--ts-danger-500))';
 }
 
 export default function PlanEvaluationModal({ program, onClose }) {
@@ -38,7 +38,7 @@ export default function PlanEvaluationModal({ program, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 sm:items-center sm:p-4">
-      <div className="max-h-[94vh] w-full overflow-auto rounded-t-lg bg-white p-5 shadow-overlay dark:bg-slate-900 sm:max-w-3xl sm:rounded-lg">
+      <div className="max-h-[94vh] w-full overflow-auto rounded-t-lg bg-surface p-5 shadow-overlay sm:max-w-3xl sm:rounded-lg">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
@@ -91,7 +91,7 @@ export default function PlanEvaluationModal({ program, onClose }) {
                   background: `conic-gradient(${scoreColor(result.score)} ${result.score}%, rgba(148,163,184,0.18) 0)`,
                 }}
               >
-                <div className="grid h-[92px] w-[92px] place-items-center rounded-full bg-white dark:bg-slate-900">
+                <div className="grid h-[92px] w-[92px] place-items-center rounded-full bg-surface">
                   <div className="text-center">
                     <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{result.score}</p>
                     <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">/ 100</p>

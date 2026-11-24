@@ -1,45 +1,17 @@
 /** @type {import('tailwindcss').Config} */
-const pine = {
-  50: '#eaf3ee',
-  100: '#d3e7dc',
-  200: '#a9cfbe',
-  300: '#77b29b',
-  400: '#5fbf9e',
-  500: '#2e8a6b',
-  600: '#0e6b52',
-  700: '#0b5642',
-  800: '#0a4535',
-  900: '#09382c',
-  950: '#052019',
-};
 
-const vermilion = {
-  50: '#f9ece8',
-  100: '#f2d8d1',
-  200: '#e5b3a6',
-  300: '#d68d7a',
-  400: '#c96a53',
-  500: '#b8432c',
-  600: '#9e3723',
-  700: '#7f2c1c',
-  800: '#612117',
-  900: '#451812',
-  950: '#2b0f0b',
-};
+// Mọi token màu đi qua CSS variable để Theme Studio có thể đổi toàn bộ giao
+// diện ngay lập tức. Giá trị fallback nằm trong index.css :root / .dark.
+const token = (name) => `rgb(var(${name}) / <alpha-value>)`;
+const scale = (prefix) =>
+  Object.fromEntries(
+    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((step) => [
+      step,
+      token(`--ts-${prefix}-${step}`),
+    ]),
+  );
 
-const ochre = {
-  50: '#f8f1df',
-  100: '#f0e3c3',
-  200: '#e3cb92',
-  300: '#d3b063',
-  400: '#c19234',
-  500: '#a9761b',
-  600: '#8d6116',
-  700: '#714d13',
-  800: '#573b10',
-  900: '#3e2a0c',
-  950: '#261a07',
-};
+const pine = scale('accent');
 
 const clinicalBlue = {
   50: '#eef3f8',
@@ -55,69 +27,69 @@ const clinicalBlue = {
   950: '#0b1824',
 };
 
+// Success độc lập với accent: đúng/sai trong quiz, cảnh báo tích cực…
+// không được đổi sang đỏ khi người dùng chọn theme đỏ/hồng.
+const successGreen = {
+  50: '#edf7f0',
+  100: '#d7eddc',
+  200: '#b0d9bc',
+  300: '#82bf95',
+  400: '#55a06e',
+  500: '#3a8455',
+  600: '#2c6a43',
+  700: '#245436',
+  800: '#1d432b',
+  900: '#163422',
+  950: '#0b1d13',
+};
+
+const radius = (px) => `calc(${px}px * var(--ts-radius, 1))`;
+
 export default {
   darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       colors: {
-        // Warm clinical neutrals — replaces the cool slate ramp app-wide.
-        slate: {
-          50: '#f1f3ee',
-          100: '#e7eae3',
-          200: '#d8ddd4',
-          300: '#c3c9bf',
-          400: '#9aa39b',
-          500: '#5f6a61',
-          600: '#4a554c',
-          700: '#3d4741',
-          800: '#29332d',
-          900: '#1a211d',
-          950: '#0d1210',
-        },
-        white: '#fffdf7',
-        black: '#0b0f0d',
+        slate: scale('ink'),
         pine,
         brand: pine,
-        emerald: pine,
+        emerald: successGreen,
         teal: pine,
-        vermilion,
-        rose: vermilion,
-        ochre,
-        amber: ochre,
-        orange: ochre,
-        lime: ochre,
+        vermilion: scale('danger'),
+        rose: scale('danger'),
+        ochre: scale('warn'),
+        amber: scale('warn'),
+        orange: scale('warn'),
+        lime: scale('warn'),
         sky: clinicalBlue,
-        paper: '#f5f6f2',
-        'paper-2': '#edefe9',
-        surface: '#fefffc',
-        'surface-2': '#eef0ea',
-        shell: '#0e1713',
-        'shell-2': '#16231e',
-        'shell-ink': '#e8e5db',
-        line: '#d8ddd4',
-        'line-strong': '#c3c9bf',
+        white: '#fffdf7',
+        black: '#0b0f0d',
+        paper: token('--ts-paper'),
+        'paper-2': token('--ts-paper-2'),
+        surface: token('--ts-surface'),
+        'surface-2': token('--ts-surface-2'),
+        'surface-deep': token('--ts-surface-deep'),
+        'page-deep': token('--ts-page-deep'),
+        shell: token('--ts-shell'),
+        'shell-2': token('--ts-shell-2'),
+        'shell-ink': token('--ts-shell-ink'),
+        line: token('--ts-line'),
+        'line-strong': token('--ts-line-strong'),
       },
       fontFamily: {
-        sans: [
-          '"Be Vietnam Pro"',
-          'Inter',
-          'system-ui',
-          '-apple-system',
-          'Segoe UI',
-          'sans-serif',
-        ],
-        display: ['"Source Serif 4"', 'Georgia', 'Cambria', 'serif'],
-        mono: ['"Roboto Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['var(--ts-font-sans)'],
+        display: ['var(--ts-font-display)'],
+        mono: ['var(--ts-font-mono)'],
       },
       borderRadius: {
-        sm: '3px',
-        DEFAULT: '4px',
-        md: '6px',
-        lg: '8px',
-        xl: '10px',
-        '2xl': '12px',
-        '3xl': '14px',
+        sm: radius(3),
+        DEFAULT: radius(4),
+        md: radius(6),
+        lg: radius(8),
+        xl: radius(10),
+        '2xl': radius(12),
+        '3xl': radius(14),
       },
       boxShadow: {
         panel: '0 1px 2px rgba(20, 25, 23, 0.04)',

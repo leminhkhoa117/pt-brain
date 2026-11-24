@@ -7,6 +7,7 @@ import { DialogProvider } from './components/DialogProvider.jsx';
 import { AuthProvider } from './hooks/useAuth.jsx';
 import { ThemeProvider } from './hooks/useTheme.jsx';
 import './index.css';
+import './theme/theme-studio.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {

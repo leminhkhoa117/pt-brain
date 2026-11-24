@@ -23,10 +23,27 @@ const schema = z.object({
   JWT_REFRESH_SECRET: z.string().min(16).default('dev-refresh-secret-change-me'),
   ACCESS_TOKEN_TTL: z.string().default('15m'),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
+  // Phiên không chọn "ghi nhớ đăng nhập": cookie phiên + refresh token ngắn hơn.
+  SESSION_REFRESH_TTL_HOURS: z.coerce.number().int().positive().default(24),
 
   CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
+  APP_PUBLIC_URL: z.string().url().optional().or(z.literal('')),
   COOKIE_SECURE: boolFromEnv,
   SERVE_CLIENT: boolFromEnv,
+
+  // ===== Google OAuth =====
+  // Tạo OAuth client tại https://console.cloud.google.com/apis/credentials
+  // Authorized redirect URI: <CLIENT_ORIGIN>/api/auth/google/callback
+  GOOGLE_CLIENT_ID: z.string().optional().default(''),
+  GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
+  GOOGLE_REDIRECT_URI: z.string().url().optional().or(z.literal('')),
+
+  // ===== Email đặt lại mật khẩu =====
+  // Nếu có RESEND_API_KEY thì gửi email thật; nếu không, link chỉ được log ở server
+  // (và trả về trong response ở môi trường development/test để test được).
+  RESEND_API_KEY: z.string().optional().default(''),
+  MAIL_FROM: z.string().default('PT Brain <no-reply@ptbrain.local>'),
+  PASSWORD_RESET_TTL_MINUTES: z.coerce.number().int().positive().default(30),
 
   // 'disk' cho local; 'mongo' (GridFS) cho Render free không có ổ đĩa persistent
   STORAGE_DRIVER: z.enum(['disk', 'mongo']).default('disk'),

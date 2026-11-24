@@ -13,7 +13,7 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 | Database | MongoDB 7 (local hoặc Atlas) |
 | AI | OpenCode Go – API OpenAI-compatible, model `deepseek-v4.1-flash` (key chỉ ở backend) |
 | Nguồn nghiên cứu | PubMed E-utilities, Europe PMC, OpenAlex, Unpaywall, Crossref, DOI resolver |
-| Test | Vitest – 303 test (unit + API integration; cần MongoDB cho phần integration) |
+| Test | Vitest – 327 test (unit + API integration; cần MongoDB cho phần integration) |
 | Tooling | ESLint 9 (flat config), Prettier, Docker Compose |
 
 ## Giao diện & logo
@@ -22,6 +22,7 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 - Asset: `client/public/logo-mark.png` (PNG, dùng cho header), `favicon.png`, icon PWA 192/512; component `BrandLogo` dùng chung nên mọi chỗ đều khớp logo.
 - Hệ thống giao diện **sổ tay huấn luyện**: nền giấy lạnh, mực đậm, đường kẻ hairline, một accent pine; tiêu đề Source Serif 4, UI Be Vietnam Pro, số liệu Roboto Mono. Sidebar pine 248px trên desktop, rail 64px trên tablet, top bar + drawer + bottom nav trên mobile.
 - Dark mode mặc định theo hệ thống; có nút chuyển sáng/tối. Token và quy tắc nằm trong `DESIGN.md`, bối cảnh sản phẩm trong `PRODUCT.md`.
+- **Theme Studio** (`/studio`): 20 bảng màu, 5 cặp font, 4 kiểu bo góc, 31 hiệu ứng (nền / texture / con trỏ / chuyển động / hover) và 48 biến thể component. Chọn xong bấm **Áp dụng** để đổi toàn app ngay, không cần tải lại; cấu hình lưu theo trình duyệt.
 
 
 ## Chạy nhanh
@@ -45,7 +46,19 @@ Mở http://localhost:5173 → **Đăng ký** → vào **Cài đặt** nhập gi
 
 - **Giáo án** → wizard tạo giáo án → **Log buổi tập**.
 - **Nghiên cứu** → dán DOI/PDF hoặc hỏi bằng tiếng Việt.
-- **Học tập** → **giáo trình PT Academy** (5 module, quiz, tiến độ), từ điển, flashcard, sổ tay.
+- **Học tập** → **giáo trình PT Academy** (6 module, 71 bài, quiz, tiến độ), từ điển, flashcard, sổ tay.
+
+### Bảo mật & đăng nhập
+
+- **Đăng nhập Google** (OAuth 2.0 + PKCE): điền `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` trong `.env`; redirect URI `http://localhost:5173/api/auth/google/callback` (production: `https://<domain>/api/auth/google/callback`). Chưa cấu hình thì nút Google tự ẩn.
+- **Ghi nhớ đăng nhập**: bật = cookie 30 ngày; tắt = cookie phiên, đóng trình duyệt là hết.
+- **Đổi / đặt mật khẩu** trong Cài đặt → Bảo mật tài khoản; tài khoản Google-only có thể đặt mật khẩu lần đầu.
+- **Quên mật khẩu**: token một lần, hết hạn 30 phút. Cấu hình `RESEND_API_KEY` + `MAIL_FROM` để gửi email thật; chưa cấu hình thì development trả link trực tiếp trong response.
+- **Phiên thiết bị**: xem thiết bị/IP/lần hoạt động cuối, thu hồi từng phiên hoặc đăng xuất mọi thiết bị khác. Đổi mật khẩu/logout thu hồi access token ngay.
+- **Chống dò mật khẩu**: khóa tạm 15 phút sau 5 lần sai + rate limit theo IP/email; mật khẩu ≥ 10 ký tự, có chữ + số.
+
+Chi tiết audit, checklist deploy và các rủi ro còn lại: [`docs/SECURITY_AUDIT.md`](docs/SECURITY_AUDIT.md).  
+Dữ liệu xương/mô liên kết cho Atlas: [`docs/ANATOMY_DATA.md`](docs/ANATOMY_DATA.md).
 
 ### Cấu hình AI (OpenCode Go)
 
@@ -77,12 +90,13 @@ Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`doc
 ## Lệnh
 
 ```bash
-npm run test        # 303 test (unit + API integration; cần MongoDB)
-npm run test:unit   # 275 unit test, không cần MongoDB
+npm run test        # 327 test (unit + API integration; cần MongoDB)
+npm run test:unit   # 282 unit test, không cần MongoDB
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
 npm run format      # Prettier
 npm --prefix client run validate:atlas  # kiểm tra 2.234 mesh + mapping 59 cơ
+npm --prefix client run validate:atlas-anatomy  # kiểm tra 315 concept xương/mô liên kết
 ```
 
 ## Cấu trúc
@@ -94,14 +108,17 @@ pt-brain/
 │  ├─ analytics/warnings.js      # Cảnh báo theo quy tắc
 │  ├─ training/planner.js        # Split, prescription, progressive overload, deload
 │  ├─ learning/sm2.js            # SM-2 flashcard
-│  ├─ curriculum/                # Giáo trình PT Academy: schema zod + 14 bài flagship
+│  ├─ anatomy/index.js           # Xương + mô liên kết: tên Việt, chức năng, tải tập, lưu ý
+│  ├─ learning/contexts.js       # Metadata học theo ngữ cảnh + action cho 71 bài
+│  ├─ security/password.js       # Chính sách mật khẩu dùng chung client/server
+│  ├─ curriculum/                # Giáo trình PT Academy: schema zod + 71 bài
 │  │                             # (validate khi import, quiz, nguồn kiểm chứng)
 │  ├─ muscles/index.js           # 59 cơ: tên Việt – Anh, nhóm, chức năng, bài tập
 │  └─ config/nutrition.js        # Hệ số/ngưỡng chỉnh được
 ├─ server/
 │  ├─ src/models/                # User, BodyLog, CalcHistory, Exercise, Program, WorkoutSession,
 │  │                             # Paper, Summary, Term, Flashcard, Note, AiUsage, Meal, MealPlan, MealPlanReview,
-│  │                             # CurriculumProgress
+│  │                             # CurriculumProgress, LearningEvent, PlanEvaluation
 │  ├─ src/services/
 │  │  ├─ research/               # metadata, pdf, reader, pubmed, europepmc, openalex, ranker, finder
 │  │  ├─ ai/                     # client, quota, summarizer, finderSummarizer, planAdvisor,
@@ -110,7 +127,7 @@ pt-brain/
 │  ├─ src/routes/                # auth, me, metrics, calc, summaries, papers, research, meals, meal-plans,
 │  │                             # muscles, exercises, programs, workouts, terms, notes, flashcards,
 │  │                             # quizzes, curriculum
-│  └─ tests/                     # 22 file test (unit + API integration)
+│  └─ tests/                     # 37 file test (unit + API integration + auth security)
 ├─ client/src/
 │  ├─ pages/                     # Dashboard, BodyLog, Calculators, Research(+Reader/Finder),
 │  │                             # Training(+Planner/Workout), Learn(+Curriculum/Lesson/Glossary/Flashcards/Notes),
@@ -127,6 +144,7 @@ pt-brain/
 
 ### Giai đoạn 0–1 — Nền tảng
 - Auth JWT httpOnly + refresh token xoay vòng; bcrypt; zod; rate limit; log không ghi cookie; xóa tài khoản.
+- Đăng nhập Google OAuth (PKCE), “ghi nhớ đăng nhập”, đổi/đặt lại mật khẩu, quản lý phiên thiết bị, khóa tạm khi dò mật khẩu, kiểm tra Origin chống CSRF — chi tiết trong [`docs/SECURITY_AUDIT.md`](docs/SECURITY_AUDIT.md).
 - Hồ sơ có giới tính, ngày sinh, chiều cao, cân nặng; 14 máy tính chỉ số, BodyLog 1 bản ghi/ngày, dashboard biểu đồ + MA7 + heatmap + cảnh báo, CSV UTF-8. Ô chiều cao/cân nặng/tuổi trong máy tính sửa được để tính nhanh, không ghi đè hồ sơ.
 - **Lịch sử tính toán**: lưu kết quả 1RM và Calo & macro vào `calchistories`; xem 50 bản ghi gần nhất ngay trong trang Máy tính, lọc theo loại, xóa từng bản ghi hoặc toàn bộ.
 - Computed snapshot cho từng ngày để biểu đồ không đổi khi công thức thay đổi.
@@ -193,8 +211,9 @@ pt-brain/
 - **Sửa giáo án**: đổi tên/mục tiêu/deload, thêm/xóa ngày, thêm/xóa bài, chỉnh set/rep/RIR/rest; chọn bài bằng popup thay vì dropdown.
 - **AI đề xuất giáo án**: dựa trên hồ sơ, dụng cụ, thời gian và evidence base; preview, có thể lưu hoặc để hệ thống fallback theo quy tắc nếu AI lỗi.
 - **Chấm điểm giáo án**: điểm 0-100 + hạng, 7 subscore (volume, tần suất, cân bằng, RIR, hồi phục, đặc hiệu, tiến bộ), điểm mạnh/vấn đề/đề xuất và trích dẫn nghiên cứu.
-- **Human Atlas 3D tương tác**: trang `/muscles` dùng **2.234 mảnh giải phẫu, 3.432 cấu trúc, 15 hệ cơ quan** từ BodyParts3D 4.0 (CC BY 4.0); xoay/zoom, tìm kiếm toàn bộ cấu trúc, bật/tắt từng hệ, thu nhỏ bảng hệ cơ quan, tách giải phẫu 0–100%, isolate cấu trúc và xem metadata PT Brain (tên Việt – Anh, nhóm, chức năng, bài tập) cho 54 cơ đã map qua FMA; bảng thông tin kèm mô tả chức năng/cấu trúc của hệ cơ quan tương ứng.
-- **Chat AI theo cơ**: khung chat nằm **dưới mô hình**, hỏi về kỹ thuật, bài tập, set/tuần, khởi động, phục hồi của cơ đang chọn; AI trả lời tiếng Việt, có ngữ cảnh hồ sơ và bằng chứng E1–E6, giới hạn quota riêng `muscle`. Trần token được nâng để câu trả lời dài không bị cắt, có retry khi model dùng hết token cho reasoning; đổi cơ giữa lúc chờ sẽ bỏ qua câu trả lời của cơ cũ.
+- **Human Atlas 3D tương tác**: trang `/muscles` dùng **2.234 mảnh giải phẫu, 3.432 cấu trúc, 15 hệ cơ quan** từ BodyParts3D 4.0 (CC BY 4.0); xoay/zoom, tìm kiếm toàn bộ cấu trúc, bật/tắt từng hệ, thu nhỏ bảng hệ cơ quan, tách giải phẫu 0–100%, isolate cấu trúc và xem metadata PT Brain (tên Việt – Anh, nhóm, chức năng, bài tập) cho 59 cơ đã map qua FMA; bảng thông tin kèm mô tả chức năng/cấu trúc của hệ cơ quan tương ứng.
+- **Hệ xương & mô liên kết trong Atlas**: knowledge base `shared/anatomy` phủ **315 concept xương/mô liên kết** (122 mục biên soạn + 193 sinh tên theo quy tắc; 0 missing) với tên Việt – Anh, nhóm, chức năng, ứng dụng tập luyện, lưu ý an toàn và cơ liên quan; bấm vào xương/gân/dây chằng/cân/sụn/đĩa đệm đều mở panel + nút **Hỏi AI** như cơ. Script `validate:atlas-anatomy` kiểm tra độ phủ trong CI.
+- **Chat AI theo cấu trúc**: chat nằm dưới mô hình, hỏi về kỹ thuật, bài tập, set/tuần, khởi động, phục hồi của **cơ, xương hoặc mô liên kết** đang chọn; AI nhận metadata đầy đủ (chức năng, bài tập, ghi chú, tải tập, lưu ý an toàn, xương/mô liên quan) + hồ sơ người dùng (mục tiêu, bệnh nền, ghi chú sức khỏe), trả lời tiếng Việt, có bằng chứng E1–E6 và quota riêng `muscle`. Đổi cấu trúc giữa lúc chờ sẽ bỏ qua câu trả lời của cấu trúc cũ.
 - **Nhập bữa ăn 2 cách**: chụp ảnh để AI ước tính, hoặc **nhập tay** từng món với kcal/P/C/F — không cần ảnh. Bữa nhập tay lưu `source=manual`, sửa lại món được, tổng ngày cập nhật ngay.
 - **Meal plan 7 ngày, tối đa 3 tháng**: AI gợi ý theo hồ sơ/sở thích, hoặc người dùng **tự xây thực đơn** trong editor (7 ngày × tới 6 bữa × 12 món, chép ngày, chọn 7–90 ngày). Plan tự tạo lấy mục tiêu ngày = trung bình chính thực đơn đó và sửa lại được.
 - **Đánh giá tuần thực tế vs plan**: mỗi tuần so kcal/protein theo ngày và theo bữa với thực đơn mẫu, tính điểm bám plan 0–100 bằng code (40% số ngày có log + 35% calo + 25% protein); AI viết nhận xét điều làm tốt/chỗ lệch/gợi ý, lưu lại từng tuần.
@@ -202,11 +221,14 @@ pt-brain/
 
 ### Giai đoạn 7 — PT Academy: giáo trình học tập cho PT
 
-- **Giáo trình 6 module** (`/learn` → tab Giáo trình): Giải phẫu cơ xương khớp · Sinh lý vận động & tập luyện · Dinh dưỡng · Yếu tố thể chất · Phục hồi chức năng & an toàn · **Ứng dụng cá nhân hoá** — **64 bài hoàn chỉnh toàn bộ outline** (15+12+13+8+9+7; module Ứng dụng gồm quy trình 6 bước + 6 ca khách cụ thể: giảm mỡ văn phòng, nữ săn chắc, tăng huyết áp, lớn tuổi loãng xương, hardgainer, đau lưng đang physio — mỗi ca có số liệu TDEE/protein, giáo án tuần và thực đơn cụ thể), mỗi bài có mục tiêu, nội dung tiếng Việt (kèm thuật ngữ Anh), box "Áp dụng vào phòng tập", thuật ngữ, quiz chấm bằng code và **nguồn tham khảo kèm license** (đã kiểm chứng: Morton 2018, ISSN creatine, PEACE & LOVE, IASP 2020, Brinjikji 2015, Crossley 2016, Kongsgaard 2009, Gabbett 2016, WHO 2020...).
+- **Giáo trình 6 module** (`/learn` → tab Giáo trình): Giải phẫu cơ xương khớp · Sinh lý vận động & tập luyện · Dinh dưỡng · Yếu tố thể chất · Phục hồi chức năng & an toàn · **Ứng dụng cá nhân hoá** — **71 bài hoàn chỉnh** (15+12+13+8+12+11), mỗi bài có mục tiêu, nội dung tiếng Việt (kèm thuật ngữ Anh), box "Áp dụng vào phòng tập", thuật ngữ, quiz chấm bằng code và **nguồn tham khảo kèm license** (đã kiểm chứng: Morton 2018, ISSN creatine, PEACE & LOVE, IASP 2020, Brinjikji 2015, Crossley 2016, Kongsgaard 2009, Gabbett 2016, WHO 2020...).
 - **Nội dung là code có version** tại `shared/curriculum/lessons/*.js` (thuần dữ liệu, không dependency); schema zod + tham chiếu chéo validate ngay khi server nạp routes (slug duy nhất, ảnh khai báo đủ, `related.muscles/conditions` trỏ tới dữ liệu có thật) — 20 test chuyên trách.- **Tiến độ per-user**: model `CurriculumProgress` (đang đọc/hoàn thành, điểm quiz tốt nhất); thanh tiến độ từng module, gợi ý **"Tiếp tục học"** trong trang giáo trình và trên Dashboard.
 - **Quiz kết hợp**: bank câu hỏi cố định chấm bằng **code** (miễn phí, có giải thích, lưu điểm tốt nhất) + nút **"AI tạo thêm câu hỏi"** từ nội dung bài (tốn quota `quiz` như quiz nghiên cứu).
 - **Chat AI theo bài** (SSE streaming, cùng cơ chế chat cơ bắp): AI chỉ trả lời trong phạm vi nội dung bài + bằng chứng liên quan; quota riêng `curriculum`.
 - **Tích hợp chéo**: thuật ngữ bài → **1-click tạo flashcard** SM-2 hoặc lưu vào từ điển cá nhân; cơ nhắc trong bài → deep-link `/muscles?muscle=` mở đúng cơ trong mô hình 3D; máy tính liên quan → deep-link `/calculators?tab=`; bệnh nền liên quan → tooltip quy tắc an toàn; nghiên cứu E1–E10 → chip DOI mở bài gốc.
+- **Học theo ngữ cảnh (mới)**: mỗi bài có metadata surface + action; Dashboard có “Học hôm nay”, Giáo trình có “Lộ trình của tôi” và “Ôn tập hôm nay”; thẻ “Học 3 phút” xuất hiện ngay trong Giáo án, Log buổi tập, Dinh dưỡng, AI thể trạng, Máy tính, Đọc nghiên cứu và panel 3D; bấm áp dụng sẽ mở đúng công cụ và ghi mastery/learning event.
+- **Đo vòng lặp học**: `CurriculumProgress` lưu mastery + hành động đã áp dụng; `LearningEvent` (TTL 180 ngày) lưu view/quiz/apply/dismiss; API `/api/learning/recommendations|next|summary|lessons/:slug/apply|dismiss`.
+- **Kế hoạch gắn Học tập vào toàn bộ app** (app → học, học → áp dụng, đóng vòng lặp): [`docs/LEARNING_INTEGRATION_PLAN.md`](docs/LEARNING_INTEGRATION_PLAN.md).
 - **Ảnh minh hoạ public domain/CC BY/CC BY-SA** (14 tệp) tải sẵn về `client/public/curriculum/images/` (bản khắc Gray's Anatomy 1918, bản đồ Vesalius 1543, sơ đồ Sarcomere CC BY-SA, minh hoạ y khoa PD-USGov) — attribution từng ảnh trong UI và trong `client/public/curriculum/ATTRIBUTION.md`; không dùng ảnh thương mại hoặc license NC/ND.
 
 ### Evidence base dùng cho AI
@@ -357,7 +379,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 - AI plan có thể trả về fallback theo quy tắc nếu model không trả JSON hợp lệ; UI hiển thị rõ nguồn.
 - Ảnh thể trạng/bữa ăn dùng chung cơ chế lưu trữ với ảnh tiến độ (đĩa hoặc GridFS); production Render dùng GridFS.
 - Chưa có xác thực ảnh y tế/chuyên gia; không dùng cho người có bệnh lý hoặc rối loạn ăn uống.
-- **Giáo trình PT Academy hoàn tất 64 bài / 6 module** (outline gốc 57 bài ở 5 module + module mới "Ứng dụng cá nhân hoá" 7 bài theo yêu cầu riêng — quy trình 6 bước + 6 ca archetype khách cụ thể với số liệu đầy đủ).
+- **Giáo trình PT Academy hoàn tất 71 bài / 6 module** (outline gốc + các đợt bổ sung anatomy/rehab/case; mỗi bài có quiz, nguồn và box áp dụng).
 - Nội dung giáo trình biên soạn từ nguồn uy tín (mỗi bài ≥ 1 nguồn kèm license, liệt kê cuối bài); giáo dục cho PT, không thay thế chứng chỉ hành nghề — disclaimer hiển thị ngay trong trang giáo trình.
 
 ## Bảo mật & bản quyền

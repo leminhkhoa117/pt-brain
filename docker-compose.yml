@@ -24,6 +24,14 @@ services:
       PORT: 4000
       MONGO_URI: mongodb://mongo:27017/pt-brain
       CLIENT_ORIGIN: http://localhost:5173
+      APP_PUBLIC_URL: http://localhost:5173
+      SESSION_REFRESH_TTL_HOURS: ${SESSION_REFRESH_TTL_HOURS:-24}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      MAIL_FROM: "${MAIL_FROM:-PT Brain <no-reply@ptbrain.local>}"
+      PASSWORD_RESET_TTL_MINUTES: ${PASSWORD_RESET_TTL_MINUTES:-30}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-me}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-me}
       AI_PROVIDER: ${AI_PROVIDER:-opencode-go}

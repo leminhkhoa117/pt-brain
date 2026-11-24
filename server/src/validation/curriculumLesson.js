@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MODULE_KEYS, validateLessonCrossRefs } from '../../../shared/curriculum/index.js';
+import { validateLearningMetadata } from '../../../shared/learning/contexts.js';
 
 /**
  * Schema nội dung một bài giáo trình (nằm ở server vì shared/ giữ thuần dữ
@@ -83,5 +84,6 @@ export const lessonSchema = z.object({
 export function validateCurriculumLessons(lessons) {
   lessons.forEach((lesson) => lessonSchema.parse(lesson));
   validateLessonCrossRefs(lessons);
+  validateLearningMetadata(lessons);
   return lessons;
 }

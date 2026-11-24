@@ -276,7 +276,7 @@ export default function MealPlanEditorModal({ plan, onClose, onSaved }) {
   return (
     <Portal>
       <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 sm:items-center sm:p-4">
-        <div className="max-h-[94vh] w-full overflow-auto rounded-t-lg bg-white p-5 shadow-overlay dark:bg-slate-900 sm:max-w-4xl sm:rounded-lg">
+        <div className="max-h-[94vh] w-full overflow-auto rounded-t-lg bg-surface p-5 shadow-overlay sm:max-w-4xl sm:rounded-lg">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">

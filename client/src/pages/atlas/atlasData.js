@@ -128,7 +128,8 @@ export const SYSTEMS = [
 export const SYSTEM_BY_ID = Object.fromEntries(SYSTEMS.map((system) => [system.id, system]));
 
 // The muscle page opens on the functional anatomy layer, not the whole organ set.
-export const DEFAULT_VISIBLE = ['muscular', 'skeletal'];
+// Connective tissue is included so gân/cân/dây chằng có thể bấm và hỏi AI ngay.
+export const DEFAULT_VISIBLE = ['muscular', 'skeletal', 'connective'];
 
 export const PRESETS = {
   all: SYSTEMS.map((system) => system.id),

@@ -26,6 +26,22 @@ services:
         generateValue: true
       - key: CLIENT_ORIGIN
         sync: false
+      - key: APP_PUBLIC_URL
+        sync: false
+      - key: SESSION_REFRESH_TTL_HOURS
+        value: "24"
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: PASSWORD_RESET_TTL_MINUTES
+        value: "30"
       - key: AI_PROVIDER
         value: opencode-go
       - key: AI_BASE_URL

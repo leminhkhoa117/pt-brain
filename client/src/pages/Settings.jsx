@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../components/ui.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useTheme } from '../hooks/useTheme.jsx';
+import { getTheme } from '../theme/presets.js';
 import { profileSchema } from '../lib/schemas.js';
 import { getErrorMessage } from '../api/client.js';
 import { fetchAiUsage } from '../api/auth.js';
 import { ACTIVITY_LABELS, EXPERIENCE_LABELS, GOAL_LABELS } from '../lib/format.js';
 import { HEALTH_CONDITIONS } from '@shared/health/conditions.js';
+import SecuritySection from './settings/SecuritySection.jsx';
 
 const AI_KIND_LABELS = [
   ['summarize', 'Tóm tắt'],
@@ -21,15 +23,17 @@ const AI_KIND_LABELS = [
   ['quiz', 'Quiz'],
   ['vision', 'Phân tích ảnh'],
   ['mealplan', 'Meal plan'],
-  ['muscle', 'Chat cơ bắp'],
+  ['muscle', 'Giải phẫu 3D'],
 ];
 
 export default function Settings() {
   const { user, saveProfile, removeAccount, logout } = useAuth();
-  const { isDark, toggle } = useTheme();
+  const { isDark, toggle, customization } = useTheme();
+  const currentTheme = getTheme(customization.themeId);
   const navigate = useNavigate();
   const [notice, setNotice] = useState(null);
   const [confirmText, setConfirmText] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [conditions, setConditions] = useState(user?.profile?.healthConditions || []);
   const [conditionNotes, setConditionNotes] = useState(user?.profile?.conditionNotes || '');
@@ -105,9 +109,13 @@ export default function Settings() {
 
   const onDelete = async () => {
     if (confirmText.trim().toUpperCase() !== 'XOA') return;
+    if (user?.hasPassword && !deletePassword.trim()) {
+      setNotice({ tone: 'danger', text: 'Nhập mật khẩu để xác nhận xóa tài khoản.' });
+      return;
+    }
     setDeleting(true);
     try {
-      await removeAccount();
+      await removeAccount(user?.hasPassword ? { password: deletePassword } : {});
       navigate('/register', { replace: true });
     } catch (error) {
       setNotice({ tone: 'danger', text: getErrorMessage(error) });
@@ -283,6 +291,20 @@ export default function Settings() {
                 />
               </button>
             </div>
+            <Link
+              to="/studio"
+              className="mt-3 flex items-center justify-between gap-3 rounded-md border border-line bg-paper-2/50 px-3 py-2.5 transition-colors hover:border-line-strong hover:bg-paper-2 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
+            >
+              <span className="min-w-0">
+                <span className="block text-[12.5px] font-semibold text-slate-800 dark:text-slate-100">
+                  Theme Studio
+                </span>
+                <span className="block text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                  {currentTheme.name} · chọn bảng màu, hiệu ứng và biến thể component
+                </span>
+              </span>
+              <Icon name="arrowRight" className="h-4 w-4 shrink-0 text-slate-400" />
+            </Link>
           </Card>
 
           <Card>
@@ -350,6 +372,10 @@ export default function Settings() {
         </div>
       </div>
 
+      <div className="mt-4">
+        <SecuritySection />
+      </div>
+
       <Card className="mt-4 border-rose-200 dark:border-rose-900/60">
         <h2 className="text-base font-semibold text-rose-600 dark:text-rose-400">Xóa tài khoản</h2>
         <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500 dark:text-slate-400">
@@ -363,10 +389,24 @@ export default function Settings() {
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
           />
+          {user?.hasPassword && (
+            <input
+              className="input max-w-[240px]"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Mật khẩu xác nhận"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+            />
+          )}
           <button
             type="button"
             className="btn bg-rose-600 text-white hover:bg-rose-700"
-            disabled={confirmText.trim().toUpperCase() !== 'XOA' || deleting}
+            disabled={
+              confirmText.trim().toUpperCase() !== 'XOA' ||
+              deleting ||
+              (user?.hasPassword && !deletePassword.trim())
+            }
             onClick={onDelete}
           >
             {deleting ? 'Đang xóa...' : 'Xóa vĩnh viễn tài khoản'}

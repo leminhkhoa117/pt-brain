@@ -26,8 +26,13 @@ adult male reference anatomy from the Database Center for Life Science
   `fibularis tertius`, `subscapularis`, `levator scapulae`) into the
   muscular display layer.
 - Added PT Brain Vietnamese labels, descriptions, and exercise metadata for
-  59 curated muscles by joining FMA IDs; the remaining source structures use
-  the system-level descriptions.
+  59 curated muscles by joining FMA IDs.
+- Added `shared/anatomy/index.js`: a Vietnamese knowledge layer for **315
+  skeletal + connective-tissue concepts** (120 curated entries + 195
+  rule-generated names). Functional descriptions, load notes and safety notes
+  are original PT Brain summaries referencing **OpenStax Anatomy & Physiology**
+  (CC BY-NC-SA 4.0, cite-only) and **Gray's Anatomy** (public domain). FMA
+  concept IDs and source geometry remain from BodyParts3D.
 - The upstream `atlas.json` concept names and source IDs are preserved.
 
 BodyParts3D is a reference anatomy, not a complete model of every human

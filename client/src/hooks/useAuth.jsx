@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  changePasswordRequest,
   deleteAccount,
   fetchMe,
   loginRequest,
@@ -156,14 +157,23 @@ export function AuthProvider({ children }) {
     [rememberSession],
   );
 
+  const changePassword = useCallback(
+    async (payload) => {
+      const data = await changePasswordRequest(payload);
+      rememberSession(data.user, data.age);
+      return data;
+    },
+    [rememberSession],
+  );
+
   const completeWelcome = useCallback(async () => {
     const data = await markWelcomeSeen();
     rememberSession(data.user, data.age);
     return data.user;
   }, [rememberSession]);
 
-  const removeAccount = useCallback(async () => {
-    await deleteAccount();
+  const removeAccount = useCallback(async (payload) => {
+    await deleteAccount(payload);
     resetSession();
   }, [resetSession]);
 
@@ -177,6 +187,7 @@ export function AuthProvider({ children }) {
       register,
       logout,
       saveProfile,
+      changePassword,
       completeWelcome,
       removeAccount,
     }),
@@ -189,6 +200,7 @@ export function AuthProvider({ children }) {
       register,
       logout,
       saveProfile,
+      changePassword,
       completeWelcome,
       removeAccount,
     ],

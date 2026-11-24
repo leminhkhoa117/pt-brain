@@ -123,7 +123,7 @@ export default function SourcePane({
         </div>
 
         {translating && !translationText && (
-          <p className="mt-2 rounded-lg bg-white/70 px-3 py-2 text-xs text-slate-500 dark:bg-slate-900/60 dark:text-slate-400">
+          <p className="mt-2 rounded-lg bg-surface/70 px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
             Đang dịch từng đoạn — bài dài có thể mất 1–2 phút. Bạn có thể cuộn xuống đọc bản gốc trong lúc chờ.
           </p>
         )}

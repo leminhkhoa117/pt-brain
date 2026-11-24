@@ -8,6 +8,10 @@ export const api = axios.create({
   timeout: 90000,
 });
 
+// Header tùy chỉnh giúp server phân biệt request của app với form HTML cross-site
+// (form không thể tự đặt header này) — một lớp phòng thủ CSRF bổ sung.
+api.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
 // Endpoint có gọi AI (tóm tắt, tìm nghiên cứu, vision, quiz, meal plan…) chạy lâu
 // hơn CRUD thường rất nhiều; timeout 30s mặc định sẽ cắt ngang và báo
 // "Máy chủ phản hồi quá lâu" dù server vẫn đang xử lý bình thường.

@@ -130,7 +130,7 @@ export default function QuizPage() {
                     </h2>
                   </div>
                   {submitted && (
-                    <div className="rounded-lg bg-white px-4 py-2 text-center shadow-sm dark:bg-slate-900">
+                    <div className="rounded-lg bg-surface px-4 py-2 text-center shadow-sm">
                       <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Điểm</p>
                       <p className="text-xl font-extrabold text-brand-600 dark:text-brand-300">
                         {score}/{questions.length}

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { HEALTH_CONDITION_KEYS } from '../../../shared/health/conditions.js';
+import { passwordProblems } from '../../../shared/security/password.js';
 
 const MIN_AGE = 14;
 const MAX_AGE = 100;
@@ -23,19 +24,65 @@ const birthDateSchema = z
     return age !== null && age >= MIN_AGE && age <= MAX_AGE;
   }, `Ngày sinh phải cho tuổi từ ${MIN_AGE} đến ${MAX_AGE}`);
 
-export const registerSchema = z.object({
-  email: z.string().trim().toLowerCase().email('Email không hợp lệ'),
-  password: z
-    .string()
-    .min(8, 'Mật khẩu tối thiểu 8 ký tự')
-    .max(100, 'Mật khẩu tối đa 100 ký tự'),
-  name: z.string().trim().min(2, 'Tên tối thiểu 2 ký tự').max(80),
-});
+const newPasswordSchema = z.string().min(1, 'Vui lòng nhập mật khẩu mới').max(100);
 
-export const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email('Email không hợp lệ'),
-  password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
-});
+export const registerSchema = z
+  .object({
+    email: z.string().trim().toLowerCase().email('Email không hợp lệ'),
+    password: newPasswordSchema,
+    name: z.string().trim().min(2, 'Tên tối thiểu 2 ký tự').max(80),
+    remember: z.boolean().optional().default(true),
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    for (const message of passwordProblems(data.password, { email: data.email, name: data.name })) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message });
+    }
+  });
+
+export const loginSchema = z
+  .object({
+    email: z.string().trim().toLowerCase().email('Email không hợp lệ'),
+    password: z.string().min(1, 'Vui lòng nhập mật khẩu').max(100),
+    remember: z.boolean().optional().default(true),
+  })
+  .strict();
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().max(100).optional(),
+    newPassword: newPasswordSchema,
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    for (const message of passwordProblems(data.newPassword)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+    }
+  });
+
+export const forgotPasswordSchema = z
+  .object({
+    email: z.string().trim().toLowerCase().email('Email không hợp lệ'),
+  })
+  .strict();
+
+export const deleteAccountSchema = z
+  .object({
+    password: z.string().max(100).optional(),
+  })
+  .strict();
+
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().trim().min(20, 'Token không hợp lệ').max(200),
+    newPassword: newPasswordSchema,
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    for (const message of passwordProblems(data.newPassword)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+    }
+  });
 
 export const profileSchema = z
   .object({

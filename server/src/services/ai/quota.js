@@ -12,7 +12,7 @@ const KIND_LABELS = {
   quiz: 'quiz',
   vision: 'phân tích ảnh',
   mealplan: 'plan ăn uống',
-  muscle: 'hỏi về cơ bắp',
+  muscle: 'hỏi về giải phẫu 3D',
   curriculum: 'hỏi bài học',
 };
 

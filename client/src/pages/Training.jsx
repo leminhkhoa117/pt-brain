@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { Segmented } from '../components/ui.jsx';
+import KeepAliveTabs from '../components/KeepAliveTabs.jsx';
 import PlannerPage from './training/PlannerPage.jsx';
 import WorkoutPage from './training/WorkoutPage.jsx';
 import WorkoutHistoryPage from './training/WorkoutHistoryPage.jsx';
@@ -24,20 +25,19 @@ export default function Training() {
     setParams(next);
   };
 
+  const panes = [
+    { value: 'planner', children: <PlannerPage /> },
+    { value: 'workout', children: <WorkoutPage /> },
+    { value: 'history', children: <WorkoutHistoryPage /> },
+    { value: 'exercises', children: <ExerciseLibraryPage /> },
+  ];
+
   return (
     <div>
       <div className="mb-4 overflow-x-auto">
         <Segmented options={TABS} value={tab} onChange={change} />
       </div>
-      {tab === 'workout' ? (
-        <WorkoutPage />
-      ) : tab === 'history' ? (
-        <WorkoutHistoryPage />
-      ) : tab === 'exercises' ? (
-        <ExerciseLibraryPage />
-      ) : (
-        <PlannerPage />
-      )}
+      <KeepAliveTabs active={tab} items={panes} />
     </div>
   );
 }

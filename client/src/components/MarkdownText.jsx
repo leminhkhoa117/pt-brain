@@ -88,8 +88,10 @@ export default function MarkdownText({ children, className, compact = false }) {
           ),
           hr: () => <hr className="my-3 border-slate-200 dark:border-slate-700" />,
           table: ({ children: content }) => (
-            <div className="my-2 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
-              <table className="min-w-full text-xs">{content}</table>
+            <div className="table-frame my-2">
+              <div className="table-frame-inner">
+                <table className="min-w-full text-xs">{content}</table>
+              </div>
             </div>
           ),
           thead: ({ children: content }) => (

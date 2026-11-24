@@ -3,7 +3,8 @@ import { streamSseJson } from './sse.js';
 
 export const getCurriculum = () => api.get('/curriculum').then(unwrap);
 
-export const getLesson = (slug) => api.get(`/curriculum/lessons/${slug}`).then(unwrap);
+export const getLesson = (slug, surface) =>
+  api.get(`/curriculum/lessons/${slug}`, { params: surface ? { surface } : {} }).then(unwrap);
 
 export const markLessonProgress = (slug, status) =>
   api.put(`/curriculum/progress/${slug}`, { status }).then(unwrap);

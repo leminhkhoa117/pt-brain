@@ -62,7 +62,7 @@ function TermHint({ term, label }) {
         aria-expanded={open}
         aria-label={`Thuật ngữ ${term.en}: ${term.vi}`}
         onClick={() => setOpen((value) => !value)}
-        className="cursor-help rounded-[2px] border-b border-dotted border-brand-500/70 bg-brand-50/40 px-[1px] text-inherit no-underline transition-colors hover:bg-brand-100/60 dark:border-brand-400/70 dark:bg-brand-950/30 dark:hover:bg-brand-950/60"
+        className="cursor-help rounded-[calc(2px*var(--ts-radius,1))] border-b border-dotted border-brand-500/70 bg-brand-50/40 px-[1px] text-inherit no-underline transition-colors hover:bg-brand-100/60 dark:border-brand-400/70 dark:bg-brand-950/30 dark:hover:bg-brand-950/60"
       >
         {label}
       </button>
@@ -70,7 +70,7 @@ function TermHint({ term, label }) {
         <span
           role="dialog"
           aria-label={`Giải thích thuật ngữ ${term.en}`}
-          className="absolute bottom-full left-0 z-40 mb-1.5 block w-72 max-w-[min(20rem,80vw)] rounded-lg border border-line bg-surface p-3 text-left shadow-overlay dark:border-white/15 dark:bg-[#161d1a]"
+          className="absolute bottom-full left-0 z-40 mb-1.5 block w-72 max-w-[min(20rem,80vw)] rounded-lg border border-line bg-surface p-3 text-left shadow-overlay dark:border-white/15"
         >
           <span className="block font-mono text-[10px] font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">
             {term.en}

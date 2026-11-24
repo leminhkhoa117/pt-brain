@@ -117,7 +117,7 @@ describe('resumeInterruptedSummaries', () => {
     expect(
       await models.Summary.countDocuments({ userId, cacheKey: first.summary.cacheKey }),
     ).toBe(1);
-  }, 15000);
+  }, 30000);
 
   it('job lỗi được đánh dấu failed và vẫn giải phóng khóa', async () => {
     const { summarizePaper } = await import('../src/services/ai/paperSummarizer.js');

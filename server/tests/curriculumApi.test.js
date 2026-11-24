@@ -78,7 +78,8 @@ describe('Curriculum API integration', () => {
     expect(lesson.slug).toBe(lessonSlug);
     expect(lesson.sections.length).toBeGreaterThanOrEqual(2);
     expect(lesson.quiz.length).toBeGreaterThanOrEqual(4);
-    expect(progress.status).toBe('new');
+    // Mở bài ghi nhận view -> bài chuyển sang "reading" ngay.
+    expect(progress.status).toBe('reading');
 
     const withImage = lesson.sections.find((s) => s.imageUrl);
     if (withImage) {
@@ -162,7 +163,8 @@ describe('Curriculum API integration', () => {
     expect(res.body.data.overall.completed).toBe(0);
 
     const lesson = await agentTwo.get(`/api/curriculum/lessons/${lessonSlug}`).expect(200);
-    expect(lesson.body.data.progress.status).toBe('new');
+    expect(lesson.body.data.progress.status).toBe('reading');
+    expect(lesson.body.data.progress.quizBest).toBe(0);
   });
 
   it('xóa tài khoản xóa sạch tiến độ giáo trình', async () => {
@@ -170,8 +172,8 @@ describe('Curriculum API integration', () => {
     const before = await CurriculumProgress.countDocuments({});
     expect(before).toBeGreaterThan(0);
 
-    await agent.delete('/api/me').expect(200);
-    await agentTwo.delete('/api/me').expect(200);
+    await agent.delete('/api/me').send({ password: 'mat-khau-rat-dai-123' }).expect(200);
+    await agentTwo.delete('/api/me').send({ password: 'mat-khau-rat-dai-123' }).expect(200);
 
     const after = await CurriculumProgress.countDocuments({});
     expect(after).toBe(0);

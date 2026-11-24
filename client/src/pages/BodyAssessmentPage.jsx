@@ -14,6 +14,7 @@ import { getErrorMessage } from '../api/client.js';
 import { compressImage } from '../lib/images.js';
 import { formatDateKey } from '../lib/date.js';
 import { GOAL_LABELS, formatNumber } from '../lib/format.js';
+import ContextLessonCard from '../learning/ContextLessonCard.jsx';
 
 const VIEWS = ['front', 'side', 'back', 'detail'];
 const VIEW_LABELS = { front: 'Trước', side: 'Nghiêng', back: 'Sau', detail: 'Chi tiết' };
@@ -95,6 +96,18 @@ export default function BodyAssessmentPage() {
           </span>
         }
       />
+
+      <div className="mb-4">
+        <ContextLessonCard
+          surface="body.assessment"
+          context={{
+            goal: user?.profile?.goal,
+            conditions: user?.profile?.healthConditions || [],
+          }}
+          title="Đọc kết quả đúng cách"
+          variant="inline"
+        />
+      </div>
 
       {error && (
         <Alert tone="danger" className="mb-4">

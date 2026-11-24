@@ -25,7 +25,7 @@ export default function FigureViewer({ src, page = 1, label = '', title = '', on
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className="flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-white shadow-overlay dark:bg-slate-900">
+      <div className="flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-surface shadow-overlay">
         <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-2.5 dark:border-slate-800">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">

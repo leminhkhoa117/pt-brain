@@ -204,6 +204,29 @@ const ICONS = {
   ),
   filter: <path d="M22 3H2l8 9.5V19l4 2v-8.5Z" />,
   bolt: <path d="M13 2 3 14h8l-1 8 10-12h-8Z" />,
+  palette: (
+    <>
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.7-.7 1.7-1.6 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16c3.3 0 6-2.7 6-6 0-5.5-4.5-8.7-10-8.7Z" />
+      <circle cx="7.5" cy="11.5" r=".8" fill="currentColor" stroke="none" />
+      <circle cx="10.5" cy="7.5" r=".8" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="7.5" r=".8" fill="currentColor" stroke="none" />
+      <circle cx="17.5" cy="11.5" r=".8" fill="currentColor" stroke="none" />
+    </>
+  ),
+  sparkles: (
+    <>
+      <path d="m12 3-1.2 3.3L7.5 7.5l3.3 1.2L12 12l1.2-3.3 3.3-1.2-3.3-1.2L12 3Z" />
+      <path d="M5 14l-.8 2.2L2 17l2.2.8L5 20l.8-2.2L8 17l-2.2-.8L5 14Z" />
+      <path d="M19 13l-.6 1.7-1.7.6 1.7.6L19 18l.6-1.7 1.7-.6-1.7-.6L19 13Z" />
+    </>
+  ),
+  layers: (
+    <>
+      <path d="m12 2 9 5-9 5-9-5 9-5Z" />
+      <path d="m3 12 9 5 9-5" />
+      <path d="m3 17 9 5 9-5" />
+    </>
+  ),
   utensils: (
     <>
       <path d="M3 2v7a3 3 0 0 0 6 0V2M6 2v20" />
@@ -312,7 +335,15 @@ export function Panel({ title, note, actions, children, className, bodyClassName
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </header>
       )}
-      <div className={clsx(!flush && 'panel-body', bodyClassName)}>{children}</div>
+      <div
+        className={clsx(
+          !flush && 'panel-body',
+          flush && 'overflow-hidden rounded-b-[inherit]',
+          bodyClassName,
+        )}
+      >
+        {children}
+      </div>
     </section>
   );
 }
@@ -424,7 +455,7 @@ export function InfoTip({ label, children, className }) {
               top: position.top,
               transform: position.below ? 'none' : 'translateY(-100%)',
             }}
-            className="pointer-events-none fixed z-[80] w-[248px] rounded-md border border-line bg-surface p-3 text-left text-[12px] font-normal normal-case leading-relaxed tracking-normal text-slate-600 shadow-overlay dark:border-white/10 dark:bg-[#1b2320] dark:text-slate-300"
+            className="pointer-events-none fixed z-[80] w-[248px] rounded-md border border-line bg-surface p-3 text-left text-[12px] font-normal normal-case leading-relaxed tracking-normal text-slate-600 shadow-overlay dark:border-white/10 dark:text-slate-300"
           >
             <span className="block font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400">
               {label}
@@ -523,7 +554,7 @@ export function EmptyState({ icon = 'info', title, note, action, className }) {
 
 export function Spinner({ className = 'h-5 w-5' }) {
   return (
-    <svg className={clsx('animate-spin text-pine-700 dark:text-pine-300', className)} viewBox="0 0 24 24" fill="none">
+    <svg className={clsx('animate-spin', className)} viewBox="0 0 24 24" fill="none">
       <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4Z" />
     </svg>

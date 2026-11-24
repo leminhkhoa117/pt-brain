@@ -12,6 +12,9 @@ import {
   Spinner,
 } from '../components/ui.jsx';
 import SummaryView from '../components/research/SummaryView.jsx';
+import ResearchProcessingCard from '../components/research/ResearchProcessingCard.jsx';
+import ResearchJobProgress from '../components/research/ResearchJobProgress.jsx';
+import ContextLessonCard from '../learning/ContextLessonCard.jsx';
 import SourcePane from '../components/research/SourcePane.jsx';
 import AskPanel from '../components/research/AskPanel.jsx';
 import RelatedWorks from '../components/research/RelatedWorks.jsx';
@@ -34,16 +37,28 @@ import {
 import { getErrorMessage } from '../api/client.js';
 import { createFlashcard } from '../api/learning.js';
 import { readStored, removeStored, writeStored } from '../lib/persist.js';
+import { useAuth } from '../hooks/useAuth.jsx';
+import { usePersistentState } from '../hooks/usePersistentState.js';
 import { formatDateKey } from '../lib/date.js';
 import { formatNumber } from '../lib/format.js';
 
 const SUMMARY_STORAGE_KEY = 'ptbrain:research:last-summary';
+const DRAFT_STORAGE_PREFIX = 'ptbrain.reader.draft.v1.';
 
 const MODES = [
   { value: 'link', label: 'Link / DOI' },
   { value: 'pdf', label: 'PDF' },
   { value: 'text', label: 'Văn bản' },
 ];
+
+const DEFAULT_DRAFT = { mode: 'link', link: '', text: '', title: '' };
+
+const normalizeDraft = (value) => ({
+  mode: MODES.some((item) => item.value === value?.mode) ? value.mode : 'link',
+  link: typeof value?.link === 'string' ? value.link : '',
+  text: typeof value?.text === 'string' ? value.text : '',
+  title: typeof value?.title === 'string' ? value.title : '',
+});
 
 const STAGES = [
   'Đang xác định bài báo',
@@ -101,12 +116,22 @@ export default function ReaderPage() {
   const dialog = useDialog();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userId = user?._id || 'anon';
   const [searchParams, setSearchParams] = useSearchParams();
   const fromFinder = searchParams.get('from') === 'finder';
-  const [mode, setMode] = useState('link');
-  const [link, setLink] = useState('');
-  const [text, setText] = useState('');
-  const [title, setTitle] = useState('');
+  const [draft, setDraft] = usePersistentState(
+    `${DRAFT_STORAGE_PREFIX}${userId}`,
+    DEFAULT_DRAFT,
+    { delay: 250 },
+  );
+  const { mode, link, text, title } = normalizeDraft(draft);
+  const patchDraft = (patch) =>
+    setDraft((prev) => normalizeDraft({ ...normalizeDraft(prev), ...patch }));
+  const setMode = (value) => patchDraft({ mode: value });
+  const setLink = (value) => patchDraft({ link: value });
+  const setText = (value) => patchDraft({ text: value });
+  const setTitle = (value) => patchDraft({ title: value });
   const [file, setFile] = useState(null);
   const [active, setActive] = useState(null);
   const [error, setError] = useState(null);
@@ -128,6 +153,10 @@ export default function ReaderPage() {
   const rememberSummary = (id) => {
     writeStored(SUMMARY_STORAGE_KEY, { id, at: Date.now() });
     if (!id) return;
+    // ReaderPage giờ được keep-alive: một bản tóm tắt chạy nền có thể xong khi
+    // người dùng đã sang tab khác. Không kéo họ về tab Đọc bằng cách xóa ?tab.
+    const activeTab = searchParams.get('tab');
+    if (activeTab === 'finder' || activeTab === 'library') return;
     const next = new URLSearchParams(searchParams);
     ['doi', 'url', 'auto', 'from'].forEach((key) => next.delete(key));
     next.delete('tab');
@@ -155,7 +184,7 @@ export default function ReaderPage() {
       setLink(url);
       setActive(null);
     }
-  }, [searchParams]);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const id = searchParams.get('summary');
@@ -198,10 +227,13 @@ export default function ReaderPage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const savedTerms = new Set((termsQuery.data?.terms || []).map((t) => t.en));
+  const autoStartedFor = useRef(null);
+  const autoInFlight = useRef(false);
 
   const createMutation = useMutation({
     mutationFn: createSummary,
     onSuccess: (data) => {
+      autoInFlight.current = false;
       setActive(data);
       setError(null);
       setNotice(null);
@@ -213,19 +245,42 @@ export default function ReaderPage() {
       queryClient.invalidateQueries({ queryKey: ['summaries'] });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    onError: (err) => setError(getErrorMessage(err)),
+    onError: (err) => {
+      autoInFlight.current = false;
+      setError(getErrorMessage(err));
+    },
   });
 
-  const autoStarted = useRef(false);
-
   useEffect(() => {
-    if (autoStarted.current || searchParams.get('auto') !== '1') return;
+    // Không còn auto=1 (đã tạo xong hoặc đã rời phiên) thì cho phép chạy lại
+    // cho bài tiếp theo. Keep-alive giữ ReaderPage mounted nên không thể dùng
+    // một cờ boolean như khi component còn bị unmount mỗi lần đổi tab.
+    if (searchParams.get('auto') !== '1') {
+      autoStartedFor.current = null;
+      autoInFlight.current = false;
+      return;
+    }
     const doi = searchParams.get('doi');
     const url = searchParams.get('url');
     if (!doi && !url) return;
-    autoStarted.current = true;
+    const autoKey = `${doi ? 'doi' : 'url'}:${doi || url}`;
+
+    // Cùng một DOI/URL:
+    // - đang gửi (kể cả StrictMode gọi effect 2 lần) => không gửi trùng;
+    // - đã có kết quả, đang xử lý hoặc đã lỗi => không tự chạy lại.
+    // Nhưng nếu trước đó request đã xong trong lúc người dùng ở tab khác
+    // (auto=1 còn trên URL, active bị reset khi bấm lại), phải chạy lại/đọc
+    // cache thay vì để Reader trống.
+    const sameKey = autoStartedFor.current === autoKey;
+    if (sameKey && (autoInFlight.current || active || createMutation.isPending || error)) {
+      return;
+    }
+
+    autoStartedFor.current = autoKey;
+    autoInFlight.current = true;
+    setError(null);
     createMutation.mutate(doi ? { doi } : { url });
-  }, [createMutation, searchParams]);
+  }, [active, createMutation, error, searchParams]);
 
   const saveTermMutation = useMutation({
     mutationFn: (term) =>
@@ -469,26 +524,11 @@ export default function ReaderPage() {
           </div>
 
           {active.summary.status === 'processing' ? (
-            <Card className="py-16 text-center">
-              <Spinner className="mx-auto h-9 w-9" />
-              <h2 className="mt-4 font-display text-[20px] font-semibold text-slate-900 dark:text-white">
-                Đang tóm tắt bài...
-              </h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                {active.summary.progress || 'Đang xử lý...'}
-              </p>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Đã {processingElapsed}s · bài dài có thể mất 2–4 phút. Nếu quá 6 phút không cập nhật,
-                hệ thống sẽ báo lỗi để bạn bấm “Thử lại”.
-              </p>
-              <button
-                type="button"
-                className="btn-secondary mt-5"
-                onClick={closeSummary}
-              >
-                Về thư viện
-              </button>
-            </Card>
+            <ResearchProcessingCard
+              progress={active.summary.progress}
+              elapsed={processingElapsed}
+              onBack={closeSummary}
+            />
           ) : active.summary.status === 'failed' ? (
             <Alert tone="danger" title="Tóm tắt thất bại">
               {active.summary.error || 'Có lỗi khi gọi AI. Hãy thử lại với PDF khác hoặc dán nội dung.'}
@@ -508,6 +548,16 @@ export default function ReaderPage() {
             </Alert>
           ) : (
           <>
+          <div className="mb-4">
+            <ContextLessonCard
+              surface="research.reader"
+              context={{
+                query: `${active.summary.title || active.paper?.title || ''} ${active.summary.tldr || ''} ${(active.summary.tags || []).join(' ')}`,
+              }}
+              title="Nền tảng liên quan bài đang đọc"
+              variant="inline"
+            />
+          </div>
           <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(340px,400px)]">
             <div className="min-w-0 space-y-4">
               <SummaryView
@@ -621,7 +671,10 @@ export default function ReaderPage() {
               )}
 
               {mode === 'pdf' && (
-                <Field label="File PDF" hint="PDF có lớp text. Bản scan chưa hỗ trợ OCR.">
+                <Field
+                  label="File PDF"
+                  hint="PDF có lớp text. Bản scan chưa hỗ trợ OCR. File PDF không được lưu khi chuyển trang hoặc tải lại — chọn lại file nếu cần."
+                >
                   <label className="flex cursor-pointer items-center justify-between gap-3 rounded-md border border-dashed border-line bg-paper-2/60 px-4 py-4 text-[13px] transition-colors hover:border-pine-600 dark:border-white/15 dark:bg-white/[0.03]">
                     <span className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                       <Icon name="book" className="h-4 w-4" />
@@ -687,25 +740,7 @@ export default function ReaderPage() {
             </form>
 
             {createMutation.isPending && (
-              <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-900 dark:bg-brand-950/40">
-                <div className="flex items-center gap-3">
-                  <Spinner className="h-5 w-5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-brand-800 dark:text-brand-200">
-                      {stage}... ({elapsed}s)
-                    </p>
-                    <p className="text-xs text-brand-700/70 dark:text-brand-300/70">
-                      Thường mất 20-90 giây; bài dài có thể lâu hơn. Đừng đóng tab.
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-brand-200/70 dark:bg-brand-900">
-                  <div
-                    className="h-full rounded-full bg-brand-600 transition-all duration-700 dark:bg-brand-400"
-                    style={{ width: `${Math.min(95, 8 + elapsed * 3)}%` }}
-                  />
-                </div>
-              </div>
+              <ResearchJobProgress stage={stage} elapsed={elapsed} />
             )}
           </Card>
 

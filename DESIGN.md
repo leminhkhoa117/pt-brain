@@ -255,3 +255,13 @@ Left-aligned 11px mono uppercase headers, 13px body cells, 1px row rules, numeri
 - **Don't** use colored left borders, heavy shadows, or lift-on-hover.
 - **Don't** use a raw browser file input, select, or checkbox without styling.
 - **Don't** invent a second accent; if a new state needs colour, assign it a job first.
+
+## Theme Studio
+
+Protocol Sheet is the default theme and the rules above are its contract. At runtime, palette,
+typography, radius and component styling are driven by `--ts-*` CSS variables generated from
+`client/src/theme/`. `/studio` lets a user choose another palette, type pairing or radius, add
+background / texture / cursor / motion / hover effects, and switch the variant of each core
+component. Selections stay a draft until **Apply**; Apply updates the variables and persists the
+configuration to `localStorage` without a reload. Non-default themes may change hue, surfaces and
+the shell, but they inherit the hierarchy, hairlines, density and spacing above.

@@ -33,6 +33,7 @@ import { formatNumber, GOAL_LABELS } from '../lib/format.js';
 import { calorieTarget } from '@shared/calculators/index.js';
 import { mealPlanPhase } from '@shared/nutrition/mealPlan.js';
 import MealPlanCard from './nutrition/MealPlanCard.jsx';
+import ContextLessonCard from '../learning/ContextLessonCard.jsx';
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Bữa sáng' },
@@ -362,6 +363,18 @@ export default function NutritionPage() {
         }
       />
 
+      <div className="mb-4">
+        <ContextLessonCard
+          surface="nutrition"
+          context={{
+            goal: user?.profile?.goal,
+            conditions: user?.profile?.healthConditions || [],
+          }}
+          title="Nền tảng cho thực đơn hôm nay"
+          variant="inline"
+        />
+      </div>
+
       {error && (
         <Alert tone="danger" className="mb-4">
           {error}
@@ -596,13 +609,13 @@ export default function NutritionPage() {
                 )}
 
                 <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-center font-mono text-[11.5px] dark:border-white/[0.08] dark:bg-white/[0.08]">
-                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                  <span className="bg-surface py-2">
                     P <b className="text-slate-900 dark:text-white">{formatNumber(estimateTotals.proteinG, 0)}</b> g
                   </span>
-                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                  <span className="bg-surface py-2">
                     C <b className="text-slate-900 dark:text-white">{formatNumber(estimateTotals.carbsG, 0)}</b> g
                   </span>
-                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                  <span className="bg-surface py-2">
                     F <b className="text-slate-900 dark:text-white">{formatNumber(estimateTotals.fatG, 0)}</b> g
                   </span>
                 </div>
@@ -729,13 +742,13 @@ export default function NutritionPage() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-center font-mono text-[11.5px] dark:border-white/[0.08] dark:bg-white/[0.08]">
-                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                  <span className="bg-surface py-2">
                     P <b className="text-slate-900 dark:text-white">{formatNumber(manualTotals.proteinG, 0)}</b> g
                   </span>
-                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                  <span className="bg-surface py-2">
                     C <b className="text-slate-900 dark:text-white">{formatNumber(manualTotals.carbsG, 0)}</b> g
                   </span>
-                  <span className="bg-surface py-2 dark:bg-[#151b18]">
+                  <span className="bg-surface py-2">
                     F <b className="text-slate-900 dark:text-white">{formatNumber(manualTotals.fatG, 0)}</b> g
                   </span>
                 </div>
@@ -796,7 +809,7 @@ export default function NutritionPage() {
             }
           >
             <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line dark:border-white/[0.08] dark:bg-white/[0.08] lg:grid-cols-4">
-              <div className="bg-surface p-3 dark:bg-[#151b18]">
+              <div className="bg-surface p-3">
                 <Progress
                   label="Calo"
                   value={totals.calories}
@@ -805,7 +818,7 @@ export default function NutritionPage() {
                   info="Năng lượng ăn vào trong ngày (kcal). Mục tiêu lấy từ plan đang áp dụng, nếu không có thì từ TDEE và mục tiêu cân nặng."
                 />
               </div>
-              <div className="bg-surface p-3 dark:bg-[#151b18]">
+              <div className="bg-surface p-3">
                 <Progress
                   label="Protein"
                   value={totals.proteinG}
@@ -814,7 +827,7 @@ export default function NutritionPage() {
                   info="Chất đạm (gam). Mục tiêu tham khảo 1,6–2,2 g/kg cân nặng/ngày, ưu tiên đủ đạm khi giảm mỡ."
                 />
               </div>
-              <div className="bg-surface p-3 dark:bg-[#151b18]">
+              <div className="bg-surface p-3">
                 <Progress
                   label="Carb"
                   value={totals.carbsG}
@@ -823,7 +836,7 @@ export default function NutritionPage() {
                   info="Carbohydrat (tinh bột/đường) – nguồn năng lượng chính cho tập luyện."
                 />
               </div>
-              <div className="bg-surface p-3 dark:bg-[#151b18]">
+              <div className="bg-surface p-3">
                 <Progress
                   label="Fat"
                   value={totals.fatG}

@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { Segmented } from '../components/ui.jsx';
+import KeepAliveTabs from '../components/KeepAliveTabs.jsx';
 import GlossaryPage from './learn/GlossaryPage.jsx';
 import FlashcardsPage from './learn/FlashcardsPage.jsx';
 import NotesPage from './learn/NotesPage.jsx';
@@ -47,26 +48,26 @@ export default function Learn() {
   };
 
   // Đang mở một bài: ưu tiên render trang bài học, bỏ qua tab bên dưới.
-  if (tab === 'curriculum' && lessonSlug) {
-    return <LessonPage slug={lessonSlug} onBack={closeLesson} />;
-  }
+  const lessonOpen = tab === 'curriculum' && Boolean(lessonSlug);
+
+  const panes = [
+    { value: 'curriculum', children: <CurriculumPage onSelectLesson={openLesson} /> },
+    { value: 'glossary', children: <GlossaryPage /> },
+    { value: 'flashcards', children: <FlashcardsPage /> },
+    { value: 'quiz', children: <QuizPage /> },
+    { value: 'notes', children: <NotesPage /> },
+  ];
 
   return (
     <div>
-      <div className="mb-4 overflow-x-auto">
-        <Segmented options={TABS} value={tab} onChange={change} />
+      {/* Ẩn nhưng vẫn mounted: đóng bài học quay lại đúng state tab cũ. */}
+      <div className={lessonOpen ? 'hidden' : undefined}>
+        <div className="mb-4 overflow-x-auto">
+          <Segmented options={TABS} value={tab} onChange={change} />
+        </div>
+        <KeepAliveTabs active={tab} items={panes} />
       </div>
-      {tab === 'flashcards' ? (
-        <FlashcardsPage />
-      ) : tab === 'quiz' ? (
-        <QuizPage />
-      ) : tab === 'notes' ? (
-        <NotesPage />
-      ) : tab === 'glossary' ? (
-        <GlossaryPage />
-      ) : (
-        <CurriculumPage onSelectLesson={openLesson} />
-      )}
+      {lessonOpen && <LessonPage slug={lessonSlug} onBack={closeLesson} />}
     </div>
   );
 }

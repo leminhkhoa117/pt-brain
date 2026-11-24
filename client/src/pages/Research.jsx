@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { Segmented } from '../components/ui.jsx';
+import KeepAliveTabs from '../components/KeepAliveTabs.jsx';
 import ReaderPage from './ReaderPage.jsx';
 import FinderPage from './FinderPage.jsx';
 import LibraryPage from './LibraryPage.jsx';
@@ -30,12 +31,19 @@ export default function Research() {
     setParams(next);
   };
 
+  const panes = [
+    { value: 'reader', children: <ReaderPage /> },
+    { value: 'finder', children: <FinderPage /> },
+    { value: 'library', children: <LibraryPage /> },
+  ];
+
   return (
     <div>
       <div className="mb-4 overflow-x-auto">
         <Segmented options={TABS} value={tab} onChange={changeTab} />
       </div>
-      {tab === 'finder' ? <FinderPage /> : tab === 'library' ? <LibraryPage /> : <ReaderPage />}
+      {/* Giữ pane đã mở mounted để state + request không mất khi đổi tab. */}
+      <KeepAliveTabs active={tab} items={panes} />
     </div>
   );
 }

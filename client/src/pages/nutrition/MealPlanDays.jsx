@@ -21,7 +21,7 @@ export default function MealPlanDays({ cycleDays = [] }) {
         <details
           key={`${day.label}-${index}`}
           open={index === 0}
-          className="group rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+          className="group rounded-xl border border-slate-200 bg-surface dark:border-slate-800"
         >
           <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2 p-3 text-sm [&::-webkit-details-marker]:hidden">
             <span className="font-semibold text-slate-800 dark:text-slate-100">

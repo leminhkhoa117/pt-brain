@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "node --watch-path=src --watch-preserve-output src/index.js",
     "start": "node src/index.js",
+    "audit:curriculum": "node scripts/audit-curriculum.mjs",
     "test": "vitest run",
-    "test:unit": "vitest run --exclude tests/api.test.js --exclude tests/resumeJob.test.js --exclude tests/curriculumApi.test.js",
+    "test:unit": "vitest run --exclude tests/api.test.js --exclude tests/resumeJob.test.js --exclude tests/curriculumApi.test.js --exclude tests/authSecurity.test.js --exclude tests/learningApi.test.js",
     "test:watch": "vitest"
   },
   "dependencies": {

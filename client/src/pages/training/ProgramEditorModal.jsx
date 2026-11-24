@@ -49,7 +49,7 @@ function DayInsertRow({ index, active, dragging, onInsert }) {
         title="Chèn ngày tập tại đây"
         aria-label={`Chèn ngày tập tại vị trí ${index + 1}`}
         className={clsx(
-          'relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full border bg-surface transition-all hover:border-pine-600 hover:text-pine-700 dark:bg-[#151b18] dark:hover:border-pine-400 dark:hover:text-pine-300',
+          'relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full border bg-surface transition-all hover:border-pine-600 hover:text-pine-700 dark:hover:border-pine-400 dark:hover:text-pine-300',
           active
             ? 'border-pine-600 text-pine-700 opacity-100 dark:border-pine-400 dark:text-pine-300'
             : 'border-line text-slate-400 opacity-80 hover:opacity-100 dark:border-white/15 dark:text-slate-500',
@@ -455,7 +455,7 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
       >
       <div
         ref={panelRef}
-        className="max-h-[94vh] w-full overflow-auto rounded-t-lg bg-white p-5 shadow-overlay dark:bg-slate-900 sm:max-w-4xl sm:rounded-lg"
+        className="max-h-[94vh] w-full overflow-auto rounded-t-lg bg-surface p-5 shadow-overlay sm:max-w-4xl sm:rounded-lg"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -516,7 +516,7 @@ export default function ProgramEditorModal({ program, onClose, onSaved }) {
           <div
             data-day-index={dayIndex}
             className={clsx(
-              'rounded-md border border-line bg-surface p-3 transition-opacity dark:border-white/[0.08] dark:bg-[#151b18]',
+              'rounded-md border border-line bg-surface p-3 transition-opacity dark:border-white/[0.08]',
               dayDragging?.active && dayDragging.from === dayIndex && 'opacity-45',
             )}
           >

@@ -3,12 +3,10 @@ import clsx from 'clsx';
 import AtlasScene from './AtlasScene.jsx';
 import {
   DEFAULT_VISIBLE,
-  EXPLANATIONS,
   PRESETS,
   SYSTEM_BY_ID,
   SYSTEM_DETAILS,
   SYSTEMS,
-  explanation,
   formatNumber,
 } from './atlasData.js';
 import {
@@ -18,7 +16,9 @@ import {
 } from './atlasMuscleMap.js';
 import { registerAtlasTools } from './atlasAgentTools.js';
 import { MUSCLE_GROUPS, MUSCLES } from '@shared/muscles/index.js';
+import { resolveAtlasStructure, BONES, CONNECTIVE_TISSUES } from '@shared/anatomy/index.js';
 import { Icon, Spinner } from '../../components/ui.jsx';
+import ContextLessonCard from '../../learning/ContextLessonCard.jsx';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import './atlas.css';
 
@@ -219,6 +219,10 @@ function systemForConcept(concept, partsById) {
 
 function muscleForConcept(concept) {
   if (!concept) return null;
+  if (String(concept.id || '').startsWith('pt:muscle:')) {
+    const slug = String(concept.id).slice('pt:muscle:'.length);
+    if (MUSCLES[slug]) return { slug, ...MUSCLES[slug] };
+  }
   const direct = CONCEPT_TO_MUSCLE[concept.id];
   if (direct && MUSCLES[direct]) return { slug: direct, ...MUSCLES[direct] };
 
@@ -230,6 +234,42 @@ function muscleForConcept(concept) {
     }
   }
   return null;
+}
+
+/**
+ * Một cấu trúc duy nhất cho detail panel + chat: cơ (metadata PT Brain) hoặc
+ * xương/mô liên kết (knowledge base shared/anatomy). Trả về null cho cơ quan
+ * không thuộc 3 nhóm này.
+ */
+function structureForConcept(concept, partsById) {
+  if (!concept) return null;
+
+  const muscle = muscleForConcept(concept);
+  if (muscle) {
+    const group = MUSCLE_GROUPS[muscle.group];
+    return {
+      kind: 'muscle',
+      slug: muscle.slug,
+      vi: muscle.vi,
+      en: muscle.en,
+      group: muscle.group,
+      groupVi: group?.vi || '',
+      groupEn: group?.en || '',
+      region: group?.vi || '',
+      description: muscle.fn,
+      functions: [muscle.fn, group?.description].filter(Boolean),
+      exercises: muscle.exercises || [],
+      note: muscle.note || '',
+    };
+  }
+
+  const system = systemForConcept(concept, partsById);
+  if (!system || !['skeletal', 'connective'].includes(system.id)) return null;
+  return resolveAtlasStructure({
+    id: concept.id,
+    name: concept.name,
+    system: system.id,
+  });
 }
 
 function IconButton({ label, active, disabled, onClick, children, className }) {
@@ -246,7 +286,7 @@ function IconButton({ label, active, disabled, onClick, children, className }) {
         'border-slate-200/80 bg-white/80 shadow-sm backdrop-blur hover:border-slate-300 hover:bg-white hover:text-slate-900',
         'dark:border-white/10 dark:bg-white/[0.05] dark:text-slate-300 dark:hover:border-white/20 dark:hover:bg-white/[0.08] dark:hover:text-white',
         active &&
-          '!border-brand-500 !bg-brand-600 !text-white dark:!border-brand-400 dark:!bg-brand-500',
+          '!border-brand-500 !bg-brand-600 !text-white dark:!border-brand-400 dark:!bg-brand-500 dark:!text-[color:var(--ts-on-accent-500)]',
         disabled && 'pointer-events-none opacity-35',
         className,
       )}
@@ -424,7 +464,7 @@ function SearchPanel({ atlas, partsById, query, setQuery, inputRef, results, onC
       <div className="atlas-panel-scroll max-h-[min(430px,55dvh)] overflow-y-auto p-1.5">
         {results.map((concept) => {
           const system = systemForConcept(concept, partsById);
-          const muscle = muscleForConcept(concept);
+          const structure = structureForConcept(concept, partsById);
           return (
             <button
               key={concept.id}
@@ -438,10 +478,10 @@ function SearchPanel({ atlas, partsById, query, setQuery, inputRef, results, onC
               />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] font-medium text-slate-800 dark:text-slate-100">
-                  {muscle ? muscle.vi : concept.name}
+                  {structure?.vi || concept.name}
                 </span>
                 <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">
-                  {muscle ? `${muscle.en} · ` : ''}
+                  {structure?.en ? `${structure.en} · ` : ''}
                   {system?.vi ?? 'Giải phẫu'}
                 </span>
               </span>
@@ -636,7 +676,7 @@ function DetailPanel({
   selectedParts,
   system,
   systemCount,
-  muscle,
+  structure,
   onChoosePart,
   onClose,
   onIsolate,
@@ -644,8 +684,13 @@ function DetailPanel({
   isolated,
   onAsk,
 }) {
-  const group = muscle ? MUSCLE_GROUPS[muscle.group] : null;
-  const description = muscle ? muscle.fn : chosen ? explanation(chosen.name, system?.id) : '';
+  const groupVi = structure?.groupVi || null;
+  const groupEn = structure?.groupEn || null;
+  const description = structure?.description || '';
+  const kindLabel = structure?.kind === 'bone' ? 'Xương' : structure?.kind === 'connective' ? 'Mô liên kết' : structure?.kind === 'muscle' ? 'Cơ' : null;
+  const relatedMuscles = (structure?.attachments || [])
+    .map((slug) => ({ slug, ...(MUSCLES[slug] || {}) }))
+    .filter((item) => item.vi);
 
   return (
     <aside className="atlas-glass atlas-detail absolute right-3 top-[4.6rem] z-30 flex max-h-[calc(100%-12rem)] w-[330px] flex-col overflow-hidden rounded-lg max-md:inset-x-3 max-md:bottom-20 max-md:top-auto max-md:max-h-[56%] max-md:w-auto">
@@ -656,11 +701,11 @@ function DetailPanel({
             {system?.vi ?? 'Giải phẫu'}
           </p>
           <h2 className="mt-1 font-display text-[20px] font-semibold leading-tight tracking-tight text-slate-900 dark:text-white">
-            {muscle ? muscle.vi : chosen?.name}
+            {structure?.vi || chosen?.name}
           </h2>
-          {muscle && (
+          {structure?.en && (
             <p className="mt-0.5 truncate text-[11px] italic text-slate-500 dark:text-slate-400 dark:text-slate-500">
-              {muscle.en}
+              {structure.en}
             </p>
           )}
         </div>
@@ -675,12 +720,17 @@ function DetailPanel({
       </div>
 
       <div className="atlas-detail-scroll min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-3 pt-2">
-        {muscle && (
+        {structure && (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="badge bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
-              {group?.vi ?? 'Cơ'}
+              {groupVi || kindLabel || 'Giải phẫu'}
             </span>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">{group?.en}</span>
+            {groupEn && <span className="text-[11px] text-slate-500 dark:text-slate-400">{groupEn}</span>}
+            {kindLabel && (
+              <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:bg-white/[0.06] dark:text-slate-400">
+                {kindLabel}
+              </span>
+            )}
           </div>
         )}
 
@@ -688,32 +738,84 @@ function DetailPanel({
           {description}
         </p>
 
-        {muscle && (
-          <>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
-                Bài tập thường dùng
-              </p>
-              <div className="mt-1.5 flex flex-wrap gap-1">
-                {muscle.exercises.map((exercise) => (
-                  <span
-                    key={exercise}
-                    className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
-                  >
-                    {exercise}
-                  </span>
-                ))}
-              </div>
+        {structure?.functions?.length ? (
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+              Chức năng chính
+            </p>
+            <ul className="mt-1.5 list-disc space-y-1 pl-4 text-[11.5px] leading-relaxed text-slate-600 dark:text-slate-300">
+              {structure.functions.slice(0, 4).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {structure?.exercises?.length ? (
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+              Bài tập thường dùng
+            </p>
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {structure.exercises.map((exercise) => (
+                <span
+                  key={exercise}
+                  className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                >
+                  {exercise}
+                </span>
+              ))}
             </div>
-            {muscle.note && (
-              <p className="border-l-2 border-amber-400 pl-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                {muscle.note}
-              </p>
-            )}
-          </>
+          </div>
+        ) : null}
+
+        {structure?.note && (
+          <p className="border-l-2 border-amber-400 pl-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+            {structure.note}
+          </p>
         )}
 
-        {!muscle && chosen && !EXPLANATIONS[String(chosen.name).toLowerCase()] && (
+        {structure?.training && (
+          <div className="rounded-lg bg-pine-50/70 px-2.5 py-2 dark:bg-pine-950/20">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-pine-700 dark:text-pine-300">
+              Ứng dụng tập luyện
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-pine-900/80 dark:text-pine-100/80">
+              {structure.training}
+            </p>
+          </div>
+        )}
+
+        {structure?.clinical && (
+          <div className="rounded-lg bg-ochre-50/70 px-2.5 py-2 dark:bg-ochre-900/15">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-ochre-700 dark:text-ochre-300">
+              Lưu ý an toàn
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-ochre-900/80 dark:text-ochre-100/80">
+              {structure.clinical}
+            </p>
+          </div>
+        )}
+
+        {relatedMuscles.length > 0 && (
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+              Cơ liên quan trực tiếp
+            </p>
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {relatedMuscles.map((item) => (
+                <span
+                  key={item.slug}
+                  className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-white/[0.06] dark:text-slate-300"
+                >
+                  {item.vi}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!structure && chosen && (
           <p className="rounded-lg bg-slate-50 px-2 py-1.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 dark:bg-white/[0.04] dark:text-slate-500">
             Mô tả ở cấp hệ cơ quan · cấu trúc được nhận diện từ bộ dữ liệu nguồn.
           </p>
@@ -725,7 +827,7 @@ function DetailPanel({
           <div>
             <p className="text-slate-500 dark:text-slate-400">Mã tham chiếu</p>
             <p className="mt-0.5 truncate font-semibold text-slate-600 dark:text-slate-300">
-              {chosen?.reference ?? chosen?.id ?? '—'}
+              {chosen?.reference ?? structure?.id ?? chosen?.id ?? '—'}
             </p>
           </div>
           <div>
@@ -771,17 +873,41 @@ function DetailPanel({
           Nguồn giải phẫu BodyParts3D
           <ChevronRightIcon className="h-3 w-3" />
         </a>
+        {structure?.source && (
+          <a
+            href={structure.source.url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-600 hover:underline dark:text-brand-300"
+          >
+            {structure.source.label}
+            <ChevronRightIcon className="h-3 w-3" />
+          </a>
+        )}
+
+        {structure && (
+          <ContextLessonCard
+            surface="muscle.atlas"
+            context={
+              structure.kind === 'muscle'
+                ? { muscles: [structure.slug] }
+                : { anatomyGroup: structure.group }
+            }
+            title="Học sâu hơn về cấu trúc này"
+            variant="inline"
+          />
+        )}
       </div>
 
       <div className="shrink-0 space-y-1 border-t border-slate-200/70 p-2.5 dark:border-white/10">
-        {muscle && onAsk ? (
+        {structure && onAsk ? (
           <button
             type="button"
             onClick={onAsk}
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-pine-200 bg-pine-50 px-3 py-2 text-[11px] font-semibold text-pine-800 transition hover:bg-pine-100 dark:border-pine-900 dark:bg-pine-950/50 dark:text-pine-200 dark:hover:bg-pine-950"
           >
             <Icon name="chat" className="h-3.5 w-3.5" />
-            Hỏi AI về cơ này
+            Hỏi AI về {kindLabel?.toLowerCase() || 'cấu trúc'} này
           </button>
         ) : null}
         <button
@@ -983,7 +1109,10 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
       (selectedParts.length ? SYSTEM_BY_ID[dominantSystem(selectedParts)] : null),
     [chosen, partsById, selectedParts],
   );
-  const selectedMuscle = useMemo(() => muscleForConcept(chosen), [chosen]);
+  const selectedStructure = useMemo(
+    () => structureForConcept(chosen, partsById),
+    [chosen, partsById],
+  );
 
   const visibleCount = useMemo(() => {
     if (!atlas) return 0;
@@ -1027,6 +1156,16 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
       }
     }
 
+    const anatomyResults = [];
+    for (const entry of [...Object.values(BONES), ...Object.values(CONNECTIVE_TISSUES)]) {
+      if (!entry.id) continue;
+      if (!entry.vi.toLowerCase().includes(term) && !entry.en.toLowerCase().includes(term)) {
+        continue;
+      }
+      const concept = atlas.concepts.find((item) => item.id === entry.id);
+      if (concept) anatomyResults.push({ ...concept, reference: entry.id });
+    }
+
     const conceptResults = atlas.concepts
       .filter(
         (concept) =>
@@ -1034,7 +1173,7 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
       )
       .sort((a, b) => a.name.length - b.name.length);
 
-    return [...muscleResults, ...conceptResults]
+    return [...muscleResults, ...anatomyResults, ...conceptResults]
       .filter(
         (concept, index, list) =>
           list.findIndex((candidate) => candidate.id === concept.id) === index,
@@ -1042,17 +1181,9 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
       .slice(0, 80);
   }, [atlas, query]);
 
-  const selectedMuscleSlug = selectedMuscle?.slug;
   useEffect(() => {
-    onMuscleChange?.(
-      selectedMuscleSlug
-        ? {
-            slug: selectedMuscleSlug,
-            ...MUSCLES[selectedMuscleSlug],
-          }
-        : null,
-    );
-  }, [onMuscleChange, selectedMuscleSlug]);
+    onMuscleChange?.(selectedStructure);
+  }, [onMuscleChange, selectedStructure]);
 
   const closeDetails = useCallback(() => {
     setDetails(false);
@@ -1217,7 +1348,7 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
   return (
     <div
       className={clsx(
-        'w-full overflow-hidden border border-slate-200/80 bg-[#f2f3f3] shadow-[0_20px_60px_-35px_rgba(15,23,42,0.45)] dark:border-white/[0.06] dark:bg-[#0b1220]',
+        'w-full overflow-hidden border border-slate-200/80 bg-paper-2 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.45)] dark:border-white/[0.06] dark:bg-surface',
         expanded
           ? 'fixed inset-0 z-[80] rounded-none border-0'
           : 'relative h-[calc(100dvh-255px)] min-h-[480px] rounded-lg sm:min-h-[600px]',
@@ -1260,8 +1391,8 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
               type="button"
               onClick={onAsk}
               className="inline-flex h-9 items-center gap-2 rounded-xl bg-pine-700 px-3 text-[11px] font-semibold text-white shadow-sm transition hover:bg-pine-600 dark:bg-pine-400 dark:text-pine-950 dark:hover:bg-pine-300"
-              aria-label="Hỏi AI về cơ đang chọn"
-              title="Hỏi AI về cơ đang chọn"
+              aria-label="Hỏi AI về cấu trúc đang chọn"
+              title="Hỏi AI về cấu trúc đang chọn"
             >
               <Icon name="chat" className="h-3.5 w-3.5" />
               <span className="max-md:hidden">Hỏi AI</span>
@@ -1395,7 +1526,7 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
             selectedParts={selectedParts}
             system={system}
             systemCount={counts[system?.id] ?? 0}
-            muscle={selectedMuscle}
+            structure={selectedStructure}
             onChoosePart={choosePart}
             onClose={closeDetails}
             onIsolate={toggleIsolate}

@@ -6,6 +6,7 @@ import WeightChart from '../components/WeightChart.jsx';
 import Heatmap from '../components/Heatmap.jsx';
 import { fetchSummary, saveMetric } from '../api/metrics.js';
 import { getCurriculum } from '../api/curriculum.js';
+import LearningTodayCard from '../learning/LearningTodayCard.jsx';
 import { getErrorMessage } from '../api/client.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { calorieTarget } from '@shared/calculators/index.js';
@@ -137,10 +138,14 @@ export default function Dashboard() {
         </div>
       )}
 
+      <div className="mb-4">
+        <LearningTodayCard />
+      </div>
+
       {/* Signature: ruled measurement strip */}
       <section className="panel overflow-hidden p-0" aria-label="Chỉ số mới nhất">
-        <div className="grid grid-cols-2 gap-px bg-line dark:bg-white/[0.08] lg:grid-cols-4">
-          <div className="border-t-2 border-t-pine-600 bg-surface dark:border-t-pine-400 dark:bg-[#151b18]">
+        <div className="metric-grid grid grid-cols-2 gap-px bg-line dark:bg-white/[0.08] lg:grid-cols-4">
+          <div className="border-t-2 border-t-pine-600 bg-surface dark:border-t-pine-400">
             <Stat
               label="Cân nặng"
               value={latest ? formatNumber(latest.weightKg, 1) : '—'}
@@ -154,7 +159,7 @@ export default function Dashboard() {
               icon="scale"
             />
           </div>
-          <div className="bg-surface dark:bg-[#151b18]">
+          <div className="bg-surface">
             <Stat
               label="TB 7 ngày"
               value={trend.length ? formatNumber(trend.at(-1).ma7, 1) : '—'}
@@ -164,7 +169,7 @@ export default function Dashboard() {
               icon="activity"
             />
           </div>
-          <div className="bg-surface dark:bg-[#151b18]">
+          <div className="bg-surface">
             <Stat
               label="Tốc độ đổi"
               value={rate ? formatNumber(rate.weeklyRatePct, 2) : '—'}
@@ -179,7 +184,7 @@ export default function Dashboard() {
               icon="flame"
             />
           </div>
-          <div className="bg-surface dark:bg-[#151b18]">
+          <div className="bg-surface">
             <Stat
               label="% mỡ cơ thể"
               value={bodyFat ? formatNumber(bodyFat, 1) : '—'}

@@ -20,6 +20,11 @@ import {
 } from '../services/ai/lessonCoach.js';
 import { assertAiQuota, getAiUsage, recordAiCall } from '../services/ai/quota.js';
 import { evidenceReferences } from '../research/evidenceBase.js';
+import {
+  markCompleted,
+  recordQuizResult,
+  recordView,
+} from '../services/learning/recommendations.js';
 
 const MODULE_ORDER = new Map(
   [...new Set(LESSONS.map((lesson) => lesson.module))].map((key, index) => [key, index]),
@@ -120,6 +125,8 @@ export async function tree(req, res) {
 /** GET /api/curriculum/lessons/:slug — nội dung đầy đủ một bài. */
 export async function lesson(req, res) {
   const found = getLessonOr404(req.params.slug);
+  const surface = typeof req.query?.surface === 'string' ? req.query.surface.slice(0, 60) : '';
+  await recordView(req.userId, found.slug, { surface });
   const progress = await CurriculumProgress.findOne({
     userId: req.userId,
     lessonSlug: found.slug,
@@ -135,9 +142,21 @@ export async function lesson(req, res) {
             quizBest: progress.quizBest,
             quizAttempts: progress.quizAttempts,
             lastQuizScore: progress.lastQuizScore,
+            mastery: progress.mastery || 0,
+            lastViewedAt: progress.lastViewedAt,
+            appliedActions: progress.appliedActions || [],
             completedAt: progress.completedAt,
           }
-        : { status: 'new', quizBest: 0, quizAttempts: 0, lastQuizScore: 0, completedAt: null },
+        : {
+            status: 'new',
+            quizBest: 0,
+            quizAttempts: 0,
+            lastQuizScore: 0,
+            mastery: 0,
+            lastViewedAt: null,
+            appliedActions: [],
+            completedAt: null,
+          },
     },
   });
 }
@@ -156,6 +175,7 @@ export async function markProgress(req, res) {
     },
     { new: true, upsert: true, setDefaultsOnInsert: true },
   );
+  if (status === 'completed') await markCompleted(req.userId, found.slug);
 
   res.json({ data: { progress: doc } });
 }
@@ -182,6 +202,7 @@ export async function submitQuiz(req, res) {
     },
     { new: true, upsert: true, setDefaultsOnInsert: true },
   );
+  const mastery = await recordQuizResult(req.userId, found.slug, graded.score);
 
   res.json({
     data: {
@@ -191,6 +212,7 @@ export async function submitQuiz(req, res) {
       total: graded.total,
       quizBest: doc.quizBest,
       quizAttempts: doc.quizAttempts,
+      mastery: mastery ?? doc.mastery,
     },
   });
 }

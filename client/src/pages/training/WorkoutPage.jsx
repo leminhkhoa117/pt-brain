@@ -25,6 +25,8 @@ import { useAuth } from '../../hooks/useAuth.jsx';
 import { formatDateKey, todayKey } from '../../lib/date.js';
 import { formatNumber } from '../../lib/format.js';
 import { MUSCLE_LABELS_VI } from '@shared/training/planner.js';
+import { MUSCLE_GROUP_TO_SLUG } from '@shared/learning/contexts.js';
+import ContextLessonCard from '../../learning/ContextLessonCard.jsx';
 import {
   CARDIO_ACTIVITIES,
   CARDIO_BY_KEY,
@@ -243,6 +245,17 @@ export default function WorkoutPage() {
     queryFn: () => listWorkouts({ limit: 20 }),
   });
 
+  const workoutMuscles = useMemo(
+    () => [
+      ...new Set(
+        (suggestionsQuery.data?.suggestions || [])
+          .map((item) => MUSCLE_GROUP_TO_SLUG[item.muscleGroup])
+          .filter(Boolean),
+      ),
+    ],
+    [suggestionsQuery.data],
+  );
+
   const metricsQuery = useQuery({
     queryKey: ['metrics-summary', 30],
     queryFn: () => fetchSummary(30),
@@ -386,6 +399,20 @@ export default function WorkoutPage() {
         title="Log buổi tập"
         subtitle="Ghi tạ hoặc cardio (chạy bộ, bơi, đạp xe...). Hệ thống so với buổi trước, gợi ý tăng tạ và ước tính calo theo MET."
       />
+
+      <div className="mb-4">
+        <ContextLessonCard
+          surface="training.workout"
+          context={{
+            goal: user?.profile?.goal,
+            experience: user?.profile?.experience,
+            conditions: user?.profile?.healthConditions || [],
+            muscles: workoutMuscles,
+          }}
+          title="Kỹ thuật cho buổi tập hôm nay"
+          variant="inline"
+        />
+      </div>
 
       {notice && (
         <Alert tone="success" className="mb-4">
@@ -822,9 +849,10 @@ export default function WorkoutPage() {
                           <Line
                             type="monotone"
                             dataKey="estimated1RM"
-                            stroke="#10b981"
+                            className="chart-accent"
+                            stroke="currentColor"
                             strokeWidth={2}
-                            dot={{ r: 3 }}
+                            dot={{ r: 3, fill: 'currentColor', strokeWidth: 0 }}
                           />
                         </LineChart>
                       </ResponsiveContainer>

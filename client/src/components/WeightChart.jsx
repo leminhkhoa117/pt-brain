@@ -21,7 +21,7 @@ function ChartTooltip({ active, payload, label }) {
   });
   const dateKey = payload[0]?.payload?.dateKey;
   return (
-    <div className="rounded-md border border-line bg-surface px-3 py-2 text-[11px] shadow-overlay dark:border-white/10 dark:bg-[#1b2320]">
+    <div className="rounded-md border border-line bg-surface px-3 py-2 text-[11px] shadow-overlay dark:border-white/10">
       <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
         {dateKey ? formatDateKey(dateKey, true) : label || '—'}
       </p>
@@ -58,7 +58,7 @@ export default function WeightChart({ data = [], height = 280 }) {
           <path d="M24 58c34-4 52-24 88-20s54 18 92-6 64-20 132-12" />
           <path
             d="M24 62c42-6 68-14 114-14s76-6 198-20"
-            stroke="#a9761b"
+            style={{ stroke: 'rgb(var(--ts-warn-500))' }}
             strokeDasharray="4 4"
             opacity="0.7"
           />
@@ -93,8 +93,8 @@ export default function WeightChart({ data = [], height = 280 }) {
           <ComposedChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <defs>
               <linearGradient id="weightAreaFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0e6b52" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#0e6b52" stopOpacity={0.0} />
+                <stop offset="0%" style={{ stopColor: 'var(--ts-accent-live)', stopOpacity: 0.2 }} />
+                <stop offset="95%" style={{ stopColor: 'var(--ts-accent-live)', stopOpacity: 0 }} />
               </linearGradient>
             </defs>
             <CartesianGrid
@@ -105,7 +105,7 @@ export default function WeightChart({ data = [], height = 280 }) {
             />
             <XAxis
               dataKey="label"
-              tick={{ fontSize: 11, fill: 'currentColor', fontFamily: 'Roboto Mono, monospace' }}
+              tick={{ fontSize: 11, fill: 'currentColor', fontFamily: 'var(--ts-font-mono)' }}
               className="text-slate-500 dark:text-slate-400"
               tickLine={false}
               axisLine={false}
@@ -113,14 +113,14 @@ export default function WeightChart({ data = [], height = 280 }) {
             />
             <YAxis
               domain={['dataMin - 1', 'dataMax + 1']}
-              tick={{ fontSize: 11, fill: 'currentColor', fontFamily: 'Roboto Mono, monospace' }}
+              tick={{ fontSize: 11, fill: 'currentColor', fontFamily: 'var(--ts-font-mono)' }}
               className="text-slate-500 dark:text-slate-400"
               tickLine={false}
               axisLine={false}
               width={44}
               tickFormatter={(v) => formatNumber(v, 1)}
             />
-            <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#9a9585', strokeDasharray: '2 3' }} />
+            <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'rgb(var(--ts-ink-400))', strokeDasharray: '2 3' }} />
             <Area
               type="monotone"
               dataKey="weightKg"
@@ -133,16 +133,18 @@ export default function WeightChart({ data = [], height = 280 }) {
               type="monotone"
               dataKey="weightKg"
               name="Cân nặng"
-              stroke="#0e6b52"
+              className="chart-accent"
+              stroke="currentColor"
               strokeWidth={2.2}
-              dot={chartData.length <= 14 ? { r: 2.5, fill: '#0e6b52', strokeWidth: 0 } : false}
-              activeDot={{ r: 4, strokeWidth: 0, fill: '#0e6b52' }}
+              dot={chartData.length <= 14 ? { r: 2.5, fill: 'currentColor', strokeWidth: 0 } : false}
+              activeDot={{ r: 4, strokeWidth: 0, fill: 'currentColor' }}
             />
             <Line
               type="monotone"
               dataKey="ma7"
               name="Trung bình 7 ngày"
-              stroke="#a9761b"
+              className="chart-warn"
+              stroke="currentColor"
               strokeWidth={1.75}
               strokeDasharray="5 4"
               dot={false}

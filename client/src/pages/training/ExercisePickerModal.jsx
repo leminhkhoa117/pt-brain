@@ -71,7 +71,7 @@ export default function ExercisePickerModal({
 
   return createPortal(
     <div className="fixed inset-0 z-[70] flex items-end justify-center bg-slate-950/75 p-0 sm:items-center sm:p-4">
-      <div className="flex max-h-[92vh] w-full flex-col rounded-t-lg bg-white shadow-overlay dark:bg-slate-900 sm:max-w-3xl sm:rounded-lg">
+      <div className="flex max-h-[92vh] w-full flex-col rounded-t-lg bg-surface shadow-overlay sm:max-w-3xl sm:rounded-lg">
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4 dark:border-white/[0.06]">
           <div>
             <h2 className="mt-1 font-display text-[20px] font-semibold text-slate-900 dark:text-white">Chọn bài tập</h2>

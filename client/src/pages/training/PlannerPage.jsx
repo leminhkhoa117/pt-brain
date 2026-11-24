@@ -17,6 +17,7 @@ import { getErrorMessage } from '../../api/client.js';
 import { GOAL_LABELS } from '../../lib/format.js';
 import { MUSCLE_LABELS_VI, SPLIT_LABELS } from '@shared/training/planner.js';
 import { CARDIO_BY_KEY } from '@shared/training/cardio.js';
+import ContextLessonCard from '../../learning/ContextLessonCard.jsx';
 import { useDialog } from '../../components/DialogProvider.jsx';
 
 const EQUIPMENT = [
@@ -272,6 +273,19 @@ export default function PlannerPage() {
           </div>
         }
       />
+
+      <div className="mb-4">
+        <ContextLessonCard
+          surface="training.planner"
+          context={{
+            goal: form.goal,
+            experience: form.experience,
+            conditions: user?.profile?.healthConditions || [],
+          }}
+          title="Trước khi lập giáo án"
+          variant="inline"
+        />
+      </div>
 
       {notice && (
         <Alert tone="success" className="mb-4">

@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Icon, LoadingBlock, PageHeader, Stat } from '../../components/ui.jsx';
 import { getCurriculum } from '../../api/curriculum.js';
 import { getErrorMessage } from '../../api/client.js';
+import { useAuth } from '../../hooks/useAuth.jsx';
+import { useLearningSummary } from '../../learning/useLearning.js';
+import ContextLessonCard from '../../learning/ContextLessonCard.jsx';
+import MasteryRing from '../../learning/MasteryRing.jsx';
 
 const MODULE_ICONS = {
   anat: 'body',
@@ -44,20 +49,20 @@ function ProgressBar({ percent, className, thick = false }) {
 function LessonStatus({ status }) {
   if (status === 'completed') {
     return (
-      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[4px] bg-pine-600 text-white dark:bg-pine-500">
+      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[calc(4px*var(--ts-radius,1))] bg-pine-600 text-white dark:bg-pine-500 dark:text-[color:var(--ts-on-accent-500)]">
         <Icon name="checkCircle" className="h-3.5 w-3.5" />
       </span>
     );
   }
   if (status === 'reading') {
     return (
-      <span className="relative grid h-5 w-5 shrink-0 place-items-center rounded-[4px] border border-pine-500 dark:border-pine-400">
+      <span className="relative grid h-5 w-5 shrink-0 place-items-center rounded-[calc(4px*var(--ts-radius,1))] border border-pine-500 dark:border-pine-400">
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-pine-600 motion-reduce:animate-none dark:bg-pine-300" />
       </span>
     );
   }
   return (
-    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[4px] border border-line dark:border-white/15" />
+    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-[calc(4px*var(--ts-radius,1))] border border-line dark:border-white/15" />
   );
 }
 
@@ -160,7 +165,7 @@ function ModuleSection({ mod, index, onSelectLesson }) {
         {mod.chapters.map((chapter) => (
           <div
             key={`${mod.key}-${chapter.no}`}
-            className="bg-surface p-3 dark:bg-[#151b18] sm:p-4"
+            className="bg-surface p-3 sm:p-4"
           >
             <p className="px-2.5 pb-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
               Chương {chapter.no} · {chapter.title}
@@ -182,6 +187,8 @@ function ModuleSection({ mod, index, onSelectLesson }) {
 }
 
 export default function CurriculumPage({ onSelectLesson }) {
+  const { user } = useAuth();
+  const learningSummary = useLearningSummary();
   const curriculumQuery = useQuery({
     queryKey: ['curriculum'],
     queryFn: getCurriculum,
@@ -236,8 +243,8 @@ export default function CurriculumPage({ onSelectLesson }) {
 
       {/* Signature: dải đo lường kẻ ô — tiến độ học tập */}
       <section className="panel overflow-hidden !p-0" aria-label="Tiến độ học tập">
-        <div className="grid grid-cols-2 gap-px bg-line lg:grid-cols-4 dark:bg-white/[0.08]">
-          <div className="border-t-2 border-t-pine-600 bg-surface dark:border-t-pine-400 dark:bg-[#151b18]">
+        <div className="metric-grid grid grid-cols-2 gap-px bg-line lg:grid-cols-4 dark:bg-white/[0.08]">
+          <div className="border-t-2 border-t-pine-600 bg-surface dark:border-t-pine-400">
             <Stat
               label="Bài hoàn thành"
               value={String(overall.completed)}
@@ -246,7 +253,7 @@ export default function CurriculumPage({ onSelectLesson }) {
               icon="checkCircle"
             />
           </div>
-          <div className="bg-surface dark:bg-[#151b18]">
+          <div className="bg-surface">
             <Stat
               label="Phút đã học"
               value={String(stats.minutesDone)}
@@ -255,7 +262,7 @@ export default function CurriculumPage({ onSelectLesson }) {
               icon="clock"
             />
           </div>
-          <div className="bg-surface dark:bg-[#151b18]">
+          <div className="bg-surface">
             <Stat
               label="Điểm quiz TB"
               value={stats.quizAvg === null ? '—' : String(stats.quizAvg)}
@@ -268,7 +275,7 @@ export default function CurriculumPage({ onSelectLesson }) {
               icon="cards"
             />
           </div>
-          <div className="bg-surface dark:bg-[#151b18]">
+          <div className="bg-surface">
             <Stat
               label="Module xong"
               value={String(stats.modulesDone)}
@@ -285,13 +292,13 @@ export default function CurriculumPage({ onSelectLesson }) {
         <button
           type="button"
           onClick={() => onSelectLesson(continueLesson.lesson.slug)}
-          className="group flex w-full items-center gap-4 rounded-lg bg-pine-600 px-4 py-3.5 text-left text-white transition-colors hover:bg-pine-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-600 sm:px-5 dark:bg-pine-500 dark:text-[#0b1512] dark:hover:bg-pine-400"
+          className="group flex w-full items-center gap-4 rounded-lg bg-pine-600 px-4 py-3.5 text-left text-white transition-colors hover:bg-pine-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pine-600 sm:px-5 dark:bg-pine-500 dark:text-[color:var(--ts-on-accent-500)] dark:hover:bg-pine-400"
         >
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-white/15 dark:bg-black/15">
             <Icon name="play" className="h-4 w-4" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block font-mono text-[10.5px] uppercase tracking-[0.12em] text-white/75 dark:text-[#0b1512]/70">
+            <span className="block font-mono text-[10.5px] uppercase tracking-[0.12em] text-white/75 dark:text-[color:var(--ts-on-accent-500)] dark:opacity-70">
               Tiếp tục học · {continueLesson.module.vi} · {continueLesson.lesson.minutes}′
             </span>
             <span className="block truncate font-display text-[17px] font-semibold leading-snug">
@@ -304,6 +311,63 @@ export default function CurriculumPage({ onSelectLesson }) {
           />
         </button>
       )}
+
+      {/* Lộ trình cá nhân hoá + ôn tập: học đi kèm dữ liệu thật của user */}
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <ContextLessonCard
+          surface="learn.home"
+          context={{
+            goal: user?.profile?.goal,
+            experience: user?.profile?.experience,
+            conditions: user?.profile?.healthConditions || [],
+          }}
+          limit={1}
+          title="Lộ trình của tôi"
+        />
+        <div className="panel !p-3.5">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-500 dark:text-slate-400">
+                Ôn tập hôm nay
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                {learningSummary.data
+                  ? `${learningSummary.data.totals.completed}/${learningSummary.data.totals.total} bài · ${learningSummary.data.week.applies} áp dụng tuần này`
+                  : 'Đang tổng hợp tiến độ…'}
+              </p>
+            </div>
+            {learningSummary.data && (
+              <MasteryRing value={learningSummary.data.totals.masteryAvg} label="Mastery" size={46} />
+            )}
+          </div>
+          <div className="mt-2 space-y-1">
+            {(learningSummary.data?.reviewDue || []).slice(0, 3).map((item) => (
+              <button
+                key={item.slug}
+                type="button"
+                onClick={() => onSelectLesson(item.slug)}
+                className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-[12px] text-slate-600 hover:bg-paper-2 dark:text-slate-300 dark:hover:bg-white/[0.05]"
+              >
+                <Icon name="refresh" className="h-3.5 w-3.5 shrink-0 text-ochre-600 dark:text-ochre-300" />
+                <span className="min-w-0 flex-1 truncate">{item.title}</span>
+                <span className="shrink-0 font-mono text-[10.5px] text-slate-400">{item.quizBest}%</span>
+              </button>
+            ))}
+            {learningSummary.data && !learningSummary.data.reviewDue.length && (
+              <p className="py-1 text-[11.5px] text-slate-500 dark:text-slate-400">
+                Chưa có bài nào cần ôn. Làm quiz sau mỗi bài để hệ thống nhắc đúng lúc.
+              </p>
+            )}
+          </div>
+          <Link
+            to="/learn?tab=flashcards"
+            className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-pine-700 hover:underline dark:text-pine-300"
+          >
+            <Icon name="cards" className="h-3 w-3" />
+            Ôn bằng flashcard
+          </Link>
+        </div>
+      </section>
 
       {/* Giáo trình đại cương: 6 module đánh số, chương kẻ ô */}
       <div className="space-y-5">

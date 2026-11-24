@@ -11,7 +11,7 @@ import { formatLongDate, todayKey } from '../lib/date.js';
 const GROUPS = [
   {
     label: 'Hôm nay',
-    items: [{ to: '/', label: 'Tổng quan', icon: 'dashboard', end: true }],
+    items: [{ to: '/dashboard', label: 'Tổng quan', icon: 'dashboard', end: true }],
   },
   {
     label: 'Cơ thể',
@@ -38,16 +38,22 @@ const GROUPS = [
   },
   {
     label: 'Công cụ',
-    items: [{ to: '/calculators', label: 'Máy tính chỉ số', icon: 'calculator' }],
+    items: [
+      { to: '/calculators', label: 'Máy tính chỉ số', icon: 'calculator' },
+      { to: '/studio', label: 'Theme Studio', icon: 'palette' },
+    ],
   },
   {
     label: 'Khám phá',
-    items: [{ to: '/welcome', label: 'Giới thiệu', icon: 'info' }],
+    items: [
+      { to: '/ui-lab', label: 'UI Lab', icon: 'bolt' },
+      { to: '/', label: 'Giới thiệu', icon: 'info' },
+    ],
   },
 ];
 
 const MOBILE_NAV = [
-  { to: '/', label: 'Tổng quan', icon: 'dashboard', end: true },
+  { to: '/dashboard', label: 'Tổng quan', icon: 'dashboard', end: true },
   { to: '/body-log', label: 'Cơ thể', icon: 'activity' },
   { to: '/nutrition', label: 'Dinh dưỡng', icon: 'utensils' },
   { to: '/training', label: 'Giáo án', icon: 'dumbbell' },
@@ -108,7 +114,7 @@ function SidebarContent({ onNavigate, rail = false, onCollapse, onExpand }) {
   return (
     <div className="flex h-full flex-col">
       <div className={clsx('flex h-14 items-center gap-2.5 border-b border-white/[0.08]', rail ? 'justify-center px-0' : 'px-4')}>
-        <Link to="/" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5">
+        <Link to="/dashboard" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5">
           <BrandLogo size={30} />
           {!rail && (
             <span className="min-w-0">
@@ -255,12 +261,12 @@ export default function Layout({ children }) {
     location.pathname === '/settings' ? 'Hồ sơ & cài đặt' : activeItem?.label || null;
 
   return (
-    <div className="min-h-screen bg-paper dark:bg-[#0e1211]">
+    <div className="min-h-screen">
       {/* Desktop / tablet rail */}
       <aside
         id="app-sidebar"
         className={clsx(
-          'fixed inset-y-0 left-0 z-40 hidden w-16 border-r border-white/[0.08] bg-gradient-to-b from-[#111e19] via-[#0e1713] to-[#0a110e] transition-[width] duration-200 md:block',
+          'app-shell fixed inset-y-0 left-0 z-40 hidden w-16 border-r transition-[width] duration-200 md:block',
           navCollapsed ? 'lg:w-16' : 'lg:w-[248px]',
         )}
       >
@@ -281,7 +287,8 @@ export default function Layout({ children }) {
           navCollapsed ? 'lg:pl-16' : 'lg:pl-[248px]',
         )}
       >
-        <header className="sticky top-0 z-30 border-b border-line bg-paper/90 backdrop-blur-md dark:border-white/[0.08] dark:bg-[#0e1211]/90">          <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <header className="app-header sticky top-0 z-30">
+          <div className="mx-auto flex h-14 max-w-[1320px] items-center gap-3 px-4 sm:px-6 lg:px-8">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
@@ -291,7 +298,7 @@ export default function Layout({ children }) {
               <Icon name="menu" className="h-4 w-4" />
             </button>
 
-            <Link to="/" className="flex items-center gap-2 md:hidden">
+            <Link to="/dashboard" className="flex items-center gap-2 md:hidden">
               <BrandLogo size={26} />
               <span className="font-display text-[15px] font-semibold text-slate-900 dark:text-white">
                 PT Brain
@@ -331,7 +338,7 @@ export default function Layout({ children }) {
                 className="hidden items-center gap-2 rounded-md border border-line bg-surface py-1 pl-1 pr-2.5 transition-colors hover:border-line-strong hover:bg-paper-2 sm:flex dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
                 title="Hồ sơ & cài đặt"
               >
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-pine-700 font-mono text-[11px] font-medium text-white dark:bg-pine-500 dark:text-white">
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-pine-700 font-mono text-[11px] font-medium text-white dark:bg-pine-500 dark:text-[color:var(--ts-on-accent-500)]">
                   <UserInitials />
                 </span>
                 <UserHeaderName />
@@ -360,7 +367,7 @@ export default function Layout({ children }) {
       {/* Mobile bottom nav */}
       <nav
         aria-label="Điều hướng nhanh"
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden dark:border-white/[0.08] dark:bg-[#151b18]/95"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden dark:border-white/[0.08]"
       >
         <div className="mx-auto grid max-w-md grid-cols-5">
           {MOBILE_NAV.map((item) => {
@@ -393,7 +400,7 @@ export default function Layout({ children }) {
             onClick={() => setDrawerOpen(false)}
             aria-label="Đóng menu"
           />
-          <div className="absolute inset-y-0 left-0 w-[280px] bg-shell shadow-overlay">
+          <div className="app-shell absolute inset-y-0 left-0 w-[280px] shadow-overlay">
             <button
               type="button"
               onClick={() => setDrawerOpen(false)}

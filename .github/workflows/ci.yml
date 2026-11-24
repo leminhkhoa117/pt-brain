@@ -61,6 +61,12 @@ jobs:
       - name: Build client
         run: npm run build
 
+      - name: Validate Human Atlas mappings
+        run: |
+          npm --prefix client run validate:atlas
+          npm --prefix client run validate:atlas-anatomy
+          npm --prefix server run audit:curriculum
+
       - name: Smoke test production serving
         env:
           NODE_ENV: production

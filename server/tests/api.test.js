@@ -379,7 +379,7 @@ describe('PT Brain API integration', () => {
       cacheKey: 'delete-test',
     });
 
-    await agentTwo.delete('/api/me').expect(200);
+    await agentTwo.delete('/api/me').send({ password: 'mat-khau-rat-dai-456' }).expect(200);
 
     expect(await models.User.findById(userIdTwo)).toBeNull();
     expect(await models.BodyLog.countDocuments({ userId: userIdTwo })).toBe(0);

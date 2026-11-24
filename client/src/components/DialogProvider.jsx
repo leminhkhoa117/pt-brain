@@ -135,7 +135,7 @@ export function DialogProvider({ children }) {
               role="dialog"
               aria-modal="true"
               aria-labelledby="app-dialog-title"
-              className="w-full max-w-md rounded-lg bg-white p-5 shadow-overlay dark:bg-slate-900"
+              className="w-full max-w-md rounded-lg bg-surface p-5 shadow-overlay"
               onMouseDown={(event) => event.stopPropagation()}
             >
               <div className="flex items-start gap-3">

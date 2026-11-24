@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import { generalLimiter } from './middleware/rateLimit.js';
+import { csrfGuard } from './middleware/csrf.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import routes from './routes/index.js';
 
@@ -16,15 +17,29 @@ export function createApp() {
 
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+          // Avatar Google (nếu hiển thị) và ảnh xem trước dạng blob.
+          'img-src': ["'self'", 'data:', 'blob:', 'https://*.googleusercontent.com'],
+          'connect-src': ["'self'"],
+          'frame-ancestors': ["'none'"],
+        },
+      },
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    }),
+  );
   app.use(
     cors({
-      origin: env.CLIENT_ORIGIN.split(',').map((s) => s.trim()),
+      origin: env.CLIENT_ORIGIN.split(',').map((s) => s.trim().replace(/\/$/, '')),
       credentials: true,
     }),
   );
   app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
+  app.use('/api', csrfGuard);
   if (env.NODE_ENV !== 'test') {
     app.use(
       pinoHttp({

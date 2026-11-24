@@ -13,6 +13,8 @@ import {
   Spinner,
 } from '../../components/ui.jsx';
 import MarkdownText from '../../components/MarkdownText.jsx';
+import ApplyActionButton from '../../learning/ApplyActionButton.jsx';
+import { lessonLearningMeta } from '@shared/learning/contexts.js';
 import { MUSCLES } from '@shared/muscles/index.js';
 import { HEALTH_CONDITIONS } from '@shared/health/conditions.js';
 import {
@@ -523,7 +525,7 @@ function TermsCard({ terms }) {
         {terms.map((term) => (
           <div
             key={term.en}
-            className="group flex flex-col gap-1.5 bg-surface p-4 dark:bg-[#151b18]"
+            className="group flex flex-col gap-1.5 bg-surface p-4"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -561,6 +563,7 @@ function QuizSection({ lesson }) {
   const [aiAnswers, setAiAnswers] = useState({});
   const [aiSubmitted, setAiSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const [cardsCreated, setCardsCreated] = useState(0);
 
   const submit = useMutation({
     mutationFn: () =>
@@ -581,6 +584,26 @@ function QuizSection({ lesson }) {
       setAiAnswers({});
       setAiSubmitted(false);
       setError(null);
+    },
+    onError: (err) => setError(getErrorMessage(err)),
+  });
+
+  const createReviewCards = useMutation({
+    mutationFn: async () => {
+      const terms = lesson.terms.slice(0, 4);
+      const created = [];
+      for (const term of terms) {
+        const result = await createFlashcard({
+          front: term.en,
+          back: `${term.vi} — ${term.def}`,
+        });
+        if (result?.card) created.push(result.card);
+      }
+      return created.length;
+    },
+    onSuccess: (count) => {
+      setCardsCreated(count);
+      queryClient.invalidateQueries({ queryKey: ['flashcards'] });
     },
     onError: (err) => setError(getErrorMessage(err)),
   });
@@ -640,6 +663,27 @@ function QuizSection({ lesson }) {
       </div>
 
       {error && <Alert tone="danger">{error}</Alert>}
+
+      {graded && score < 100 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-ochre-200 bg-ochre-50/60 px-3 py-2 text-[11.5px] text-ochre-900 dark:border-ochre-800/60 dark:bg-ochre-900/20 dark:text-ochre-200">
+          <Icon name="cards" className="h-4 w-4 shrink-0" />
+          <span className="min-w-0 flex-1">
+            Còn câu sai — tạo flashcard từ thuật ngữ bài này để ôn lại theo lịch SM-2.
+          </span>
+          <button
+            type="button"
+            className="btn-secondary !px-2.5 !py-1 text-[11px]"
+            disabled={createReviewCards.isPending || cardsCreated > 0}
+            onClick={() => createReviewCards.mutate()}
+          >
+            {createReviewCards.isPending
+              ? 'Đang tạo…'
+              : cardsCreated > 0
+                ? `Đã tạo ${cardsCreated} flashcard`
+                : 'Tạo flashcard ôn tập'}
+          </button>
+        </div>
+      )}
 
       <div className="space-y-3">
         {questions.map((question, qIndex) => {
@@ -1037,10 +1081,11 @@ function LessonChat({ lesson }) {
 export default function LessonPage({ slug, onBack }) {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
+  const surface = searchParams.get('surface') || '';
 
   const lessonQuery = useQuery({
-    queryKey: ['curriculum-lesson', slug],
-    queryFn: () => getLesson(slug),
+    queryKey: ['curriculum-lesson', slug, surface],
+    queryFn: () => getLesson(slug, surface),
   });
 
   // Cây giáo trình (đã cache) để tính bài trước/sau — giữ "vòng học tiếp".
@@ -1068,6 +1113,10 @@ export default function LessonPage({ slug, onBack }) {
 
   const data = lessonQuery.data;
   const lesson = data?.lesson;
+  const learningMeta = useMemo(
+    () => (lesson ? lessonLearningMeta(lesson) : null),
+    [lesson],
+  );
   const imageByFile = useMemo(() => {
     const map = new Map();
     (lesson?.images || []).forEach((image) => map.set(image.file, image));
@@ -1222,7 +1271,7 @@ export default function LessonPage({ slug, onBack }) {
         {/* Ghi chú thực hành: phần đáng mang ra floor nhất */}
         <Card className="overflow-hidden !p-0 border-pine-200 bg-pine-50/50 dark:border-pine-900 dark:bg-pine-950/20">
           <div className="flex items-center gap-3 border-b border-pine-200/70 px-4 py-3.5 dark:border-pine-900">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-pine-600 text-white dark:bg-pine-500">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-pine-600 text-white dark:bg-pine-500 dark:text-[color:var(--ts-on-accent-500)]">
               <Icon name="dumbbell" className="h-4 w-4" />
             </span>
             <div className="min-w-0">
@@ -1245,6 +1294,29 @@ export default function LessonPage({ slug, onBack }) {
           <Alert tone="warning" title="Lưu ý an toàn & ranh giới chuyên môn">
             <MarkdownText compact>{lesson.safetyBox}</MarkdownText>
           </Alert>
+        )}
+
+        {learningMeta?.actions?.length > 0 && (
+          <Card className="space-y-3 border-pine-200 bg-pine-50/40 dark:border-pine-900 dark:bg-pine-950/15">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                Làm ngay trong app
+              </h3>
+              <p className="mt-0.5 text-[12px] text-slate-500 dark:text-slate-400">
+                Áp dụng bài này vào giáo án, chỉ số hoặc buổi tập thật — hệ thống sẽ ghi nhận vào mastery.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {learningMeta.actions.map((action) => (
+                <ApplyActionButton
+                  key={`${action.type}-${action.key || action.muscle || action.tab || ''}`}
+                  action={action}
+                  lessonSlug={lesson.slug}
+                  surface={surface || 'learn.home'}
+                />
+              ))}
+            </div>
+          </Card>
         )}
 
         <TermsCard terms={lesson.terms} />

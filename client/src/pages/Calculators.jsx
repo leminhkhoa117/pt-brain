@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, EmptyState, Field, Icon, InfoTip, PageHeader, Segmented, Spinner } from '../components/ui.jsx';
+import KeepAliveTabs from '../components/KeepAliveTabs.jsx';
 import { useDialog } from '../components/DialogProvider.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { fetchSummary, saveMetric } from '../api/metrics.js';
@@ -22,6 +23,7 @@ import {
 } from '@shared/calculators/index.js';
 import { ACTIVITY_LABELS, GOAL_LABELS, formatNumber } from '../lib/format.js';
 import { computeAge, todayKey } from '../lib/date.js';
+import ContextLessonCard from '../learning/ContextLessonCard.jsx';
 
 const TABS = [
   { value: '1rm', label: '1RM & tạ tập' },
@@ -207,6 +209,26 @@ export default function Calculators() {
         }
       />
 
+      <div className="mb-4">
+        <ContextLessonCard
+          surface={`calculator.${tab === '1rm' ? '1rm' : tab === 'calories' ? 'calories' : tab === 'body' ? 'body' : 'hr'}`}
+          context={{
+            goal: common.goal,
+            experience: profile.experience,
+            calculator:
+              tab === '1rm'
+                ? 'one-rm'
+                : tab === 'calories'
+                  ? 'tdee'
+                  : tab === 'body'
+                    ? 'navy-body-fat'
+                    : 'hr-zones',
+          }}
+          title="Hiểu chỉ số trước khi dùng"
+          variant="inline"
+        />
+      </div>
+
       {notice && (
         <Alert tone={notice.tone} className="mb-4">
           {notice.text}
@@ -266,37 +288,54 @@ export default function Calculators() {
         <Segmented options={TABS} value={tab} onChange={setTab} />
       </div>
 
-      {tab === '1rm' && (
-        <OneRepMax
-          defaultWeight={common.weightKg}
-          onSave={(payload) => saveHistory.mutate({ type: 'one-rep-max', input: payload })}
-          isSaving={saveHistory.isPending}
-        />
-      )}
-
-      {tab === 'calories' && (
-        <Calories
-          common={common}
-          weight={weight}
-          height={height}
-          age={age}
-          onGoalChange={(goal) => setCommon((prev) => ({ ...prev, goal }))}
-          onSave={(input) => saveHistory.mutate({ type: 'macro', input })}
-          isSaving={saveHistory.isPending}
-        />
-      )}
-
-      {tab === 'body' && (
-        <BodyComposition
-          common={common}
-          weight={weight}
-          height={height}
-          onSave={(payload) => saveBody.mutate(payload)}
-          isSaving={saveBody.isPending}
-        />
-      )}
-
-      {tab === 'hr' && <HeartRate age={age} />}
+      {/* Giữ pane đã mở mounted: đổi tab không mất input/kết quả riêng. */}
+      <KeepAliveTabs
+        active={tab}
+        items={[
+          {
+            value: '1rm',
+            children: (
+              <OneRepMax
+                defaultWeight={common.weightKg}
+                onSave={(payload) =>
+                  saveHistory.mutate({ type: 'one-rep-max', input: payload })
+                }
+                isSaving={saveHistory.isPending}
+              />
+            ),
+          },
+          {
+            value: 'calories',
+            children: (
+              <Calories
+                common={common}
+                weight={weight}
+                height={height}
+                age={age}
+                onGoalChange={(goal) => setCommon((prev) => ({ ...prev, goal }))}
+                onSave={(input) => saveHistory.mutate({ type: 'macro', input })}
+                isSaving={saveHistory.isPending}
+              />
+            ),
+          },
+          {
+            value: 'body',
+            children: (
+              <BodyComposition
+                common={common}
+                weight={weight}
+                height={height}
+                onSave={(payload) => saveBody.mutate(payload)}
+                isSaving={saveBody.isPending}
+              />
+            ),
+          },
+          {
+            value: 'hr',
+            children: <HeartRate age={age} />,
+          },
+        ]}
+      />
 
       <CalculationHistory
         history={history}
@@ -523,7 +562,7 @@ function OneRepMax({ defaultWeight, onSave, isSaving }) {
                   'Trung bình cộng Epley và Brzycki — con số tham khảo chính, giúp giảm sai lệch giữa hai công thức.',
                 ],
               ].map(([label, value, formula, description]) => (
-                <div key={label} className="bg-surface p-3 dark:bg-[#151b18]">
+                <div key={label} className="bg-surface p-3">
                   <p className="metric-label justify-center">
                     {label}
                     <InfoTip label={`${label} 1RM`}>
@@ -574,9 +613,10 @@ function OneRepMax({ defaultWeight, onSave, isSaving }) {
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           Số rep và RIR gợi ý chỉ mang tính tham khảo, tùy bài tập và trình độ.
         </p>
-        <div className="mt-3 max-h-[420px] overflow-auto rounded-md border border-line dark:border-white/[0.08]">
-          <table className="table-clinical min-w-full">
-            <thead className="sticky top-0 z-10 bg-surface dark:bg-[#151b18]">
+        <div className="table-scroll mt-3">
+          <div className="table-scroll-inner max-h-[420px]">
+            <table className="table-clinical min-w-full">
+            <thead className="sticky top-0 z-10 bg-surface">
               <tr>
                 <th className="px-3 py-2">%1RM</th>
                 <th className="px-3 py-2">Mức tạ</th>
@@ -619,6 +659,7 @@ function OneRepMax({ defaultWeight, onSave, isSaving }) {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </Card>
     </div>
@@ -699,7 +740,7 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
         {calc && !calc.error && (
           <>
             <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-line bg-line dark:border-white/[0.08] dark:bg-white/[0.08]">
-              <div className="bg-surface p-3.5 dark:bg-[#151b18]">
+              <div className="bg-surface p-3.5">
                 <p className="metric-label">
                   BMR
                   <InfoTip label="BMR (Basal Metabolic Rate)">
@@ -712,7 +753,7 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
                   <span className="font-sans text-xs font-medium text-slate-500 dark:text-slate-400">kcal</span>
                 </p>
               </div>
-              <div className="border-t-2 border-t-pine-600 bg-surface p-3.5 dark:border-t-pine-400 dark:bg-[#151b18]">
+              <div className="border-t-2 border-t-pine-600 bg-surface p-3.5 dark:border-t-pine-400">
                 <p className="metric-label text-pine-700 dark:text-pine-300">
                   TDEE
                   <InfoTip label="TDEE (Total Daily Energy Expenditure)">
@@ -794,7 +835,7 @@ function Calories({ common, weight, height, age, onGoalChange, onSave, isSaving 
                 ['Chất béo', calc.macros.fatG, 'g'],
                 ['Carb', calc.macros.carbG, 'g'],
               ].map(([label, value, unit]) => (
-                <div key={label} className="bg-surface p-3 dark:bg-[#151b18]">
+                <div key={label} className="bg-surface p-3">
                   <p className="font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
                     {label}
                   </p>
@@ -1001,7 +1042,7 @@ function BodyComposition({ common, weight, height, onSave, isSaving }) {
             ]
               .filter(([, value]) => value !== undefined)
               .map(([label, value, unit, hint, info]) => (
-                <div key={label} className="bg-surface p-3.5 dark:bg-[#151b18]">
+                <div key={label} className="bg-surface p-3.5">
                   <p className="metric-label">
                     {label}
                     <InfoTip label={label}>{info}</InfoTip>
