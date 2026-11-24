@@ -62,7 +62,7 @@ const normalize = (value = '') =>
     .trim();
 
 const CLINICAL_RE =
-  /\b(patient|patients|asthma|copd|chronic obstructive|respiratory illness|respiratory disease|pulmonary disease|pulmonary rehabilitation|neuromuscular|stroke|surgery|postoperative|intensive care|mechanical ventilation|cancer|heart failure|disease|disorder|syndrome|bronchiectasis|cystic fibrosis|airway clearance|active cycle|obese|obesity|labour|labor|pregnan\w*|benh nhan|benh|hen|phau thuat|dot quy|ung thu|suy tim)\b/;
+  /\b(patient|patients|asthma|copd|chronic obstructive|respiratory illness|respiratory disease|pulmonary disease|pulmonary rehabilitation|neuromuscular|stroke|surgery|postoperative|intensive care|mechanical ventilation|cancer|heart failure|disease|disorder|syndrome|bronchiectasis|cystic fibrosis|airway clearance|active cycle|obese|obesity|labour|labor|pregnan\w*|low back pain|shoulder pain|knee osteoarthritis|osteoarthritis|acl|anterior cruciate|rotator cuff|tendinopathy|dau lung|dau vai|dau goi|thoai hoa|chan thuong|phuc hoi|benh nhan|benh|hen|phau thuat|dot quy|ung thu|suy tim)\b/;
 const HEALTHY_RE =
   /\b(healthy|athlete|athletes|triathlet\w*|cyclists?|trained|runners?|swimmers?|soccer|football|basketball|weightlift\w*|powerlift\w*|recreationally active|young adults?|strength trained|resistance trained)\b/;
 

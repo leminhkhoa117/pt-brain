@@ -50,11 +50,14 @@ async function collectFromSources(queries, { yearFrom, yearTo }) {
   return { results, failures, calls: settled.length };
 }
 
-export async function findResearch(user, { question, queries: providedQueries, filters = {} }) {
+export async function findResearch(
+  user,
+  { question, queries: providedQueries, concepts: providedConcepts, filters = {} },
+) {
   await assertAiQuota(user._id, 'search');
 
   let queries = (providedQueries || []).map((q) => q.trim()).filter(Boolean).slice(0, 4);
-  let concepts = [];
+  let concepts = Array.isArray(providedConcepts) ? providedConcepts : [];
   let mesh = [];
   let usage = { input: 0, output: 0, cost: 0 };
   let model = '';

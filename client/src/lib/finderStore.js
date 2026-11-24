@@ -60,6 +60,18 @@ const normalizePayload = (payload) => {
   if (Array.isArray(payload?.queries) && payload.queries.length) {
     normalized.queries = payload.queries.filter(Boolean).slice(0, 4);
   }
+  if (Array.isArray(payload?.concepts) && payload.concepts.length) {
+    normalized.concepts = payload.concepts
+      .filter((concept) => concept && concept.label && Array.isArray(concept.terms) && concept.terms.length)
+      .slice(0, 6)
+      .map((concept) => ({
+        label: String(concept.label).slice(0, 80),
+        terms: concept.terms
+          .filter(Boolean)
+          .slice(0, 10)
+          .map((term) => String(term).slice(0, 120)),
+      }));
+  }
   return normalized;
 };
 
@@ -97,6 +109,7 @@ export function startFinderSearch(payload, userId) {
         question: normalized.question,
         filters: normalized.filters,
         queries: result.queries || [],
+        concepts: result.concepts || [],
         data: result,
         saved: {},
         resultCount: result.results?.length || 0,

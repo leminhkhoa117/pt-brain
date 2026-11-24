@@ -1,9 +1,17 @@
 import { z } from 'zod';
 
+const researchConceptSchema = z
+  .object({
+    label: z.string().trim().min(2, 'Tên khái niệm quá ngắn').max(80),
+    terms: z.array(z.string().trim().min(2).max(120)).min(1).max(10),
+  })
+  .strict();
+
 export const researchSearchSchema = z
   .object({
     question: z.string().trim().min(5, 'Câu hỏi quá ngắn').max(1000, 'Câu hỏi quá dài'),
     queries: z.array(z.string().trim().min(3).max(220)).max(4).optional(),
+    concepts: z.array(researchConceptSchema).max(6).optional(),
     filters: z
       .object({
         yearFrom: z.coerce.number().int().min(1900).max(2100).optional(),

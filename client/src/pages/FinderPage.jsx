@@ -8,6 +8,7 @@ import { createPaper } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
 import MarkdownText from '../components/MarkdownText.jsx';
 import ResearchJobProgress from '../components/research/ResearchJobProgress.jsx';
+import ResearchTopics from '../components/research/ResearchTopics.jsx';
 import { formatNumber, formatDoi, htmlToPlainText } from '../lib/format.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useFlushOnPageHide } from '../hooks/useFlushOnPageHide.js';
@@ -333,17 +334,22 @@ export default function FinderPage() {
     startFinderSearch({ question: question.trim(), filters: buildFilters(filters) }, userId);
   };
 
+  const queriesMatchData =
+    Array.isArray(data?.queries) &&
+    data.queries.length === draftQueries.length &&
+    data.queries.every((query, index) => query === draftQueries[index]);
+  const currentConcepts = queriesMatchData ? data?.concepts || [] : [];
+
   const rerun = () => {
     if (!draftQueries.length || searchPending) return;
     setError(null);
-    startFinderSearch(
-      {
-        question: question.trim(),
-        queries: draftQueries.filter(Boolean).slice(0, 4),
-        filters: buildFilters(filters),
-      },
-      userId,
-    );
+    const payload = {
+      question: question.trim(),
+      queries: draftQueries.filter(Boolean).slice(0, 4),
+      filters: buildFilters(filters),
+    };
+    if (currentConcepts.length) payload.concepts = currentConcepts;
+    startFinderSearch(payload, userId);
   };
 
   const rerunWithoutFilters = () => {
@@ -353,6 +359,7 @@ export default function FinderPage() {
     const payload = { question: question.trim(), filters: {} };
     const usable = draftQueries.filter(Boolean).slice(0, 4);
     if (usable.length) payload.queries = usable;
+    if (usable.length && currentConcepts.length) payload.concepts = currentConcepts;
     startFinderSearch(payload, userId);
   };
 
@@ -360,6 +367,23 @@ export default function FinderPage() {
     if (searchPending || question.trim().length < 5) return;
     setError(null);
     startFinderSearch({ question: question.trim(), filters: buildFilters(filters) }, userId);
+  };
+
+  const applyTopic = (topic) => {
+    if (searchPending || !topic) return;
+    setError(null);
+    setFilters(EMPTY_FILTERS);
+    setQuestion(topic.exampleQuestion);
+    setDraftQueries(topic.queries.slice(0, 4));
+    startFinderSearch(
+      {
+        question: topic.exampleQuestion,
+        queries: topic.queries.slice(0, 4),
+        concepts: topic.concepts,
+        filters: {},
+      },
+      userId,
+    );
   };
 
   const addExampleQuery = (query) => {
@@ -372,14 +396,15 @@ export default function FinderPage() {
   const resumeSearch = () => {
     if (!recovery || searchPending) return;
     setError(null);
-    startFinderSearch(
-      {
-        question: recovery.question || question.trim(),
-        queries: (recovery.queries || []).filter(Boolean).slice(0, 4),
-        filters: recovery.filters || buildFilters(filters),
-      },
-      userId,
-    );
+    const payload = {
+      question: recovery.question || question.trim(),
+      queries: (recovery.queries || []).filter(Boolean).slice(0, 4),
+      filters: recovery.filters || buildFilters(filters),
+    };
+    if (Array.isArray(recovery.concepts) && recovery.concepts.length) {
+      payload.concepts = recovery.concepts;
+    }
+    startFinderSearch(payload, userId);
   };
 
   const dismissRecovery = () => {
@@ -414,6 +439,7 @@ export default function FinderPage() {
       {
         question: entry.question,
         queries: (entry.queries || []).slice(0, 4),
+        concepts: entry.concepts || entry.data?.concepts || [],
         filters: entry.filters || {},
       },
       userId,
@@ -574,6 +600,8 @@ export default function FinderPage() {
           />
         )}
       </Card>
+
+      <ResearchTopics onSelect={applyTopic} disabled={searchPending} />
 
       {history.length > 0 && (
         <Card className="mt-4">
