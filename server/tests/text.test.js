@@ -4,6 +4,7 @@ import {
   htmlToText,
   normalizeText,
   splitIntoChunks,
+  stripHtml,
   xmlToText,
 } from '../src/utils/text.js';
 
@@ -31,6 +32,24 @@ describe('htmlToText', () => {
 
   it('trả về chuỗi rỗng với input rỗng', () => {
     expect(htmlToText('')).toBe('');
+  });
+});
+
+describe('stripHtml (abstract nguồn ngoài)', () => {
+  it('bỏ thẻ h4/p và giải mã entity', () => {
+    const text = stripHtml(
+      '<h4>Objective</h4><p>In the past, 23 studies (p &lt; 0.05).</p><h4>Methods</h4><p>We performed a review.</p>',
+    );
+    expect(text).toContain('Objective');
+    expect(text).toContain('In the past, 23 studies (p < 0.05).');
+    expect(text).toContain('Methods');
+    expect(text).not.toContain('<h4>');
+    expect(text).not.toContain('&lt;');
+  });
+
+  it('giữ nguyên text thuần', () => {
+    expect(stripHtml('Background: resistance training.')).toBe('Background: resistance training.');
+    expect(stripHtml('')).toBe('');
   });
 });
 

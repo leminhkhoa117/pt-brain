@@ -1,5 +1,4 @@
 import { fetchJson } from '../../utils/http.js';
-import { normalizeText } from '../../utils/text.js';
 import { mapEuropePmcResult } from './metadata.js';
 
 const EUROPEPMC = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search';
@@ -15,6 +14,5 @@ export async function searchEuropePmc(query, { pageSize = 8, yearFrom, yearTo } 
   return (data?.resultList?.result || []).map((result) => ({
     ...mapEuropePmcResult(result),
     source: 'europepmc',
-    abstract: normalizeText(result.abstractText || ''),
   }));
 }

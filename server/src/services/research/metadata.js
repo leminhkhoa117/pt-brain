@@ -1,6 +1,6 @@
 import { ApiError } from '../../utils/ApiError.js';
 import { fetchBuffer, fetchJson } from '../../utils/http.js';
-import { decodeEntities, extractHtmlTitle, htmlToText, normalizeText, xmlToText } from '../../utils/text.js';
+import { decodeEntities, extractHtmlTitle, htmlToText, normalizeText, stripHtml, xmlToText } from '../../utils/text.js';
 import { extractDoi, normalizeDoi, doiFromFilename } from '../../utils/doi.js';
 import { env } from '../../config/env.js';
 import { evidenceLevelFromPublicationTypes } from './evidence.js';
@@ -136,7 +136,7 @@ export function mapEuropePmcResult(result) {
     pmid: result?.pmid || '',
     pmcid: result?.pmcid || '',
     url: result?.doi ? `https://doi.org/${normalizeDoi(result.doi)}` : '',
-    abstract: normalizeText(decodeEntities(result?.abstractText || '')),
+    abstract: stripHtml(result?.abstractText || ''),
     publicationTypes: types,
     evidenceLevel: evidence.level,
     citationCount: Number(result?.citedByCount) || 0,
@@ -158,7 +158,7 @@ function basePaperFromCrossref(message) {
     pages: String(message?.page || ''),
     doi: normalizeDoi(message?.DOI || ''),
     url: message?.DOI ? `https://doi.org/${normalizeDoi(message.DOI)}` : '',
-    abstract: normalizeText(decodeEntities(String(message?.abstract || '').replace(/<[^>]+>/g, ' '))),
+    abstract: stripHtml(message?.abstract || ''),
     publicationTypes: types,
     evidenceLevel: evidenceLevelFromPublicationTypes(types).level,
     citationCount: Number(message?.['is-referenced-by-count']) || 0,

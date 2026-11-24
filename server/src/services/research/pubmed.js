@@ -1,5 +1,4 @@
 import { fetchJson } from '../../utils/http.js';
-import { normalizeText } from '../../utils/text.js';
 import { mapEuropePmcResult } from './metadata.js';
 
 const ESEARCH = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi';
@@ -31,6 +30,5 @@ export async function searchPubMed(query, { retmax = 8, yearFrom, yearTo } = {})
   return (data?.resultList?.result || []).map((result) => ({
     ...mapEuropePmcResult(result),
     source: 'pubmed',
-    abstract: normalizeText(result.abstractText || ''),
   }));
 }

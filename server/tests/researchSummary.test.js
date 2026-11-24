@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import { summaryContentSchema } from '../src/validation/summary.js';
 import { verifySummary, verifyFactsQuotes } from '../src/services/ai/summaryVerifier.js';
 import { augmentFactsFromText } from '../src/services/ai/paperFacts.js';
-import { extractBibliographicHints } from '../src/services/research/metadata.js';
+import { extractBibliographicHints, mapEuropePmcResult } from '../src/services/research/metadata.js';
 import { extractDoi, doiFromFilename, formatDoiForDisplay } from '../src/utils/doi.js';
 import { orderPageItems } from '../src/services/research/pdfLayout.js';
 
@@ -391,5 +391,18 @@ describe('schema tương thích', () => {
     expect(parsed.mainResults[0].claimType).toBe('data');
     expect(parsed.quickRead.lines).toEqual([]);
     expect(parsed.evidenceAxes.design.rating).toBe('vừa');
+  });
+});
+
+describe('abstract Europe PMC', () => {
+  it('bỏ markup h4/p trước khi trả về client', () => {
+    const paper = mapEuropePmcResult({
+      title: 'Clinical recommendations',
+      abstractText: '<h4>Objective</h4><p>In the past, studies examined efficacy.</p>',
+    });
+    expect(paper.abstract).toContain('Objective');
+    expect(paper.abstract).toContain('In the past, studies examined efficacy.');
+    expect(paper.abstract).not.toContain('<h4>');
+    expect(paper.abstract).not.toContain('</p>');
   });
 });

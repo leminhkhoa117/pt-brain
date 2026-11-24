@@ -1,7 +1,9 @@
 import { evidenceLevelFromPublicationTypes } from './evidence.js';
 import { assessFullText } from './fullText.js';
+import { buildRelevanceContext, scoreRelevance } from './relevance.js';
 
 const EVIDENCE_WEIGHT = { 1: 100, 2: 80, 3: 50, 4: 20, 5: 0 };
+const MAX_BASE_SCORE = 142;
 
 const TITLE_STOPWORDS = new Set([
   'the',
@@ -153,11 +155,40 @@ export function scoreResult(item, currentYear = new Date().getFullYear()) {
 }
 
 /** Lọc và xếp hạng hoàn toàn bằng code, không để AI quyết định thứ tự. */
-export function rankResults(results = [], { maxLevel, openAccessOnly, fullTextOnly } = {}) {
+export function rankResults(
+  results = [],
+  { maxLevel, openAccessOnly, fullTextOnly } = {},
+  relevanceInput = null,
+) {
+  const context = relevanceInput ? buildRelevanceContext(relevanceInput) : null;
+
   return results
     .filter((item) => (maxLevel ? (item.evidenceLevel || 5) <= maxLevel : true))
     .filter((item) => (openAccessOnly ? item.isOpenAccess : true))
-    .map((item) => ({ ...item, ...assessFullText(item), score: scoreResult(item) }))
+    .map((item) => {
+      const enriched = { ...item, ...assessFullText(item) };
+      const relevance = context ? scoreRelevance(enriched, context) : null;
+      // Loại bài không khớp chủ đề chính, tránh bài đúng evidence nhưng lạc đề.
+      if (context && !relevance.primaryMatch) return null;
+
+      const baseScore = scoreResult(enriched);
+      // Liên quan là yếu tố chính (70%); evidence/recency/citation chỉ tinh chỉnh
+      // thứ tự giữa các bài đã cùng chủ đề (30%).
+      const score = relevance
+        ? Math.round(
+            relevance.score * 70 +
+              (Math.min(baseScore, MAX_BASE_SCORE) / MAX_BASE_SCORE) * 30,
+          )
+        : baseScore;
+
+      return {
+        ...enriched,
+        score,
+        relevanceScore: relevance ? relevance.score : undefined,
+        matchedConcepts: relevance ? relevance.matchedConcepts : undefined,
+      };
+    })
+    .filter(Boolean)
     .filter((item) => (fullTextOnly ? item.hasFullText : true))
     .sort((a, b) => b.score - a.score);
 }

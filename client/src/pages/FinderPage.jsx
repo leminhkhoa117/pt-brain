@@ -8,7 +8,7 @@ import { createPaper } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
 import MarkdownText from '../components/MarkdownText.jsx';
 import ResearchJobProgress from '../components/research/ResearchJobProgress.jsx';
-import { formatNumber, formatDoi } from '../lib/format.js';
+import { formatNumber, formatDoi, htmlToPlainText } from '../lib/format.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { useFlushOnPageHide } from '../hooks/useFlushOnPageHide.js';
 import {
@@ -22,11 +22,7 @@ import {
   saveFinderDraft,
   saveLastSearch,
 } from '../lib/finderHistory.js';
-import {
-  getFinderSnapshot,
-  startFinderSearch,
-  subscribeFinderStore,
-} from '../lib/finderStore.js';
+import { getFinderSnapshot, startFinderSearch, subscribeFinderStore } from '../lib/finderStore.js';
 
 const LEVEL_STYLES = {
   1: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
@@ -41,6 +37,23 @@ const STAGES = [
   'Đang gọi PubMed, Europe PMC, OpenAlex và Crossref',
   'Đang gộp kết quả và xếp hạng bằng code',
   'AI đang viết mô tả và tổng hợp bằng chứng',
+];
+
+const QUERY_EXAMPLES = [
+  {
+    label: 'Kỹ thuật thở khi tập kháng lực',
+    query:
+      '("breathing technique" OR "breathing pattern") AND ("resistance training" OR "strength training")',
+  },
+  {
+    label: 'Valsalva khi squat/deadlift',
+    query: '("Valsalva maneuver" OR Valsalva) AND (squat OR deadlift OR "resistance exercise")',
+  },
+  {
+    label: 'Luyện cơ hô hấp',
+    query:
+      '("respiratory muscle training" OR "inspiratory muscle training") AND (performance OR athletes)',
+  },
 ];
 
 const buildFilters = (filters) => {
@@ -333,6 +346,29 @@ export default function FinderPage() {
     );
   };
 
+  const rerunWithoutFilters = () => {
+    if (searchPending) return;
+    setError(null);
+    setFilters(EMPTY_FILTERS);
+    const payload = { question: question.trim(), filters: {} };
+    const usable = draftQueries.filter(Boolean).slice(0, 4);
+    if (usable.length) payload.queries = usable;
+    startFinderSearch(payload, userId);
+  };
+
+  const regenerateQueries = () => {
+    if (searchPending || question.trim().length < 5) return;
+    setError(null);
+    startFinderSearch({ question: question.trim(), filters: buildFilters(filters) }, userId);
+  };
+
+  const addExampleQuery = (query) => {
+    setDraftQueries((prev) => {
+      if (prev.includes(query) || prev.length >= 4) return prev;
+      return [...prev, query];
+    });
+  };
+
   const resumeSearch = () => {
     if (!recovery || searchPending) return;
     setError(null);
@@ -410,8 +446,8 @@ export default function FinderPage() {
       {recovery && !searchPending && (
         <Alert tone="warning" title="Lần tìm trước bị gián đoạn" className="mb-4">
           <p>
-            Trình duyệt đã tải lại khi đang tìm nên kết quả dở dang không còn. Câu hỏi và bộ lọc
-            đã được khôi phục sẵn. Bấm “Tiếp tục tìm” để chạy lại — thao tác này tốn 1 lượt tìm AI.
+            Trình duyệt đã tải lại khi đang tìm nên kết quả dở dang không còn. Câu hỏi và bộ lọc đã
+            được khôi phục sẵn. Bấm “Tiếp tục tìm” để chạy lại — thao tác này tốn 1 lượt tìm AI.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             <button
@@ -514,11 +550,15 @@ export default function FinderPage() {
 
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Kết quả luôn có link DOI/PubMed thật. Không có bài báo do AI tự sinh. Badge
-              “Toàn văn PMC” hoặc “Có PDF” nghĩa là hệ thống có nguồn đọc trực tiếp, không chỉ abstract.
+              Kết quả luôn có link DOI/PubMed thật. Không có bài báo do AI tự sinh. Badge “Toàn văn
+              PMC” hoặc “Có PDF” nghĩa là hệ thống có nguồn đọc trực tiếp, không chỉ abstract.
             </p>
             <button type="submit" className="btn-primary" disabled={searchPending}>
-              {searchPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="search" className="h-4 w-4" />}
+              {searchPending ? (
+                <Spinner className="h-4 w-4 text-white" />
+              ) : (
+                <Icon name="search" className="h-4 w-4" />
+              )}
               {searchPending ? 'Đang tìm...' : 'Tìm nghiên cứu'}
             </button>
           </div>
@@ -582,7 +622,7 @@ export default function FinderPage() {
                   </p>
                   <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
                     {formatSavedAt(entry.savedAt)}
-                    {entry.resultCount ?? entry.data?.results?.length
+                    {(entry.resultCount ?? entry.data?.results?.length)
                       ? ` · ${entry.resultCount ?? entry.data.results.length} bài`
                       : ''}
                     {entry.data ? '' : ' · cần tìm lại'}
@@ -614,69 +654,152 @@ export default function FinderPage() {
 
       {data && (
         <div className="mt-4">
-          {draftQueries.length > 0 && (
-            <Card>
-              <div className="flex flex-wrap items-center justify-between gap-2">
+          <Card>
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Truy vấn tiếng Anh đã dùng
+                  Truy vấn tiếng Anh
                 </h3>
-                <button type="button" className="btn-ghost !px-2.5 !py-1.5 text-xs" onClick={rerun} disabled={searchPending}>
+                <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                  {draftQueries.length
+                    ? 'Sửa hoặc thêm truy vấn cụ thể hơn rồi bấm “Tìm lại”. Tối đa 4 truy vấn.'
+                    : 'Chưa có truy vấn. Thêm truy vấn tiếng Anh hoặc bấm “Tạo lại truy vấn”.'}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                  onClick={() => setDraftQueries([])}
+                  disabled={searchPending || !draftQueries.length}
+                >
+                  Xóa hết
+                </button>
+                <button
+                  type="button"
+                  className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                  onClick={regenerateQueries}
+                  disabled={searchPending || question.trim().length < 5}
+                >
+                  Tạo lại truy vấn
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary !px-2.5 !py-1.5 text-xs"
+                  onClick={rerun}
+                  disabled={searchPending || !draftQueries.length}
+                >
                   Tìm lại với truy vấn này
                 </button>
               </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {draftQueries.map((query, index) => (
-                  <span
-                    key={`${query}-${index}`}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {draftQueries.map((query, index) => (
+                <span
+                  key={`${query}-${index}`}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                >
+                  {query}
+                  <button
+                    type="button"
+                    onClick={() => setDraftQueries((prev) => prev.filter((_, i) => i !== index))}
+                    className="text-slate-500 dark:text-slate-400 hover:text-rose-500"
+                    aria-label="Xóa truy vấn"
                   >
-                    {query}
-                    <button
-                      type="button"
-                      onClick={() => setDraftQueries((prev) => prev.filter((_, i) => i !== index))}
-                      className="text-slate-500 dark:text-slate-400 hover:text-rose-500"
-                      aria-label="Xóa truy vấn"
+                    <Icon name="close" className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+
+            {Array.isArray(data.concepts) && data.concepts.length > 0 && (
+              <div className="mt-3">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Khái niệm chính
+                </p>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {data.concepts.map((concept, index) => (
+                    <span
+                      key={`${concept.label}-${index}`}
+                      className="badge bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
+                      title={(concept.terms || []).join(', ')}
                     >
-                      <Icon name="close" className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
+                      {concept.label}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="mt-2 flex gap-2">
-                <input
-                  className="input !py-1.5 text-xs"
-                  placeholder="Thêm truy vấn tiếng Anh..."
-                  value={newQuery}
-                  onChange={(e) => setNewQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (newQuery.trim()) {
-                        setDraftQueries((prev) => [...prev, newQuery.trim()].slice(0, 4));
-                        setNewQuery('');
-                      }
-                    }
-                  }}
-                  maxLength={220}
-                />
-                <button
-                  type="button"
-                  className="btn-secondary !px-3 !py-1.5 text-xs"
-                  onClick={() => {
+            )}
+
+            <div className="mt-2 flex gap-2">
+              <input
+                className="input !py-1.5 text-xs"
+                placeholder="Thêm truy vấn tiếng Anh..."
+                value={newQuery}
+                onChange={(e) => setNewQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
                     if (newQuery.trim()) {
                       setDraftQueries((prev) => [...prev, newQuery.trim()].slice(0, 4));
                       setNewQuery('');
                     }
-                  }}
-                >
-                  Thêm
-                </button>
+                  }
+                }}
+                maxLength={220}
+              />
+              <button
+                type="button"
+                className="btn-secondary !px-3 !py-1.5 text-xs"
+                onClick={() => {
+                  if (newQuery.trim()) {
+                    setDraftQueries((prev) => [...prev, newQuery.trim()].slice(0, 4));
+                    setNewQuery('');
+                  }
+                }}
+              >
+                Thêm
+              </button>
+            </div>
+
+            <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+              Mẹo: bọc cụm từ trong ngoặc kép, dùng <code>OR</code> cho từ đồng nghĩa và{' '}
+              <code>AND</code> để giao nhau.
+            </p>
+            <details className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <summary className="cursor-pointer font-semibold text-slate-600 dark:text-slate-300">
+                Công thức & ví dụ
+              </summary>
+              <div className="mt-1 space-y-1">
+                <p>
+                  <code className="rounded bg-slate-100 px-1 py-0.5 dark:bg-slate-800">
+                    (&quot;từ đồng nghĩa A&quot; OR &quot;từ đồng nghĩa B&quot;) AND (&quot;từ đồng
+                    nghĩa C&quot; OR &quot;từ đồng nghĩa D&quot;)
+                  </code>
+                </p>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {QUERY_EXAMPLES.map((example) => (
+                    <button
+                      key={example.label}
+                      type="button"
+                      className="rounded-full border border-slate-200 px-2 py-0.5 text-left hover:border-brand-300 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:hover:border-brand-700 dark:hover:text-brand-300"
+                      onClick={() => addExampleQuery(example.query)}
+                      disabled={draftQueries.includes(example.query) || draftQueries.length >= 4}
+                      title={example.query}
+                    >
+                      + {example.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                Đã quét {data.scanned} kết quả thô · gộp còn {data.total} bài · hiển thị {results.length} bài tốt nhất.
-              </p>
-            </Card>
-          )}
+            </details>
+
+            <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+              Đã quét {data.scanned} kết quả thô · gộp còn {data.total} bài · hiển thị{' '}
+              {results.length} bài tốt nhất.
+              {data.expanded ? ' · đã tự mở rộng truy vấn' : ''}
+            </p>
+          </Card>
 
           {data.synthesis && (
             <Card className="mt-4 border-brand-200 bg-brand-50/60 dark:border-brand-900 dark:bg-brand-950/30">
@@ -690,7 +813,8 @@ export default function FinderPage() {
                 {data.synthesis}
               </MarkdownText>
               <p className="mt-2 text-[11px] text-brand-700/60 dark:text-brand-300/60">
-                Tổng hợp chỉ dựa trên abstract của các bài trong danh sách. Trích dẫn [n] tương ứng số thứ tự bên dưới.
+                Tổng hợp chỉ dựa trên abstract của các bài trong danh sách. Trích dẫn [n] tương ứng
+                số thứ tự bên dưới.
               </p>
             </Card>
           )}
@@ -698,9 +822,44 @@ export default function FinderPage() {
           <LandscapeCard landscape={data.landscape} />
 
           {!results.length && (
-            <Alert tone="info" className="mt-4">
-              Không có kết quả phù hợp. Thử bỏ lọc hoặc dùng câu hỏi rộng hơn.
-            </Alert>
+            <Card className="mt-4 border-amber-200 bg-amber-50/60 dark:border-amber-900/60 dark:bg-amber-950/20">
+              <div className="flex items-start gap-2">
+                <Icon
+                  name="info"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+                />
+                <div>
+                  <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                    Không có kết quả phù hợp
+                  </h3>
+                  <p className="mt-1 text-xs text-amber-800/90 dark:text-amber-200/80">
+                    Thường do bộ lọc quá hẹp hoặc truy vấn quá chung. Thử một trong các cách sau:
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="btn-secondary !px-3 !py-1.5 text-xs"
+                      onClick={rerunWithoutFilters}
+                      disabled={searchPending}
+                    >
+                      Bỏ lọc & tìm lại
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-ghost !px-3 !py-1.5 text-xs"
+                      onClick={rerun}
+                      disabled={searchPending || !draftQueries.length}
+                    >
+                      Thử lại
+                    </button>
+                  </div>
+                  <p className="mt-2 text-[11px] text-amber-800/70 dark:text-amber-200/60">
+                    Nếu vẫn ít kết quả, thêm một truy vấn tiếng Anh có thuật ngữ chuyên ngành (ví dụ
+                    “Valsalva”, “intra-abdominal pressure”, “respiratory muscle training”).
+                  </p>
+                </div>
+              </div>
+            </Card>
           )}
 
           <div className="mt-4 space-y-3">
@@ -708,15 +867,24 @@ export default function FinderPage() {
               const key = paperKey(item);
               const isSaved = saved[key];
               const isExpanded = expanded[key];
+              const abstractText = htmlToPlainText(item.abstract);
               return (
-                <Card key={key} className="transition hover:border-slate-300 dark:hover:border-slate-700">
+                <Card
+                  key={key}
+                  className="transition hover:border-slate-300 dark:hover:border-slate-700"
+                >
                   <div className="flex gap-3">
                     <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-sm font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                       {item.id}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <span className={clsx('badge', LEVEL_STYLES[item.evidenceLevel] || LEVEL_STYLES[5])}>
+                        <span
+                          className={clsx(
+                            'badge',
+                            LEVEL_STYLES[item.evidenceLevel] || LEVEL_STYLES[5],
+                          )}
+                        >
                           Mức {item.evidenceLevel}/5
                         </span>
                         {item.isRetracted && (
@@ -782,15 +950,12 @@ export default function FinderPage() {
                       </p>
 
                       {item.viSummary && (
-                        <MarkdownText
-                          compact
-                          className="mt-2 text-slate-700 dark:text-slate-300"
-                        >
+                        <MarkdownText compact className="mt-2 text-slate-700 dark:text-slate-300">
                           {item.viSummary}
                         </MarkdownText>
                       )}
 
-                      {item.abstract && (
+                      {abstractText && (
                         <div className="mt-2">
                           <p
                             className={clsx(
@@ -798,14 +963,12 @@ export default function FinderPage() {
                               !isExpanded && 'line-clamp-2',
                             )}
                           >
-                            {item.abstract}
+                            {abstractText}
                           </p>
                           <button
                             type="button"
                             className="mt-1 text-[11px] font-semibold text-brand-600 hover:underline dark:text-brand-400"
-                            onClick={() =>
-                              setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
-                            }
+                            onClick={() => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))}
                           >
                             {isExpanded ? 'Thu gọn abstract' : 'Xem abstract'}
                           </button>
@@ -823,7 +986,10 @@ export default function FinderPage() {
                         </button>
                         <button
                           type="button"
-                          className={clsx('btn-secondary !px-3 !py-1.5 text-xs', isSaved && 'text-emerald-600')}
+                          className={clsx(
+                            'btn-secondary !px-3 !py-1.5 text-xs',
+                            isSaved && 'text-emerald-600',
+                          )}
                           disabled={isSaved || savePaper.isPending}
                           onClick={() =>
                             savePaper.mutate({
@@ -835,7 +1001,7 @@ export default function FinderPage() {
                               pmid: item.pmid || '',
                               pmcid: item.pmcid || '',
                               url: item.url || '',
-                              abstract: (item.abstract || '').slice(0, 50000),
+                              abstract: abstractText.slice(0, 50000),
                               publicationTypes: item.publicationTypes || [],
                               evidenceLevel: item.evidenceLevel || 5,
                               citationCount: item.citationCount || 0,

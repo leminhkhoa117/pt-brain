@@ -33,6 +33,31 @@ export function formatDoi(value = '') {
   return `${match[1]}${match[2].toUpperCase()}${match[3]}`;
 }
 
+/**
+ * Bỏ markup HTML trong text lấy từ nguồn ngoài (Europe PMC trả abstract dạng
+ * `<h4>Objective</h4>...`). Không render HTML để tránh XSS, chỉ lấy text thuần
+ * và giữ xuống dòng giữa các mục.
+ */
+export function htmlToPlainText(value = '') {
+  const text = String(value || '');
+  const hasMarkup = /<[a-z][^>]*>/i.test(text);
+  const hasEntity = /&(?:[a-z]+|#\d+|#x[0-9a-f]+);/i.test(text);
+  if (!hasMarkup && !hasEntity) return text;
+
+  const doc = new DOMParser().parseFromString(text, 'text/html');
+  doc.querySelectorAll('script, style, noscript, svg, iframe').forEach((el) => el.remove());
+  doc.querySelectorAll('br').forEach((el) => el.replaceWith('\n'));
+  doc
+    .querySelectorAll('p, div, h1, h2, h3, h4, h5, h6, li, tr, blockquote')
+    .forEach((el) => el.append('\n'));
+
+  return (doc.body.textContent || '')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 export const GOAL_LABELS = {
   cut: 'Giảm mỡ',
   maintain: 'Duy trì',

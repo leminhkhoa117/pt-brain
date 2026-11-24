@@ -44,6 +44,21 @@ export function htmlToText(html = '') {
   return normalizeText(main.text());
 }
 
+/**
+ * Bỏ markup trong một đoạn văn bản rời (vd. abstract Europe PMC trả
+ * `<h4>Objective</h4>...`) nhưng vẫn giữ ranh giới giữa các mục.
+ */
+export function stripHtml(html = '') {
+  if (!html) return '';
+  const $ = cheerio.load(String(html));
+  $('script, style, noscript, svg, iframe, form').remove();
+  $('br').replaceWith('\n');
+  $('p, div, h1, h2, h3, h4, h5, h6, li, tr, blockquote, figcaption, caption').each((_, el) => {
+    $(el).append('\n');
+  });
+  return normalizeText($.root().text());
+}
+
 export function extractHtmlTitle(html = '') {
   if (!html) return '';
   const $ = cheerio.load(html);
