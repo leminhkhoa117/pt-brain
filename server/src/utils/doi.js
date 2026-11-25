@@ -1,10 +1,15 @@
-/** Chuẩn hóa DOI: bỏ URL/tiền tố "doi:", bỏ dấu câu cuối. */
+/** Chuẩn hóa DOI: bỏ URL/tiền tố "doi:", bỏ dấu câu cuối, bỏ version bioRxiv/medRxiv. */
 export function normalizeDoi(value = '') {
-  return String(value)
+  const cleaned = String(value)
     .trim()
     .replace(/^https?:\/\/(dx\.)?doi\.org\//i, '')
     .replace(/^doi:\s*/i, '')
     .replace(/[.,;)\]]+$/, '');
+  // bioRxiv/medRxiv URL thường có hậu tố version (v1, v2...) không thuộc DOI.
+  if (/^10\.(1101|64898)\//i.test(cleaned)) {
+    return cleaned.replace(/v\d+$/i, '');
+  }
+  return cleaned;
 }
 
 /** Tìm DOI đầu tiên trong văn bản hoặc tên file. */

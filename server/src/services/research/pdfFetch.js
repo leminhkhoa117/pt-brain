@@ -1,4 +1,5 @@
 import { fetchBuffer } from '../../utils/http.js';
+import { fetchBufferWithCurl, isPreprintHost } from '../../utils/curlFetch.js';
 import { parsePdfBuffer } from './pdf.js';
 
 const MAX_PDF_BYTES = 25 * 1024 * 1024;
@@ -57,13 +58,28 @@ function looksLikeHtml(buffer, contentType = '') {
 }
 
 async function downloadPdf(url, { maxBytes = MAX_PDF_BYTES } = {}) {
-  let response = await fetchBuffer(url, {
-    maxBytes,
-    accept: 'application/pdf,text/html;q=0.9,*/*;q=0.8',
-    headers: BROWSER_HEADERS,
-    timeout: PER_CANDIDATE_TIMEOUT_MS,
-    retries: 0,
-  });
+  let response;
+  try {
+    response = await fetchBuffer(url, {
+      maxBytes,
+      accept: 'application/pdf,text/html;q=0.9,*/*;q=0.8',
+      headers: BROWSER_HEADERS,
+      timeout: PER_CANDIDATE_TIMEOUT_MS,
+      retries: 0,
+    });
+  } catch (error) {
+    // bioRxiv/medRxiv sau Cloudflare thường trả 429/403 cho TLS fingerprint
+    // của Node nhưng cho curl qua. Chỉ fallback cho đúng host preprint.
+    if (!isPreprintHost(url) || !/HTTP (403|429)/i.test(error?.message || '')) {
+      throw error;
+    }
+    response = await fetchBufferWithCurl(url, {
+      maxBytes,
+      timeout: 20000,
+      accept: 'application/pdf,text/html;q=0.9,*/*;q=0.8',
+      headers: BROWSER_HEADERS,
+    });
+  }
 
   // Một số host trả HTML (trang trung gian/challenge) thay vì PDF; thử lấy
   // citation_pdf_url đúng một lần rồi tải lại.

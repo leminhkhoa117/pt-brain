@@ -445,7 +445,10 @@ export async function enrichPaperMetadata(
     }).catch(() => null);
     if (page) {
       const extracted = htmlToText(page.buffer.toString('utf8'));
-      if (extracted.length > 800) {
+      // Landing page của preprint/publisher thường chỉ có abstract. Nếu đã biết
+      // PDF, đừng nhận HTML ngắn làm "toàn văn" — ưu tiên tải PDF bên dưới.
+      const minimumHtml = paper.pdfUrl ? 5000 : 800;
+      if (extracted.length >= minimumHtml) {
         text = extracted;
         sourceKind = 'open_access_fulltext';
       }
@@ -471,6 +474,12 @@ export async function enrichPaperMetadata(
   // Semantic Scholar) thay vì chỉ best_oa_location. Giữ PMC XML ở ưu tiên đầu.
   if (!text) {
     const baseCandidates = dedupeCandidates([
+      ...(paper.pdfUrl
+        ? [{ url: paper.pdfUrl, kind: 'pdf', source: 'paper' }]
+        : []),
+      ...(paper.fullTextUrl && paper.fullTextUrl !== paper.pdfUrl
+        ? [{ url: paper.fullTextUrl, kind: 'landing', source: 'paper' }]
+        : []),
       ...candidatesFromOpenAlex(openalex || {}),
       ...candidatesFromUnpaywall(oa || {}),
     ]);
