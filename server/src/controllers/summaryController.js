@@ -3,6 +3,7 @@ import {
   clearQa,
   createSummaryForUser,
   deleteSummaryForUser,
+  expireStaleSummariesForUser,
   getSummaryForUser,
   retrySummaryForUser,
 } from '../services/research/reader.js';
@@ -62,6 +63,10 @@ export async function list(req, res) {
   const tag = String(params.tag || '').trim();
   const limit = Math.min(Math.max(Number(params.limit) || 100, 1), 100);
   const offset = Math.max(Number(params.offset) || 0, 0);
+
+  // Mở thư viện là dịp dọn job đã chết (server restart, AI treo...) để item
+  // không hiển thị "Đang xử lý" vô hạn. Job đang chạy thật có heartbeat 30s.
+  await expireStaleSummariesForUser(req.userId);
 
   const query = { userId: req.userId };
   if (favoriteOnly) query.isFavorite = true;

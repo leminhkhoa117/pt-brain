@@ -15,6 +15,8 @@ import { ApiError } from '../../utils/ApiError.js';
 import { normalizeText, truncateText } from '../../utils/text.js';
 import {
   acquireSummaryLock,
+  clearAllSummaryLocks,
+  refreshSummaryLock,
   releaseSummaryLock,
   releaseSummaryLocks,
 } from './summaryLock.js';
@@ -101,11 +103,24 @@ export function buildCacheKey(resolved, version = PROMPT_VERSION) {
   return `text:${crypto.createHash('sha256').update(resolved.text).digest('hex').slice(0, 40)}${suffix}`;
 }
 
-// Job tóm tắt chạy trong RAM. Nếu server restart hoặc AI treo, document có thể
-// kẹt ở "processing" mãi. Sau 6 phút không cập nhật thì coi là job chết.
-const STALE_PROCESSING_MS = 6 * 60 * 1000;
+// Job tóm tắt chạy trong RAM. Trong lúc chạy, heartbeat cập nhật updatedAt mỗi
+// 30 giây; nếu process chết thì updatedAt đứng yên và job được coi là stale.
+const STALE_PROCESSING_MS = 3 * 60 * 1000;
+const SUMMARY_HEARTBEAT_MS = 30 * 1000;
+// Chặn trên cho toàn bộ pipeline (trích facts + viết + kiểm tra + sửa). Không có
+// ngưỡng này, một chuỗi call AI chậm có thể giữ job "processing" vô hạn.
+const SUMMARY_JOB_TIMEOUT_MS = 15 * 60 * 1000;
 const STALE_PROCESSING_ERROR =
   'Job tóm tắt bị gián đoạn (server khởi động lại hoặc quá thời gian). Bấm "Thử lại" để chạy lại.';
+
+function withTimeout(promise, timeoutMs, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new ApiError(504, 'SUMMARY_TIMEOUT', message)), timeoutMs);
+    timer.unref?.();
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 async function failIfStale(summary) {
   if (!summary || summary.status !== 'processing') return false;
@@ -191,17 +206,36 @@ async function responseForSummary(summary, { cached, processing }) {
  * Cập nhật progress/status vào Summary để client polling.
  */
 async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey }) {
+  // Heartbeat giữ lock sống và updatedAt mới trong suốt job dài. Nhờ đó:
+  // - lock không hết hạn khi AI call kéo dài hơn TTL;
+  // - failIfStale/expireStale không đánh dấu nhầm job đang chạy.
+  const heartbeat = setInterval(() => {
+    refreshSummaryLock(userId, cacheKey);
+    Summary.updateOne(
+      { _id: summaryId, status: 'processing' },
+      { $set: { updatedAt: new Date() } },
+    ).catch(() => {});
+  }, SUMMARY_HEARTBEAT_MS);
+  heartbeat.unref?.();
+
   try {
-    const { content, facts, usage, model, promptVersion } = await summarizePaper({
-      paper: resolved.paper,
-      text: resolved.text,
-      basedOn: resolved.basedOn,
-      figureHints: resolved.figureHints || [],
-      facts: resolved.facts || null,
-      onProgress: (progress) => {
-        Summary.updateOne({ _id: summaryId }, { $set: { progress } }).catch(() => {});
-      },
-    });
+    const { content, facts, usage, model, promptVersion } = await withTimeout(
+      summarizePaper({
+        paper: resolved.paper,
+        text: resolved.text,
+        basedOn: resolved.basedOn,
+        figureHints: resolved.figureHints || [],
+        facts: resolved.facts || null,
+        onProgress: (progress) => {
+          Summary.updateOne(
+            { _id: summaryId, status: 'processing' },
+            { $set: { progress } },
+          ).catch(() => {});
+        },
+      }),
+      SUMMARY_JOB_TIMEOUT_MS,
+      'Tóm tắt quá thời gian cho phép (15 phút). Bấm "Thử lại" để chạy lại.',
+    );
 
     // PDF thường có metadata rác; bổ sung các field còn thiếu từ nội dung AI trích
     if (content.metadata) {
@@ -252,6 +286,7 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey })
       },
     ).catch(() => {});
   } finally {
+    clearInterval(heartbeat);
     await releaseSummaryLock(userId, cacheKey);
   }
 }
@@ -489,6 +524,11 @@ export async function retrySummaryForUser(userId, id) {
  * từ sourceText đã lưu. Giới hạn số job resume cùng lúc để không bùng AI call.
  */
 export async function resumeInterruptedSummaries({ limit = 5 } = {}) {
+  // Job tóm tắt chạy trong RAM: sau restart, mọi lock còn trong DB đều thuộc
+  // process đã chết. Xóa trước khi resume, nếu không lock cũ còn hạn sẽ khiến
+  // job bị bỏ qua và document kẹt "processing" vĩnh viễn.
+  await clearAllSummaryLocks();
+
   const processing = await Summary.find({ status: 'processing' }).sort({ updatedAt: 1 }).lean();
   const selected = processing.slice(0, limit);
   const overflow = processing.slice(limit);
@@ -582,6 +622,36 @@ export async function markStaleSummariesFailed(maxAgeMinutes = 0) {
   );
   await releaseSummaryLocks(stale);
   return result.modifiedCount;
+}
+
+/**
+ * Dọn job kẹt của một user khi mở thư viện. Chỉ coi là stale sau khi không có
+ * heartbeat trong STALE_PROCESSING_MS, nên job đang chạy thật không bị đánh
+ * dấu nhầm. Nhờ vậy item không còn hiển thị "Đang xử lý" mãi.
+ */
+export async function expireStaleSummariesForUser(userId, maxAgeMs = STALE_PROCESSING_MS) {
+  const cutoff = new Date(Date.now() - maxAgeMs);
+  const stale = await Summary.find({
+    userId,
+    status: 'processing',
+    updatedAt: { $lt: cutoff },
+  })
+    .select('_id cacheKey')
+    .lean();
+  if (!stale.length) return 0;
+
+  await Summary.updateMany(
+    { _id: { $in: stale.map((item) => item._id) }, status: 'processing' },
+    {
+      $set: {
+        status: 'failed',
+        progress: '',
+        error: STALE_PROCESSING_ERROR,
+      },
+    },
+  );
+  await releaseSummaryLocks(stale.map((item) => ({ userId, cacheKey: item.cacheKey })));
+  return stale.length;
 }
 
 export async function appendQa(userId, id, question, answer) {

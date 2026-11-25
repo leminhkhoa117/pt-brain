@@ -376,7 +376,9 @@ async function extractChunk(chunk, index, total, paper, sessionId, onProgress) {
     schema: paperFactsSchema,
     maxTokens: 24000,
     retries: 1,
-    timeoutMs: 360000,
+    // Khớp AI_TIMEOUT_MS mặc định (3 phút). Trước đây 6 phút × retry có thể
+    // giữ một job đơn lẻ tới ~12 phút mà UI không có tiến triển gì.
+    timeoutMs: 180000,
     sessionId,
   });
   return result;

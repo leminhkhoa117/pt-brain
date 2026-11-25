@@ -63,6 +63,14 @@ export default function LibraryPage() {
       if (!lastPage.page?.hasMore) return undefined;
       return allPages.reduce((total, page) => total + page.summaries.length, 0);
     },
+    // Có bài đang tóm tắt thì tự làm mới để trạng thái/tiến trình không bị
+    // đứng ở "Đang xử lý" khi job đã xong hoặc đã bị đánh dấu lỗi.
+    refetchInterval: (query) => {
+      const hasProcessing = (query.state.data?.pages || []).some((page) =>
+        (page.summaries || []).some((item) => item.status === 'processing'),
+      );
+      return hasProcessing ? 5000 : false;
+    },
   });
   const pages = summariesQuery.data?.pages || [];
   const items = pages.flatMap((page) => page.summaries);

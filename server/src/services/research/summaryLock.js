@@ -38,6 +38,25 @@ export async function releaseSummaryLock(userId, cacheKey) {
   await SummaryJobLock.deleteOne({ userId, cacheKey }).catch(() => {});
 }
 
+/** Giữ khóa sống trong lúc job dài chạy (heartbeat), tránh lock hết hạn giữa chừng. */
+export async function refreshSummaryLock(userId, cacheKey, ttlMs = SUMMARY_LOCK_TTL_MS) {
+  if (!cacheKey) return;
+  await SummaryJobLock.updateOne(
+    { userId, cacheKey },
+    { $set: { expiresAt: new Date(Date.now() + ttlMs) } },
+  ).catch(() => {});
+}
+
+/**
+ * Chỉ gọi lúc khởi động: job tóm tắt chạy trong RAM, nên mọi lock còn lại
+ * thuộc process đã chết. Xóa trước khi resume để job không bị bỏ qua vì
+ * lock cũ còn hạn. App chạy single-instance; nếu scale nhiều instance cần
+ * thay bằng lock có owner + heartbeat.
+ */
+export async function clearAllSummaryLocks() {
+  await SummaryJobLock.deleteMany({}).catch(() => {});
+}
+
 export async function releaseSummaryLocks(locks = []) {
   const pairs = locks.filter((item) => item?.cacheKey);
   if (!pairs.length) return;

@@ -98,6 +98,85 @@ describe('resumeInterruptedSummaries', () => {
     expect(await waitForLockReleased('resume-job-1')).toBe(0);
   });
 
+  it('resume chạy lại job dù còn lock mồ côi còn hạn từ process cũ', async () => {
+    const paper = await models.Paper.create({ userId, title: 'Orphan lock paper' });
+    const summary = await models.Summary.create({
+      userId,
+      paperId: paper._id,
+      inputType: 'text',
+      basedOn: 'fulltext',
+      content: { tldr: 'Đang xử lý...', mainResults: [] },
+      sourceText: 'Nội dung nguồn để test lock mồ côi sau khi server restart.',
+      sourceKind: 'user_text',
+      cacheKey: 'resume-orphan-lock',
+      status: 'processing',
+      progress: 'Đang trích dữ kiện đoạn 1/1...',
+    });
+    // Mô phỏng lock do process cũ để lại với hạn 7 phút như lúc job đang chạy.
+    await models.SummaryJobLock.create({
+      userId,
+      cacheKey: 'resume-orphan-lock',
+      expiresAt: new Date(Date.now() + 7 * 60 * 1000),
+    });
+
+    const result = await reader.resumeInterruptedSummaries();
+    expect(result.resumed).toBeGreaterThanOrEqual(1);
+
+    const finished = await waitForStatus(summary._id, 'ready');
+    expect(finished.status).toBe('ready');
+    expect(await waitForLockReleased('resume-orphan-lock')).toBe(0);
+  });
+
+  it('dọn job quá hạn heartbeat khi mở thư viện, không đụng job đang chạy', async () => {
+    const paper = await models.Paper.create({ userId, title: 'Stale sweep paper' });
+    const stale = await models.Summary.create({
+      userId,
+      paperId: paper._id,
+      inputType: 'text',
+      basedOn: 'fulltext',
+      content: { tldr: 'Đang xử lý...', mainResults: [] },
+      sourceText: 'Nội dung nguồn của job đã chết.',
+      cacheKey: 'stale-sweep',
+      status: 'processing',
+      progress: 'Đang trích dữ kiện đoạn 1/1...',
+    });
+    const fresh = await models.Summary.create({
+      userId,
+      paperId: paper._id,
+      inputType: 'text',
+      basedOn: 'fulltext',
+      content: { tldr: 'Đang xử lý...', mainResults: [] },
+      sourceText: 'Nội dung nguồn của job đang chạy thật.',
+      cacheKey: 'fresh-sweep',
+      status: 'processing',
+      progress: 'Đang viết bản giải thích cho PT...',
+    });
+    await models.SummaryJobLock.create({
+      userId,
+      cacheKey: 'stale-sweep',
+      expiresAt: new Date(Date.now() + 7 * 60 * 1000),
+    });
+    await models.Summary.collection.updateOne(
+      { _id: stale._id },
+      { $set: { updatedAt: new Date(Date.now() - 10 * 60 * 1000) } },
+    );
+
+    const cleaned = await reader.expireStaleSummariesForUser(userId);
+    expect(cleaned).toBeGreaterThanOrEqual(1);
+
+    const staleAfter = await models.Summary.findById(stale._id).lean();
+    expect(staleAfter.status).toBe('failed');
+    expect(staleAfter.progress).toBe('');
+    expect(staleAfter.error).toContain('gián đoạn');
+    expect(
+      await models.SummaryJobLock.countDocuments({ userId, cacheKey: 'stale-sweep' }),
+    ).toBe(0);
+
+    const freshAfter = await models.Summary.findById(fresh._id).lean();
+    expect(freshAfter.status).toBe('processing');
+    await models.Summary.deleteOne({ _id: fresh._id });
+  });
+
   it('hai request cùng nội dung chỉ tạo một job và một Summary', async () => {
     const { summarizePaper } = await import('../src/services/ai/paperSummarizer.js');
     summarizePaper.mockClear();
