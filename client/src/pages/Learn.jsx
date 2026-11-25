@@ -29,12 +29,15 @@ export default function Learn() {
     if (value === 'curriculum') next.delete('tab');
     else next.set('tab', value);
     next.delete('lesson');
+    next.delete('focus');
     setParams(next);
   };
 
-  const openLesson = (slug) => {
+  const openLesson = (slug, { focus = '' } = {}) => {
     const next = new URLSearchParams(params);
     next.set('lesson', slug);
+    if (focus) next.set('focus', focus);
+    else next.delete('focus');
     if (tab !== 'curriculum') next.set('tab', 'curriculum');
     setParams(next);
     window.scrollTo({ top: 0 });
@@ -43,6 +46,7 @@ export default function Learn() {
   const closeLesson = () => {
     const next = new URLSearchParams(params);
     next.delete('lesson');
+    next.delete('focus');
     setParams(next);
     window.scrollTo({ top: 0 });
   };

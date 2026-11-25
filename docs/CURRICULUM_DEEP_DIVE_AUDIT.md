@@ -152,10 +152,18 @@ Các con số dưới đây đã được dùng để sửa bài; nguồn đầy
 - **Bài mới `case-2-11`:** cây quyết định không tiến bộ 2–4 tuần với 3 ca cụ thể.
 - **Đồng bộ phụ:** protein range `nutr-2-1`, deload wording `phys-4-1`, waist/MA7 protocol `fit-6-1`, red flags `nutr-7-1`, BP threshold `case-2-3`, comment module 5→6.
 
-## 11. Việc tiếp theo (chưa làm)
+## 11. P2 practice wrapper — đã triển khai
 
-- Quiz scenario/self-explanation bắt buộc; lưu kết quả theo objective.
-- Wrong-answer → flashcard; review queue có due date.
+- **Search giáo trình:** tìm theo tên bài, mục tiêu, thuật ngữ (Anh/Việt), chương, module; accent-insensitive (gõ “Valsalva” ra `anat-5-2`).
+- **Ôn tập mở thẳng quiz:** link “Ôn tập hôm nay” và reviewDue mở chế độ **quiz-only** (`focus=quiz`) thay vì đọc lại cả bài; có nút “Về bài đầy đủ”.
+- **Sai câu → flashcard thật:** tạo card từ chính câu sai, front = câu hỏi, back = đáp án đúng + giải thích; xử lý trùng 409.
+- **Completion honest:** nút “Đánh dấu hoàn thành” chỉ xuất hiện sau khi đã làm quiz; trước đó là “Làm quiz để hoàn thành” và cuộn tới quiz.
+- **Quiz deep-link:** `#quiz` + review mode; giữ điểm/best score và invalidate cache sau khi nộp.
+
+## 12. Việc còn lại (chưa làm)
+
+- Spaced review có `nextReviewAt`/due date cho từng lesson (hiện vẫn dùng quizBest < 80).
+- Quiz scenario/self-explanation bắt buộc + lưu theo objective.
 - Case CTA prefill planner + chấm bằng rubric 7 subscore.
-- Lesson search + note theo bài; mobile Learn entry.
+- Note theo bài; mobile Learn entry.
 - Có thể thêm `fit-3-2` nếu muốn tách riêng nhịp thở bền khỏi bài anatomy.

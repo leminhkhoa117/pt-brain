@@ -103,6 +103,19 @@ export function validateLessonCrossRefs(lessons) {
 
 /** Metadata nhẹ của một bài, dùng cho cây giáo trình ở client. */
 export function lessonMeta(lesson) {
+  const searchText = [
+    lesson.title,
+    lesson.subtitle,
+    ...(lesson.objectives || []),
+    ...(lesson.terms || []).flatMap((term) => [term.en, term.vi]),
+    ...(lesson.sections || []).map((section) => section.heading),
+    lesson.module,
+    lesson.chapterTitle,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .slice(0, 1600);
+
   return {
     slug: lesson.slug,
     module: lesson.module,
@@ -114,6 +127,7 @@ export function lessonMeta(lesson) {
     minutes: lesson.minutes,
     quizCount: lesson.quiz.length,
     termCount: lesson.terms.length,
+    searchText,
   };
 }
 

@@ -572,12 +572,15 @@ function QuizSection({ lesson }) {
   const [aiSubmitted, setAiSubmitted] = useState(false);
   const [error, setError] = useState(null);
   const [cardsCreated, setCardsCreated] = useState(0);
+  const [cardsSkipped, setCardsSkipped] = useState(0);
 
   const submit = useMutation({
     mutationFn: () =>
       submitLessonQuiz(lesson.slug, lesson.quiz.map((_, i) => answers[i] ?? 0)),
     onSuccess: (data) => {
       setGraded(data);
+      setCardsCreated(0);
+      setCardsSkipped(0);
       queryClient.invalidateQueries({ queryKey: ['curriculum'] });
       queryClient.invalidateQueries({ queryKey: ['curriculum-lesson', lesson.slug] });
       setError(null);
@@ -598,19 +601,38 @@ function QuizSection({ lesson }) {
 
   const createReviewCards = useMutation({
     mutationFn: async () => {
-      const terms = lesson.terms.slice(0, 4);
-      const created = [];
-      for (const term of terms) {
-        const result = await createFlashcard({
-          front: term.en,
-          back: `${term.vi} — ${term.def}`,
-        });
-        if (result?.card) created.push(result.card);
+      const missed = graded
+        ? lesson.quiz
+            .map((question, index) => ({ question, result: graded.results?.[index] }))
+            .filter((item) => item.result && !item.result.correct)
+        : [];
+
+      const items = missed.length
+        ? missed.map(({ question, result }) => ({
+            front: question.q,
+            back: `Đáp án đúng: ${question.choices[result.answer]} — ${result.explain}`,
+          }))
+        : lesson.terms.slice(0, 4).map((term) => ({
+            front: term.en,
+            back: `${term.vi} — ${term.def}`,
+          }));
+
+      let created = 0;
+      let skipped = 0;
+      for (const item of items) {
+        try {
+          await createFlashcard(item);
+          created += 1;
+        } catch (err) {
+          if (err?.response?.status === 409) skipped += 1;
+          else throw err;
+        }
       }
-      return created.length;
+      return { created, skipped };
     },
-    onSuccess: (count) => {
-      setCardsCreated(count);
+    onSuccess: ({ created, skipped }) => {
+      setCardsCreated(created);
+      setCardsSkipped(skipped);
       queryClient.invalidateQueries({ queryKey: ['flashcards'] });
     },
     onError: (err) => setError(getErrorMessage(err)),
@@ -630,7 +652,7 @@ function QuizSection({ lesson }) {
   );
 
   return (
-    <Card className="space-y-4">
+    <Card id="quiz" className="scroll-mt-24 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-sm font-bold text-slate-900 dark:text-white">
@@ -676,19 +698,20 @@ function QuizSection({ lesson }) {
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-ochre-200 bg-ochre-50/60 px-3 py-2 text-[11.5px] text-ochre-900 dark:border-ochre-800/60 dark:bg-ochre-900/20 dark:text-ochre-200">
           <Icon name="cards" className="h-4 w-4 shrink-0" />
           <span className="min-w-0 flex-1">
-            Còn câu sai — tạo flashcard từ thuật ngữ bài này để ôn lại theo lịch SM-2.
+            Còn câu sai — tạo flashcard từ chính câu sai (kèm đáp án + giải thích) để ôn lại
+            theo lịch SM-2.
           </span>
           <button
             type="button"
             className="btn-secondary !px-2.5 !py-1 text-[11px]"
-            disabled={createReviewCards.isPending || cardsCreated > 0}
+            disabled={createReviewCards.isPending || cardsCreated + cardsSkipped > 0}
             onClick={() => createReviewCards.mutate()}
           >
             {createReviewCards.isPending
               ? 'Đang tạo…'
-              : cardsCreated > 0
-                ? `Đã tạo ${cardsCreated} flashcard`
-                : 'Tạo flashcard ôn tập'}
+              : cardsCreated + cardsSkipped > 0
+                ? `Đã tạo ${cardsCreated}${cardsSkipped ? ` · ${cardsSkipped} đã có` : ''}`
+                : `Tạo flashcard từ ${graded.total - correctCount} câu sai`}
           </button>
         </div>
       )}
@@ -789,6 +812,8 @@ function QuizSection({ lesson }) {
             onClick={() => {
               setAnswers({});
               setGraded(null);
+              setCardsCreated(0);
+              setCardsSkipped(0);
             }}
           >
             Làm lại
@@ -1090,6 +1115,7 @@ export default function LessonPage({ slug, onBack }) {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const surface = searchParams.get('surface') || '';
+  const focus = searchParams.get('focus') || '';
 
   const lessonQuery = useQuery({
     queryKey: ['curriculum-lesson', slug, surface],
@@ -1153,6 +1179,7 @@ export default function LessonPage({ slug, onBack }) {
   const goToLesson = (nextSlug) => {
     const next = new URLSearchParams(searchParams);
     next.set('lesson', nextSlug);
+    next.delete('focus');
     setSearchParams(next);
     window.scrollTo(0, 0);
   };
@@ -1175,6 +1202,57 @@ export default function LessonPage({ slug, onBack }) {
   if (!lesson) return null;
 
   const isCompleted = data.progress.status === 'completed';
+  const hasQuiz = (data.progress.quizAttempts || 0) > 0;
+  const scrollToQuiz = () =>
+    document.getElementById('quiz')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const showFullLesson = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('focus');
+    setSearchParams(next);
+    window.scrollTo(0, 0);
+  };
+
+  if (focus === 'quiz') {
+    return (
+      <div className="space-y-5">
+        <button type="button" className="btn-ghost !px-2 !py-1 !text-xs" onClick={onBack}>
+          ← Giáo trình
+        </button>
+        <PageHeader
+          title={`Ôn tập: ${lesson.title}`}
+          subtitle="Chế độ ôn tập chỉ hiện quiz cuối bài — làm lại để kiểm tra trí nhớ thay vì đọc lại từ đầu."
+          meta={
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              <span className="font-mono">
+                {lesson.quiz.length} câu quiz · {lesson.minutes} phút
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>Điểm tốt nhất {data.progress.quizBest}%</span>
+            </div>
+          }
+          actions={
+            <div className="flex flex-wrap gap-2">
+              {!isCompleted && hasQuiz && (
+                <button
+                  type="button"
+                  className="btn-primary"
+                  disabled={mark.isPending}
+                  onClick={() => mark.mutate('completed')}
+                >
+                  {mark.isPending && <Spinner className="h-4 w-4" />}
+                  Đánh dấu hoàn thành
+                </button>
+              )}
+              <button type="button" className="btn-secondary" onClick={showFullLesson}>
+                Về bài đầy đủ
+              </button>
+            </div>
+          }
+        />
+        <QuizSection lesson={lesson} />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -1214,10 +1292,18 @@ export default function LessonPage({ slug, onBack }) {
               type="button"
               className={clsx(isCompleted ? 'btn-secondary' : 'btn-primary')}
               disabled={mark.isPending}
-              onClick={() => mark.mutate(isCompleted ? 'reading' : 'completed')}
+              onClick={() => {
+                if (isCompleted) mark.mutate('reading');
+                else if (hasQuiz) mark.mutate('completed');
+                else scrollToQuiz();
+              }}
             >
               {mark.isPending && <Spinner className="h-4 w-4" />}
-              {isCompleted ? '✓ Đã hoàn thành' : 'Đánh dấu hoàn thành'}
+              {isCompleted
+                ? '✓ Đã hoàn thành'
+                : hasQuiz
+                  ? 'Đánh dấu hoàn thành'
+                  : 'Làm quiz để hoàn thành'}
             </button>
           }
         />

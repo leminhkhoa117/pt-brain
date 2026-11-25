@@ -19,6 +19,13 @@ const MODULE_ICONS = {
   case: 'notebook',
 };
 
+const normalizeSearch = (value = '') =>
+  String(value)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd');
+
 /** Bar chạy từ 0 tới giá trị sau khi mount — một "nhịp sống" nhỏ, tôn trọng reduced-motion. */
 function ProgressBar({ percent, className, thick = false }) {
   const [mounted, setMounted] = useState(false);
@@ -195,6 +202,38 @@ export default function CurriculumPage({ onSelectLesson }) {
   });
 
   const data = curriculumQuery.data;
+  const [search, setSearch] = useState('');
+  const normalizedSearch = normalizeSearch(search.trim());
+
+  const visibleModules = useMemo(() => {
+    const modules = data?.modules || [];
+    if (!normalizedSearch) return modules;
+
+    return modules
+      .map((mod) => ({
+        ...mod,
+        chapters: mod.chapters
+          .map((chapter) => ({
+            ...chapter,
+            lessons: chapter.lessons.filter((lesson) =>
+              normalizeSearch(
+                `${lesson.title} ${lesson.subtitle || ''} ${lesson.searchText || ''} ${chapter.title} ${mod.vi}`,
+              ).includes(normalizedSearch),
+            ),
+          }))
+          .filter((chapter) => chapter.lessons.length),
+      }))
+      .filter((mod) => mod.chapters.length);
+  }, [data, normalizedSearch]);
+
+  const searchResultCount = useMemo(
+    () =>
+      visibleModules.reduce(
+        (sum, mod) => sum + mod.chapters.reduce((n, chapter) => n + chapter.lessons.length, 0),
+        0,
+      ),
+    [visibleModules],
+  );
 
   const stats = useMemo(() => {
     if (!data?.modules) return null;
@@ -240,6 +279,35 @@ export default function CurriculumPage({ onSelectLesson }) {
         title="Giáo trình PT"
         subtitle={`${modules.length} module · ${overall.totalLessons} bài — từ giải phẫu, sinh lý, dinh dưỡng, thể chất, phục hồi tới ca ứng dụng cá nhân hoá.`}
       />
+
+      <div className="relative max-w-xl">
+        <Icon
+          name="search"
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+        />
+        <input
+          className="input pl-9 pr-9"
+          placeholder="Tìm bài, thuật ngữ, chủ đề… (vd. Valsalva, plateau, tăng cơ)"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          aria-label="Tìm trong giáo trình"
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch('')}
+            className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-slate-400 hover:bg-paper-2 hover:text-slate-700 dark:hover:bg-white/10 dark:hover:text-white"
+            aria-label="Xóa tìm kiếm"
+          >
+            <Icon name="close" className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+      {normalizedSearch && (
+        <p className="text-[12px] text-slate-500 dark:text-slate-400">
+          Tìm thấy <strong>{searchResultCount}</strong> bài khớp “{search.trim()}”.
+        </p>
+      )}
 
       {/* Signature: dải đo lường kẻ ô — tiến độ học tập */}
       <section className="panel overflow-hidden !p-0" aria-label="Tiến độ học tập">
@@ -345,7 +413,7 @@ export default function CurriculumPage({ onSelectLesson }) {
               <button
                 key={item.slug}
                 type="button"
-                onClick={() => onSelectLesson(item.slug)}
+                onClick={() => onSelectLesson(item.slug, { focus: 'quiz' })}
                 className="flex w-full items-center gap-2 rounded-lg px-1.5 py-1.5 text-left text-[12px] text-slate-600 hover:bg-paper-2 dark:text-slate-300 dark:hover:bg-white/[0.05]"
               >
                 <Icon name="refresh" className="h-3.5 w-3.5 shrink-0 text-ochre-600 dark:text-ochre-300" />
@@ -371,14 +439,20 @@ export default function CurriculumPage({ onSelectLesson }) {
 
       {/* Giáo trình đại cương: 6 module đánh số, chương kẻ ô */}
       <div className="space-y-5">
-        {modules.map((mod, index) => (
+        {visibleModules.map((mod) => (
           <ModuleSection
             key={mod.key}
             mod={mod}
-            index={index}
+            index={modules.findIndex((item) => item.key === mod.key)}
             onSelectLesson={onSelectLesson}
           />
         ))}
+        {normalizedSearch && !visibleModules.length && (
+          <Alert tone="info">
+            Không tìm thấy bài phù hợp. Thử từ khóa ngắn hơn, hoặc tìm theo thuật ngữ tiếng Anh
+            (ví dụ “Valsalva”, “deload”, “protein”).
+          </Alert>
+        )}
       </div>
 
       <p className="border-t border-line pt-3 text-[12px] leading-relaxed text-slate-500 dark:border-white/[0.08] dark:text-slate-400">

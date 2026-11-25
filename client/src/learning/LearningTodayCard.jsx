@@ -90,7 +90,7 @@ export default function LearningTodayCard() {
           {review && (
             <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
               Ôn tập:{' '}
-              <Link to={`/learn?lesson=${review.slug}`} className="font-semibold text-pine-700 hover:underline dark:text-pine-300">
+              <Link to={`/learn?lesson=${review.slug}&focus=quiz`} className="font-semibold text-pine-700 hover:underline dark:text-pine-300">
                 {review.title}
               </Link>{' '}
               · quiz tốt nhất {review.quizBest}%
