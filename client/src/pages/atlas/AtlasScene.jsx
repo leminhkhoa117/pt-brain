@@ -61,6 +61,7 @@ const AtlasScene = forwardRef(function AtlasScene(
     let lastIsolate = '';
     let layoutKey = '';
     let amount = 0;
+    let fitVersion = 0;
     let lastState = null;
     let lastRequiredKey = '';
     let needsFit = true;
@@ -477,6 +478,7 @@ const AtlasScene = forwardRef(function AtlasScene(
     ensureChunks(initialChunks).catch(() => {});
 
     const fit = (view, extent = 0) => {
+      fitVersion += 1;
       const mobile = el.clientWidth < 768;
       const reservedHeight = mobile ? 330 : 270;
       const horizontalReserve = mobile ? 40 : 320;
@@ -528,6 +530,9 @@ const AtlasScene = forwardRef(function AtlasScene(
       camera.updateProjectionMatrix();
       renderer.setSize(el.clientWidth, el.clientHeight);
       fit(latest.current.view, amount);
+      // Resize đổi camera/aspect: buộc khối focus (isolate/focusSelection)
+      // tính lại khung để không bị fit() trả về toàn thân.
+      lastIsolate = '';
     };
     const observer = new ResizeObserver(resize);
     observer.observe(el);
@@ -637,6 +642,7 @@ const AtlasScene = forwardRef(function AtlasScene(
         lastState?.visible !== nextState.visible ||
         lastState?.selected !== nextState.selected ||
         lastState?.isolate !== nextState.isolate ||
+        lastState?.focusSelection !== nextState.focusSelection ||
         lastState?.highlightSelection !== nextState.highlightSelection;
       const moving = Math.abs(amount - nextState.explode) > 0.0001;
 
@@ -747,11 +753,12 @@ const AtlasScene = forwardRef(function AtlasScene(
         fit(amount > 0.5 ? 'front' : nextState.view, Math.max(0, (amount - 0.3) / 0.7));
       }
 
-      const isolateKey = nextState.isolate
-        ? `${nextState.selected.join(',')}:${nextState.reset}:${nextState.inspectorOpen}:${nextState.layersOpen}:${camera.aspect}`
+      const focusMode = Boolean(nextState.isolate || nextState.focusSelection);
+      const isolateKey = focusMode
+        ? `${nextState.selected.join(',')}:${nextState.reset}:${nextState.inspectorOpen}:${nextState.layersOpen}:${camera.aspect}:${fitVersion}`
         : '';
-      if (isolateKey !== lastIsolate || (nextState.isolate && moving)) {
-        if (nextState.isolate) {
+      if (isolateKey !== lastIsolate || (focusMode && moving)) {
+        if (focusMode) {
           const box = new T.Box3();
           atlas.parts.forEach((part, index) => {
             if (nextState.selected.includes(part.id)) {
@@ -832,7 +839,7 @@ const AtlasScene = forwardRef(function AtlasScene(
                 size.z,
               ) /
                 (2 * Math.tan(T.MathUtils.degToRad(camera.fov / 2)))) *
-                1.35,
+                (nextState.focusSelection && !nextState.isolate ? 1.8 : 1.35),
             );
             controls.maxDistance = Math.max(40, distance * 2);
             controls.target.copy(center);

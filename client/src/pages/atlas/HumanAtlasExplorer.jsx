@@ -27,6 +27,7 @@ const INITIAL_STATE = {
   visible: DEFAULT_VISIBLE,
   selected: [],
   isolate: false,
+  focusSelection: false,
   highlightSelection: false,
   view: 'three-quarter',
   rotate: false,
@@ -1018,7 +1019,12 @@ function AboutDialog({ atlas, onClose }) {
   );
 }
 
-export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', onAsk }) {
+export default function HumanAtlasExplorer({
+  onMuscleChange,
+  initialSlug = '',
+  onAsk,
+  compact = false,
+}) {
   const { isDark } = useTheme();
   const [atlas, setAtlas] = useState(null);
   const [state, setState] = useState(INITIAL_STATE);
@@ -1251,10 +1257,11 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
         : [...current.visible, part.system],
       selected: [id],
       isolate: false,
+      focusSelection: compact,
       highlightSelection: true,
       rotate: false,
     }));
-    setDetails(true);
+    setDetails(!compact);
     setPanel(null);
   };
 
@@ -1270,10 +1277,11 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
           : current.visible,
       selected: concept.elements,
       isolate: false,
+      focusSelection: compact,
       highlightSelection: true,
       rotate: false,
     }));
-    setDetails(true);
+    setDetails(!compact);
     setPanel(null);
     void sceneRef.current?.ensureParts(concept.elements);
   };
@@ -1337,9 +1345,9 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
     () => ({
       ...state,
       inspectorOpen: details && selectedParts.length > 0,
-      layersOpen: !systemsCollapsed,
+      layersOpen: compact ? false : !systemsCollapsed,
     }),
-    [details, selectedParts.length, state, systemsCollapsed],
+    [compact, details, selectedParts.length, state, systemsCollapsed],
   );
 
   const loadingProgress =
@@ -1348,10 +1356,12 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
   return (
     <div
       className={clsx(
-        'w-full overflow-hidden border border-slate-200/80 bg-paper-2 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.45)] dark:border-white/[0.06] dark:bg-surface',
+        'w-full overflow-hidden bg-paper-2 dark:bg-surface',
         expanded
           ? 'fixed inset-0 z-[80] rounded-none border-0'
-          : 'relative h-[calc(100dvh-255px)] min-h-[480px] rounded-lg sm:min-h-[600px]',
+          : compact
+            ? 'relative h-full min-h-[320px] rounded-none border-0 shadow-none'
+            : 'relative h-[calc(100dvh-255px)] min-h-[480px] rounded-lg border border-slate-200/80 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.45)] dark:border-white/[0.06] sm:min-h-[600px]',
       )}
     >
       {atlas && (
@@ -1369,104 +1379,112 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_51%_43%,transparent_35%,rgba(131,145,158,0.08)_100%)]" />
 
       <>
-        <div className="atlas-identity pointer-events-none absolute left-4 top-4 z-20 max-md:left-3 max-md:top-3">
-          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" />
-            Interactive anatomy
-          </p>
-          <h2 className="mt-1.5 flex items-center gap-2 text-[26px] font-bold tracking-[-0.04em] text-slate-900 max-md:text-[22px] dark:text-white">
-            Human Atlas
-            <span className="rounded-md border border-slate-200 px-1.5 py-0.5 text-[11px] font-semibold tracking-normal text-slate-500 dark:text-slate-400 dark:border-white/10 dark:text-slate-500">
-              3D
-            </span>
-          </h2>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">
-            {atlas ? formatNumber(atlas.parts.length) : '2.234'} mảnh · BodyParts3D 4.0
-          </p>
-        </div>
-
-        <div className="absolute right-3 top-3 z-30 flex items-center gap-1.5">
-          {onAsk ? (
-            <button
-              type="button"
-              onClick={onAsk}
-              className="inline-flex h-9 items-center gap-2 rounded-xl bg-pine-700 px-3 text-[11px] font-semibold text-white shadow-sm transition hover:bg-pine-600 dark:bg-pine-400 dark:text-pine-950 dark:hover:bg-pine-300"
-              aria-label="Hỏi AI về cấu trúc đang chọn"
-              title="Hỏi AI về cấu trúc đang chọn"
-            >
-              <Icon name="chat" className="h-3.5 w-3.5" />
-              <span className="max-md:hidden">Hỏi AI</span>
-            </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              setDetails(false);
-              setPanel((current) => (current === 'search' ? null : 'search'));
-            }}
-            className="atlas-glass inline-flex h-9 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold text-slate-600 transition hover:bg-white dark:text-slate-300 dark:hover:bg-white/10"
-            aria-label="Tìm cấu trúc giải phẫu"
-          >
-            <SearchIcon className="h-3.5 w-3.5" />
-            <span className="max-md:hidden">Tìm cấu trúc</span>
-            <kbd className="hidden rounded border border-slate-200 px-1 text-[11px] font-normal text-slate-500 dark:text-slate-400 lg:inline dark:border-white/10 dark:text-slate-500">
-              /
-            </kbd>
-          </button>
-          <IconButton
-            label="Nguồn và giới hạn dữ liệu"
-            onClick={() => {
-              setDetails(false);
-              setPanel(null);
-              setAbout(true);
-            }}
-          >
-            <InfoIcon />
-          </IconButton>
-          <IconButton
-            label={expanded ? 'Thoát toàn màn hình' : 'Mở toàn màn hình'}
-            onClick={() => setExpanded((current) => !current)}
-          >
-            {expanded ? <MinimizeIcon /> : <ExpandIcon />}
-          </IconButton>
-        </div>
-
-        <div
-          className={clsx(
-            'absolute left-3 top-[8.2rem] z-30 max-h-[calc(100%-12.5rem)] w-[248px] max-md:inset-x-3 max-md:bottom-20 max-md:top-auto max-md:max-h-[58%] max-md:w-auto',
-            panel === 'systems' ? 'block' : systemsCollapsed ? 'hidden' : 'hidden md:block',
-          )}
-        >
-          <SystemsPanel
-            counts={counts}
-            activeSystems={activeSystems}
-            visible={state.visible}
-            visibleCount={visibleCount}
-            onToggle={toggleSystem}
-            onOnly={showOnly}
-            onPreset={applyPreset}
-            onClose={() => setPanel(null)}
-            onCollapse={() => setSystemsCollapsed(true)}
-          />
-        </div>
-
-        {systemsCollapsed && (
-          <button
-            type="button"
-            onClick={() => setSystemsCollapsed(false)}
-            className="atlas-glass absolute left-3 top-[8.2rem] z-30 hidden items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-semibold text-slate-600 shadow-lg transition hover:bg-white md:flex dark:text-slate-300 dark:hover:bg-white/10"
-            aria-label="Mở lại bảng hệ cơ quan"
-            title="Mở lại bảng hệ cơ quan"
-          >
-            <LayersIcon className="h-3.5 w-3.5 text-brand-600 dark:text-brand-300" />
-            <span>Hệ cơ quan</span>
-            <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[11px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-400">
-              {activeSystems.length}
-            </span>
-          </button>
+        {!compact && (
+          <div className="atlas-identity pointer-events-none absolute left-4 top-4 z-20 max-md:left-3 max-md:top-3">
+            <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]" />
+              Interactive anatomy
+            </p>
+            <h2 className="mt-1.5 flex items-center gap-2 text-[26px] font-bold tracking-[-0.04em] text-slate-900 max-md:text-[22px] dark:text-white">
+              Human Atlas
+              <span className="rounded-md border border-slate-200 px-1.5 py-0.5 text-[11px] font-semibold tracking-normal text-slate-500 dark:text-slate-400 dark:border-white/10 dark:text-slate-500">
+                3D
+              </span>
+            </h2>
+            <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500">
+              {atlas ? formatNumber(atlas.parts.length) : '2.234'} mảnh · BodyParts3D 4.0
+            </p>
+          </div>
         )}
 
-        {panel === 'search' && (
+        {!compact && (
+          <div className="absolute right-3 top-3 z-30 flex items-center gap-1.5">
+            {onAsk ? (
+              <button
+                type="button"
+                onClick={onAsk}
+                className="inline-flex h-9 items-center gap-2 rounded-xl bg-pine-700 px-3 text-[11px] font-semibold text-white shadow-sm transition hover:bg-pine-600 dark:bg-pine-400 dark:text-pine-950 dark:hover:bg-pine-300"
+                aria-label="Hỏi AI về cấu trúc đang chọn"
+                title="Hỏi AI về cấu trúc đang chọn"
+              >
+                <Icon name="chat" className="h-3.5 w-3.5" />
+                <span className="max-md:hidden">Hỏi AI</span>
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                setDetails(false);
+                setPanel((current) => (current === 'search' ? null : 'search'));
+              }}
+              className="atlas-glass inline-flex h-9 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold text-slate-600 transition hover:bg-white dark:text-slate-300 dark:hover:bg-white/10"
+              aria-label="Tìm cấu trúc giải phẫu"
+            >
+              <SearchIcon className="h-3.5 w-3.5" />
+              <span className="max-md:hidden">Tìm cấu trúc</span>
+              <kbd className="hidden rounded border border-slate-200 px-1 text-[11px] font-normal text-slate-500 dark:text-slate-400 lg:inline dark:border-white/10 dark:text-slate-500">
+                /
+              </kbd>
+            </button>
+            <IconButton
+              label="Nguồn và giới hạn dữ liệu"
+              onClick={() => {
+                setDetails(false);
+                setPanel(null);
+                setAbout(true);
+              }}
+            >
+              <InfoIcon />
+            </IconButton>
+            <IconButton
+              label={expanded ? 'Thoát toàn màn hình' : 'Mở toàn màn hình'}
+              onClick={() => setExpanded((current) => !current)}
+            >
+              {expanded ? <MinimizeIcon /> : <ExpandIcon />}
+            </IconButton>
+          </div>
+        )}
+
+        {!compact && (
+          <>
+            <div
+              className={clsx(
+                'absolute left-3 top-[8.2rem] z-30 max-h-[calc(100%-12.5rem)] w-[248px] max-md:inset-x-3 max-md:bottom-20 max-md:top-auto max-md:max-h-[58%] max-md:w-auto',
+                panel === 'systems' ? 'block' : systemsCollapsed ? 'hidden' : 'hidden md:block',
+              )}
+            >
+              <SystemsPanel
+                counts={counts}
+                activeSystems={activeSystems}
+                visible={state.visible}
+                visibleCount={visibleCount}
+                onToggle={toggleSystem}
+                onOnly={showOnly}
+                onPreset={applyPreset}
+                onClose={() => setPanel(null)}
+                onCollapse={() => setSystemsCollapsed(true)}
+              />
+            </div>
+
+            {systemsCollapsed && (
+              <button
+                type="button"
+                onClick={() => setSystemsCollapsed(false)}
+                className="atlas-glass absolute left-3 top-[8.2rem] z-30 hidden items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-semibold text-slate-600 shadow-lg transition hover:bg-white md:flex dark:text-slate-300 dark:hover:bg-white/10"
+                aria-label="Mở lại bảng hệ cơ quan"
+                title="Mở lại bảng hệ cơ quan"
+              >
+                <LayersIcon className="h-3.5 w-3.5 text-brand-600 dark:text-brand-300" />
+                <span>Hệ cơ quan</span>
+                <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[11px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-400">
+                  {activeSystems.length}
+                </span>
+              </button>
+            )}
+          </>
+        )}
+
+        {!compact && panel === 'search' && (
           <SearchPanel
             atlas={atlas ?? { concepts: [] }}
             partsById={partsById}
@@ -1489,7 +1507,7 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
         />
 
         <p className="pointer-events-none absolute bottom-[5.7rem] left-1/2 z-10 w-[calc(100%-2rem)] -translate-x-1/2 text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400 dark:text-slate-500">
-          {state.isolate
+          {state.isolate || state.focusSelection
             ? (chosen?.name ?? 'Cấu trúc đang chọn')
             : state.explode > 0.95
               ? 'Danh mục giải phẫu'
@@ -1498,29 +1516,33 @@ export default function HumanAtlasExplorer({ onMuscleChange, initialSlug = '', o
                 : 'Nam trưởng thành · BodyParts3D 4.0'}
         </p>
 
-        <BottomDock
-          explode={state.explode}
-          onExplode={changeExplode}
-          onReset={reset}
-          onSystems={() => {
-            setDetails(false);
-            setPanel((current) => (current === 'systems' ? null : 'systems'));
-          }}
-        />
+        {!compact && (
+          <BottomDock
+            explode={state.explode}
+            onExplode={changeExplode}
+            onReset={reset}
+            onSystems={() => {
+              setDetails(false);
+              setPanel((current) => (current === 'systems' ? null : 'systems'));
+            }}
+          />
+        )}
 
-        <div className="pointer-events-none absolute bottom-1.5 left-4 right-4 z-10 hidden items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 md:flex dark:text-slate-500">
-          <span>Kéo để xoay · Cuộn để zoom · Bấm để xem cấu trúc</span>
-          <a
-            href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html"
-            target="_blank"
-            rel="noreferrer"
-            className="pointer-events-auto font-semibold hover:text-brand-600 dark:hover:text-brand-300"
-          >
-            BodyParts3D · CC BY 4.0
-          </a>
-        </div>
+        {!compact && (
+          <div className="pointer-events-none absolute bottom-1.5 left-4 right-4 z-10 hidden items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 md:flex dark:text-slate-500">
+            <span>Kéo để xoay · Cuộn để zoom · Bấm để xem cấu trúc</span>
+            <a
+              href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html"
+              target="_blank"
+              rel="noreferrer"
+              className="pointer-events-auto font-semibold hover:text-brand-600 dark:hover:text-brand-300"
+            >
+              BodyParts3D · CC BY 4.0
+            </a>
+          </div>
+        )}
 
-        {details && selectedParts.length > 0 && (
+        {!compact && details && selectedParts.length > 0 && (
           <DetailPanel
             chosen={chosen}
             selectedParts={selectedParts}

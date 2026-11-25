@@ -13,6 +13,7 @@ import {
   Spinner,
 } from '../../components/ui.jsx';
 import MarkdownText from '../../components/MarkdownText.jsx';
+import MuscleAtlasModal from '../../components/MuscleAtlasModal.jsx';
 import ApplyActionButton from '../../learning/ApplyActionButton.jsx';
 import { lessonLearningMeta } from '@shared/learning/contexts.js';
 import { MUSCLES } from '@shared/muscles/index.js';
@@ -312,6 +313,7 @@ function LessonImage({ image }) {
 function RelatedRow({ lesson, evidence }) {
   const navigate = useNavigate();
   const { related } = lesson;
+  const [activeMuscle, setActiveMuscle] = useState('');
   const hasRelated =
     related.muscles.length ||
     related.exercises.length ||
@@ -326,27 +328,29 @@ function RelatedRow({ lesson, evidence }) {
   };
 
   return (
-    <Card className="space-y-3">
-      <h3 className="text-sm font-bold text-slate-900 dark:text-white">Kết nối với app</h3>
-      {related.muscles.length > 0 && (
-        <div>
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-            Xem cơ trong mô hình 3D
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {related.muscles.map((slug) => (
-              <Link
-                key={slug}
-                to={`/muscles?muscle=${slug}`}
-                className="inline-flex items-center gap-1 rounded-lg border border-line px-2.5 py-1 text-[12px] font-medium text-slate-600 transition hover:border-pine-300 hover:text-pine-700 dark:border-white/10 dark:text-slate-300 dark:hover:border-pine-700 dark:hover:text-pine-300"
-              >
-                <Icon name="body" className="h-3 w-3" />
-                {muscleName(slug)}
-              </Link>
-            ))}
+    <>
+      <Card className="space-y-3">
+        <h3 className="text-sm font-bold text-slate-900 dark:text-white">Kết nối với app</h3>
+        {related.muscles.length > 0 && (
+          <div>
+            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              Xem cơ trong mô hình 3D
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {related.muscles.map((slug) => (
+                <button
+                  key={slug}
+                  type="button"
+                  onClick={() => setActiveMuscle(slug)}
+                  className="inline-flex items-center gap-1 rounded-lg border border-line px-2.5 py-1 text-[12px] font-medium text-slate-600 transition hover:border-pine-300 hover:text-pine-700 dark:border-white/10 dark:text-slate-300 dark:hover:border-pine-700 dark:hover:text-pine-300"
+                >
+                  <Icon name="body" className="h-3 w-3" />
+                  {muscleName(slug)}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
       {related.exercises.length > 0 && (
         <div>
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
@@ -425,7 +429,11 @@ function RelatedRow({ lesson, evidence }) {
           </div>
         </div>
       )}
-    </Card>
+      </Card>
+      {activeMuscle && (
+        <MuscleAtlasModal slug={activeMuscle} onClose={() => setActiveMuscle('')} />
+      )}
+    </>
   );
 }
 
