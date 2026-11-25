@@ -189,7 +189,9 @@ export default function LibraryPage() {
             {stats.total ? 'Không có bài nào khớp bộ lọc.' : 'Chưa có bài nào được phân tích.'}
           </p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Vào tab “Đọc & tóm tắt” để phân tích DOI/PDF đầu tiên.
+            {stats.total
+              ? 'Thử từ khóa khác hoặc bỏ bộ lọc “Đã ghim”.'
+              : 'Vào tab “Đọc & tóm tắt” để phân tích DOI/PDF đầu tiên.'}
           </p>
         </Card>
       ) : (
@@ -217,7 +219,7 @@ export default function LibraryPage() {
                       Bản cũ
                     </span>
                   )}
-                  {item.needsReview && (
+                  {item.status === 'ready' && item.needsReview && (
                     <span className="badge bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
                       Cần đối chiếu
                     </span>
@@ -314,6 +316,7 @@ export default function LibraryPage() {
                     href={`${import.meta.env.VITE_API_BASE || '/api'}/summaries/${item.id}/export.md`}
                     className="btn-ghost !px-2 !py-1 text-xs"
                     title="Tải Markdown"
+                    aria-label="Tải bản tóm tắt dạng Markdown"
                   >
                     .md
                   </a>
@@ -321,6 +324,7 @@ export default function LibraryPage() {
                     href={summaryPdfUrl(item.id)}
                     className="btn-ghost !px-2 !py-1 text-xs"
                     title="Tải PDF"
+                    aria-label="Tải bản tóm tắt dạng PDF"
                   >
                     .pdf
                   </a>
@@ -328,6 +332,7 @@ export default function LibraryPage() {
                     href={summaryCitationUrl(item.id, 'bibtex')}
                     className="btn-ghost !px-2 !py-1 text-xs"
                     title="Tải BibTeX (.bib)"
+                    aria-label="Tải trích dẫn BibTeX"
                   >
                     .bib
                   </a>
@@ -335,6 +340,7 @@ export default function LibraryPage() {
                     href={summaryCitationUrl(item.id, 'ris')}
                     className="btn-ghost !px-2 !py-1 text-xs"
                     title="Tải RIS (.ris)"
+                    aria-label="Tải trích dẫn RIS"
                   >
                     .ris
                   </a>
@@ -342,6 +348,7 @@ export default function LibraryPage() {
                     href={summaryCitationUrl(item.id, 'apa')}
                     className="btn-ghost !px-2 !py-1 text-xs"
                     title="Tải trích dẫn APA"
+                    aria-label="Tải trích dẫn APA"
                   >
                     .apa
                   </a>

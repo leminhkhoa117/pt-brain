@@ -594,7 +594,7 @@ export default function FinderPage() {
           <ResearchJobProgress
             stage={stage}
             elapsed={elapsed}
-            note="Thường 20–60 giây tùy số truy vấn và nguồn. Bạn có thể rời tab, job vẫn chạy nền."
+            note="Thường 1–2 phút tùy số truy vấn và nguồn. Bạn có thể rời tab, job vẫn chạy nền."
             progressBase={10}
             progressRate={4}
           />

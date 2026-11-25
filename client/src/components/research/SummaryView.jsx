@@ -435,11 +435,21 @@ export default function SummaryView({
               Áp dụng vào plan
             </button>
           ) : null}
-          <a href={summaryExportUrl(summary._id)} className="btn-ghost !px-2.5 !py-1.5 text-xs" title="Tải Markdown">
+          <a
+            href={summaryExportUrl(summary._id)}
+            className="btn-ghost !px-2.5 !py-1.5 text-xs"
+            title="Tải Markdown"
+            aria-label="Tải bản tóm tắt dạng Markdown"
+          >
             <Icon name="download" className="h-4 w-4" />
             .md
           </a>
-          <a href={summaryPdfUrl(summary._id)} className="btn-ghost !px-2.5 !py-1.5 text-xs" title="Tải PDF">
+          <a
+            href={summaryPdfUrl(summary._id)}
+            className="btn-ghost !px-2.5 !py-1.5 text-xs"
+            title="Tải PDF"
+            aria-label="Tải bản tóm tắt dạng PDF"
+          >
             .pdf
           </a>
           {onRefresh ? (

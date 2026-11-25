@@ -142,7 +142,16 @@ export default function ReaderPage() {
   const [chatFocusSignal, setChatFocusSignal] = useState(0);
   const activeIdRef = useRef(null);
 
-  const listQuery = useQuery({ queryKey: ['summaries'], queryFn: () => listSummaries() });
+  const listQuery = useQuery({
+    queryKey: ['summaries'],
+    queryFn: () => listSummaries(),
+    // Có bài đang tóm tắt thì làm mới danh sách để trạng thái/tiến trình
+    // không bị đứng ở nội dung cũ.
+    refetchInterval: (query) =>
+      (query.state.data?.summaries || []).some((item) => item.status === 'processing')
+        ? 5000
+        : false,
+  });
   const termsQuery = useQuery({ queryKey: ['terms'], queryFn: listTerms });
 
   useEffect(() => {
@@ -361,6 +370,9 @@ export default function ReaderPage() {
     onSuccess: (data) => {
       setActive((prev) => (prev ? { ...prev, summary: data.summary } : prev));
       setError(null);
+      // Cập nhật danh sách ngay: nếu không, Library/Reader còn cache "ready"
+      // nên không bật polling và vẫn hiện nội dung cũ trong lúc job chạy lại.
+      queryClient.invalidateQueries({ queryKey: ['summaries'] });
     },
     onError: (err) => setError(getErrorMessage(err)),
   });
@@ -590,7 +602,7 @@ export default function ReaderPage() {
                   const ok = await dialog.confirm({
                     title: 'Tạo lại bản tóm tắt',
                     message:
-                      'Tạo lại bản tóm tắt bằng AI? Việc này tốn 1 lượt tóm tắt và có thể mất 1–2 phút. Bản dịch đã lưu vẫn được giữ.',
+                      'Tạo lại bản tóm tắt bằng AI? Việc này tốn 1 lượt tóm tắt và có thể mất vài phút (tối đa 15 phút). Bản dịch đã lưu vẫn được giữ.',
                     confirmLabel: 'Tạo lại',
                   });
                   if (ok) retryMutation.mutate();
@@ -799,7 +811,15 @@ export default function ReaderPage() {
                           Bản cũ
                         </span>
                       ) : null}
-                      {item.needsReview ? (
+                      {item.status === 'processing' ? (
+                        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-400">
+                          Đang xử lý
+                        </span>
+                      ) : item.status === 'failed' ? (
+                        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-rose-500">
+                          Lỗi
+                        </span>
+                      ) : item.needsReview ? (
                         <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-rose-500">
                           Cần đối chiếu
                         </span>
@@ -820,9 +840,11 @@ export default function ReaderPage() {
                       {item.createdAt ? ` · lưu ${formatDateKey(String(item.createdAt).slice(0, 10))}` : ''}
                     </p>
                   </div>
-                  {item.tldr && (
+                  {(item.tldr || item.status === 'processing') && (
                     <p className="mt-2.5 line-clamp-3 border-t border-line/70 pt-2.5 text-xs leading-relaxed text-slate-500 dark:border-white/[0.06] dark:text-slate-400">
-                      {item.tldr}
+                      {item.status === 'processing'
+                        ? item.progress || 'Đang xử lý...'
+                        : item.tldr}
                     </p>
                   )}
                 </button>

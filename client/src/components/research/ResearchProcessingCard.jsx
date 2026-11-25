@@ -53,14 +53,14 @@ export default function ResearchProcessingCard({
             <span className="research-scan block h-full w-1/3 rounded-full bg-pine-600 dark:bg-pine-300" />
           </div>
           <div className="mt-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
-            <span>Thường 2–4 phút</span>
-            <span>Có thể rời tab</span>
+            <span>Thường 3–8 phút</span>
+            <span>Tối đa 15 phút</span>
           </div>
         </div>
 
         <p className="mx-auto mt-4 max-w-[48ch] text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-          Bạn có thể rời tab — job vẫn chạy nền. Nếu quá 6 phút không cập nhật, hệ thống sẽ báo lỗi
-          để bạn bấm “Thử lại”.
+          Bạn có thể rời tab — job vẫn chạy nền. Nếu quá 3 phút không có cập nhật, hệ thống sẽ báo
+          lỗi để bạn bấm “Thử lại”.
         </p>
 
         {onBack ? (
