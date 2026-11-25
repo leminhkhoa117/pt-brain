@@ -65,7 +65,13 @@ Red flags trong buổi tập cần dừng và hướng khách báo bác sĩ: run
 
 - Loại cả NHÓM thực phẩm với quy tắc cứng không y tế ("carb là độc", "sạch-bẩn tuyệt đối") kèm sợ ăn ngoài kiểm soát.
 - Quan hệ lệch lạc với cân/số calo: cân mỗi ngày nhiều lần, ăn bù–nôn, tập "trả nợ" compulsive.
-- Với nữ: **mất kinh nguyệt** trong giai đoạn ăn ít (đã gặp ở bài Micronutrients — RED-S).
+- Với nữ: **mất kinh nguyệt** trong giai đoạn ăn ít (đã gặp ở bài Micronutrients — RED-S); mất kinh > 3 tháng cần chuyển hướng.
+
+**Ngưỡng dừng giảm cân cần nhớ:**
+
+- **BMI < 18,5** hoặc khách đã rất gầy — không tiếp tục cut.
+- Giảm **> 1,5%/tuần** kéo dài, hoặc **> 1–2 kg/tuần** ở người không béo — chậm lại, kiểm tra khối nạc.
+- Mang thai, sỏi mật, bệnh nền chưa ổn định hoặc đang đổi thuốc — bác sĩ duyệt trước khi đổi ăn/tập.
 
 **Suy dinh dưỡng năng lượng kéo dài (RED-S)**: lạnh cấu trúc, tóc gãy, hồi phục chậm, hiệu suất rơi — việc đầu tiên là **tăng năng lượng**, không phải "thêm supplement".
 

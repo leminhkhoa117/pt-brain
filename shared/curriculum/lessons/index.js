@@ -31,6 +31,7 @@ import phys43 from './phys-4-3.js';
 import phys51 from './phys-5-1.js';
 import phys52 from './phys-5-2.js';
 import phys61 from './phys-6-1.js';
+import phys62 from './phys-6-2.js';
 import nutr11 from './nutr-1-1.js';
 import nutr21 from './nutr-2-1.js';
 import nutr22 from './nutr-2-2.js';
@@ -63,6 +64,7 @@ import case27 from './case-2-7.js';
 import case28 from './case-2-8.js';
 import case29 from './case-2-9.js';
 import case210 from './case-2-10.js';
+import case211 from './case-2-11.js';
 import rehab11 from './rehab-1-1.js';
 import rehab12 from './rehab-1-2.js';
 import rehab21 from './rehab-2-1.js';
@@ -104,6 +106,7 @@ export const LESSONS = [
   phys51,
   phys52,
   phys61,
+  phys62,
   nutr11,
   nutr21,
   nutr22,
@@ -136,6 +139,7 @@ export const LESSONS = [
   case28,
   case29,
   case210,
+  case211,
   rehab11,
   rehab12,
   rehab21,

@@ -34,7 +34,7 @@ Với người tập, mục tiêu dinh dưỡng là để cán cân này nghiên
 - **Morton và cộng sự (2018)** — meta-analysis 49 nghiên cứu trên BJSM: lợi ích của protein lên khối cơ và sức mạnh đạt điểm gãy quanh **1,6 g/kg/ngày**; khoảng tin cậy trên tới ~2,2 g/kg. Trên mức này, lợi ích thêm rất nhỏ ở người khỏe mạnh (đây là nguồn E3 trong thư viện bằng chứng của PT Brain).
 - **ISSN Position Stand (2017)**: khuyến nghị **1,4–2,0 g/kg/ngày** cho người tập xây cơ.
 
-Khoang thực hành cho PT: đa số khách dùng tốt trong **1,6–2,2 g/kg/ngày**. Khi khách **đang giảm calo sâu**, nhu cầu tăng lên để giữ cơ — Helms 2014 gợi ý người tập gầy, có nền tảng, đang cắt calo dùng tới **2,3–3,1 g/kg khối cơ (FFM)**. Lưu ý đơn vị: 2,5 g/kg *cân nặng* của người 30% mỡ là khác với 2,5 g/kg *khối cơ* của vận động viên 10% mỡ.
+Khoang thực hành cho PT: đa số khách dùng tốt trong **1,6–2,2 g/kg/ngày** (1,4–2,0 là mức tối thiểu theo ISSN; 1,6–2,2 là khoang thực hành rộng hơn cho người tập đều). Khi khách **đang giảm calo sâu**, nhu cầu tăng lên để giữ cơ — Helms 2014 gợi ý người tập gầy, có nền tảng, đang cắt calo dùng tới **2,3–3,1 g/kg khối cơ (FFM)**. Lưu ý đơn vị: 2,5 g/kg *cân nặng* của người 30% mỡ là khác với 2,5 g/kg *khối cơ* của vận động viên 10% mỡ.
 
 Ví dụ nhanh: khách 70 kg, cân nặng ổn định, tập 4 buổi/tuần → 112–154 g protein/ngày.`,
     },

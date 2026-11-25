@@ -1,7 +1,7 @@
 /**
  * Giáo trình học tập cho PT (PT Academy).
  *
- * - MODULES: 5 mảng kiến thức nền tảng của nghề PT.
+ * - MODULES: 6 mảng kiến thức nền tảng của nghề PT.
  * - LESSONS: nội dung từng bài, biên soạn từ nguồn uy tín (mỗi bài >= 1 nguồn,
  *   liệt kê trong `sources` kèm giấy phép).
  * - File này giữ thuần dữ liệu/hàm thuần (không dependency ngoài) theo quy

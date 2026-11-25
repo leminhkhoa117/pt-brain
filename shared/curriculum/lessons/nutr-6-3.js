@@ -47,9 +47,21 @@ Cách xếp trong tuần: 1 ngày refeed thường rơi vào ngày tập nặng 
       heading: 'Diet break 5–14 ngày: về maintain thật',
       body: `Khi mệt tích luỹ (2–3 tín hiệu của bài Hormone: HR nghỉ lên, ngủ xấu, RPE mọi bài tăng), một **tuần ăn maintain** làm ba việc: hồi NEAT, hồi đầu óc, và kiểm chứng "cân mới là maintain thật".
 
-Lưu ý tâm lý quan trọng: khách thường sợ cân **nhảy lên** 0,5–1 kg trong break — nói trước rằng phần lớn là **nước + glycogen** (mỗi gram glycogen giữ ~3 g nước), không phải mỡ hoàn trả. MA7 sau break ổn định ở mức mới là điều mong đợi, không phải thất bại.
+Lưu ý tâm lý quan trọng: khách thường sợ cân **nhảy lên** 0,5–1 kg trong break — nói trước rằng phần lớn là **nước + glycogen** (mỗi gram glycogen giữ ~2–3 g nước), không phải mỡ hoàn trả. MA7 sau break ổn định ở mức mới là điều mong đợi, không phải thất bại.
 
-Sau break, khách thường cut **hiệu quả hơn** ở lại chu kỳ tiếp: NEAT đã hồi, adherence được sạc.`,
+Sau break, nhiều khách cut **dễ bám hơn** vì NEAT và adherence đã hồi — nhưng đừng hứa "break tăng tốc giảm mỡ": so sánh intermittent với continuous trong meta-analysis cho kết quả không khác biệt rõ. Diet break là **công cụ hành vi**, không phải mẹo chuyển hoá.`,
+    },
+    {
+      heading: 'Liều chuẩn & ai không nên dùng',
+      body: `Ba công cụ chỉ có lợi khi đúng liều và đúng người:
+
+| Công cụ | Liều thực hành | Tần suất tối đa | Không phù hợp khi |
+| --- | --- | --- | --- |
+| **Refeed** | 1 ngày ăn maintain; +20–30% carb, protein giữ nguyên | 1 ngày/tuần, chỉ khi deficit ≥ 15–20% hoặc adherence kém | Tiền sử rối loạn ăn, mất kiểm soát ăn uống |
+| **Diet break** | 5–14 ngày ăn maintain thật | Sau 8–10 tuần cut hoặc 2–3 tín hiệu mệt | Thai kỳ, rối loạn ăn, bệnh nền chưa ổn định |
+| **Reverse diet** | +50–100 kcal/tuần (phần lớn carb) tới maintain mới | Một lần khi kết thúc cut | Đang trong giai đoạn tăng cân có chủ đích |
+
+Refeed không phải "ngày ăn bù": nếu cả tuần đã dư, thêm 1 ngày maintain chỉ làm chậm tiến độ. Diet break không phải "nghỉ diet để ăn thoải mái": vẫn ăn có cấu trúc ở mức maintain. Với khách có tiền sử rối loạn ăn, mọi công cụ "ăn tự do" cần chuyên gia tâm lý/dinh dưỡng duyệt — PT không tự triển khai.`,
     },
     {
       heading: 'Reverse diet: thoát cut không "nổ" mỡ',
@@ -86,12 +98,22 @@ Reverse diet là **công cụ hành vi** nhiều hơn "thần dược chuyển h
     {
       en: 'Glycogen-water weight',
       vi: 'Cân nước glycogen',
-      def: 'Mỗi gram glycogen giữ ~3 g nước — lý do cân nhảy khi ăn lại carb, không phải mỡ hoàn trả.',
+      def: 'Mỗi gram glycogen giữ ~2–3 g nước — lý do cân nhảy khi ăn lại carb, không phải mỡ hoàn trả.',
     },
     {
       en: 'Adherence fatigue',
       vi: 'Mệt tuân thủ',
       def: 'Sự mòn của chế độ ăn kéo dài — ba công cụ refeed/break/reverse là "nhịp thở" chữa đúng loại mệt này.',
+    },
+    {
+      en: 'Refeed dose',
+      vi: 'Liều refeed',
+      def: 'Một ngày ăn maintain, +20–30% carb, protein giữ; tối đa 1 ngày/tuần và chỉ khi deficit đủ sâu/adherence kém.',
+    },
+    {
+      en: 'Contraindication (diet tools)',
+      vi: 'Chống chỉ định công cụ diet',
+      def: 'Tiền sử rối loạn ăn, thai kỳ, bệnh nền chưa ổn định — không tự dùng refeed/diet break khi chưa có chuyên gia duyệt.',
     },
   ],
   images: [],
@@ -112,7 +134,7 @@ Reverse diet là **công cụ hành vi** nhiều hơn "thần dược chuyển h
       q: 'Khách diet break 1 tuần, cân lên 0,8 kg. Diễn giải đúng?',
       choices: [
         'Mỡ hoàn trả ngay lập tức',
-        'Phần lớn là nước + glycogen (mỗi g glycogen giữ ~3 g nước) — mong đợi, không phải thất bại',
+        'Phần lớn là nước + glycogen (mỗi g glycogen giữ ~2–3 g nước) — mong đợi, không phải thất bại',
         'Diet break thất bại',
         'Phải cut lại sâu hơn gấp đôi',
       ],
@@ -147,14 +169,38 @@ Reverse diet là **công cụ hành vi** nhiều hơn "thần dược chuyển h
     {
       q: 'Sau diet break, cut vòng tiếp thường thế nào?',
       choices: [
-        'Kém hiệu quả hơn vì "lười đi rồi"',
-        'Hiệu quả hơn: NEAT và adherence đã được sạc lại',
+        'Chắc chắn nhanh hơn vì "trao đổi chất tăng"',
+        'Có thể dễ bám hơn nhờ NEAT/adherence hồi; bằng chứng không cho thấy nhanh hơn rõ rệt',
         'Không thể cut nữa',
         'Phải đổi toàn bộ giáo án',
       ],
       answer: 1,
       explain:
-        'Break không phải lùi bước — nó hồi phần "chất đốt" (NEAT, tinh thần) khiến phần còn lại của chu kỳ chạy được bền.',
+        'Diet break là công cụ hành vi, không phải mẹo chuyển hoá. Nó giúp khách tiếp tục được lâu hơn, không đảm bảo tốc độ giảm mỡ nhanh hơn.',
+    },
+    {
+      q: 'Khách có tiền sử rối loạn ăn, đang cut và hỏi có nên thêm "cheat day/refeed tự do" không. Bạn làm gì?',
+      choices: [
+        'Cho refeed 2 ngày/tuần',
+        'Không tự triển khai; giữ cấu trúc ăn hiện tại và chuyển hướng chuyên gia tâm lý/dinh dưỡng',
+        'Cắt sâu hơn để bù',
+        'Bỏ theo dõi cân',
+      ],
+      answer: 1,
+      explain:
+        'Công cụ "ăn tự do" có thể kích hoạt mất kiểm soát ở người có tiền sử rối loạn ăn; đây là vùng cần chuyên gia, không phải thử nghiệm.',
+    },
+    {
+      q: 'Diet break đúng nghĩa là ăn ở mức nào?',
+      choices: [
+        'Dư 500 kcal mỗi ngày',
+        'Maintain thật (bằng TDEE hiện tại), protein giữ, không phải "nghỉ ăn"',
+        'Cắt thêm 20%',
+        'Chỉ ăn carb',
+      ],
+      answer: 1,
+      explain:
+        'Diet break là tạm dừng deficit, không phải ăn dư. Ăn maintain giúp hồi NEAT/adherence mà không tạo cú tăng mỡ hoàn trả.',
     },
   ],
   related: {
@@ -174,6 +220,16 @@ Reverse diet là **công cụ hành vi** nhiều hơn "thần dược chuyển h
       label: 'ACSM / Academy of Nutrition and Dietetics — Position stand nutrition',
       url: 'https://www.acsm.org/education-resources/books-and-multimedia-resources',
       license: 'cite-only',
+    },
+    {
+      label: 'Byrne et al. 2018 — MATADOR intermittent energy restriction (RCT)',
+      url: 'https://doi.org/10.1038/ijo.2017.206',
+      license: 'cite-only',
+    },
+    {
+      label: 'Headland et al. 2016 — Intermittent vs continuous energy restriction (meta-analysis)',
+      url: 'https://doi.org/10.3390/nu8060354',
+      license: 'CC BY 4.0',
     },
   ],
 };

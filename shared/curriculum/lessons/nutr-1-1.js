@@ -53,12 +53,12 @@ PT Brain tính BMR theo **Mifflin-St Jeor** (công thức được ưa chuộng 
       body: `Công thức thực hành (máy tính **Mục tiêu calo** trong app tự làm):
 
 - **Giảm mỡ**: TDEE **− 10% đến − 25%**. Mức −10–15% cho khách cần giữ sức mạnh/đấu; −20–25% cho khách mỡ cao, chấp nhận mệt hơn.
-- **Tăng cơ (khách mới/trung cấp)**: TDEE **+ 5% đến + 15%** — "bulking khiêm tốn" hạn chế mỡ tích.
+- **Tăng cơ (khách mới/trung cấp)**: TDEE **+5% đến +15%** khởi đầu (có thể lên **+10–20%** nếu 3–4 tuần cân phẳng, eo ổn) — "bulking khiêm tốn" hạn chế mỡ tích.
 - **Maintain/recomp**: ăn bằng TDEE, ưu tiên protein + tập kháng lực đều.
 
 Sai số của mọi tính toán là **±10–20%** (công thức BMR có sai số, đếm kcal có sai số). Vì vậy con số đầu tiên chỉ là **giả thuyết**: đo kết quả bằng xu hướng cân nặng 2–4 tuần (tab Theo dõi cơ thể có MA7) rồi chỉnh.
 
-Ví dụ: khách nữ 60 kg, TDEE tính ra 2.000 kcal, mục tiêu giảm 10% → 1.800 kcal. Sau 3 tuần MA7 không nhích → không vội hạ 500 kcal; hạ thêm 100–150 kcal hoặc thêm 2.000 bước/ngày rồi chờ tiếp.`,
+Ví dụ: khách nữ 60 kg, TDEE tính ra 2.000 kcal, mục tiêu giảm 10% → 1.800 kcal. Sau 3 tuần MA7 không nhích → không vội hạ 500 kcal; hạ thêm 200–300 kcal hoặc thêm 2.000–3.000 bước/ngày rồi chờ tiếp.`,
     },
     {
       heading: 'Tốc độ an toàn và tín hiệu chỉnh',
@@ -69,7 +69,7 @@ Ví dụ: khách nữ 60 kg, TDEE tính ra 2.000 kcal, mục tiêu giảm 10% �
 
 Tín hiệu cần chỉnh:
 
-- MA7 phẳng 3 tuần → giảm nhẹ calo hoặc tăng NEAT.
+- MA7 phẳng **3 tuần** sau khi đã kiểm tra log ăn, nước/muối và chu kỳ kinh → giảm **200–300 kcal** hoặc tăng **2.000–3.000 bước/ngày**; mỗi lần một biến. Nếu dữ liệu ăn uống thiếu, sửa log trước khi cắt calo.
 - Sức mạnh rơi nhanh, ngủ kém, dễ cáu → đang cut quá gắt: ăn 1–2 ngày ở mức maintain (mini-diet break), giảm mức deficit.
 - Cân rơi > 1,5%/tuần ở khách gầy → mất cơ nhiều: hạ tốc.
 
@@ -160,10 +160,10 @@ Tín hiệu cần chỉnh:
         'Protein vừa no vừa có TEF cao — một trong những lý do mọi giao thức giảm mỡ đều ưu tiên nó.',
     },
     {
-      q: 'MA7 của khách phẳng 3 tuần dù ăn đúng mức deficit. Bước tiếp theo hợp lý?',
+      q: 'MA7 của khách phẳng 3 tuần dù ăn đúng mức deficit, log ăn đầy đủ. Bước tiếp theo hợp lý?',
       choices: [
         'Cắt một nửa calo ngay',
-        'Hạ nhẹ 100–150 kcal hoặc thêm ~2.000 bước/ngày rồi theo dõi tiếp',
+        'Hạ 200–300 kcal hoặc thêm 2.000–3.000 bước/ngày rồi theo dõi tiếp',
         'Bỏ luôn việc theo dõi',
         'Tăng calo lên 50%',
       ],

@@ -53,7 +53,7 @@ Kết luận thực hành: tối ưu **chất lượng mỗi rep** (tải + biê
 
 **4. Nghỉ giữa set (E5 — Grgic 2018):** compound **2–3 phút** duy trì chất lượng set tốt hơn nghỉ ~1 phút; isolation 60–90 giây là đủ.
 
-Umbrella review (E6 — McLeod 2024) chốt: **không có một giáo án tối ưu duy nhất** — volume, tần suất, nỗ lực, nghỉ đều quan trọng, và cá nhân hóa theo trình độ/thời gian/hồi phục mới là "biến số thứ năm". Deload (E8): giảm 40–50% volume 1 tuần mỗi 4–8 tuần khi thấy tín hiệu quá tải — không cần thiết nếu khách vẫn tiến bộ.`,
+Umbrella review (E6 — McLeod 2024) chốt: **không có một giáo án tối ưu duy nhất** — volume, tần suất, nỗ lực, nghỉ đều quan trọng, và cá nhân hóa theo trình độ/thời gian/hồi phục mới là "biến số thứ năm". Deload (E8): giảm 40–50% volume 1 tuần sau 4–8 tuần tích lũy **hoặc** khi có 2–3 tín hiệu quá tải — không theo lịch cứng, không cần nếu khách vẫn tiến bộ.`,
     },
     {
       heading: 'Tăng lực trước, tăng cơ sau',

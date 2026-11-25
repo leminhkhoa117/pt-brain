@@ -57,8 +57,8 @@ Lịch gợi ý: buổi đầu tiên (khách mới) làm 20–30 phút battery; 
       heading: 'Thành phần cơ thể — không cần máy đắt',
       body: `Bộ đo miễn phí nhưng tin cậy về **xu hướng**:
 
-- **Cân mỗi sáng** (cùng điều kiện) → MA7 trong tab Theo dõi cơ thể làm mượt nhiễu.
-- **Vòng bụng tại rốn** mỗi 2 tuần (nam > 94 cm, nữ > 80 cm là ngưỡng cảnh báo sức khỏe trao đổi thường được nhắc).
+- **Cân mỗi sáng** (cùng điều kiện, 5–7 ngày/tuần) → MA7 trong tab Theo dõi cơ thể làm mượt nhiễu.
+- **Vòng bụng** ngang rốn hoặc điểm giữa xương sườn dưới–cánh chậu (chọn một, giữ nhất quán) mỗi 2 tuần; nam > 94 cm, nữ > 80 cm là ngưỡng cảnh báo sức khỏe trao đổi thường được nhắc.
 - **Máy tính % mỡ Navy** của app từ vòng cổ/vòng bụng/vòng mông — sai số cá nhân ổn định nên hợp lý để theo xu hướng.
 - **Ảnh tiến độ** 4 tuần/lần cùng góc, ánh sáng — cái "thước" khách tin nhất.
 

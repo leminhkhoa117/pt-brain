@@ -73,7 +73,7 @@ Ghi mọi thứ bằng **module Dinh dưỡng của app** (nhập tay hoặc ch�
     {
       heading: 'Theo dõi & quyết định (bước 6)',
       body: `- **Mỗi sáng**: cân (MA7 tự tính trong app) — quyết định chỉ đọc MA7 Chủ nhật.
-- **Chủ nhật tuần 4**: MA7 giảm 1,6–2,4 kg? → đúng kịch bản, giữ nguyên. Phẳng 2 tuần? → **chỉ MỘT thay đổi**: −100 kcal HOẶC +2.000 bước (bài Năng lượng).
+- **Chủ nhật tuần 4**: MA7 giảm 1,6–2,4 kg? → đúng kịch bản, giữ nguyên. Phẳng **3 tuần**? → **chỉ MỘT thay đổi**: −200–300 kcal HOẶC +2.000–3.000 bước (bài Năng lượng).
 - **Tuần 4–5**: nếu mệt rõ (ngủ kém, RPE mọi bài tăng — bài Hormone) → 5 ngày ăn maintain (bài Refeed) rồi tiếp.
 - **Tuần 8**: re-test battery mini — push-up, plank, 1 dặm. Kỳ vọng hợp lý: push-up 6→12, plank 32→60s, dặm nhanh hơn 40–60 giây **và** rep tạ tăng — bộ ba bằng chứng "giảm mỡ không mất sức".
 - **Tuần 12**: vòng bụng −4–6 cm, ảnh tiến độ, quyết định hướng tiếp (maintain 3 tuần → chu kỳ 2 — bài Thoát cut).
@@ -105,7 +105,7 @@ Ba tín hiệu cần khách báo ngay (không đợi Chủ nhật): đau lan ch�
     {
       en: 'Week-4 fork',
       vi: 'Ngã rẽ tuần 4',
-      def: 'MA7 phẳng 2 tuần → đúng MỘT thay đổi (−100 kcal hoặc +2.000 bước) — không "phạt" bằng cắt đôi calo.',
+      def: 'MA7 phẳng 3 tuần → đúng MỘT thay đổi (−200–300 kcal hoặc +2.000–3.000 bước) — không "phạt" bằng cắt đôi calo.',
     },
     {
       en: 'Strength-retention test',
@@ -140,10 +140,10 @@ Ba tín hiệu cần khách báo ngay (không đợi Chủ nhật): đau lan ch�
         '8.000 bước xây nền đóng cửa calo mà không tranh ngân sách phục hồi với 3 buổi tạ; Zone 2 thêm sau khi thói quen ổn.',
     },
     {
-      q: 'Chủ nhật tuần 4: MA7 chỉ giảm 0,3 kg trong 2 tuần. Hành động đúng?',
+      q: 'Chủ nhật tuần 4: MA7 chỉ giảm 0,3 kg trong 3 tuần. Hành động đúng?',
       choices: [
         'Cắt còn 1.400 kcal ngay',
-        'Đúng MỘT thay đổi: −100 kcal HOẶC +2.000 bước, rồi chờ 2 tuần dữ liệu tiếp',
+        'Đúng MỘT thay đổi: −200–300 kcal HOẶC +2.000–3.000 bước, rồi chờ 2 tuần dữ liệu tiếp',
         'Bỏ luôn giảm mỡ',
         'Thêm 3 buổi HIIT mỗi ngày',
       ],

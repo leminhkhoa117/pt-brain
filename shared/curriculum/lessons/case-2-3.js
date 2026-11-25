@@ -36,11 +36,11 @@ Phân tích archetype: **bệnh nền tim mạch + hoàn toàn mới** — an to
       heading: 'Ba quy tắc an toàn đắt giá nhất',
       body: `Điều kiện "hypertension" của PT Brain tự động nhắc khi lập giáo án — nhưng PT phải hiểu vì sao để giám sát bằng mắt:
 
-1. **Không nín thở gắng sức (Valsalva)** — tăng huyết áp nội sọ và toàn thân đột ngột (bài Vai trò của hơi thở). Thay vào đó: **thở ra khi phát lực**, hít vào pha hạ.
+1. **Không nín thở gắng sức (Valsalva)** — tăng áp lực lồng ngực/ổ bụng và huyết áp đột ngột (bài Vai trò của hơi thở). Thay vào đó: **thở ra khi phát lực**, hít vào pha hạ.
 2. **Không set 1RM / RIR 0** — quy tắc RIR 2–3: mọi set "còn 2–3 rep trong túi".
 3. **Máy có tựa trước tạ tự do nặng** — kiểm soát tốt hơn khi kỹ thuật chưa có; deadlift máy/leg press/row tựa ngực.
 
-Kèm quy tắc vận hành: đo huyết áp buổi sáng các ngày tập (khách có máy nhà); **sáng nào > 160/100 → bỏ buổi nặng hôm đó, đi bộ nhẹ + liên hệ bác sĩ** nếu lặp lại — số này là hợp đồng với bác sĩ điều trị của Hoà, không phải ý kiến của PT.`,
+Kèm quy tắc vận hành: đo huyết áp buổi sáng các ngày tập (khách có máy nhà); **sáng nào ≥ 180/110 → không tập, liên hệ bác sĩ; 140–159/90–99 → chỉ tập nhẹ, tránh Valsalva/1RM và báo bác sĩ điều trị** — số này là hợp đồng với bác sĩ của Hoà, không phải ý kiến của PT.`,
     },
     {
       heading: 'Giáo án "bắt đầu từ bậc thang thấp nhất"',

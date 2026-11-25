@@ -46,7 +46,7 @@ Mở http://localhost:5173 → **Đăng ký** → vào **Cài đặt** nhập gi
 
 - **Giáo án** → wizard tạo giáo án → **Log buổi tập**.
 - **Nghiên cứu** → dán DOI/PDF hoặc hỏi bằng tiếng Việt.
-- **Học tập** → **giáo trình PT Academy** (6 module, 71 bài, quiz, tiến độ), từ điển, flashcard, sổ tay.
+- **Học tập** → **giáo trình PT Academy** (6 module, 73 bài, quiz, tiến độ), từ điển, flashcard, sổ tay.
 
 ### Bảo mật & đăng nhập
 
@@ -109,9 +109,9 @@ pt-brain/
 │  ├─ training/planner.js        # Split, prescription, progressive overload, deload
 │  ├─ learning/sm2.js            # SM-2 flashcard
 │  ├─ anatomy/index.js           # Xương + mô liên kết: tên Việt, chức năng, tải tập, lưu ý
-│  ├─ learning/contexts.js       # Metadata học theo ngữ cảnh + action cho 71 bài
+│  ├─ learning/contexts.js       # Metadata học theo ngữ cảnh + action cho 73 bài
 │  ├─ security/password.js       # Chính sách mật khẩu dùng chung client/server
-│  ├─ curriculum/                # Giáo trình PT Academy: schema zod + 71 bài
+│  ├─ curriculum/                # Giáo trình PT Academy: schema zod + 73 bài
 │  │                             # (validate khi import, quiz, nguồn kiểm chứng)
 │  ├─ muscles/index.js           # 59 cơ: tên Việt – Anh, nhóm, chức năng, bài tập
 │  └─ config/nutrition.js        # Hệ số/ngưỡng chỉnh được
@@ -221,7 +221,7 @@ pt-brain/
 
 ### Giai đoạn 7 — PT Academy: giáo trình học tập cho PT
 
-- **Giáo trình 6 module** (`/learn` → tab Giáo trình): Giải phẫu cơ xương khớp · Sinh lý vận động & tập luyện · Dinh dưỡng · Yếu tố thể chất · Phục hồi chức năng & an toàn · **Ứng dụng cá nhân hoá** — **71 bài hoàn chỉnh** (15+12+13+8+12+11), mỗi bài có mục tiêu, nội dung tiếng Việt (kèm thuật ngữ Anh), box "Áp dụng vào phòng tập", thuật ngữ, quiz chấm bằng code và **nguồn tham khảo kèm license** (đã kiểm chứng: Morton 2018, ISSN creatine, PEACE & LOVE, IASP 2020, Brinjikji 2015, Crossley 2016, Kongsgaard 2009, Gabbett 2016, WHO 2020...).
+- **Giáo trình 6 module** (`/learn` → tab Giáo trình): Giải phẫu cơ xương khớp · Sinh lý vận động & tập luyện · Dinh dưỡng · Yếu tố thể chất · Phục hồi chức năng & an toàn · **Ứng dụng cá nhân hoá** — **73 bài hoàn chỉnh** (15+13+13+8+12+12), mỗi bài có mục tiêu, nội dung tiếng Việt (kèm thuật ngữ Anh), box "Áp dụng vào phòng tập", thuật ngữ, quiz chấm bằng code và **nguồn tham khảo kèm license** (đã kiểm chứng: Morton 2018, ISSN creatine, PEACE & LOVE, IASP 2020, Brinjikji 2015, Crossley 2016, Kongsgaard 2009, Gabbett 2016, WHO 2020...).
 - **Nội dung là code có version** tại `shared/curriculum/lessons/*.js` (thuần dữ liệu, không dependency); schema zod + tham chiếu chéo validate ngay khi server nạp routes (slug duy nhất, ảnh khai báo đủ, `related.muscles/conditions` trỏ tới dữ liệu có thật) — 20 test chuyên trách.- **Tiến độ per-user**: model `CurriculumProgress` (đang đọc/hoàn thành, điểm quiz tốt nhất); thanh tiến độ từng module, gợi ý **"Tiếp tục học"** trong trang giáo trình và trên Dashboard.
 - **Quiz kết hợp**: bank câu hỏi cố định chấm bằng **code** (miễn phí, có giải thích, lưu điểm tốt nhất) + nút **"AI tạo thêm câu hỏi"** từ nội dung bài (tốn quota `quiz` như quiz nghiên cứu).
 - **Chat AI theo bài** (SSE streaming, cùng cơ chế chat cơ bắp): AI chỉ trả lời trong phạm vi nội dung bài + bằng chứng liên quan; quota riêng `curriculum`.
@@ -379,7 +379,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 - AI plan có thể trả về fallback theo quy tắc nếu model không trả JSON hợp lệ; UI hiển thị rõ nguồn.
 - Ảnh thể trạng/bữa ăn dùng chung cơ chế lưu trữ với ảnh tiến độ (đĩa hoặc GridFS); production Render dùng GridFS.
 - Chưa có xác thực ảnh y tế/chuyên gia; không dùng cho người có bệnh lý hoặc rối loạn ăn uống.
-- **Giáo trình PT Academy hoàn tất 71 bài / 6 module** (outline gốc + các đợt bổ sung anatomy/rehab/case; mỗi bài có quiz, nguồn và box áp dụng).
+- **Giáo trình PT Academy hoàn tất 73 bài / 6 module** (outline gốc + các đợt bổ sung anatomy/rehab/case + deep-dive volume/plateau; mỗi bài có quiz, nguồn và box áp dụng).
 - Nội dung giáo trình biên soạn từ nguồn uy tín (mỗi bài ≥ 1 nguồn kèm license, liệt kê cuối bài); giáo dục cho PT, không thay thế chứng chỉ hành nghề — disclaimer hiển thị ngay trong trang giáo trình.
 
 ## Bảo mật & bản quyền

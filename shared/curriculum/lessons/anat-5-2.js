@@ -12,13 +12,15 @@ export default {
   order: 2,
   title: 'Cơ hô hấp và thở khi tập nặng: từ cơ hoành tới brace',
   subtitle:
-    'Cơ hoành là động cơ thở chính, thở ra nghỉ là thụ động — và trong phòng tập, hơi thở là một phần của kỹ thuật, không phải nền nhạc.',
-  minutes: 10,
+    'Cơ hoành là động cơ thở chính, thở ra nghỉ là thụ động — và trong phòng tập, hơi thở là một phần của kỹ thuật, không phải nền nhạc. Từ Valsalva 1–3 rep tới nhịp thở bền và ngưỡng an toàn.',
+  minutes: 14,
   objectives: [
     'Mô tả vai trò của cơ hoành và cơ liên sườn trong một chu kỳ thở.',
     'Phân biệt thở ngực nông và thở "360 độ" vào sườn-lưng.',
     'Giải thích cơ chế Valsalva khi vác tạ nặng và những ai cần tránh.',
-    'Áp dụng nhịp thở vào các bài đẩy/kéo: hít khi hạ, thở khi phát lực.',
+    'Chọn nhịp thở theo rep range: 1–3, 3–6, 6–12, bài giữ và cardio.',
+    'Nhận diện chống chỉ định, ngưỡng huyết áp và dấu hiệu dừng khi thở dưới tải.',
+    'Áp dụng nhịp thở bền và bài thở khởi động vào buổi tập thật.',
   ],
   sections: [
     {
@@ -42,29 +44,60 @@ Thở kiểu này huấn luyện cơ hoành và cơ liên sườn làm việc đ
     },
     {
       heading: 'Valsalva: tạm nín thở để khóa cột sống — đúng lúc, đúng người',
-      body: `**Valsalva maneuver**: hít sâu ~70–80% dung tích, đóng thanh khí, siết thành hộp — áp lực ổ bụng tăng vọt, cột sống được nâng đỡ từ trong (cơ chế "đai tự nhiên" đã học). Đây là kỹ thuật chuẩn cho **1–3 rep tạ nặng** (squat, deadlift, press), kèm tăng huyết áp thoáng qua.
+      body: `**Valsalva maneuver**: hít sâu ~70–80% dung tích, đóng thanh khí, siết thành hộp — áp lực ổ bụng tăng vọt, cột sống được nâng đỡ từ trong. Đây là kỹ thuật cho **rep nặng 1–5 RM** (squat, deadlift, press), kèm tăng huyết áp thoáng qua — đã ghi nhận trung bình ~320/250 mmHg trong leg press nặng ở người trẻ khỏe.
 
-Ba quy tắc và một chống chỉ định:
+**Quy tắc theo rep range:**
 
-- Chỉ giữ trong **một lần đẩy ngắn** (1–2 giây), thở ra ngay khi tạ qua điểm khó.
-- Không dùng cho set nhiều rep — thay bằng brace nhẹ + thở theo nhịp.
-- **Chống chỉ định rõ**: khách tăng huyết áp chưa kiểm soát, bệnh tim, có thai — dùng brace nhẹ và thở liên tục (điều kiện "Tăng huyết áp" trong app tự cảnh báo khi lập giáo án).`,
+- **1–5 RM nặng:** Valsalva, giữ **1–3 giây**, thở ra ngay khi tạ qua điểm khó; không giữ qua nhiều rep.
+- **6–12 rep:** hít vào pha hạ, thở ra pha phát lực; brace nhẹ, thở liên tục.
+- **12+ / isolation:** thở đều, brace vừa đủ; không nín.
+- **Carry, plank, Pallof:** thở nông đều quanh brace; không nín dài.
+
+**Chống chỉ định / cần hỏi y tế trước khi dùng Valsalva:** huyết áp chưa đạt mục tiêu (ví dụ ≥ 140/90), bệnh tim, phình/tách động mạch chủ, Marfan hoặc vascular Ehlers-Danlos, bệnh võng mạc/glaucoma nặng, thoát vị, mới phẫu thuật, đang mang thai, rối loạn sàn chậu. Nhóm này dùng **brace nhẹ + thở liên tục**, không nín.
+
+**Dấu hiệu dừng ngay:** chóng mặt, nhìn mờ/tunnel vision, đau đầu, đau ngực, hoa mắt. Khách có huyết áp **≥ 180/110** không nên tập nặng hôm đó; **140–159/90–99** tránh Valsalva và 1RM, dùng 8–12 RM + brace + thở — chuyển hướng kiểm tra y tế thay vì "thử xem sao".`,
     },
     {
-      heading: 'Nhịp thở theo bài: đơn giản và bền',
-      body: `Quy tắc mặc định cho đa số khách:
+      heading: 'Bảng chọn nhịp thở theo mục tiêu',
+      body: `| Mục tiêu | Nhịp thở | Ghi chú |
+| --- | --- | --- |
+| 1–3 RM tối đa | Valsalva 1–3 giây | Chỉ khi không có chống chỉ định |
+| 4–6 RM nặng | Valsalva ngắn hoặc brace + thở ra ở điểm khó | Không nín cả set |
+| 6–12 rep | Hít khi hạ, thở khi phát lực | Nhịp mặc định cho đa số bài |
+| 12+ / isolation | Thở đều, brace vừa | Ưu tiên kiểm soát và nhịp |
+| Carry / plank | Thở nông quanh brace | Không nín dài |
+| Cardio dễ | 3:2 hoặc thở mũi thoải mái | Nói được câu trọn (talk test) |
+| Cardio ngưỡng | 2:2 hoặc 2:1 | Thở ra chủ động, không hyperventilate |
 
-- **Bài đẩy/kéo tạ**: hít vào pha hạ (eccentric), thở ra lúc phát lực (concentric) — "hơi thở đi cùng chiều với trọng lực".
-- **Bài core giữ tư thế** (plank, Pallof): thở nông đều quanh brace, không nín dài.
-- **Cardio Zone 2**: nhịp thở đều, nói được câu trọn (bài Tim mạch & vùng nhịp tim).
-- **Rep cuối form vỡ**: nếu khách đổi nhịp thở loạn — đó thường là tín hiệu đầu tiên của mệt kỹ thuật, đáng để hạ tạ sớm hơn tay run.`,
+Nguyên tắc chung: **rep càng nặng, nín càng ngắn; set càng dài, thở càng liên tục.** Nếu khách phải nín mới hoàn thành set 10 rep, đó là dấu hiệu tạ quá nặng hoặc brace chưa đủ — không phải "thở yếu".`,
+    },
+    {
+      heading: 'Thở bền: cadence, talk test và vấn đề hô hấp',
+      body: `Với chạy/đạp, nhịp thở là **dụng cụ điều tốc**:
+
+- **Dễ (Zone 2):** 3 bước hít – 2 bước thở, hoặc thở mũi thoải mái; nói được câu trọn.
+- **Ngưỡng:** 2:2 hoặc 2:1; nói được 3–5 từ, không nói cả câu.
+- **Rất gắt:** 2:1 hoặc thở miệng; nếu không giữ được nhịp, giảm tốc trước khi form sụp.
+
+**Side stitch:** giảm nhẹ tốc độ, thở ra dài hơn hít vào, ấn nhẹ vùng đau; nếu lặp lại nhiều buổi, xem lại ăn trước chạy và tăng tốc đột ngột.
+
+**Hen khi gắng sức (EIB) / hen:** khởi động 10–15 phút, mang thuốc theo kế hoạch bác sĩ; dừng nếu khò khè, tức ngực, ho kéo dài — không "chạy cho hết".
+
+**Lo lắng/hyperventilation:** kéo dài pha thở ra (4 giây vào – 6–8 giây ra), thở mũi; không tập nín thở khi đang hoảng.
+
+**Huấn luyện cơ hô hấp (RMT/IMT):** meta-analysis cho thấy RMT cải thiện hiệu suất sức bền (khoảng +16% test tải hằng, +18.5% test tăng dần; người ít nền hưởng lợi nhiều hơn). Liều thực hành phổ biến: **30 hơi, 1–2 lần/ngày, ~50–70% MIP, 4–6 tuần** — bằng chứng mức trung bình, không phải bắt buộc cho mọi khách. Nhịp thở cố định (3:2, 2:2) chỉ là **gợi ý**; bằng chứng cho việc ép nhịp còn yếu, nên ưu tiên nhịp tự nhiên thoải mái.
+
+**Tín hiệu form:** rep cuối mà nhịp thở loạn, khách nín vô thức hoặc thở dốc mất kiểm soát — đó thường là mệt kỹ thuật đến trước mệt cơ; hạ tạ sớm thay vì thêm rep.`,
     },
   ],
   applyBox: `**Gian tập thực hành — 5 phút "định hình lại hơi thở" trước buổi:**
 1. Crocodile breathing (nằm sấp, bụng trên sàn): 8 hơi 360°, mỗi hơi 4 giây vào — 6 giây ra.
 2. Sitting 360°: tay quanh sườn — 10 hơi, kiểm tra hai tay cùng nở.
 3. Stand-up brace test: hít 70%, siết hộp, giữ 5 giây, thở — 3 lần.
-4. Mang cảm giác đó vào bài đầu tiên của buổi (thường là bài nặng nhất): hít trước khi rời rack, thở ra khi đẩy.`,
+4. Mang cảm giác đó vào bài đầu tiên của buổi (thường là bài nặng nhất): hít trước khi rời rack, thở ra khi đẩy.
+5. Với khách có bệnh nền tim mạch/hô hấp: chọn biến thể brace nhẹ + thở liên tục, ghi rõ trong giáo án.`,
+  safetyBox:
+    'Không dùng Valsalva cho khách tăng huyết áp chưa đạt mục tiêu (ví dụ ≥ 140/90), bệnh tim, phình/tách động mạch chủ, Marfan/vascular Ehlers-Danlos, bệnh võng mạc/glaucoma nặng, thoát vị, mới phẫu thuật, đang mang thai hoặc rối loạn sàn chậu — dùng brace nhẹ + thở liên tục. Dừng buổi tập và chuyển hướng y tế nếu chóng mặt, nhìn mờ, đau đầu, đau ngực, ngất; không tập nặng khi huyết áp ≥ 180/110, và tránh Valsalva/1RM khi huyết áp 140–159/90–99. PT không chẩn đoán bệnh hô hấp/tim mạch — chỉ hướng dẫn kỹ thuật trong phạm vi an toàn.',
   terms: [
     {
       en: 'Diaphragm',
@@ -95,6 +128,21 @@ Ba quy tắc và một chống chỉ định:
       en: 'Accessory breathing muscles',
       vi: 'Cơ thở phụ',
       def: 'Scalene/SCM "gọi viện" khi thở gấp; thở ngực nông kéo dài cả ngày là dấu hiệu lệch vai trò sang nhóm này.',
+    },
+    {
+      en: 'Bracing',
+      vi: 'Siết hộp / brace',
+      def: 'Siết bụng-thân quanh một hơi thở vào sườn để tạo áp lực ổ bụng; có thể thở nông liên tục thay vì nín như Valsalva.',
+    },
+    {
+      en: 'Blood pressure response',
+      vi: 'Đáp ứng huyết áp',
+      def: 'Valsalva làm huyết áp tăng thoáng qua rồi hạ khi thở ra; ngưỡng an toàn và dấu hiệu dừng cần kiểm tra ở khách tim mạch.',
+    },
+    {
+      en: 'Exercise-induced bronchoconstriction',
+      vi: 'Co thắt phế quản khi gắng sức',
+      def: 'Khò khè/tức ngực khi chạy gắng; cần khởi động kỹ, mang thuốc theo kế hoạch bác sĩ và dừng khi triệu chứng tăng.',
     },
   ],
   images: [
@@ -179,6 +227,30 @@ Ba quy tắc và một chống chỉ định:
       explain:
         'Hít 360° làm đầy cả phần sau lồng ngực — thành "hộp" brace tròn đủ trước khi siết, tốt hơn hít nông chỉ đầy trước.',
     },
+    {
+      q: 'Khách 46 tuổi, huyết áp đo 150/95, muốn test 1RM squat hôm nay. Bạn xử lý thế nào?',
+      choices: [
+        'Cho test 1RM và dùng Valsalva bình thường',
+        'Không test nặng hôm nay; hướng khách kiểm tra huyết áp/y tế, dùng brace nhẹ + thở liên tục khi tập vừa',
+        'Cho tập nhưng bỏ qua huyết áp',
+        'Chỉ cần uống nước là được',
+      ],
+      answer: 1,
+      explain:
+        'Huyết áp 150/95 đã trên mục tiêu (≥ 140/90): tránh Valsalva/1RM, dùng 8–12 RM + brace + thở, và chuyển hướng kiểm tra y tế. ≥ 180/110 là ngưỡng không tập nặng.',
+    },
+    {
+      q: 'Bài 4×8 tạ đòn nên thở thế nào?',
+      choices: [
+        'Valsalva nín cả set',
+        'Hít vào pha hạ, thở ra pha phát lực; brace nhẹ, thở liên tục',
+        'Nín đến khi xong 8 rep',
+        'Thở miệng liên tục thật nhanh',
+      ],
+      answer: 1,
+      explain:
+        'Rep range 6–12 dùng nhịp hít hạ/thở phát lực; nín cả set làm huyết áp tăng kéo dài mà không thêm lợi ích.',
+    },
   ],
   related: {
     muscles: ['rectus-abdominis', 'transversus-abdominis', 'external-oblique', 'erector-spinae'],
@@ -197,6 +269,31 @@ Ba quy tắc và một chống chỉ định:
       label: 'OpenStax Anatomy & Physiology — The respiratory system & mechanics of breathing',
       url: 'https://openstax.org/books/anatomy-and-physiology/pages/22-3-the-process-of-breathing',
       license: 'CC BY-NC-SA 4.0 (cite-only)',
+    },
+    {
+      label: 'MacDougall et al. 1985 — Arterial blood pressure response to heavy resistance exercise',
+      url: 'https://doi.org/10.1152/jappl.1985.58.3.785',
+      license: 'cite-only',
+    },
+    {
+      label: 'Hackett & Chow 2013 — Valsalva maneuver: IAP and safety during resistance exercise',
+      url: 'https://doi.org/10.1519/JSC.0b013e31827de07d',
+      license: 'cite-only',
+    },
+    {
+      label: 'Ikeda et al. 2009 — Valsalva vs forced exhalation on isometric strength',
+      url: 'https://doi.org/10.1519/JSC.0b013e31818eb256',
+      license: 'cite-only',
+    },
+    {
+      label: 'Illi et al. 2012 — Respiratory muscle training and exercise performance (meta-analysis)',
+      url: 'https://doi.org/10.1007/BF03262290',
+      license: 'cite-only',
+    },
+    {
+      label: 'Romer et al. 2002 — Inspiratory muscle training and cycling time-trial performance',
+      url: 'https://doi.org/10.1080/026404102760000053',
+      license: 'cite-only',
     },
   ],
 };
