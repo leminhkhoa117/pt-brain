@@ -22,7 +22,6 @@ const BodyAssessmentPage = lazy(() => import('./pages/BodyAssessmentPage.jsx'));
 const MusclePage = lazy(() => import('./pages/MusclePage.jsx'));
 const Settings = lazy(() => import('./pages/Settings.jsx'));
 const Welcome = lazy(() => import('./pages/Welcome.jsx'));
-const UiLab = lazy(() => import('./pages/UiLab.jsx'));
 const Studio = lazy(() => import('./pages/Studio.jsx'));
 
 function PageFallback() {
@@ -123,7 +122,6 @@ export default function App() {
         <Route path="/calculators" element={<Calculators />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/studio" element={<Studio />} />
-        <Route path="/ui-lab" element={<UiLab />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

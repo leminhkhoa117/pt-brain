@@ -1006,8 +1006,7 @@ export default function Welcome() {
                 </p>
                 <p className="mt-1 text-[12px] leading-relaxed text-slate-500 dark:text-slate-400">
                   Bắt đầu bằng cân nặng và một buổi tập. Khi đã quen, thêm nghiên cứu, dinh dưỡng và
-                  theo dõi cardio. Trang này luôn mở lại được từ mục “Giới thiệu” trên thanh điều
-                  hướng.
+                  theo dõi cardio. Trang này chỉ hiển thị khi bạn mở địa chỉ trang web.
                 </p>
               </div>
             </div>

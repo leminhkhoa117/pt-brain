@@ -43,13 +43,6 @@ const GROUPS = [
       { to: '/studio', label: 'Theme Studio', icon: 'palette' },
     ],
   },
-  {
-    label: 'Khám phá',
-    items: [
-      { to: '/ui-lab', label: 'UI Lab', icon: 'bolt' },
-      { to: '/', label: 'Giới thiệu', icon: 'info' },
-    ],
-  },
 ];
 
 const MOBILE_NAV = [
