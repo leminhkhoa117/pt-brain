@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Badge, EmptyState, Icon, InfoTip, Panel, Spinner } from '../../components/ui.jsx';
 import { useDialog } from '../../components/DialogProvider.jsx';
@@ -39,12 +40,21 @@ function PhaseBadge({ phase }) {
 export default function MealPlanCard() {
   const dialog = useDialog();
   const queryClient = useQueryClient();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [aiOpen, setAiOpen] = useState(false);
   const [editor, setEditor] = useState(null);
   const [reviewPlan, setReviewPlan] = useState(null);
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
+
+  // Người dùng đi cập nhật hồ sơ rồi quay lại: mở lại modal AI ngay.
+  useEffect(() => {
+    if (!location.state?.resumeAiMealPlan) return;
+    setAiOpen(true);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.state, location.pathname, navigate]);
 
   const plansQuery = useQuery({ queryKey: ['meal-plans'], queryFn: listMealPlans });
   const plans = plansQuery.data?.plans || [];

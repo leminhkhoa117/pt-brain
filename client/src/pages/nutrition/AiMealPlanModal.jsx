@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert, Card, Field, Icon, Spinner, Portal } from '../../components/ui.jsx';
+import { useDialog } from '../../components/DialogProvider.jsx';
 import MarkdownText from '../../components/MarkdownText.jsx';
 import { aiSuggestMealPlan, createMealPlan } from '../../api/mealPlans.js';
 import { getErrorMessage } from '../../api/client.js';
@@ -56,8 +58,15 @@ function splitList(value = '') {
     .slice(0, 20);
 }
 
+function joinVietnamese(items) {
+  if (items.length <= 1) return items[0] || '';
+  return `${items.slice(0, -1).join(', ')} và ${items[items.length - 1]}`;
+}
+
 export default function AiMealPlanModal({ onClose, onSaved }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const dialog = useDialog();
   const { user } = useAuth();
   const [form, setForm] = useState(() => ({
     ...EMPTY_FORM(),
@@ -65,6 +74,28 @@ export default function AiMealPlanModal({ onClose, onSaved }) {
   }));
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
+
+  const missingProfile = [
+    !user?.profile?.sex && 'giới tính',
+    !user?.profile?.birthDate && 'ngày sinh',
+    !user?.profile?.heightCm && 'chiều cao',
+  ].filter(Boolean);
+  const profileIncomplete = missingProfile.length > 0;
+
+  const goUpdateProfile = async () => {
+    if (!profileIncomplete) return;
+    const ok = await dialog.confirm({
+      title: 'Cập nhật hồ sơ',
+      message: `AI cần ${joinVietnamese(missingProfile)} để tính calo và protein. Bạn có muốn đến trang Cài đặt để cập nhật không? Cập nhật xong bạn sẽ được quay lại đây.`,
+      confirmLabel: 'Đi cập nhật',
+      cancelLabel: 'Ở lại',
+      tone: 'info',
+    });
+    if (!ok) return;
+    navigate('/settings', {
+      state: { returnTo: '/nutrition', resumeAiMealPlan: true },
+    });
+  };
 
   const today = todayKey();
   const durationDays = daysBetween(form.endDate, form.startDate) + 1;
@@ -173,6 +204,16 @@ export default function AiMealPlanModal({ onClose, onSaved }) {
               <Icon name="close" className="h-4 w-4" />
             </button>
           </div>
+
+          {profileIncomplete && (
+            <Alert tone="warning" className="mt-3" title="Hồ sơ chưa đủ để tính calo">
+              Còn thiếu {joinVietnamese(missingProfile)}. AI cần các thông tin này để tính calo và
+              protein chính xác.{' '}
+              <button type="button" className="link" onClick={goUpdateProfile}>
+                Cập nhật hồ sơ
+              </button>
+            </Alert>
+          )}
 
           {error && (
             <Alert tone="danger" className="mt-3">
@@ -347,7 +388,7 @@ export default function AiMealPlanModal({ onClose, onSaved }) {
                 type="button"
                 className="btn-primary mt-4"
                 disabled={suggest.isPending || Boolean(dateError)}
-                onClick={() => suggest.mutate()}
+                onClick={() => (profileIncomplete ? goUpdateProfile() : suggest.mutate())}
               >
                 {suggest.isPending ? (
                   <Spinner className="h-4 w-4 text-white" />

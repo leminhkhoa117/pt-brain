@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +18,7 @@ const AI_KIND_LABELS = [
   ['summarize', 'Tóm tắt'],
   ['ask', 'Hỏi đáp'],
   ['search', 'Tìm nghiên cứu'],
+  ['synthesize', 'Tổng hợp toàn văn'],
   ['translate', 'Dịch bài'],
   ['apply', 'Giáo án AI'],
   ['quiz', 'Quiz'],
@@ -31,6 +32,10 @@ export default function Settings() {
   const { isDark, toggle, customization } = useTheme();
   const currentTheme = getTheme(customization.themeId);
   const navigate = useNavigate();
+  const location = useLocation();
+  // Khi được đưa từ modal AI sang đây, lưu lại nơi cần quay về và mở lại modal.
+  const returnTo = location.state?.returnTo || null;
+  const resumeAiMealPlan = Boolean(location.state?.resumeAiMealPlan);
   const [notice, setNotice] = useState(null);
   const [confirmText, setConfirmText] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
@@ -79,10 +84,24 @@ export default function Settings() {
     });
   }, [user, reset]);
 
+  // Được đưa sang từ modal AI: cuộn thẳng tới phần hồ sơ để người dùng điền nhanh.
+  useEffect(() => {
+    if (!returnTo) return;
+    document.getElementById('profile-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [returnTo]);
+
+  const backToOrigin = () => {
+    if (!returnTo) return;
+    navigate(returnTo, {
+      replace: true,
+      state: resumeAiMealPlan ? { resumeAiMealPlan: true } : undefined,
+    });
+  };
+
   const onSubmit = async (values) => {
     setNotice(null);
     try {
-      await saveProfile({
+      const savedUser = await saveProfile({
         name: values.name,
         profile: {
           sex: values.sex || undefined,
@@ -96,6 +115,24 @@ export default function Settings() {
           conditionNotes: conditionNotes.trim(),
         },
       });
+
+      if (returnTo) {
+        const stillMissing = [
+          !savedUser?.profile?.sex && 'giới tính',
+          !savedUser?.profile?.birthDate && 'ngày sinh',
+          !savedUser?.profile?.heightCm && 'chiều cao',
+        ].filter(Boolean);
+        if (!stillMissing.length) {
+          backToOrigin();
+          return;
+        }
+        setNotice({
+          tone: 'warning',
+          text: `Đã lưu hồ sơ. Còn thiếu ${stillMissing.join(', ')} để quay lại tạo plan ăn uống.`,
+        });
+        return;
+      }
+
       setNotice({ tone: 'success', text: 'Đã lưu hồ sơ. Các máy tính sẽ dùng thông tin mới.' });
     } catch (error) {
       setNotice({ tone: 'danger', text: getErrorMessage(error) });
@@ -127,6 +164,16 @@ export default function Settings() {
     <div>
       <PageHeader title="Cài đặt" subtitle="Hồ sơ là nguồn dữ liệu cho mọi phép tính trong app." />
 
+      {returnTo && (
+        <Alert tone="info" className="mb-4" title="Cập nhật hồ sơ để quay lại tạo plan ăn uống">
+          Điền giới tính, ngày sinh và chiều cao rồi bấm “Lưu hồ sơ”; bạn sẽ được đưa lại trang
+          Dinh dưỡng và mở lại phần AI đề xuất.{' '}
+          <button type="button" className="link" onClick={backToOrigin}>
+            Quay lại ngay
+          </button>
+        </Alert>
+      )}
+
       {notice && (
         <Alert tone={notice.tone} className="mb-4">
           {notice.text}
@@ -134,7 +181,7 @@ export default function Settings() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card id="profile-card" className="scroll-mt-20 lg:col-span-2">
           <h2 className="text-base font-semibold text-slate-900 dark:text-white">Hồ sơ cá nhân</h2>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Giới tính, ngày sinh, chiều cao và cân nặng được dùng để tính BMR, TDEE, % mỡ và FFMI.
