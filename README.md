@@ -27,7 +27,7 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 
 ## Chạy nhanh
 
-Yêu cầu: Node.js >= 20, MongoDB đang chạy (local hoặc Atlas).
+Yêu cầu: Node.js >= 20, MongoDB đang chạy (local hoặc Atlas). Hoặc dùng Docker — xem [mục Docker](#docker).
 
 ```bash
 npm install
@@ -76,22 +76,86 @@ PDF_MAX_MB=20
 
 Key không có tiền tố `VITE_` nên Vite không đưa vào bundle frontend.
 
-### Docker (chưa chạy thử trên máy này)
+### Docker
+
+Đã chạy thử trên **Windows 11 Pro + Docker Desktop (WSL2)**: client, API và Mongo đều healthy. Yêu cầu Docker Engine/Docker Desktop + Docker Compose v2.
+
+Trên Windows, nếu Docker báo **“Windows hypervisor is not running”**, mở PowerShell Admin:
+
+```powershell
+bcdedit /set hypervisorlaunchtype auto
+```
+
+rồi restart. Nếu vẫn lỗi, bật thêm thành phần hypervisor:
+
+```powershell
+dism.exe /online /enable-feature /featurename:Microsoft-Hyper-V-Hypervisor /all /norestart
+```
 
 ```bash
-docker compose up --build
+cp .env.example .env          # Windows: Copy-Item .env.example .env
+docker compose up -d --build
 # client :5173 | api :4000 | mongo :27017
 ```
 
-Máy phát triển hiện tại chưa cài Docker; cấu hình đã sẵn nhưng luồng local mới là luồng đã kiểm chứng.
+`docker compose` tự đọc `.env` để lấy `AI_API_KEY`, JWT secret...; file `.env` không được copy vào image. Trong Docker, server kết nối Mongo nội bộ qua `mongodb://mongo:27017/pt-brain`; `MONGO_URI` trong `.env` chỉ dùng khi chạy local.
+
+Kiểm tra stack:
+
+```bash
+docker compose ps
+curl http://localhost:4000/api/health
+# {"data":{"ok":true,"service":"pt-brain-api","db":"up",...}}
+```
+
+Lệnh thường dùng:
+
+```bash
+docker compose logs -f server   # log API
+docker compose logs -f client   # log Vite
+docker compose down             # dừng, giữ dữ liệu
+docker compose up -d            # chạy lại
+docker compose up -d --build    # build lại khi đổi package.json/Dockerfile
+docker compose down -v          # XÓA volume Mongo/uploads
+```
+
+- `client/src`, `server/src` và `shared` được mount vào container nên sửa code hot-reload; đổi dependency hoặc Dockerfile mới cần build lại.
+- Dữ liệu nằm trong volume `mongo_data` và `uploads_data`.
+- Nếu máy đang chạy MongoDB local ở cổng 27017, tắt service trước (Windows, PowerShell Admin):
+
+```powershell
+Stop-Service MongoDB
+Set-Service MongoDB -StartupType Manual
+# bật lại khi cần: Set-Service MongoDB -StartupType Automatic; Start-Service MongoDB
+```
+
+- Docker Mongo là database riêng, **không tự đọc dữ liệu MongoDB local**. Migrate bằng [MongoDB Database Tools](https://www.mongodb.com/try/download/database-tools) (`mongodump`/`mongorestore`; PowerShell Admin cho lệnh service):
+
+```powershell
+# 1) dừng container Mongo, bật service local
+docker compose stop mongo
+Start-Service MongoDB
+
+# 2) dump database local
+mongodump --uri "mongodb://127.0.0.1:27017" --db pt-brain --out .\mongo-dump --gzip
+
+# 3) tắt service local, bật lại container Mongo
+Stop-Service MongoDB
+docker compose start mongo
+
+# 4) restore vào Docker Mongo
+mongorestore --uri "mongodb://127.0.0.1:27017" --gzip --drop .\mongo-dump
+```
+
+Sau restore, chạy `docker compose start server` và kiểm tra `curl http://localhost:4000/api/health`.
 
 Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ## Lệnh
 
 ```bash
-npm run test        # 327 test (unit + API integration; cần MongoDB)
-npm run test:unit   # 282 unit test, không cần MongoDB
+npm run test        # 384 test (unit + API integration; cần MongoDB)
+npm run test:unit   # 337 unit test, không cần MongoDB
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
 npm run format      # Prettier
@@ -361,7 +425,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 - **PDF scan không có OCR**: file không có lớp text trả lỗi rõ ràng, cần bản PDF có text hoặc dán nội dung.
 - PDF được **trích text** (không gửi nguyên file cho model như phương án Anthropic trong plan gốc), nên bảng/hình phức tạp có thể mất cấu trúc.
 - Chưa có test API tự động (supertest); E2E hiện chạy tay.
-- Docker Compose chưa được chạy thử trên máy này (đã test chế độ production-serving trực tiếp).
+- Docker Compose đã chạy thử trên Windows 11 + Docker Desktop (WSL2). Dữ liệu Mongo trong Docker là volume riêng, không tự đồng bộ với MongoDB local — xem mục Docker để migrate.
 - Job tóm tắt vẫn chạy trong RAM của process, chưa có queue phân tán. Khi restart, tối đa 5 job đang `processing` được resume tuần tự; job vượt giới hạn hoặc thiếu nguồn bị đánh dấu `failed` và có nút "Thử lại". Nếu chạy nhiều instance cần queue thật (BullMQ/Agenda) để tránh resume trùng.
 - Ảnh tiến độ và PDF có thể lưu trên đĩa (`STORAGE_DRIVER=disk`) hoặc trong MongoDB GridFS (`STORAGE_DRIVER=mongo`). Bản deploy Render free dùng GridFS nên ảnh không mất khi restart; quota Atlas free là 512 MB.
 - PWA đã test manifest/SW/asset và build production; cài trên điện thoại cần HTTPS (Render đã có sẵn).
