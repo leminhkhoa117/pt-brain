@@ -103,21 +103,21 @@ export const workoutCreateSchema = z
     if (data.kind === 'cardio') {
       if (!data.activity) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['activity'],
           message: 'Chọn loại vận động cho buổi cardio',
         });
       }
       if (!data.durationMin) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['durationMin'],
           message: 'Nhập thời gian vận động (phút)',
         });
       }
     } else if (!data.sets?.length) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['sets'],
         message: 'Cần ít nhất 1 set',
       });

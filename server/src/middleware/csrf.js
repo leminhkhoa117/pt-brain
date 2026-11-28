@@ -35,12 +35,10 @@ export function csrfGuard(req, res, next) {
     return next(new ApiError(403, 'CSRF_BLOCKED', 'Nguồn yêu cầu không hợp lệ'));
   }
 
-  // Tùy chọn: yêu cầu header tùy chỉnh để chặn form HTML cross-site ngay cả khi
-  // Origin bị thiếu. Client axios luôn gửi header này.
+  // Yêu cầu header tùy chỉnh để chặn form HTML cross-site ngay cả khi Origin bị
+  // thiếu. Client axios luôn gửi header này; test/supertest được bỏ qua.
   if (req.get('x-requested-with') === 'XMLHttpRequest') return next();
-
-  // Test/supertest và các tích hợp server-side không có cookie trình duyệt.
   if (env.NODE_ENV === 'test') return next();
 
-  return next();
+  return next(new ApiError(403, 'CSRF_BLOCKED', 'Thiếu header xác thực yêu cầu'));
 }

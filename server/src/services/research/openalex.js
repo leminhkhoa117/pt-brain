@@ -19,10 +19,15 @@ function normalizeDoi(value = '') {
   return String(value).replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').toLowerCase();
 }
 
-export async function searchOpenAlex(query, { perPage = 8, yearFrom, yearTo } = {}) {
+export async function searchOpenAlex(
+  query,
+  { perPage = 8, yearFrom, yearTo, openAccessOnly = true } = {},
+) {
   const filters = [];
   if (yearFrom) filters.push(`from_publication_date:${yearFrom}-01-01`);
   if (yearTo) filters.push(`to_publication_date:${yearTo}-12-31`);
+  // Lọc tại nguồn để giảm hẳn bài paywall trước khi làm giàu full text.
+  if (openAccessOnly) filters.push('open_access.is_oa:true');
   const params = new URLSearchParams({
     search: query,
     'per-page': String(perPage),

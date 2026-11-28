@@ -21,6 +21,8 @@ const require = createRequire(import.meta.url);
 const pdfParse = require('pdf-parse/lib/pdf-parse.js');
 
 const PDF_DIR = fileURLToPath(new URL('../../../uploads/papers/', import.meta.url));
+// Giới hạn để một PDF độc hại không thể treo process đơn lẻ.
+const MAX_PDF_PAGES = 150;
 
 export function sha256(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -192,12 +194,21 @@ function pageTextRenderer(pageTexts) {
 /** Trích text từ PDF. PDF scan không có text sẽ trả lỗi rõ ràng (chưa hỗ trợ OCR). */
 export async function parsePdfBuffer(buffer, { filename = '' } = {}) {
   if (!buffer?.length) throw ApiError.badRequest('File PDF rỗng');
+  if (!buffer.subarray(0, 1024).includes(Buffer.from('%PDF-'))) {
+    throw ApiError.badRequest('File không phải PDF hợp lệ');
+  }
   const pageTexts = [];
   let data;
   try {
-    data = await pdfParse(buffer, { pagerender: pageTextRenderer(pageTexts) });
+    data = await pdfParse(buffer, {
+      max: MAX_PDF_PAGES,
+      pagerender: pageTextRenderer(pageTexts),
+    });
   } catch (error) {
     throw new ApiError(422, 'PDF_PARSE_FAILED', `Không đọc được PDF: ${error.message}`);
+  }
+  if (data.numpages > MAX_PDF_PAGES) {
+    throw ApiError.badRequest(`PDF quá dài (tối đa ${MAX_PDF_PAGES} trang)`);
   }
   // Giữ marker trang để model trích dẫn đúng trang và để verifier đối chiếu.
   const text = normalizeText(

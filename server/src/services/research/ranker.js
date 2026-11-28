@@ -1,5 +1,6 @@
 import { evidenceLevelFromPublicationTypes } from './evidence.js';
 import { assessFullText } from './fullText.js';
+import { isVerifiedOpenAccess } from './accessPolicy.js';
 import { buildRelevanceContext, scoreRelevance } from './relevance.js';
 
 const EVIDENCE_WEIGHT = { 1: 100, 2: 80, 3: 50, 4: 20, 5: 0 };
@@ -149,9 +150,9 @@ export function scoreResult(item, currentYear = new Date().getFullYear()) {
   const age = Math.max(0, currentYear - (item.year || currentYear));
   const recency = Math.max(0, 18 - age * 2);
   const citations = Math.min(18, Math.log10((item.citationCount || 0) + 1) * 7);
-  const openAccess = item.isOpenAccess ? 4 : 0;
   const hasAbstract = item.abstract && item.abstract.length > 200 ? 2 : 0;
-  return Math.round((EVIDENCE_WEIGHT[level] ?? 0) + recency + citations + openAccess + hasAbstract);
+  // Mọi kết quả Finder đều OA; không cộng điểm OA để tránh ưu tiên vô nghĩa.
+  return Math.round((EVIDENCE_WEIGHT[level] ?? 0) + recency + citations + hasAbstract);
 }
 
 /** Lọc và xếp hạng hoàn toàn bằng code, không để AI quyết định thứ tự. */
@@ -164,9 +165,11 @@ export function rankResults(
 
   return results
     .filter((item) => (maxLevel ? (item.evidenceLevel || 5) <= maxLevel : true))
-    .filter((item) => (openAccessOnly ? item.isOpenAccess : true))
     .map((item) => {
       const enriched = { ...item, ...assessFullText(item) };
+      // OA phải được xác minh từ metadata, không suy ra từ việc có link PDF.
+      if (openAccessOnly && !isVerifiedOpenAccess(enriched)) return null;
+
       const relevance = context ? scoreRelevance(enriched, context) : null;
       // Loại bài không khớp chủ đề chính, tránh bài đúng evidence nhưng lạc đề.
       if (context && !relevance.primaryMatch) return null;

@@ -2,6 +2,7 @@ import {
   appendQa,
   clearQa,
   createSummaryForUser,
+  deleteAbstractOnlySummaries,
   deleteSummaryForUser,
   expireStaleSummariesForUser,
   getSummaryForUser,
@@ -173,11 +174,24 @@ export async function remove(req, res) {
   res.json({ data: { ok: true } });
 }
 
+/** Dọn các bản cũ chỉ dựa trên abstract; bản fulltext không bị ảnh hưởng. */
+export async function removeAbstractOnly(req, res) {
+  const result = await deleteAbstractOnlySummaries(req.userId);
+  res.json({ data: result });
+}
+
 /** Người dùng xác nhận đã đối chiếu PDF gốc; mở khoá "Áp dụng vào plan". */
 export async function markReviewed(req, res) {
   const summary = await Summary.findOne({ _id: req.params.id, userId: req.userId });
   if (!summary) {
     throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+  }
+  if (summary.basedOn !== 'fulltext') {
+    throw new ApiError(
+      409,
+      'FULLTEXT_REQUIRED',
+      'Bản tóm tắt này chỉ dựa trên abstract. Hãy tạo bản mới từ toàn văn/PDF trước khi đối chiếu.',
+    );
   }
   summary.reviewedAt = new Date();
   summary.needsReview = false;
@@ -468,6 +482,13 @@ export async function exportPdf(req, res) {
         message: 'Bài chưa tóm tắt xong, không thể áp dụng vào giáo án.',
       },
     });
+  }
+  if (summary.basedOn !== 'fulltext') {
+    throw new ApiError(
+      409,
+      'FULLTEXT_REQUIRED',
+      'Bản tóm tắt này chỉ dựa trên abstract nên không thể áp dụng vào giáo án. Hãy tạo bản mới từ toàn văn/PDF.',
+    );
   }
   if (
     (summary.needsReview || summary.content?.verification?.passed === false) &&

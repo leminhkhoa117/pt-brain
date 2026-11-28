@@ -4,7 +4,7 @@ services:
     container_name: pt-brain-mongo
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -22,6 +22,8 @@ services:
     environment:
       NODE_ENV: development
       PORT: 4000
+      # Docker chạy trực tiếp, không qua reverse proxy.
+      TRUST_PROXY: 0
       MONGO_URI: mongodb://mongo:27017/pt-brain
       CLIENT_ORIGIN: http://localhost:5173
       APP_PUBLIC_URL: http://localhost:5173
@@ -44,7 +46,7 @@ services:
       PDF_MAX_MB: ${PDF_MAX_MB:-20}
       STORAGE_DRIVER: ${STORAGE_DRIVER:-disk}
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
     depends_on:
       mongo:
         condition: service_healthy
@@ -68,7 +70,8 @@ services:
     environment:
       VITE_API_PROXY_TARGET: http://server:4000
     ports:
-      - "5173:5173"
+      # Chỉ mở trong máy. Muốn test điện thoại trong LAN thì đổi thành "5173:5173".
+      - "127.0.0.1:5173:5173"
     depends_on:
       - server
     volumes:

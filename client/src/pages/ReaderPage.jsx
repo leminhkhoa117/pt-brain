@@ -25,6 +25,7 @@ import {
   createSummary,
   createTerm,
   deleteSummary,
+  getFullTextCandidates,
   getSummary,
   listSummaries,
   listTerms,
@@ -62,7 +63,7 @@ const normalizeDraft = (value) => ({
 
 const STAGES = [
   'Đang xác định bài báo',
-  'Đang tải toàn văn / abstract',
+  'Đang tải toàn văn open access',
   'Đang trích nội dung chính',
   'AI đang đọc và tóm tắt',
 ];
@@ -112,6 +113,125 @@ function NoteBox({ summaryId, paperId }) {
   );
 }
 
+function FullTextHelp({ details, onUpload }) {
+  const doi = details?.doi || '';
+  const title = details?.title || '';
+  const publisherUrl = details?.publisherUrl || (doi ? `https://doi.org/${doi}` : '');
+  const candidates = useQuery({
+    queryKey: ['research-fulltext', doi],
+    queryFn: () => getFullTextCandidates(doi),
+    enabled: false,
+  });
+
+  const subject = encodeURIComponent(`Request for full-text copy: ${title || doi || 'paper'}`);
+  const body = encodeURIComponent(
+    [
+      'Kính gửi tác giả,',
+      '',
+      `Tôi đang nghiên cứu và rất quan tâm đến bài: ${title || doi || ''}.`,
+      doi ? `DOI: ${doi}` : '',
+      '',
+      'Nếu thuận tiện, anh/chị có thể gửi cho tôi bản PDF của bài báo?',
+      'Tôi sẽ dùng cho mục đích nghiên cứu cá nhân và trích dẫn đầy đủ.',
+      '',
+      'Trân trọng,',
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  );
+  const mailto = `mailto:?subject=${subject}&body=${body}`;
+
+  return (
+    <Card className="mb-4 border-amber-200 bg-amber-50/60 dark:border-amber-900/60 dark:bg-amber-950/20">
+      <div className="flex items-start gap-2">
+        <Icon name="info" className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+            Cần toàn văn để tóm tắt
+          </h3>
+          <p className="mt-1 text-xs leading-relaxed text-amber-800/90 dark:text-amber-200/80">
+            Bài này không có bản open access đọc được, nên hệ thống không tạo bản tóm tắt từ
+            abstract. Hãy tìm PDF hợp pháp, nhờ tác giả, dùng thư viện, hoặc tải PDF bạn có quyền
+            truy cập.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {doi && (
+              <button
+                type="button"
+                className="btn-primary !px-3 !py-1.5 text-xs"
+                disabled={candidates.isFetching}
+                onClick={() => candidates.refetch()}
+              >
+                <Icon name="search" className="h-3.5 w-3.5" />
+                {candidates.isFetching ? 'Đang tìm...' : 'Tìm bản PDF hợp pháp'}
+              </button>
+            )}
+            {publisherUrl && (
+              <a
+                href={publisherUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-secondary !px-3 !py-1.5 text-xs"
+              >
+                Mở nhà xuất bản
+                <Icon name="external" className="h-3.5 w-3.5" />
+              </a>
+            )}
+            <a href={mailto} className="btn-ghost !px-3 !py-1.5 text-xs">
+              Nhờ tác giả gửi bản
+            </a>
+            <button
+              type="button"
+              className="btn-ghost !px-3 !py-1.5 text-xs"
+              onClick={onUpload}
+            >
+              Tải PDF của tôi
+            </button>
+          </div>
+
+          {candidates.isError && (
+            <p className="mt-2 text-xs text-rose-600 dark:text-rose-300">
+              {getErrorMessage(candidates.error)}
+            </p>
+          )}
+          {candidates.data?.candidates?.length ? (
+            <div className="mt-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-800/80 dark:text-amber-200/70">
+                Nguồn hợp pháp đã tìm thấy
+              </p>
+              <ul className="mt-1.5 space-y-1.5">
+                {candidates.data.candidates.map((candidate) => (
+                  <li key={`${candidate.source}-${candidate.url}`}>
+                    <a
+                      href={candidate.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs font-medium text-amber-900 underline decoration-dotted underline-offset-2 hover:decoration-solid dark:text-amber-100"
+                    >
+                      {candidate.label || candidate.source}
+                    </a>
+                    <span className="ml-1 text-[10px] text-amber-700/70 dark:text-amber-300/60">
+                      {candidate.kind === 'pdf'
+                        ? 'PDF'
+                        : candidate.kind === 'pmc_xml'
+                          ? 'XML'
+                          : 'trang'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-[10px] text-amber-700/70 dark:text-amber-300/60">
+                Không có Sci-Hub trong danh sách này. Nếu không có bản OA, hãy dùng kênh thư viện
+                hoặc liên hệ tác giả.
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 export default function ReaderPage() {
   const dialog = useDialog();
   const queryClient = useQueryClient();
@@ -135,6 +255,7 @@ export default function ReaderPage() {
   const [file, setFile] = useState(null);
   const [active, setActive] = useState(null);
   const [error, setError] = useState(null);
+  const [errorInfo, setErrorInfo] = useState(null);
   const [notice, setNotice] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [loadingId, setLoadingId] = useState(null);
@@ -245,6 +366,7 @@ export default function ReaderPage() {
       autoInFlight.current = false;
       setActive(data);
       setError(null);
+      setErrorInfo(null);
       setNotice(null);
       setLink('');
       setText('');
@@ -256,7 +378,9 @@ export default function ReaderPage() {
     },
     onError: (err) => {
       autoInFlight.current = false;
+      const apiError = err?.response?.data?.error;
       setError(getErrorMessage(err));
+      setErrorInfo(apiError?.code === 'FULLTEXT_REQUIRED' ? apiError : null);
     },
   });
 
@@ -374,7 +498,11 @@ export default function ReaderPage() {
       // nên không bật polling và vẫn hiện nội dung cũ trong lúc job chạy lại.
       queryClient.invalidateQueries({ queryKey: ['summaries'] });
     },
-    onError: (err) => setError(getErrorMessage(err)),
+    onError: (err) => {
+      const apiError = err?.response?.data?.error;
+      setError(getErrorMessage(err));
+      setErrorInfo(apiError?.code === 'FULLTEXT_REQUIRED' ? apiError : null);
+    },
   });
 
   const reviewMutation = useMutation({
@@ -399,12 +527,15 @@ export default function ReaderPage() {
   const submit = (e) => {
     e.preventDefault();
     setError(null);
+    setErrorInfo(null);
     if (mode === 'pdf') {
       if (!file) return setError('Chọn file PDF trước khi gửi.');
       return createMutation.mutate({ file, title: title.trim() || undefined });
     }
     if (mode === 'text') {
-      if (text.trim().length < 80) return setError('Văn bản cần tối thiểu 80 ký tự.');
+      if (text.trim().length < 5000) {
+        return setError('Văn bản phải là toàn văn, tối thiểu 5.000 ký tự. Abstract không được chấp nhận.');
+      }
       return createMutation.mutate({ text: text.trim(), title: title.trim() || undefined });
     }
     const value = link.trim();
@@ -421,6 +552,7 @@ export default function ReaderPage() {
   const loadSaved = async (id) => {
     setLoadingId(id);
     setError(null);
+    setErrorInfo(null);
     setNotice(null);
     try {
       const data = await getSummary(id);
@@ -437,6 +569,7 @@ export default function ReaderPage() {
   /** Thoát khỏi bài đang đọc: xóa URL + bộ nhớ để lần sau mở lại là thư viện. */
   const closeSummary = () => {
     setActive(null);
+    setErrorInfo(null);
     setNotice(null);
     forgetSummary();
   };
@@ -489,7 +622,7 @@ export default function ReaderPage() {
       {!active && (
         <PageHeader
           title="Đọc &amp; tóm tắt"
-          subtitle="Dán link/DOI, tải PDF hoặc dán văn bản. AI tóm tắt tiếng Việt, giữ nguyên số liệu gốc để bạn đối chiếu."
+          subtitle="Chỉ tóm tắt khi có toàn văn open access hoặc PDF bạn tải lên. Không tóm tắt từ abstract."
           actions={
             usage ? (
               <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -500,10 +633,22 @@ export default function ReaderPage() {
         />
       )}
 
-      {error && (
-        <Alert tone="danger" className="mb-4">
-          {error}
-        </Alert>
+      {errorInfo?.code === 'FULLTEXT_REQUIRED' ? (
+        <FullTextHelp
+          details={errorInfo.details}
+          onUpload={() => {
+            setError(null);
+            setErrorInfo(null);
+            setMode('pdf');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      ) : (
+        error && (
+          <Alert tone="danger" className="mb-4">
+            {error}
+          </Alert>
+        )
       )}
 
       {notice && (
@@ -716,10 +861,13 @@ export default function ReaderPage() {
               )}
 
               {mode === 'text' && (
-                <Field label="Dán văn bản hoặc abstract" hint="Tối thiểu 80 ký tự, tối đa 400.000 ký tự.">
+                <Field
+                  label="Dán toàn văn"
+                  hint="Tối thiểu 5.000 ký tự, tối đa 400.000 ký tự. Không nhận abstract."
+                >
                   <textarea
                     className="input min-h-[180px]"
-                    placeholder="Dán abstract hoặc nội dung bài báo..."
+                    placeholder="Dán toàn văn bài báo (Methods, Results, Discussion...)"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     disabled={createMutation.isPending}
@@ -741,8 +889,8 @@ export default function ReaderPage() {
 
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="max-w-xl text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                  Chỉ nạp toàn văn từ nguồn hợp pháp (open access) hoặc file bạn tự tải lên. Bài paywall
-                  sẽ được gắn nhãn “chỉ dựa trên abstract”.
+                  Chỉ nạp toàn văn từ nguồn hợp pháp (open access) hoặc file bạn tự tải lên. Bài
+                  paywall/abstract-only sẽ bị từ chối thay vì tạo bản tóm tắt vô nghĩa.
                 </p>
                 <button type="submit" className="btn-primary" disabled={createMutation.isPending}>
                   {createMutation.isPending ? <Spinner className="h-4 w-4 text-white" /> : <Icon name="book" className="h-4 w-4" />}
@@ -825,8 +973,11 @@ export default function ReaderPage() {
                         </span>
                       ) : null}
                       {item.basedOn === 'abstract_only' && (
-                        <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">
-                          Abstract
+                        <span
+                          className="font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400"
+                          title="Bản cũ chỉ dựa trên abstract; chính sách mới không tạo mới từ abstract"
+                        >
+                          Chỉ abstract
                         </span>
                       )}
                       {loadingId === item.id && <Spinner className="h-4 w-4" />}

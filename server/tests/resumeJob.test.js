@@ -25,6 +25,9 @@ let models;
 let reader;
 let userId;
 
+// Reader mới chỉ nhận toàn văn; test dùng chuỗi đủ dài thay vì abstract ngắn.
+const FULLTEXT_SAMPLE = 'Nội dung toàn văn của bài nghiên cứu. '.repeat(200);
+
 async function waitForStatus(summaryId, expected, timeoutMs = 3000) {
   const started = Date.now();
   while (Date.now() - started < timeoutMs) {
@@ -73,7 +76,9 @@ afterAll(async () => {
   }
 });
 
-describe('resumeInterruptedSummaries', () => {
+// Test này chờ job nền + DB; khi chạy song song với các suite DB khác có thể
+// vượt timeout 5s mặc định dù job vẫn hoàn tất bình thường.
+describe('resumeInterruptedSummaries', { timeout: 15000 }, () => {
   it('chạy lại job processing từ sourceText và giải phóng khóa', async () => {
     const paper = await models.Paper.create({ userId, title: 'Resume paper' });
     const summary = await models.Summary.create({
@@ -82,7 +87,7 @@ describe('resumeInterruptedSummaries', () => {
       inputType: 'text',
       basedOn: 'fulltext',
       content: { tldr: 'Đang xử lý...', mainResults: [] },
-      sourceText: 'Nội dung nguồn đủ dài để chạy lại job tóm tắt sau khi restart.',
+      sourceText: FULLTEXT_SAMPLE,
       sourceKind: 'user_text',
       cacheKey: 'resume-job-1',
       status: 'processing',
@@ -106,7 +111,7 @@ describe('resumeInterruptedSummaries', () => {
       inputType: 'text',
       basedOn: 'fulltext',
       content: { tldr: 'Đang xử lý...', mainResults: [] },
-      sourceText: 'Nội dung nguồn để test lock mồ côi sau khi server restart.',
+      sourceText: FULLTEXT_SAMPLE,
       sourceKind: 'user_text',
       cacheKey: 'resume-orphan-lock',
       status: 'processing',
@@ -181,9 +186,7 @@ describe('resumeInterruptedSummaries', () => {
     const { summarizePaper } = await import('../src/services/ai/paperSummarizer.js');
     summarizePaper.mockClear();
     const user = await models.User.findById(userId);
-    const text =
-      'Nghiên cứu này kiểm tra hiệu quả của việc tăng dần khối lượng tập luyện ở người mới, ' +
-      'với thời gian can thiệp 12 tuần và kết quả chính là khối cơ đo bằng DEXA.';
+    const text = FULLTEXT_SAMPLE;
 
     const [first, second] = await Promise.all([
       reader.createSummaryForUser(user, { text }),
@@ -209,7 +212,7 @@ describe('resumeInterruptedSummaries', () => {
       inputType: 'text',
       basedOn: 'fulltext',
       content: { tldr: 'Đang xử lý...', mainResults: [] },
-      sourceText: 'Nội dung nguồn để test job lỗi và giải phóng khóa sau khi thất bại.',
+      sourceText: FULLTEXT_SAMPLE,
       cacheKey: 'resume-job-fail',
       status: 'processing',
     });

@@ -50,6 +50,7 @@ Repo đã có `render.yaml` (Blueprint).
 | Biến | Giá trị production |
 | --- | --- |
 | `NODE_ENV` | `production` |
+| `TRUST_PROXY` | `1` (Render đứng sau 1 proxy; Docker/local để `0`) |
 | `SERVE_CLIENT` | `true` |
 | `COOKIE_SECURE` | `true` |
 | `STORAGE_DRIVER` | `mongo` (Render free) hoặc `disk` (VPS/Docker có ổ đĩa) |

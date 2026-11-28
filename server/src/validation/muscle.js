@@ -37,11 +37,11 @@ export const muscleChatSchema = z
   .strict()
   .superRefine((data, ctx) => {
     if (data.kind === 'muscle' && !data.slug) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['slug'], message: 'Thiếu mã cơ' });
+      ctx.addIssue({ code: 'custom', path: ['slug'], message: 'Thiếu mã cơ' });
     }
     if (data.kind !== 'muscle' && !data.id && !data.name) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['id'],
         message: 'Thiếu mã FMA hoặc tên cấu trúc',
       });

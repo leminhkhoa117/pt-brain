@@ -7,7 +7,7 @@ import {
 const optNumber = (min, max, message) =>
   z.preprocess(
     (v) => (v === '' || v === null || v === undefined ? undefined : Number(v)),
-    z.number({ invalid_type_error: message }).min(min, message).max(max, message).optional(),
+    z.number({ error: message }).min(min, message).max(max, message).optional(),
   );
 
 const MIN_AGE = 14;
@@ -27,7 +27,10 @@ export const bodyLogSchema = z.object({
   weightKg: z.preprocess(
     (v) => (v === '' || v == null ? undefined : Number(v)),
     z
-      .number({ required_error: 'Cân nặng là bắt buộc', invalid_type_error: 'Cân nặng phải là số' })
+      .number({
+        error: (issue) =>
+          issue.input === undefined ? 'Cân nặng là bắt buộc' : 'Cân nặng phải là số',
+      })
       .min(20, 'Cân nặng tối thiểu 20 kg')
       .max(400, 'Cân nặng tối đa 400 kg'),
   ),
@@ -80,7 +83,7 @@ export const registerSchema = z
   })
   .superRefine((data, ctx) => {
     for (const message of passwordProblems(data.password, { email: data.email, name: data.name })) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message });
+      ctx.addIssue({ code: 'custom', path: ['password'], message });
     }
   });
 
@@ -96,7 +99,7 @@ export const changePasswordSchema = z
   })
   .superRefine((data, ctx) => {
     for (const message of passwordProblems(data.newPassword)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+      ctx.addIssue({ code: 'custom', path: ['newPassword'], message });
     }
   });
 
@@ -115,6 +118,6 @@ export const resetPasswordSchema = z
   })
   .superRefine((data, ctx) => {
     for (const message of passwordProblems(data.newPassword)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+      ctx.addIssue({ code: 'custom', path: ['newPassword'], message });
     }
   });

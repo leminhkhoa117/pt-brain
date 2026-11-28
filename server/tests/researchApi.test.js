@@ -13,6 +13,19 @@ vi.mock('../src/utils/http.js', async (importOriginal) => {
   return { ...actual, fetchJson: vi.fn() };
 });
 
+// Không gọi AI thật khi test tổng hợp toàn văn.
+vi.mock('../src/services/ai/client.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(async () => ({
+      text: 'Tổng hợp từ toàn văn: kết quả chính ổn định [1].',
+      usage: { input: 10, output: 5, cost: 0 },
+      model: 'test-model',
+    })),
+  };
+});
+
 let app;
 let agent;
 let models;
@@ -200,6 +213,73 @@ describe('Research API integration', () => {
     await agent
       .get(`/api/summaries/${new mongoose.Types.ObjectId()}/citation?format=bibtex`)
       .expect(404);
+  });
+
+  it('trả nguồn PDF hợp pháp, không có Sci-Hub', async () => {
+    const res = await agent
+      .get('/api/research/fulltext')
+      .query({ doi: '10.1249/MSS.0000000000001764' })
+      .expect(200);
+
+    expect(res.body.data.doi).toBe('10.1249/MSS.0000000000001764');
+    expect(Array.isArray(res.body.data.candidates)).toBe(true);
+    expect(
+      res.body.data.candidates.some((candidate) =>
+        String(candidate.url).includes('doi.org/10.1249/MSS.0000000000001764'),
+      ),
+    ).toBe(true);
+    expect(JSON.stringify(res.body.data)).not.toMatch(/sci-hub/i);
+  });
+
+  it('dọn các bản chỉ abstract nhưng giữ bản fulltext', async () => {
+    const fulltext = await models.Summary.findById(summaryId).lean();
+    const abstractSummary = await models.Summary.create({
+      userId: fulltext.userId,
+      paperId: paperId,
+      inputType: 'doi',
+      basedOn: 'abstract_only',
+      content: { tldr: 'Bản abstract cũ', mainResults: [] },
+      status: 'ready',
+      cacheKey: 'research-api-abstract-only',
+    });
+
+    const res = await agent.delete('/api/summaries/abstract-only').expect(200);
+    expect(res.body.data.deleted).toBeGreaterThanOrEqual(1);
+    expect(await models.Summary.exists({ _id: abstractSummary._id })).toBeNull();
+    expect(await models.Summary.exists({ _id: summaryId })).not.toBeNull();
+  });
+
+  it('tổng hợp từ Summary fulltext, không nhận abstract-only', async () => {
+    const fulltext = await models.Summary.findById(summaryId).lean();
+    const abstractSummary = await models.Summary.create({
+      userId: fulltext.userId,
+      paperId: paperId,
+      inputType: 'doi',
+      basedOn: 'abstract_only',
+      content: { tldr: 'Bản abstract', mainResults: [] },
+      status: 'ready',
+      cacheKey: 'research-api-abstract-synth',
+    });
+
+    const res = await agent
+      .post('/api/research/synthesize')
+      .send({
+        question: 'Kết quả chính của bài này là gì?',
+        summaryIds: [String(summaryId)],
+      })
+      .expect(200);
+
+    expect(res.body.data.answer).toContain('[1]');
+    expect(res.body.data.papers).toHaveLength(1);
+    expect(res.body.data.papers[0].summaryId).toBe(String(summaryId));
+
+    await agent
+      .post('/api/research/synthesize')
+      .send({
+        question: 'Kết quả chính của bài này là gì?',
+        summaryIds: [String(abstractSummary._id)],
+      })
+      .expect(422);
   });
 
   it('enrich batch full-text cập nhật đúng PMCID/PDF', async () => {

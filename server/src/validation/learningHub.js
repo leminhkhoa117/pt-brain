@@ -28,7 +28,7 @@ export const applyActionSchema = z
     actionType: actionTypeSchema,
     label: z.string().trim().max(200).optional().default(''),
     surface: z.string().trim().max(60).optional().default(''),
-    payload: z.record(z.any()).optional(),
+    payload: z.record(z.string(), z.any()).optional(),
   })
   .strict();
 

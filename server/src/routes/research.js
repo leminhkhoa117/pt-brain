@@ -8,6 +8,8 @@ const router = Router();
 router.use(requireAuth);
 
 router.post('/search', aiLimiter, asyncHandler(research.search));
+router.post('/synthesize', aiLimiter, asyncHandler(research.synthesize));
+router.get('/fulltext', asyncHandler(research.fullText));
 router.get('/graph', asyncHandler(research.graph));
 
 export default router;

@@ -76,7 +76,7 @@ export const lessonSchema = z.object({
       conditions: z.array(z.string().trim().max(40)).max(6).default([]),
       evidence: z.array(z.string().trim().max(10)).max(10).default([]),
     })
-    .default({}),
+    .prefault({}),
   sources: z.array(sourceSchema).min(1).max(8),
 });
 

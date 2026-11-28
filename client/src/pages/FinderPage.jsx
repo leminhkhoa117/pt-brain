@@ -6,7 +6,6 @@ import { Alert, Card, Field, Icon, PageHeader, Spinner } from '../components/ui.
 import { useDialog } from '../components/DialogProvider.jsx';
 import { createPaper } from '../api/summaries.js';
 import { getErrorMessage } from '../api/client.js';
-import MarkdownText from '../components/MarkdownText.jsx';
 import ResearchJobProgress from '../components/research/ResearchJobProgress.jsx';
 import ResearchTopics from '../components/research/ResearchTopics.jsx';
 import { formatNumber, formatDoi, htmlToPlainText } from '../lib/format.js';
@@ -35,9 +34,8 @@ const LEVEL_STYLES = {
 
 const STAGES = [
   'AI đang dịch câu hỏi sang truy vấn học thuật',
-  'Đang gọi PubMed, Europe PMC, OpenAlex và Crossref',
-  'Đang gộp kết quả và xếp hạng bằng code',
-  'AI đang viết mô tả và tổng hợp bằng chứng',
+  'Đang tìm bài open access trên PubMed, Europe PMC, OpenAlex và Crossref',
+  'Đang xác minh toàn văn và xếp hạng bằng code',
 ];
 
 const QUERY_EXAMPLES = [
@@ -61,9 +59,8 @@ const buildFilters = (filters) => {
   const result = {};
   if (filters.yearFrom) result.yearFrom = Number(filters.yearFrom);
   if (filters.yearTo) result.yearTo = Number(filters.yearTo);
-  if (filters.openAccessOnly) result.openAccessOnly = true;
-  if (filters.fullTextOnly) result.fullTextOnly = true;
   if (filters.maxLevel) result.maxLevel = Number(filters.maxLevel);
+  // OA + toàn văn do server ép; client không gửi cờ để tránh vô hiệu hoá chính sách.
   return result;
 };
 
@@ -72,16 +69,12 @@ const paperKey = (r) => r.doi || r.pmid || r.title;
 const EMPTY_FILTERS = {
   yearFrom: '',
   yearTo: '',
-  openAccessOnly: false,
-  fullTextOnly: false,
   maxLevel: '',
 };
 
 const toFormFilters = (filters = {}) => ({
   yearFrom: filters.yearFrom ? String(filters.yearFrom) : '',
   yearTo: filters.yearTo ? String(filters.yearTo) : '',
-  openAccessOnly: Boolean(filters.openAccessOnly),
-  fullTextOnly: Boolean(filters.fullTextOnly),
   maxLevel: filters.maxLevel ? String(filters.maxLevel) : '',
 });
 
@@ -417,8 +410,22 @@ export default function FinderPage() {
       navigate(`/research?doi=${encodeURIComponent(paper.doi)}&auto=1&from=finder`);
       return;
     }
+    if (paper.pmcid) {
+      navigate(
+        `/research?url=${encodeURIComponent(`https://www.ncbi.nlm.nih.gov/pmc/articles/${paper.pmcid}/`)}&auto=1&from=finder`,
+      );
+      return;
+    }
     if (paper.url) {
       navigate(`/research?url=${encodeURIComponent(paper.url)}&auto=1&from=finder`);
+      return;
+    }
+    if (paper.fullTextUrl) {
+      navigate(`/research?url=${encodeURIComponent(paper.fullTextUrl)}&auto=1&from=finder`);
+      return;
+    }
+    if (paper.pdfUrl) {
+      navigate(`/research?url=${encodeURIComponent(paper.pdfUrl)}&auto=1&from=finder`);
     }
   };
 
@@ -453,7 +460,7 @@ export default function FinderPage() {
     <div>
       <PageHeader
         title="Tìm nghiên cứu"
-        subtitle="Hỏi bằng tiếng Việt, nhận danh sách nghiên cứu thật từ PubMed, Europe PMC, OpenAlex và Crossref. Hệ thống xếp hạng bằng code, AI chỉ viết mô tả."
+        subtitle="Chỉ trả bài open access đã xác minh và có toàn văn đọc được. Bài paywall hoặc chỉ có abstract bị loại; không tóm tắt từ abstract."
         actions={
           data?.quota ? (
             <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -550,34 +557,20 @@ export default function FinderPage() {
                 <option value="4">Mức 1-4</option>
               </select>
             </Field>
-            <div className="flex flex-col justify-end gap-1.5 pb-1">
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-                  checked={filters.openAccessOnly}
-                  onChange={(e) => setFilters((f) => ({ ...f, openAccessOnly: e.target.checked }))}
-                  disabled={searchPending}
-                />
-                Chỉ open access
-              </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-                  checked={filters.fullTextOnly}
-                  onChange={(e) => setFilters((f) => ({ ...f, fullTextOnly: e.target.checked }))}
-                  disabled={searchPending}
-                />
-                Chỉ bài có toàn văn/PDF
-              </label>
+            <div className="flex flex-col justify-end gap-1 pb-1">
+              <span className="badge bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                OA + toàn văn bắt buộc
+              </span>
+              <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                Server tự xác minh; không có tuỳ chọn tắt.
+              </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Kết quả luôn có link DOI/PubMed thật. Không có bài báo do AI tự sinh. Badge “Toàn văn
-              PMC” hoặc “Có PDF” nghĩa là hệ thống có nguồn đọc trực tiếp, không chỉ abstract.
+              Kết quả chỉ gồm bài open access đã xác minh, có PMC XML hoặc PDF trực tiếp. Bài chỉ có
+              abstract hoặc landing page chưa chắc toàn văn sẽ bị loại. Không có bài do AI tự sinh.
             </p>
             <button type="submit" className="btn-primary" disabled={searchPending}>
               {searchPending ? (
@@ -585,7 +578,7 @@ export default function FinderPage() {
               ) : (
                 <Icon name="search" className="h-4 w-4" />
               )}
-              {searchPending ? 'Đang tìm...' : 'Tìm nghiên cứu'}
+              {searchPending ? 'Đang tìm...' : 'Tìm bài OA'}
             </button>
           </div>
         </form>
@@ -823,29 +816,15 @@ export default function FinderPage() {
             </details>
 
             <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-              Đã quét {data.scanned} kết quả thô · gộp còn {data.total} bài · hiển thị{' '}
+              Đã quét {data.scanned} kết quả thô · gộp còn {data.total} bài đủ điều kiện · hiển thị{' '}
               {results.length} bài tốt nhất.
+              {data.dropped
+                ? ` · loại ${data.dropped.notOa + data.dropped.noFullText} bài không OA/không có toàn văn`
+                : ''}
+              {data.probe ? ` · kiểm tra ${data.probe.checked} URL` : ''}
               {data.expanded ? ' · đã tự mở rộng truy vấn' : ''}
             </p>
           </Card>
-
-          {data.synthesis && (
-            <Card className="mt-4 border-brand-200 bg-brand-50/60 dark:border-brand-900 dark:bg-brand-950/30">
-              <div className="flex items-center gap-2">
-                <Icon name="book" className="h-4 w-4 text-brand-600 dark:text-brand-400" />
-                <h3 className="text-sm font-semibold text-brand-900 dark:text-brand-100">
-                  Tổng hợp tiếng Việt
-                </h3>
-              </div>
-              <MarkdownText className="mt-2 text-brand-900/90 dark:text-brand-100/90">
-                {data.synthesis}
-              </MarkdownText>
-              <p className="mt-2 text-[11px] text-brand-700/60 dark:text-brand-300/60">
-                Tổng hợp chỉ dựa trên abstract của các bài trong danh sách. Trích dẫn [n] tương ứng
-                số thứ tự bên dưới.
-              </p>
-            </Card>
-          )}
 
           <LandscapeCard landscape={data.landscape} />
 
@@ -858,10 +837,11 @@ export default function FinderPage() {
                 />
                 <div>
                   <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
-                    Không có kết quả phù hợp
+                    Không có bài OA + toàn văn phù hợp
                   </h3>
                   <p className="mt-1 text-xs text-amber-800/90 dark:text-amber-200/80">
-                    Thường do bộ lọc quá hẹp hoặc truy vấn quá chung. Thử một trong các cách sau:
+                    Hệ thống không hạ chuẩn xuống bài paywall hoặc chỉ có abstract. Thử mở rộng năm,
+                    mức bằng chứng hoặc đổi từ khoá:
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button
@@ -870,7 +850,7 @@ export default function FinderPage() {
                       onClick={rerunWithoutFilters}
                       disabled={searchPending}
                     >
-                      Bỏ lọc & tìm lại
+                      Bỏ lọc năm/mức &amp; tìm lại
                     </button>
                     <button
                       type="button"
@@ -882,8 +862,8 @@ export default function FinderPage() {
                     </button>
                   </div>
                   <p className="mt-2 text-[11px] text-amber-800/70 dark:text-amber-200/60">
-                    Nếu vẫn ít kết quả, thêm một truy vấn tiếng Anh có thuật ngữ chuyên ngành (ví dụ
-                    “Valsalva”, “intra-abdominal pressure”, “respiratory muscle training”).
+                    Nếu bài bạn cần không có bản OA, hãy mở DOI/nhà xuất bản, nhờ tác giả gửi bản,
+                    dùng thư viện, hoặc tải PDF bạn có quyền truy cập. Không dùng Sci-Hub.
                   </p>
                 </div>
               </div>
@@ -921,8 +901,17 @@ export default function FinderPage() {
                           </span>
                         )}
                         {item.isOpenAccess && (
-                          <span className="badge bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                            OA{item.oaStatus ? ` · ${item.oaStatus}` : ''}
+                          <span
+                            className="badge bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                            title={
+                              item.oaStatus === 'bronze'
+                                ? 'Free to read: đọc được trên trang nhà xuất bản nhưng không có giấy phép mở'
+                                : 'Open access đã xác minh'
+                            }
+                          >
+                            {item.oaStatus === 'bronze'
+                              ? 'Free to read'
+                              : `OA${item.oaStatus ? ` · ${item.oaStatus}` : ''}`}
                           </span>
                         )}
                         <span
@@ -977,17 +966,14 @@ export default function FinderPage() {
                         {item.providers?.length ? ` · ${item.providers.join(' + ')}` : ''}
                       </p>
 
-                      {item.viSummary && (
-                        <MarkdownText compact className="mt-2 text-slate-700 dark:text-slate-300">
-                          {item.viSummary}
-                        </MarkdownText>
-                      )}
-
                       {abstractText && (
                         <div className="mt-2">
+                          <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                            Abstract gốc — chỉ để sàng lọc, không phải bản tóm tắt AI
+                          </p>
                           <p
                             className={clsx(
-                              'text-xs leading-relaxed text-slate-500 dark:text-slate-400',
+                              'mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400',
                               !isExpanded && 'line-clamp-2',
                             )}
                           >
@@ -998,7 +984,7 @@ export default function FinderPage() {
                             className="mt-1 text-[11px] font-semibold text-brand-600 hover:underline dark:text-brand-400"
                             onClick={() => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))}
                           >
-                            {isExpanded ? 'Thu gọn abstract' : 'Xem abstract'}
+                            {isExpanded ? 'Thu gọn abstract gốc' : 'Xem abstract gốc'}
                           </button>
                         </div>
                       )}
@@ -1010,8 +996,41 @@ export default function FinderPage() {
                           onClick={() => openReader(item)}
                         >
                           <Icon name="book" className="h-3.5 w-3.5" />
-                          Tóm tắt chi tiết
+                          Đọc toàn văn &amp; tóm tắt
                         </button>
+                        {item.pdfUrl && (
+                          <a
+                            href={item.pdfUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn-secondary !px-3 !py-1.5 text-xs"
+                          >
+                            PDF
+                            <Icon name="external" className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {item.pmcid && (
+                          <a
+                            href={`https://www.ncbi.nlm.nih.gov/pmc/articles/${item.pmcid}/`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                          >
+                            PMC
+                            <Icon name="external" className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {item.fullTextSource === 'oa_html' && item.fullTextUrl && (
+                          <a
+                            href={item.fullTextUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn-ghost !px-2.5 !py-1.5 text-xs"
+                          >
+                            HTML
+                            <Icon name="external" className="h-3.5 w-3.5" />
+                          </a>
+                        )}
                         <button
                           type="button"
                           className={clsx(

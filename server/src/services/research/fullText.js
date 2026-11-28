@@ -18,6 +18,7 @@ const PDF_URL_PATTERN = /\.pdf(?:$|[?#])/i;
 export const FULL_TEXT_LABELS = {
   pmc_xml: 'Toàn văn PMC',
   pdf: 'Có PDF',
+  oa_html: 'Toàn văn HTML OA',
   landing: 'Có link toàn văn',
   abstract: 'Chỉ abstract',
 };

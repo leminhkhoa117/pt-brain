@@ -8,6 +8,7 @@ const KIND_LABELS = {
   translate: 'dịch bài',
   ask: 'hỏi đáp',
   search: 'tìm kiếm',
+  synthesize: 'tổng hợp toàn văn',
   apply: 'AI plan',
   quiz: 'quiz',
   vision: 'phân tích ảnh',
@@ -18,7 +19,7 @@ const KIND_LABELS = {
 
 /**
  * Kiểm tra quota trước khi gọi AI (không tăng nếu request thất bại).
- * kind: 'summarize' | 'ask' | 'search' | 'apply' | 'quiz' | 'vision' | 'mealplan' | 'muscle'
+ * kind: 'summarize' | 'ask' | 'search' | 'synthesize' | 'apply' | 'quiz' | 'vision' | 'mealplan' | 'muscle'
  */
 export async function assertAiQuota(userId, kind, limit = env.AI_DAILY_LIMIT_PER_USER) {
   const dateKey = todayKeyVN();
@@ -59,6 +60,7 @@ export async function getAiUsage(userId) {
     translate: usage?.translate || 0,
     ask: usage?.ask || 0,
     search: usage?.search || 0,
+    synthesize: usage?.synthesize || 0,
     apply: usage?.apply || 0,
     quiz: usage?.quiz || 0,
     vision: usage?.vision || 0,

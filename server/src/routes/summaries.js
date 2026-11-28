@@ -21,6 +21,7 @@ router.post('/:id/apply-to-plan', aiLimiter, asyncHandler(summaries.applyToPlan)
 router.post('/:id/review', asyncHandler(summaries.markReviewed));
 router.post('/:id/retry', aiLimiter, asyncHandler(summaries.retry));
 router.post('/:id/translate', aiLimiter, asyncHandler(summaries.translate));
+router.delete('/abstract-only', asyncHandler(summaries.removeAbstractOnly));
 router.delete('/:id/chat', asyncHandler(summaries.clearChat));
 router.patch('/:id', asyncHandler(summaries.updateMeta));
 router.get('/:id', asyncHandler(summaries.getOne));

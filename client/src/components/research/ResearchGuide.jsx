@@ -24,8 +24,8 @@ export default function ResearchGuide() {
           hẹp (RCT, cơ chế, hiệu suất cấp tính).
         </li>
         <li>
-          <strong>Đọc abstract</strong> để kiểm tra thiết kế, cỡ mẫu và population; lưu bài phù hợp
-          vào thư viện để đọc lại.
+          <strong>Đọc toàn văn</strong> (PMC/PDF open access) để kiểm tra thiết kế, cỡ mẫu và
+          population; lưu bài phù hợp vào thư viện. Không tóm tắt chỉ từ abstract.
         </li>
       </ol>
       <p className="mt-2">

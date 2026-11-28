@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { Alert, Card, Icon, PageHeader, Spinner } from '../components/ui.jsx';
+import SynthesizeFullTextCard from '../components/research/SynthesizeFullTextCard.jsx';
 import { useDialog } from '../components/DialogProvider.jsx';
 import {
+  deleteAbstractOnlySummaries,
   deleteSummary,
   listSummaries,
   summaryCitationUrl,
@@ -114,15 +116,46 @@ export default function LibraryPage() {
     onError: (err) => setError(getErrorMessage(err)),
   });
 
+  const removeAbstractOnly = useMutation({
+    mutationFn: deleteAbstractOnlySummaries,
+    onSuccess: async (result) => {
+      await queryClient.invalidateQueries({ queryKey: ['summaries'] });
+      await dialog.alert({
+        title: 'Đã dọn bản abstract cũ',
+        message: `Đã xoá ${result.deleted || 0} bản tóm tắt chỉ dựa trên abstract. Các bản fulltext vẫn được giữ.`,
+      });
+    },
+    onError: (err) => setError(getErrorMessage(err)),
+  });
+
   return (
     <div>
       <PageHeader
         title="Thư viện nghiên cứu"
         subtitle="Mọi bài đã phân tích đều được lưu tự động. Ghim (★) để đánh dấu bài quan trọng và tìm lại nhanh."
         actions={
-          <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-            {stats.total} bài · {stats.favorites} đã ghim
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="btn-ghost !px-2.5 !py-1.5 text-xs text-slate-500 hover:text-rose-500 dark:text-slate-400"
+              disabled={removeAbstractOnly.isPending}
+              onClick={async () => {
+                const ok = await dialog.confirm({
+                  title: 'Xoá bản chỉ abstract',
+                  message:
+                    'Xoá toàn bộ bản tóm tắt cũ chỉ dựa trên abstract? Bản tạo từ toàn văn/PDF không bị ảnh hưởng.',
+                  confirmLabel: 'Xoá bản abstract',
+                });
+                if (ok) removeAbstractOnly.mutate();
+              }}
+            >
+              <Icon name="trash" className="h-3.5 w-3.5" />
+              {removeAbstractOnly.isPending ? 'Đang xoá...' : 'Dọn bản abstract'}
+            </button>
+            <span className="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              {stats.total} bài · {stats.favorites} đã ghim
+            </span>
+          </div>
         }
       />
 
@@ -171,6 +204,8 @@ export default function LibraryPage() {
           </div>
         </div>
       </Card>
+
+      <SynthesizeFullTextCard summaries={items} />
 
       {lastPage?.page?.hasMore && !summariesQuery.isFetching && (
         <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
@@ -225,8 +260,11 @@ export default function LibraryPage() {
                     </span>
                   )}
                   {item.basedOn === 'abstract_only' && (
-                    <span className="badge bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
-                      Abstract
+                    <span
+                      className="badge bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                      title="Bản cũ chỉ dựa trên abstract; không thể tạo lại hoặc áp dụng vào giáo án"
+                    >
+                      Chỉ abstract
                     </span>
                   )}
                   {item.status === 'processing' && (

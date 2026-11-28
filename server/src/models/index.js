@@ -7,6 +7,7 @@ export { WorkoutSession } from './WorkoutSession.js';
 export { Paper } from './Paper.js';
 export { Summary } from './Summary.js';
 export { SummaryJobLock } from './SummaryJobLock.js';
+export { OaVerification } from './OaVerification.js';
 export { Term } from './Term.js';
 export { Flashcard } from './Flashcard.js';
 export { Note } from './Note.js';

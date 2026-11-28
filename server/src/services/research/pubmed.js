@@ -8,10 +8,13 @@ const EUROPEPMC = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search';
  * Tìm trên PubMed để lấy PMID, sau đó lấy metadata + abstract đầy đủ từ Europe PMC
  * (esummary của PubMed không trả abstract).
  */
-export async function searchPubMed(query, { retmax = 8, yearFrom, yearTo } = {}) {
+export async function searchPubMed(
+  query,
+  { retmax = 8, yearFrom, yearTo, openAccessOnly = true } = {},
+) {
   const params = new URLSearchParams({
     db: 'pubmed',
-    term: query,
+    term: openAccessOnly ? `(${query}) AND "free full text"[sb]` : query,
     retmode: 'json',
     retmax: String(retmax),
     sort: 'relevance',

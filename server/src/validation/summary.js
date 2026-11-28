@@ -375,7 +375,7 @@ export const paperFactsSchema = z.object({
         doi: sourceRefSchema,
       }),
     )
-    .default({}),
+    .prefault({}),
   study: z
     .preprocess(
       (value) => (value && typeof value === 'object' ? value : {}),
@@ -389,7 +389,7 @@ export const paperFactsSchema = z.object({
               description: sourceRefSchema,
             }),
           )
-          .default({}),
+          .prefault({}),
         intervention: sourceRefSchema,
         device: sourceRefSchema,
         comparator: sourceRefSchema,
@@ -400,7 +400,7 @@ export const paperFactsSchema = z.object({
         failureCriteria: sourceRefSchema,
       }),
     )
-    .default({}),
+    .prefault({}),
   results: z
     .array(
       z.preprocess(
@@ -430,8 +430,8 @@ export const paperFactsSchema = z.object({
         benefitSignals: z.array(claimRefSchema).default([]),
       }),
     )
-    .default({}),
-  sections: z.record(z.boolean()).default({}),
+    .prefault({}),
+  sections: z.record(z.string(), z.boolean()).prefault({}),
   glossaryCandidates: z.array(claimRefSchema).default([]),
 });
 
@@ -496,7 +496,7 @@ export const summaryContentSchema = z.object({
   authorsConclusion: z.string().default('Không nêu trong bài'),
   authorsView: authorsViewSchema,
   // Kết luận dễ hiểu cho người học: 2-4 câu + 3-5 điểm nhớ nhanh.
-  conclusion: conclusionSchema.default({}),
+  conclusion: conclusionSchema.prefault({}),
   limitations: stringArray(/\n+/),
   limitationsStructured: limitationsStructuredSchema,
   conflictOfInterest: z.string().default('Không nêu trong bài'),
@@ -516,7 +516,7 @@ export const summaryContentSchema = z.object({
         rounds: z.coerce.number().int().min(0).catch(0).default(0),
       }),
     )
-    .default({}),
+    .prefault({}),
   confidence: z.preprocess(
     (value) => {
       if (value && typeof value === 'object') {

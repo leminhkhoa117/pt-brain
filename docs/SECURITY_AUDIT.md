@@ -1,8 +1,8 @@
 # PT Brain — Audit bảo mật & nâng cấp xác thực
 
-> Ngày thực hiện: 21/11/2026  
+> Ngày thực hiện: 21/11/2026 · cập nhật 28/11/2026
 > Phạm vi: `server/src` (Express + MongoDB), `client/src` (React), cấu hình cookie/JWT, luồng đăng nhập và dữ liệu người dùng.  
-> Trạng thái: **đã triển khai + test tự động**.
+> Trạng thái: **đã triển khai + test tự động**. Các mục S1/S2 đã xử lý trong đợt nâng dependency 28/11/2026.
 
 ---
 
@@ -26,7 +26,7 @@
 | JWT | ✅ | Chỉ nhận `HS256`, secret production bắt buộc đổi, access token 15 phút |
 | Xóa tài khoản | ✅ | Xóa DB + ảnh/PDF, xóa toàn bộ `Session`; yêu cầu mật khẩu xác nhận nếu tài khoản có mật khẩu |
 
-Test tự động: **327/327 pass**, gồm 9 test bảo mật mới (`server/tests/authSecurity.test.js`), 9 test learning API (`server/tests/learningApi.test.js`) và 6 test anatomy/AI context (`server/tests/anatomy.test.js`).
+Test tự động: **386/386 pass**, gồm 9 test bảo mật (`server/tests/authSecurity.test.js`), 9 test learning API (`server/tests/learningApi.test.js`), 6 test anatomy/AI context (`server/tests/anatomy.test.js`) và 2 test an toàn PDF (`server/tests/pdfSafety.test.js`).
 
 ---
 
@@ -81,8 +81,8 @@ Test tự động: **327/327 pass**, gồm 9 test bảo mật mới (`server/tes
 
 | ID | Vấn đề | Ảnh hưởng | Hướng xử lý |
 | --- | --- | --- | --- |
-| S1 | `zod 3.25.x` có advisory memory exhaustion | Runtime; giảm nhẹ nhờ body limit 2 MB và schema max | Nâng zod 4.6.7+; viết lại các `invalid_type_error`/`errorMap` theo API mới; chạy toàn bộ test |
-| S2 | `react-router 6.27` có advisory open-redirect | Client; chỉ khai thác khi điều hướng URL do kẻ tấn công kiểm soát | Nâng React Router 7.18.6+; kiểm tra toàn bộ route/link |
+| S1 ✅ | `zod 3.25.x` có advisory memory exhaustion | Runtime; giảm nhẹ nhờ body limit 2 MB và schema max | **Đã nâng zod 4.6.7** (28/11/2026); sửa `default({})` → `prefault({})`, `invalid_type_error` → `error`; 386 test pass |
+| S2 ✅ | `react-router 6.27` có advisory open-redirect | Client; chỉ khai thác khi điều hướng URL do kẻ tấn công kiểm soát | **Đã nâng React Router 7.18.7** (28/11/2026); kiểm tra login/register/navigation + build |
 | S3 | `vitest`/`vite`/`tinypool` có advisory critical/high | Chỉ dev tooling, không nằm trong runtime production | Nâng Vitest/Vite sau khi S1/S2; chạy lại test/build |
 | S4 | Rate limit lưu trong RAM | Không chia sẻ khi scale nhiều instance | Dùng Redis store (`rate-limit-redis`) khi có nhiều instance |
 | S5 | Tài khoản email/mật khẩu chưa xác minh email | Email giả có thể đăng ký; không ảnh hưởng đăng nhập Google | Thêm luồng verify email trước khi dùng tính năng nhạy cảm (hoặc chỉ cho Google verified) |
@@ -150,15 +150,21 @@ PASSWORD_RESET_TTL_MINUTES=30
 ## 6. Kết quả kiểm chứng
 
 ```bash
-npm --prefix server test     # 327/327 pass
-npm run lint                 # 0 lỗi (sau khi xóa file tạm)
+npm --prefix server test     # 386/386 pass
+npm run lint                 # 0 lỗi
 npm --prefix client build    # build pass
 npm --prefix client run validate:atlas-anatomy  # 315 concept, 0 missing
 ```
 
-`npm audit` (21/11/2026):
+`npm audit --omit=dev` (28/11/2026): **0 vulnerabilities** ở cả server và client. Các advisory còn lại là dev-only (`vitest`/`vite`/`esbuild`/`tinypool`), không nằm trong runtime production.
 
-- Server: 2 critical, 2 high, 3 moderate — critical/high chủ yếu là `vitest`/`vite`/`tinypool` (dev-only); `zod` là runtime high.
-- Client: 1 high (`vite`, dev-only), 3 moderate (`react-router`, `react-router-dom`, `esbuild`).
+## 7. Cập nhật 28/11/2026
+
+- Nâng `zod` 4.6.7, `react-router-dom` 7.18.7, `@hookform/resolvers` 7.0.9, `multer` 2.5.0.
+- Docker chỉ bind `127.0.0.1` cho Mongo/API/client; thêm `TRUST_PROXY` theo môi trường.
+- Log HTTP redact `token`/`code`/`state`; CSRF yêu cầu `X-Requested-With` khi thiếu `Origin`.
+- PDF: kiểm tra magic bytes `%PDF` và giới hạn 150 trang trước khi parse.
+- Express bật gzip; asset có hash cache 1 năm, model 3D cache 1 năm, `sw.js`/`index.html` no-cache.
+- Thêm `scripts/backup-mongo.ps1` (dump + SHA256 + retention) và GitHub Actions CI/Dependabot.
 
 Không phát hiện lỗi XSS trực tiếp: React escape mặc định, `MarkdownText` không bật HTML thô, không có `dangerouslySetInnerHTML`/`eval` trong client. Các controller dùng `userId` trong filter (không có IDOR rõ ràng); upload ảnh kiểm tra magic bytes + regex tên file; endpoint tải nguồn ngoài đã có chặn SSRF và giới hạn dung lượng từ audit trước.

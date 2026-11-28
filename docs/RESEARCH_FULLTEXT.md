@@ -65,6 +65,7 @@ Test: `identifier.test.js` (6 test) + full suite 358 pass.
 
 ## 4. Lưu ý vận hành
 
-- Fallback full text bioRxiv/medRxiv cần **curl** trên máy chủ. Nếu host không có curl, reader vẫn fallback abstract như trước (không crash).
+- Fallback full text bioRxiv/medRxiv cần **curl** trên máy chủ. Nếu host không có curl, Reader trả `FULLTEXT_REQUIRED` thay vì fallback abstract (chính sách v4).
 - Chỉ dùng curl cho host preprint; không mở rộng cho mọi URL để giữ bề mặt SSRF nhỏ.
 - Nếu Cloudflare đổi hành vi hoặc curl cũng bị chặn, cần thêm proxy/reader service có kiểm soát.
+- Finder chỉ đề xuất bài OA + toàn văn; bài chỉ có abstract bị loại trước khi xếp hạng.

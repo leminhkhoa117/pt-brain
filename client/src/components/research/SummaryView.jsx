@@ -423,12 +423,14 @@ export default function SummaryView({
             <button
               type="button"
               onClick={onApply}
-              disabled={summary.needsReview}
+              disabled={summary.needsReview || abstractOnly}
               className="btn-secondary !px-2.5 !py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               title={
-                summary.needsReview
-                  ? 'Bản chưa qua kiểm tra tự động — không áp dụng vào giáo án'
-                  : 'Đề xuất chỉnh giáo án từ bài này'
+                abstractOnly
+                  ? 'Bản cũ chỉ dựa trên abstract — không áp dụng vào giáo án'
+                  : summary.needsReview
+                    ? 'Bản chưa qua kiểm tra tự động — không áp dụng vào giáo án'
+                    : 'Đề xuất chỉnh giáo án từ bài này'
               }
             >
               <Icon name="target" className="h-4 w-4" />
@@ -452,7 +454,7 @@ export default function SummaryView({
           >
             .pdf
           </a>
-          {onRefresh ? (
+          {onRefresh && !abstractOnly ? (
             <button
               type="button"
               onClick={onRefresh}
@@ -506,8 +508,9 @@ export default function SummaryView({
 
       {abstractOnly ? (
         <Alert tone="warning" className="mt-4">
-          <strong>Chỉ dựa trên abstract.</strong> Có thể thiếu thiết kế chi tiết, bảng số liệu và nhiều
-          kết quả phụ. Nên tải PDF hoặc đọc bài gốc trước khi dùng cho kết luận quan trọng.
+          <strong>Bản cũ — chỉ dựa trên abstract.</strong> Chính sách mới không tạo bản tóm tắt từ
+          abstract vì thiếu thiết kế chi tiết, bảng số liệu và kết quả phụ. Hãy mở PDF/link OA hoặc
+          tải PDF để tạo bản mới; bản này không thể áp dụng vào giáo án.
         </Alert>
       ) : null}
 
@@ -992,8 +995,8 @@ export default function SummaryView({
       <div className="mt-5 rounded-md border border-line bg-paper-2/40 p-3.5 text-xs text-slate-500 dark:border-white/[0.08] dark:bg-white/[0.02] dark:text-slate-400">
         <p className="font-semibold text-slate-600 dark:text-slate-300">Độ tin cậy</p>
         <p className="mt-1">
-          Nguồn: {abstractOnly ? 'chỉ abstract' : 'toàn văn bài báo'}. Số liệu do AI trích xuất, cần đối
-          chiếu cột “Bài gốc” bên cạnh.
+          Nguồn: {abstractOnly ? 'bản cũ chỉ có abstract' : 'toàn văn bài báo'}. Số liệu do AI trích
+          xuất, cần đối chiếu cột “Bài gốc” bên cạnh.
         </p>
         {c.verification && c.verification.passed === false ? (
           summary.reviewedAt ? (

@@ -13,7 +13,7 @@ Web app cho người đang học/làm PT: tìm nghiên cứu khoa học, tóm t�
 | Database | MongoDB 7 (local hoặc Atlas) |
 | AI | OpenCode Go – API OpenAI-compatible, model `deepseek-v4.1-flash` (key chỉ ở backend) |
 | Nguồn nghiên cứu | PubMed E-utilities, Europe PMC, OpenAlex, Unpaywall, Crossref, DOI resolver |
-| Test | Vitest – 327 test (unit + API integration; cần MongoDB cho phần integration) |
+| Test | Vitest - 386 test (unit + API integration; cần MongoDB cho phần integration) |
 | Tooling | ESLint 9 (flat config), Prettier, Docker Compose |
 
 ## Giao diện & logo
@@ -100,6 +100,8 @@ docker compose up -d --build
 
 `docker compose` tự đọc `.env` để lấy `AI_API_KEY`, JWT secret...; file `.env` không được copy vào image. Trong Docker, server kết nối Mongo nội bộ qua `mongodb://mongo:27017/pt-brain`; `MONGO_URI` trong `.env` chỉ dùng khi chạy local.
 
+Mặc định các port chỉ bind `127.0.0.1`. Muốn test điện thoại trong LAN, đổi mapping của client thành `"5173:5173"`; không mở Mongo/API ra LAN.
+
 Kiểm tra stack:
 
 ```bash
@@ -149,12 +151,29 @@ mongorestore --uri "mongodb://127.0.0.1:27017" --gzip --drop .\mongo-dump
 
 Sau restore, chạy `docker compose start server` và kiểm tra `curl http://localhost:4000/api/health`.
 
+#### Backup & restore
+
+Script `scripts/backup-mongo.ps1` dump database từ container, tạo file `.sha256` và tự xóa bản cũ hơn 30 ngày:
+
+```powershell
+.\scripts\backup-mongo.ps1
+# tùy chọn: -OutDir "D:\Backups\pt-brain" -KeepDays 60
+```
+
+Nên chạy hằng ngày bằng **Task Scheduler**. Định kỳ thử restore vào database tạm để chắc file backup dùng được:
+
+```powershell
+docker cp "$env:USERPROFILE\PTBrainBackups\pt-brain-<stamp>.gz" pt-brain-mongo:/tmp/restore.gz
+docker exec pt-brain-mongo sh -lc 'mongorestore --archive=/tmp/restore.gz --gzip --nsFrom="pt-brain.*" --nsTo="pt-brain-restore.*"'
+docker exec pt-brain-mongo mongosh --quiet --eval "db.getSiblingDB('pt-brain-restore').dropDatabase()"
+```
+
 Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ## Lệnh
 
 ```bash
-npm run test        # 384 test (unit + API integration; cần MongoDB)
+npm run test        # 386 test (unit + API integration; cần MongoDB)
 npm run test:unit   # 337 unit test, không cần MongoDB
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
@@ -191,7 +210,7 @@ pt-brain/
 │  ├─ src/routes/                # auth, me, metrics, calc, summaries, papers, research, meals, meal-plans,
 │  │                             # muscles, exercises, programs, workouts, terms, notes, flashcards,
 │  │                             # quizzes, curriculum
-│  └─ tests/                     # 37 file test (unit + API integration + auth security)
+│  └─ tests/                     # 49 file test (unit + API integration + auth security)
 ├─ client/src/
 │  ├─ pages/                     # Dashboard, BodyLog, Calculators, Research(+Reader/Finder),
 │  │                             # Training(+Planner/Workout), Learn(+Curriculum/Lesson/Glossary/Flashcards/Notes),
@@ -214,8 +233,10 @@ pt-brain/
 - Computed snapshot cho từng ngày để biểu đồ không đổi khi công thức thay đổi.
 
 ### Giai đoạn 2 — Research Reader
-- Input: DOI/link PubMed–PMC–doi.org, PDF ≤ 20 MB, hoặc văn bản/abstract.
-- Ingest: Europe PMC full text XML → PDF OA → abstract; Crossref/Unpaywall fallback; chống SSRF, giới hạn dung lượng, timeout.
+- Input: DOI/link PubMed–PMC–doi.org, PDF ≤ 20 MB, hoặc **toàn văn dán tay** (≥ 5.000 ký tự).
+- Ingest: Europe PMC full text XML → PDF OA → HTML OA ≥ 5.000 ký tự; Crossref/Unpaywall fallback; chống SSRF, giới hạn dung lượng, timeout.
+- Finder probe top 20 URL trước khi trả kết quả: kiểm tra `%PDF`, PMC XML hoặc HTML có đủ mục Methods/Results/Discussion; cache probe 6 giờ.
+- Không tóm tắt từ abstract: bài paywall/abstract-only trả `FULLTEXT_REQUIRED` kèm gợi ý tìm PDF hợp pháp.
 - Tóm tắt theo **pipeline 3 bước**: (1) trích dữ kiện thuần JSON — mỗi trường có số trang + trích nguyên văn; (2) viết cho PT theo cấu trúc trang mới; (3) kiểm tra tự động số liệu/nhãn/lặp/mục thiếu, tự sửa tối đa 2 vòng. Validate zod, cache theo DOI/hash file **+ prompt version**, giới hạn quota AI/ngày.
 - PDF hai cột được đọc theo **bố cục cột** (không lẫn chú thích hình); text có marker `[[page N]]` để trích dẫn đúng trang. Bài dài: trích dữ kiện theo từng đoạn rồi gộp để không mất số liệu.
 - Metadata lấy từ **Crossref** (kể cả khi PDF không in DOI): tiêu đề, tác giả, năm, tập(số), trang, DOI; không dùng tên file làm tiêu đề.
@@ -226,15 +247,18 @@ pt-brain/
 - **Mức bằng chứng 3 trục**: Thiết kế / Độ chắc chắn / Liên quan tới PT, mỗi trục cao–vừa–thấp kèm lý do; thay cho “Mức bằng chứng x/5” không tiêu chí.
 - Nếu kiểm tra tự động fail sau 2 vòng: vẫn lưu để đọc/export, gắn `needsReview`, khoá “Áp dụng vào plan”; export Markdown/PDF có **phụ lục facts** để audit.
 - **Chat hỏi đáp theo từng bài**: lịch sử lưu riêng trong `Summary.qa`, AI nhớ cả nội dung bài + các câu hỏi trước; bài dài được chọn đoạn thông minh (giữ đầu, Results/Discussion/Conclusion và mẫu đều phần còn lại) trước khi đưa vào ngữ cảnh. Có nút xóa lịch sử.
-- Nhãn rõ **“chỉ dựa trên abstract”** khi không có toàn văn; mọi số liệu yêu cầu giữ nguyên.
+- Bản cũ `abstract_only` được gắn nhãn **“Chỉ abstract”**, không thể tạo lại/áp dụng; mọi số liệu yêu cầu giữ nguyên.
 
 ### Giai đoạn 3 — Research Finder
 - Câu hỏi tiếng Việt → 2–4 truy vấn tiếng Anh (sửa/xóa/thêm được).
-- Gọi song song PubMed, Europe PMC, OpenAlex; gộp, loại trùng DOI/PMID/title.
-- **Xếp hạng bằng code** theo mức bằng chứng + độ mới + trích dẫn + open access.
-- Lọc năm, mức bằng chứng, open access.
-- AI viết 2–3 dòng/kết quả từ abstract và tổng hợp có trích dẫn `[1]`, `[2]`; nêu mâu thuẫn/chưa rõ.
-- Lưu bài vào thư viện, mở Reader với DOI đã chọn.
+- Gọi song song PubMed, Europe PMC, OpenAlex, Crossref; gộp, loại trùng DOI/PMID/title.
+- **Chỉ trả bài open access đã xác minh + có toàn văn** (PMC XML hoặc PDF trực tiếp). Bài non-OA, landing-only hoặc chỉ abstract bị loại ở server.
+- **Xếp hạng bằng code** theo mức bằng chứng + độ mới + trích dẫn + liên quan.
+- Lọc năm, mức bằng chứng; không có toggle tắt chính sách OA.
+- Không gọi AI tóm tắt abstract: Finder chỉ dịch truy vấn, mỗi card có abstract gốc để sàng lọc và nút PDF/PMC/HTML.
+- Lưu bài vào thư viện, mở Reader với DOI đã chọn; Reader chỉ tóm tắt khi có toàn văn.
+- **Tổng hợp từ toàn văn**: trong Thư viện, chọn câu hỏi và tổng hợp tối đa 8 bản `basedOn=fulltext` đã tóm tắt; không dùng abstract.
+- **Dọn bản abstract cũ**: nút xoá toàn bộ Summary `abstract_only` nhưng giữ bản fulltext.
 - **Lịch sử tìm kiếm**: lưu 8 lần tìm gần nhất (câu hỏi, bộ lọc, truy vấn và kết quả) trong `localStorage` theo từng tài khoản; bấm “Mở lại” để xem lại danh sách mà không tốn lượt AI. Khi đang đọc một bài, nút **“← Kết quả tìm kiếm”** đưa về đúng danh sách cũ.
 
 ### Giai đoạn 4 — Planner + Workout Log
@@ -391,7 +415,7 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 
 ## Kiểm chứng
 
-- `npm run test`: **303/303 pass** - công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, trích hình/bảng, ranker, progression, SM-2, PDF, quiz, retrieval, plan metrics/evidence, apply changes, cửa sổ tuần và điểm bám meal plan, validate chat cơ bắp, validate ước tính calo, API integration (auth, metrics, program, library, xóa tài khoản), pipeline research 3 bước + golden sample (crossover, quan sát, RCT, SR/MA, meta-analysis), **giáo trình PT Academy (schema 14 bài, chấm quiz, tiến độ, xóa dữ liệu theo user)**.
+- `npm run test`: **386/386 pass** - công thức, cảnh báo, text/HTML/XML, SSRF, schema tóm tắt, trích hình/bảng, ranker, progression, SM-2, PDF, quiz, retrieval, plan metrics/evidence, apply changes, cửa sổ tuần và điểm bám meal plan, validate chat cơ bắp, validate ước tính calo, API integration (auth, metrics, program, library, xóa tài khoản), pipeline research 3 bước + golden sample (crossover, quan sát, RCT, SR/MA, meta-analysis), **chính sách OA + fulltext (accessPolicy, Finder chỉ trả bài đủ điều kiện)**, **giáo trình PT Academy (schema 14 bài, chấm quiz, tiến độ, xóa dữ liệu theo user)**, **an toàn PDF (magic bytes + giới hạn số trang)**.
 - `npm run lint`: 0 lỗi.
 - `npm run build`: thành công; tách chunk react/charts/query.
 - **E2E smoke giáo trình trên server dev + MongoDB thật**: register → GET cây (5 module/14 bài) →
@@ -399,10 +423,11 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
   mark completed → "Tiếp tục học" nhảy đúng bài kế tiếp → evidence/deep-link resolve đủ; smoke
   user xóa sạch sau test (kèm CurriculumProgress cleanup).
 - E2E với MongoDB + AI thật:
-  - Reader DOI meta-analysis: 201 trong ~65s, nhãn abstract-only, số liệu `P = 0.002`, `ES 0.023`, cache lần 2 trong **2s** cùng ID.
+  - Reader DOI meta-analysis: 201 trong ~65s, số liệu `P = 0.002`, `ES 0.023`, cache lần 2 trong **2s** cùng ID.
   - Reader fulltext OA: `sourceKind=open_access_fulltext`, 7.7k ký tự, mức 4, 4 kết quả chính.
+  - Reader bài non-OA: trả `FULLTEXT_REQUIRED`, không tạo Summary, UI gợi ý nguồn PDF hợp pháp.
   - **PDF có sẵn `000441029.pdf`**: `POST /summaries` trả **202 sau 0s**, job nền 226s với tiến trình `Đang đọc đoạn 1/4 → 4/4 → tổng hợp`; kết quả `ready`, toàn văn 53.902 ký tự, tiêu đề AI “Leg Power Predicts Cognitive Ageing in Twins”, 8 kết quả chính, mức bằng chứng 3.
-  - Finder: 28s, 3 truy vấn, 53 kết quả thô → 14 bài sau gộp → 8 kết quả, tổng hợp có trích dẫn.
+  - Finder: 28s, 3 truy vấn, 53 kết quả thô → chỉ giữ bài OA + toàn văn, tối đa 8 kết quả, không tóm tắt abstract.
   - Planner: 110 bài seed, giáo án 4 buổi = 73 set/tuần, volume đúng theo phép cộng tay.
   - Log 3 buổi → gợi ý tăng tạ 42.5 / 52.5 / 62.5 kg; 1RM progression đúng.
   - Apply-to-plan: 11s, 4 thay đổi trước→sau, áp dụng thành công.
@@ -450,7 +475,8 @@ Thành công: `{ "data": ... }`. Lỗi: `{ "error": { code, message, details? } 
 
 - JWT trong cookie `httpOnly`, refresh token lưu hash, xoay vòng; mọi query lọc `userId`.
 - API key AI chỉ ở backend; log không ghi header/cookie.
-- Toàn văn chỉ lưu khi là **open access** hoặc **PDF người dùng tự tải**; bài paywall chỉ lưu abstract.
+- Toàn văn chỉ lưu khi là **open access** hoặc **PDF người dùng tự tải**; bài paywall/abstract-only bị từ chối, không tạo Summary và không lưu nguyên văn.
+- Không tích hợp Sci-Hub hoặc mirror: chỉ dùng Europe PMC/PMC, OpenAlex, Unpaywall, Semantic Scholar, preprint/repository, thư viện và bản PDF người dùng có quyền.
 - Chỉ số và gợi ý mang tính ước lượng, không thay thế bác sĩ/chuyên gia dinh dưỡng. Bản tóm tắt AI có thể sai — cần đối chiếu bài gốc với kết luận quan trọng.
 
 ### Mô hình cơ bắp 3D

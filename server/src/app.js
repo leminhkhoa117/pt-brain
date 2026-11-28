@@ -1,5 +1,6 @@
 import express from 'express';
 import helmet from 'helmet';
+import compression from 'compression';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import pinoHttp from 'pino-http';
@@ -15,7 +16,7 @@ import routes from './routes/index.js';
 export function createApp() {
   const app = express();
 
-  app.set('trust proxy', 1);
+  app.set('trust proxy', env.TRUST_PROXY);
   app.disable('x-powered-by');
   app.use(
     helmet({
@@ -37,6 +38,7 @@ export function createApp() {
       credentials: true,
     }),
   );
+  app.use(compression());
   app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
   app.use('/api', csrfGuard);
@@ -51,7 +53,11 @@ export function createApp() {
             return {
               id: req.id,
               method: req.method,
-              url: req.url,
+              // Không ghi token đặt lại mật khẩu / OAuth code vào log.
+              url: String(req.url || '').replace(
+                /([?&](token|code|state)=)[^&]*/gi,
+                '$1[redacted]',
+              ),
               remoteAddress: req.remoteAddress,
             };
           },
@@ -71,9 +77,32 @@ export function createApp() {
       path.dirname(fileURLToPath(import.meta.url)),
       '../../client/dist',
     );
-    app.use(express.static(clientDist, { index: false, maxAge: '1h' }));
+    // Asset Vite có hash trong tên → cache dài, không cần revalidate.
+    app.use(
+      '/assets',
+      express.static(path.join(clientDist, 'assets'), { immutable: true, maxAge: '1y' }),
+    );
+    // Model 3D nặng và không đổi tên; cache mạnh sau lần tải đầu.
+    app.use(
+      '/models',
+      express.static(path.join(clientDist, 'models'), { immutable: true, maxAge: '1y' }),
+    );
+    app.use('/curriculum', express.static(path.join(clientDist, 'curriculum'), { maxAge: '1d' }));
+    app.use(
+      express.static(clientDist, {
+        index: false,
+        maxAge: 0,
+        setHeaders(res, filePath) {
+          // Service worker phải được kiểm tra lại mỗi lần để nhận bản mới.
+          if (path.basename(filePath) === 'sw.js') {
+            res.setHeader('Cache-Control', 'no-cache');
+          }
+        },
+      }),
+    );
     app.get('*', (req, res, next) => {
       if (req.path.startsWith('/api')) return next();
+      res.set('Cache-Control', 'no-cache');
       return res.sendFile(path.join(clientDist, 'index.html'));
     });
   }

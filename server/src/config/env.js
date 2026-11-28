@@ -17,6 +17,8 @@ const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
   LOG_LEVEL: z.string().default('info'),
+  // Số hop reverse proxy tin cậy. 0 khi chạy trực tiếp (Docker/local), 1 trên Render.
+  TRUST_PROXY: z.coerce.number().int().min(0).default(0),
   MONGO_URI: z.string().default('mongodb://127.0.0.1:27017/pt-brain'),
 
   JWT_ACCESS_SECRET: z.string().min(16).default('dev-access-secret-change-me'),

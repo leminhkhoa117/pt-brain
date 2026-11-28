@@ -36,7 +36,7 @@ export const registerSchema = z
   .strict()
   .superRefine((data, ctx) => {
     for (const message of passwordProblems(data.password, { email: data.email, name: data.name })) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['password'], message });
+      ctx.addIssue({ code: 'custom', path: ['password'], message });
     }
   });
 
@@ -56,7 +56,7 @@ export const changePasswordSchema = z
   .strict()
   .superRefine((data, ctx) => {
     for (const message of passwordProblems(data.newPassword)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+      ctx.addIssue({ code: 'custom', path: ['newPassword'], message });
     }
   });
 
@@ -80,7 +80,7 @@ export const resetPasswordSchema = z
   .strict()
   .superRefine((data, ctx) => {
     for (const message of passwordProblems(data.newPassword)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['newPassword'], message });
+      ctx.addIssue({ code: 'custom', path: ['newPassword'], message });
     }
   });
 

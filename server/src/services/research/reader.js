@@ -13,6 +13,7 @@ import { parsePdfBuffer, savePdfBuffer, removePdfFile } from './pdf.js';
 import { extractFigureHints } from './figures.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { normalizeText, truncateText } from '../../utils/text.js';
+import { fullTextRequiredError } from './accessPolicy.js';
 import {
   acquireSummaryLock,
   clearAllSummaryLocks,
@@ -22,6 +23,18 @@ import {
 } from './summaryLock.js';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Văn bản dán tay phải là toàn văn, không phải abstract.
+const MANUAL_FULLTEXT_MIN_CHARS = 5000;
+// Ngưỡng tối thiểu cho mọi nguồn fulltext đã xác minh (PDF/PMC XML).
+const FULLTEXT_MIN_CHARS = 500;
+
+/** Defense in depth: mọi luồng tạo/retry Summary đều phải qua kiểm tra này. */
+export function assertFullTextReady(resolved = {}) {
+  const text = String(resolved.text || '').trim();
+  if (resolved.basedOn === 'fulltext' && text.length >= FULLTEXT_MIN_CHARS) return;
+  throw fullTextRequiredError(resolved.paper || {}, resolved.sourceUrl || '');
+}
 
 function inferTitleFromText(text) {
   const first = normalizeText(text)
@@ -72,6 +85,12 @@ async function resolveInput(input, file) {
   }
 
   const text = normalizeText(input.text);
+  if (text.length < MANUAL_FULLTEXT_MIN_CHARS) {
+    throw fullTextRequiredError(
+      { title: input.title || inferTitleFromText(text), url: '' },
+      '',
+    );
+  }
   const paper = await enrichPaperMetadata(
     {
       title: input.title || inferTitleFromText(text),
@@ -86,10 +105,10 @@ async function resolveInput(input, file) {
   return {
     paper,
     text,
-    basedOn: text.length >= 5000 ? 'fulltext' : 'abstract_only',
+    basedOn: 'fulltext',
     sourceKind: 'user_text',
     sourceUrl: '',
-    inputType: text.length >= 5000 ? 'text' : 'abstract',
+    inputType: 'text',
   };
 }
 
@@ -219,6 +238,7 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey })
   heartbeat.unref?.();
 
   try {
+    assertFullTextReady(resolved);
     const { content, facts, usage, model, promptVersion } = await withTimeout(
       summarizePaper({
         paper: resolved.paper,
@@ -297,6 +317,7 @@ async function runSummaryJob({ summaryId, paperId, userId, resolved, cacheKey })
  */
 export async function createSummaryForUser(user, input, file) {
   const resolved = await resolveInput(input, file);
+  assertFullTextReady(resolved);
   resolved.figureHints =
     resolved.figureHints?.length ? resolved.figureHints : extractFigureHints(resolved.text);
   const cacheKey = buildCacheKey(resolved);
@@ -475,6 +496,9 @@ export async function retrySummaryForUser(userId, id) {
 
     const paper = await Paper.findById(summary.paperId);
     if (!paper) throw ApiError.notFound('Không tìm thấy metadata bài báo');
+    if (summary.basedOn !== 'fulltext') {
+      throw fullTextRequiredError(paper, paper.url || summary.sourceUrl || '');
+    }
     if (!summary.sourceText) {
       throw new ApiError(
         422,
@@ -552,6 +576,22 @@ export async function resumeInterruptedSummaries({ limit = 5 } = {}) {
   let failed = overflow.length;
 
   for (const summary of selected) {
+    if (summary.basedOn !== 'fulltext') {
+      await Summary.updateOne(
+        { _id: summary._id },
+        {
+          $set: {
+            status: 'failed',
+            progress: '',
+            error:
+              'Bản cũ chỉ dựa trên abstract. Chính sách mới yêu cầu toàn văn — hãy tải PDF hoặc mở link OA.',
+          },
+        },
+      ).catch(() => {});
+      failed += 1;
+      continue;
+    }
+
     const paper = await Paper.findById(summary.paperId);
     if (!paper || !summary.sourceText) {
       await Summary.updateOne(
@@ -664,6 +704,27 @@ export async function appendQa(userId, id, question, answer) {
 export async function clearQa(userId, id) {
   const result = await Summary.updateOne({ _id: id, userId }, { $set: { qa: [] } });
   if (!result.matchedCount) throw ApiError.notFound('Không tìm thấy bản tóm tắt');
+}
+
+/** Xoá toàn bộ Summary cũ chỉ dựa trên abstract; không đụng bản fulltext. */
+export async function deleteAbstractOnlySummaries(userId) {
+  const summaries = await Summary.find({ userId, basedOn: 'abstract_only' })
+    .select('_id pdfHash')
+    .lean();
+  if (!summaries.length) return { deleted: 0 };
+
+  await Summary.deleteMany({
+    _id: { $in: summaries.map((summary) => summary._id) },
+    userId,
+    basedOn: 'abstract_only',
+  });
+
+  const hashes = [...new Set(summaries.map((summary) => summary.pdfHash).filter(Boolean))];
+  for (const hash of hashes) {
+    const remaining = await Summary.countDocuments({ pdfHash: hash });
+    if (!remaining) await removePdfFile(hash);
+  }
+  return { deleted: summaries.length };
 }
 
 export async function deleteSummaryForUser(userId, id) {

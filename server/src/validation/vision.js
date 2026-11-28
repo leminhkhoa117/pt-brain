@@ -55,7 +55,7 @@ export const bodyAssessmentSchema = z.object({
       summary: z.string().default(''),
       muscleBalance: stringArray,
     })
-    .default({}),
+    .prefault({}),
   posture: z
     .array(
       z.object({
@@ -70,7 +70,7 @@ export const bodyAssessmentSchema = z.object({
       assessment: z.string().default(''),
       gaps: stringArray,
     })
-    .default({}),
+    .prefault({}),
   priorities: stringArray,
   trainingAdjustments: stringArray,
   nutritionAdjustments: stringArray,

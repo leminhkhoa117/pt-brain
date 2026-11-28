@@ -65,7 +65,7 @@ export const mealPlanCreateSchema = z
     goal: z.enum(['cut', 'maintain', 'lean_bulk', 'bulk']).default('maintain'),
     startDate: dateKey,
     endDate: dateKey,
-    preferences: mealPlanPreferencesSchema.default({}),
+    preferences: mealPlanPreferencesSchema.prefault({}),
     cycleDays: z.array(daySchema).length(7, 'Cần đúng 7 ngày thực đơn mẫu'),
     rationale: z.string().max(8000).default(''),
     cautions: z.array(z.string().max(500)).max(20).default([]),

@@ -86,12 +86,11 @@ jobs:
           curl -fsS http://127.0.0.1:4100/ | grep -q '<title>PT Brain</title>'
           kill $SERVER_PID
 
-      # Chỉ chặn critical; high severity đang được theo dõi trong IMPROVEMENT_PLAN
-      # (zod < 4.6.6, react-router < 7.18.5) và sẽ xử lý ở đợt nâng cấp riêng.
+      # zod/react-router đã được nâng; chặn từ high trở lên cho dependency runtime.
       - name: Audit production dependencies
         run: |
-          npm --prefix server audit --omit=dev --audit-level=critical
-          npm --prefix client audit --omit=dev --audit-level=critical
+          npm --prefix server audit --omit=dev --audit-level=high
+          npm --prefix client audit --omit=dev --audit-level=high
 
   docker:
     name: Build Docker images

@@ -1,3 +1,7 @@
+/**
+ * Không còn dùng trong Finder v4: tóm tắt/tổng hợp từ abstract đã bị bỏ.
+ * Giữ file để tái sử dụng cho tính năng "tổng hợp từ toàn văn" sau này.
+ */
 import { z } from 'zod';
 import { chatCompletion, parseJsonLoose } from './client.js';
 import { truncateText } from '../../utils/text.js';

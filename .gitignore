@@ -24,6 +24,8 @@ client/uploads/
 *.log
 tmp-*
 tmp/
+backups/
+mongo-dump/
 server/tmp-*
 
 # Công cụ local

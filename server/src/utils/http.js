@@ -303,6 +303,87 @@ export async function fetchBuffer(
   throw new ApiError(502, 'TOO_MANY_REDIRECTS', 'Nguồn chuyển hướng quá nhiều lần');
 }
 
+/**
+ * Kiểm tra nhanh một URL mà không tải toàn bộ body:
+ * - theo redirect thủ công và kiểm tra SSRF ở từng hop;
+ * - chỉ đọc chunk đầu tiên (đủ để thấy magic bytes `%PDF` hoặc meta PDF);
+ * - HEAD được hỗ trợ cho nơi không cần body.
+ */
+export async function probeUrl(
+  input,
+  {
+    method = 'GET',
+    timeout = 2500,
+    headers = {},
+    accept = '*/*',
+    maxBytes = 64 * 1024,
+  } = {},
+) {
+  let current = await assertPublicUrl(input);
+  for (let hop = 0; hop <= 3; hop += 1) {
+    let response;
+    try {
+      response = await fetch(current.toString(), {
+        method,
+        headers: {
+          'User-Agent': USER_AGENT,
+          Accept: accept,
+          'Accept-Encoding': 'identity',
+          ...headers,
+        },
+        redirect: 'manual',
+        signal: AbortSignal.timeout(timeout),
+      });
+    } catch (error) {
+      throw new ApiError(504, 'PROBE_TIMEOUT', `Không kiểm tra được nguồn: ${error.message}`);
+    }
+
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      await response.body?.cancel?.().catch(() => {});
+      if (!location) throw new ApiError(502, 'PROBE_FAILED', 'Nguồn chuyển hướng không hợp lệ');
+      current = await assertPublicUrl(new URL(location, current).toString());
+      continue;
+    }
+    if (!response.ok) {
+      await response.body?.cancel?.().catch(() => {});
+      throw new ApiError(502, 'PROBE_HTTP', `Nguồn trả lời HTTP ${response.status}`, {
+        status: response.status,
+      });
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    const contentLength = Number(response.headers.get('content-length') || 0);
+    if (method === 'HEAD' || !response.body) {
+      await response.body?.cancel?.().catch(() => {});
+      return {
+        buffer: Buffer.alloc(0),
+        contentType,
+        finalUrl: current.toString(),
+        status: response.status,
+        contentLength,
+      };
+    }
+
+    const reader = response.body.getReader();
+    let chunk = new Uint8Array();
+    try {
+      const read = await reader.read();
+      if (!read.done && read.value) chunk = read.value;
+    } finally {
+      await reader.cancel().catch(() => {});
+    }
+    return {
+      buffer: Buffer.from(chunk).subarray(0, maxBytes),
+      contentType,
+      finalUrl: current.toString(),
+      status: response.status,
+      contentLength,
+    };
+  }
+  throw new ApiError(502, 'TOO_MANY_REDIRECTS', 'Nguồn chuyển hướng quá nhiều lần');
+}
+
 /** Gọi API JSON tin cậy (Crossref, Europe PMC, Unpaywall...) với timeout + cache + retry. */
 export async function fetchJson(
   url,

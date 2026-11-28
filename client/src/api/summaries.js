@@ -22,6 +22,8 @@ export const createSummary = ({ file, title, doi, url, text }) => {
 export const listSummaries = (params = {}) => api.get('/summaries', { params }).then(unwrap);
 export const getSummary = (id) => api.get(`/summaries/${id}`).then(unwrap);
 export const deleteSummary = (id) => api.delete(`/summaries/${id}`).then(unwrap);
+export const deleteAbstractOnlySummaries = () =>
+  api.delete('/summaries/abstract-only').then(unwrap);
 export const retrySummary = (id) =>
   api.post(`/summaries/${id}/retry`, null, { timeout: AI_TIMEOUT_MS }).then(unwrap);
 export const markSummaryReviewed = (id) => api.post(`/summaries/${id}/review`).then(unwrap);
@@ -68,6 +70,10 @@ export const createPaper = (payload) => api.post('/papers', payload).then(unwrap
 export const searchResearch = (payload) =>
   api.post('/research/search', payload, { timeout: AI_TIMEOUT_MS }).then(unwrap);
 export const getResearchGraph = (params) => api.get('/research/graph', { params }).then(unwrap);
+export const getFullTextCandidates = (doi) =>
+  api.get('/research/fulltext', { params: { doi } }).then(unwrap);
+export const synthesizeResearch = (payload) =>
+  api.post('/research/synthesize', payload, { timeout: AI_TIMEOUT_MS }).then(unwrap);
 export const applyToPlan = (summaryId, programId) =>
   api
     .post(`/summaries/${summaryId}/apply-to-plan`, { programId }, { timeout: AI_TIMEOUT_MS })

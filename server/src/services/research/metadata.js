@@ -13,6 +13,7 @@ import {
   semanticScholarCandidates,
 } from './oaCandidates.js';
 import { fetchFirstReadablePdf } from './pdfFetch.js';
+import { fullTextRequiredError } from './accessPolicy.js';
 
 const EUROPEPMC = 'https://www.ebi.ac.uk/europepmc/webservices/rest';
 const CROSSREF = 'https://api.crossref.org/works';
@@ -387,9 +388,85 @@ export async function enrichPaperMetadata(
 }
 
 /**
+ * Trả danh sách đường đọc hợp pháp cho một DOI (không tải PDF, không Sci-Hub).
+ * Dùng cho nút "Tìm bản PDF hợp pháp" khi Reader báo FULLTEXT_REQUIRED.
+ */
+export async function getLegalFullTextCandidates(doiInput) {
+  const doi = normalizeDoi(doiInput);
+  if (!doi) throw ApiError.badRequest('DOI không hợp lệ');
+
+  const [em, openalex, oa] = await Promise.all([
+    europePmcSearch(`DOI:"${doi}"`).catch(() => null),
+    openalexByDoi(doi).catch(() => null),
+    unpaywallByDoi(doi).catch(() => null),
+  ]);
+
+  const candidates = [];
+  if (em?.pmcid && em?.isOpenAccess === 'Y') {
+    candidates.push({
+      source: 'europepmc',
+      kind: 'pmc_xml',
+      url: `${EUROPEPMC}/${em.pmcid}/fullTextXML`,
+      label: 'Toàn văn PMC',
+    });
+    candidates.push({
+      source: 'europepmc',
+      kind: 'pmc',
+      url: `https://www.ncbi.nlm.nih.gov/pmc/articles/${em.pmcid}/`,
+      label: 'Trang PMC',
+    });
+  }
+
+  candidates.push(
+    ...candidatesFromOpenAlex(openalex || {}).map((candidate) => ({
+      ...candidate,
+      label: candidate.kind === 'pdf' ? 'PDF từ OpenAlex' : 'Trang toàn văn OpenAlex',
+    })),
+    ...candidatesFromUnpaywall(oa || {}).map((candidate) => ({
+      ...candidate,
+      label: candidate.kind === 'pdf' ? 'PDF từ Unpaywall' : 'Trang toàn văn Unpaywall',
+    })),
+  );
+
+  if (!candidates.some((candidate) => candidate.kind === 'pdf')) {
+    const s2 = await semanticScholarCandidates(doi).catch(() => []);
+    candidates.push(
+      ...s2.map((candidate) => ({
+        ...candidate,
+        label: 'PDF từ Semantic Scholar',
+      })),
+    );
+  }
+
+  candidates.push({
+    source: 'publisher',
+    kind: 'landing',
+    url: `https://doi.org/${doi}`,
+    label: 'Trang nhà xuất bản (dùng quyền truy cập của bạn)',
+  });
+
+  const license =
+    oa?.best_oa_location?.license ||
+    openalex?.best_oa_location?.license ||
+    oa?.oa_locations?.find((location) => location?.license)?.license ||
+    '';
+
+  return {
+    doi,
+    isOa: Boolean(em?.isOpenAccess === 'Y' || openalex?.open_access?.is_oa || oa?.is_oa),
+    oaStatus: oa?.oa_status || openalex?.open_access?.oa_status || '',
+    license,
+    candidates: dedupeCandidates(candidates).slice(0, 12),
+    checkedAt: new Date().toISOString(),
+  };
+}
+
+/**
  * Lấy metadata + nội dung theo DOI/PMID/PMCID.
- * Ưu tiên toàn văn open access (Europe PMC XML -> PDF), nếu không có thì dùng abstract.
- */export async function resolveWorkByDoi(doiInput) {
+ * Chỉ nhận toàn văn open access (Europe PMC XML -> PDF -> HTML OA); bài
+ * paywall/abstract-only bị từ chối bằng FULLTEXT_REQUIRED.
+ */
+export async function resolveWorkByDoi(doiInput) {
   const doi = normalizeDoi(doiInput);
   if (!doi) throw ApiError.badRequest('DOI không hợp lệ');
 
@@ -412,7 +489,7 @@ export async function enrichPaperMetadata(
   paper.title = paper.title || normalizeText(cross?.title?.[0] || openalex?.title || '') || doi;
   paper.url = paper.url || `https://doi.org/${doi}`;
   paper.isOpenAccess = paper.isOpenAccess || Boolean(oa?.is_oa || openalex?.open_access?.is_oa);
-  paper.oaStatus = paper.oaStatus || openalex?.open_access?.oa_status || '';
+  paper.oaStatus = paper.oaStatus || openalex?.open_access?.oa_status || oa?.oa_status || '';
   paper.isRetracted = Boolean(paper.isRetracted || openalex?.is_retracted);
   paper.source = em ? 'europepmc' : 'openalex';
 
@@ -445,10 +522,9 @@ export async function enrichPaperMetadata(
     }).catch(() => null);
     if (page) {
       const extracted = htmlToText(page.buffer.toString('utf8'));
-      // Landing page của preprint/publisher thường chỉ có abstract. Nếu đã biết
-      // PDF, đừng nhận HTML ngắn làm "toàn văn" — ưu tiên tải PDF bên dưới.
-      const minimumHtml = paper.pdfUrl ? 5000 : 800;
-      if (extracted.length >= minimumHtml) {
+      // Landing page của preprint/publisher thường chỉ có abstract. Chỉ nhận
+      // HTML >= 5.000 ký tự làm toàn văn; ưu tiên tải PDF bên dưới.
+      if (extracted.length >= 5000) {
         text = extracted;
         sourceKind = 'open_access_fulltext';
       }
@@ -502,19 +578,15 @@ export async function enrichPaperMetadata(
     }
   }
 
-  if (!text) text = paper.abstract;
-  if (!text || text.length < 80) {
-    throw new ApiError(
-      422,
-      'NO_CONTENT',
-      'Không lấy được abstract hoặc toàn văn của bài này. Hãy thử tải PDF hoặc dán nội dung.',
-    );
+  // Không fallback abstract: Reader chỉ tóm tắt khi có toàn văn.
+  if (!text || text.length < 500) {
+    throw fullTextRequiredError(paper, paper.url || paper.fullTextUrl || paper.pdfUrl);
   }
 
   return {
     paper,
     text,
-    basedOn: sourceKind === 'abstract' ? 'abstract_only' : 'fulltext',
+    basedOn: 'fulltext',
     sourceKind,
     sourceUrl: paper.url || paper.fullTextUrl || paper.pdfUrl,
   };
@@ -528,21 +600,16 @@ export async function resolveWorkByPmid(pmid) {
   const paper = mapEuropePmcResult(em);
   paper.source = 'pubmed';
   paper.url = `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`;
-  let text = paper.abstract;
-  let sourceKind = 'abstract';
+  let text = '';
   if (paper.pmcid && paper.isOpenAccess) {
-    const full = await fetchPmcFullText(paper.pmcid).catch(() => null);
-    if (full) {
-      text = full;
-      sourceKind = 'open_access_fulltext';
-    }
+    text = (await fetchPmcFullText(paper.pmcid).catch(() => null)) || '';
   }
-  if (!text) throw new ApiError(422, 'NO_CONTENT', 'Bài này không có abstract/full text truy cập được');
+  if (!text || text.length < 500) throw fullTextRequiredError(paper, paper.url);
   return {
     paper,
     text,
-    basedOn: sourceKind === 'abstract' ? 'abstract_only' : 'fulltext',
-    sourceKind,
+    basedOn: 'fulltext',
+    sourceKind: 'open_access_fulltext',
     sourceUrl: paper.url,
   };
 }
@@ -556,7 +623,7 @@ export async function resolveWorkByPmcid(pmcid) {
   paper.source = 'europepmc';
   paper.url = `https://www.ncbi.nlm.nih.gov/pmc/articles/${pmcid}/`;
   const full = await fetchPmcFullText(pmcid).catch(() => null);
-  if (!full) throw new ApiError(422, 'NO_CONTENT', 'Bài này chưa có toàn văn open access');
+  if (!full) throw fullTextRequiredError(paper, paper.url);
   return {
     paper,
     text: full,
@@ -580,6 +647,12 @@ export async function resolveWorkByUrl(url) {
 
   if (/application\/pdf/i.test(page.contentType)) {
     const parsedPdf = await parsePdfBuffer(page.buffer);
+    if (!parsedPdf.text || parsedPdf.text.length < 500) {
+      throw fullTextRequiredError(
+        { title: parsedPdf.title || 'Bài báo từ PDF', url: page.finalUrl },
+        page.finalUrl,
+      );
+    }
     return {
       paper: {
         title: parsedPdf.title || 'Bài báo từ PDF',
@@ -598,11 +671,11 @@ export async function resolveWorkByUrl(url) {
 
   const html = page.buffer.toString('utf8');
   const text = htmlToText(html);
-  if (text.length < 300) {
-    throw new ApiError(
-      422,
-      'NO_CONTENT',
-      'Không trích được nội dung chính từ link này. Thử tải PDF hoặc dán văn bản.',
+  // Trang landing/abstract thường chỉ 1.000–3.000 ký tự. Không nhận làm toàn văn.
+  if (text.length < 5000) {
+    throw fullTextRequiredError(
+      { title: extractHtmlTitle(html) || page.finalUrl, url: page.finalUrl },
+      page.finalUrl,
     );
   }
   return {

@@ -61,3 +61,19 @@ export const researchGraphSchema = z
     limit: z.coerce.number().int().min(1).max(50).default(20),
   })
   .strict();
+
+export const researchFullTextSchema = z
+  .object({
+    doi: z.string().trim().min(3).max(300),
+  })
+  .strict();
+
+export const researchSynthesizeSchema = z
+  .object({
+    question: z.string().trim().min(5, 'Câu hỏi quá ngắn').max(1000, 'Câu hỏi quá dài'),
+    summaryIds: z
+      .array(z.string().regex(/^[a-f0-9]{24}$/i, 'ID bản tóm tắt không hợp lệ'))
+      .min(1, 'Cần ít nhất một bản tóm tắt')
+      .max(8, 'Tối đa 8 bản tóm tắt'),
+  })
+  .strict();
