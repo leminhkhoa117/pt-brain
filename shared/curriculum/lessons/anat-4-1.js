@@ -41,7 +41,7 @@ export default {
 - **Cấu trúc phụ**: meniscus ở gối, labrum ở vai — tấm đệm sụn tăng diện tích tiếp xúc.
 
 Vì sao chấn thương khớp khó lành hơn cơ? Cơ có máu nuôi dồi dào còn sụn và dây chằng gần như không có — tiến độ phục hồi tính bằng tháng chứ không bằng ngày (chi tiết trong module Phục hồi chức năng).`,
-      image: 'anat-4-1-synovial.jpg',
+      image: 'anat-4-1-synovial.webp',
     },
     {
       heading: 'Bảng hành động khớp cho PT',
@@ -110,7 +110,7 @@ Lặp lại vài lần, bạn sẽ đọc mọi mô tả kỹ thuật bằng "m�
   ],
   images: [
     {
-      file: 'anat-4-1-synovial.jpg',
+      file: 'anat-4-1-synovial.webp',
       caption: 'Sơ đồ cấu trúc một khớp trượt (minh hoạ y khoa public domain).',
       source: 'Wikimedia Commons',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Illu_synovial_joint.jpg',

@@ -26,7 +26,7 @@ export default {
       body: `Người lớn có **206 xương** — mỗi cái là một cơ quan sống: có màng bao (periosteum) giàu thần kinh, mạch máu nuôi, và đội tế bào hằng ngày vừa **dọn (osteoclast)** vừa **đắp (osteoblast)**. Xương bạn nhìn trên ảnh hôm nay không còn nguyên xi như năm ngoái — nó đã được thay thế từng phần.
 
 Điều này tạo ra nguyên tắc vàng cho PT: **xương thích ứng theo tải bạn đặt lên nó**. Tải cơ học hợp lý (nhất là kháng lực + tác động gánh trọng lực) là tín hiệu đắp xương; nằm ngồi lười lâu ngày là tín hiệu dọn. Đây là lý do các hướng dẫn y tế xếp **tập kháng lực đều đặn** vào danh sách biện pháp duy trì mật độ xương.`,
-      image: 'anat-3-1-skeleton.jpg',
+      image: 'anat-3-1-skeleton.webp',
     },
     {
       heading: 'Hai hệ: trục và phần phụ',
@@ -101,7 +101,7 @@ Với PT: đai vai là **cấu trúc cơ giữ** (chuyển động ưu tiên), �
   ],
   images: [
     {
-      file: 'anat-3-1-skeleton.jpg',
+      file: 'anat-3-1-skeleton.webp',
       caption: 'Bộ xương người — bản khắc kinh điển của Vesalius (1543).',
       source: 'Andreas Vesalius / Wikimedia Commons',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Vesalius_Fabrica_p163.jpg',

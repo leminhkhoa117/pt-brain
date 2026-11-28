@@ -56,7 +56,7 @@ Lưu ý hai cặp hay nhầm: **medial/lateral** đo theo đường giữa của
 | Transverse (mặt phẳng ngang) | Vertical (trục dọc) | Xoay: trong/ngoài vai, sấp/ngửa cẳng tay | Cable woodchop, nội xoay hông, Russian twist |
 
 Một bài tập ghép nhiều mặt phẳng là bài **multi-planar** — ví dụ bước chéo gối (curtsy lunge) vừa gấp duỗi (sagittal), vừa khép hông (frontal), vừa xoay (transverse). Khách mới tập và người cao tuổi rất cần loại chuyển động này vì đời sống hầu như luôn multi-planar.`,
-      image: 'anat-1-1-planes.jpg',
+      image: 'anat-1-1-planes.webp',
     },
     {
       heading: 'Các hành động khớp bạn sẽ gặp mỗi ngày',
@@ -136,7 +136,7 @@ Khi bạn giải thích kỹ thuật cho khách bằng khung này, lỗi tư th�
   ],
   images: [
     {
-      file: 'anat-1-1-planes.jpg',
+      file: 'anat-1-1-planes.webp',
       caption: 'Ba mặt phẳng giải phẫu: sagittal, frontal (coronal) và transverse.',
       source: 'Connexions / Wikimedia Commons',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Planes_of_Body.jpg',

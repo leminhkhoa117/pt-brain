@@ -17,6 +17,22 @@ vi.mock('../src/services/ai/paperSummarizer.js', () => ({
   })),
 }));
 
+// Không gọi Crossref/OpenAlex thật: test này chỉ kiểm tra lock/resume, và call
+// mạng có thể làm test vượt timeout khi chạy song song.
+vi.mock('../src/services/research/metadata.js', () => ({
+  enrichPaperMetadata: vi.fn(async (paper) => ({
+    ...paper,
+    title: paper.title || 'Resume test',
+    authors: [],
+    year: 2026,
+    journal: '',
+    doi: '',
+  })),
+  parseIdentifier: vi.fn(() => ({ doi: '', pmid: '', url: '' })),
+  resolveWorkByDoi: vi.fn(),
+  resolveWorkByUrl: vi.fn(),
+}));
+
 const DB_NAME = `pt-brain-resume-test-${process.pid}-${Date.now()}`;
 const DB_URI = `mongodb://127.0.0.1:27017/${DB_NAME}`;
 

@@ -32,7 +32,7 @@ Ba biến số quyết định Q:
 - Với khách thường, HR là biến số **duy nhất đo được giá rẻ ngay tại chỗ** — vì vậy nó là "đồng hồ công suất" trong thực hành.
 
 Huyết áp khi vận động: **tâm thu tăng dần theo cường độ** (140–200 mmHg khi gắng hết sức là bình thường), **tâm hở thay đổi ít**. Con số bất thường (tâm thu > 250, tụt, ngất) là tín hiệu dừng ngay.`,
-      image: 'phys-3-1-conduction.jpg',
+      image: 'phys-3-1-conduction.webp',
     },
     {
       heading: 'HRmax: công thức và sai số cần nhớ',
@@ -112,7 +112,7 @@ Ghi lại HR nghỉ mỗi sáng trong tab Theo dõi cơ thể; nếu tăng > 5�
   ],
   images: [
     {
-      file: 'phys-3-1-conduction.jpg',
+      file: 'phys-3-1-conduction.webp',
       caption: 'Hệ dẫn truyền tim: nút xoang phát nhịp, lan qua tâm nhĩ xuống nút AV và các nhánh tới tâm thất.',
       source: 'Cypressvine / Wikimedia Commons (dựa trên Gray\u2019s Anatomy)',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Cardiac_Conduction_System.jpg',
