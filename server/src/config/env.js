@@ -21,6 +21,11 @@ const schema = z.object({
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
   MONGO_URI: z.string().default('mongodb://127.0.0.1:27017/pt-brain'),
 
+  // ===== Monitoring (tùy chọn) =====
+  SENTRY_DSN: z.string().trim().optional().default(''),
+  SENTRY_ENVIRONMENT: z.string().trim().optional().default(''),
+  SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0),
+
   JWT_ACCESS_SECRET: z.string().min(16).default('dev-access-secret-change-me'),
   JWT_REFRESH_SECRET: z.string().min(16).default('dev-refresh-secret-change-me'),
   ACCESS_TOKEN_TTL: z.string().default('15m'),

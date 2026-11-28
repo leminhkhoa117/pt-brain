@@ -7,8 +7,11 @@ import PwaUpdateBanner from './components/PwaUpdateBanner.jsx';
 import { DialogProvider } from './components/DialogProvider.jsx';
 import { AuthProvider } from './hooks/useAuth.jsx';
 import { ThemeProvider } from './hooks/useTheme.jsx';
+import { initClientMonitoring } from './lib/monitoring.js';
 import './index.css';
 import './theme/theme-studio.css';
+
+void initClientMonitoring();
 
 const queryClient = new QueryClient({
   defaultOptions: {

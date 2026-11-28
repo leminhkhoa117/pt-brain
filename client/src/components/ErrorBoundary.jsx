@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { captureClientException } from '../lib/monitoring.js';
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -12,6 +13,7 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error('UI error:', error, info);
+    captureClientException(error, { componentStack: info?.componentStack });
   }
 
   render() {

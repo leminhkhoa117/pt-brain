@@ -12,6 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@sentry/node": "^11.20.0",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0",
     "compression": "^1.8.2",

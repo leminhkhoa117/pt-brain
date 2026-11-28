@@ -3,6 +3,11 @@ services:
     image: mongo:7
     container_name: pt-brain-mongo
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "127.0.0.1:27017:27017"
     volumes:
@@ -19,6 +24,11 @@ services:
       dockerfile: server/Dockerfile
     container_name: pt-brain-server
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       NODE_ENV: development
       PORT: 4000
@@ -67,6 +77,11 @@ services:
       dockerfile: client/Dockerfile
     container_name: pt-brain-client
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       VITE_API_PROXY_TARGET: http://server:4000
     ports:

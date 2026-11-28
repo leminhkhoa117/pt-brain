@@ -64,6 +64,7 @@ Repo đã có `render.yaml` (Blueprint).
 | `AI_API_KEY` | key OpenCode Go (chỉ ở backend) |
 | `CONTACT_EMAIL` | email liên hệ Crossref/Unpaywall |
 | `PDF_MAX_MB` | `20` |
+| `SENTRY_DSN` / `VITE_SENTRY_DSN` | Tùy chọn; để trống để tắt Sentry. Xem `docs/MONITORING.md` |
 
 ## Lưu ý production
 

@@ -62,3 +62,16 @@ services:
         sync: false
       - key: PDF_MAX_MB
         value: "20"
+      # Monitoring tùy chọn: để trống SENTRY_DSN/VITE_SENTRY_DSN để tắt.
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_ENVIRONMENT
+        value: production
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        value: "0"
+      - key: VITE_SENTRY_DSN
+        sync: false
+      - key: VITE_SENTRY_ENVIRONMENT
+        value: production
+      - key: VITE_SENTRY_TRACES_SAMPLE_RATE
+        value: "0"

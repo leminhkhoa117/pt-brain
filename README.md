@@ -170,6 +170,8 @@ docker exec pt-brain-mongo mongosh --quiet --eval "db.getSiblingDB('pt-brain-res
 
 Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
+Monitoring (Sentry tùy chọn, uptime, log, backup): xem [`docs/MONITORING.md`](docs/MONITORING.md).
+
 ## Lệnh
 
 ```bash

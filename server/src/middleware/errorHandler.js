@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+import { captureException } from '../config/sentry.js';
 import { ApiError } from '../utils/ApiError.js';
 import { logger } from '../utils/logger.js';
 
@@ -49,6 +50,12 @@ export function errorHandler(err, req, res, next) {
 
   if (status >= 500) {
     logger.error({ err, url: req.originalUrl, method: req.method }, 'Unhandled error');
+    captureException(err, {
+      method: req.method,
+      // Không gửi query string (có thể chứa token reset/OAuth) lên Sentry.
+      url: String(req.originalUrl || '').split('?')[0],
+      status,
+    });
     // Không trả message nội bộ (đường dẫn file, query MongoDB, stack...) cho client.
     // ApiError 5xx là lỗi có chủ đích (AI timeout, upstream) nên vẫn giữ message.
     if (!(err instanceof ApiError)) {

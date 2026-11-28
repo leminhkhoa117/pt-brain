@@ -1,10 +1,12 @@
 import { createApp } from './app.js';
 import { connectDb, disconnectDb } from './config/db.js';
 import { env } from './config/env.js';
+import { captureException, initSentry } from './config/sentry.js';
 import { logger } from './utils/logger.js';
 import { resumeInterruptedSummaries } from './services/research/reader.js';
 
 async function main() {
+  await initSentry();
   await connectDb();
   const resumed = await resumeInterruptedSummaries().catch((error) => {
     logger.warn({ err: error }, 'Không khôi phục được job tóm tắt sau khởi động lại');
@@ -32,9 +34,11 @@ async function main() {
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('unhandledRejection', (err) => {
     logger.error({ err }, 'Unhandled promise rejection');
+    captureException(err, { type: 'unhandledRejection' });
   });
   process.on('uncaughtException', (err) => {
     logger.fatal({ err }, 'Uncaught exception, thoát process');
+    captureException(err, { type: 'uncaughtException' });
     process.exit(1);
   });
 }
