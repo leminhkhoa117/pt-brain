@@ -26,6 +26,11 @@ tmp-*
 tmp/
 backups/
 mongo-dump/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
 server/tmp-*
 
 # Công cụ local

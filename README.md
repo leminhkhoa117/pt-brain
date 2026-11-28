@@ -174,6 +174,7 @@ Triển khai production (Render + MongoDB Atlas, `SERVE_CLIENT=true`): xem [`doc
 
 ```bash
 npm run test        # 386 test (unit + API integration; cần MongoDB)
+npm run test:e2e    # Playwright E2E: auth, validation, health (DB riêng pt-brain-e2e)
 npm run test:unit   # 337 unit test, không cần MongoDB
 npm run lint        # ESLint toàn repo
 npm run build       # build production client
@@ -181,6 +182,8 @@ npm run format      # Prettier
 npm --prefix client run validate:atlas  # kiểm tra 2.234 mesh + mapping 59 cơ
 npm --prefix client run validate:atlas-anatomy  # kiểm tra 315 concept xương/mô liên kết
 ```
+
+`test:e2e` tự dựng API ở `:4100` và Vite ở `:4173`, dùng MongoDB database `pt-brain-e2e`; ở máy dev dùng Chrome cài sẵn, CI cài Chromium của Playwright. Test không đụng database Docker `pt-brain`.
 
 ## Cấu trúc
 
